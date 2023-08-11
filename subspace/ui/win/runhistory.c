@@ -71,6 +71,7 @@ static int loadbtn_action(Ihandle* ih)
         if (runid == activeid) {
             subspaceSetRun(self->ss, irun);
             runinfoReplayLog(irun, false, 0, 0);
+            runhistorywinOnClose(self->win);
         } else {
             RunInfo* nrun = runinfoCreate(self->ss);
             if (runinfoLoadHistoric(nrun, runid)) {
@@ -715,12 +716,14 @@ void RunHistoryWin_select(_In_ RunHistoryWin* self, int row)
     bool canabandon = false;
 
     sa_stvar* rowa = (sa_stvar*)&self->rows.a[row - 1];
+    int64 runid    = -1;
     int32 result   = -1;
+    stConvert(int64, &runid, stvar, rowa->a[0]);
     stConvert(int32, &result, stvar, rowa->a[2]);
-    canabandon = (result == RUN_Active);
+    canabandon = (result == RUN_Active) && runid != activeid;
 
     IupSetAttribute(self->abandonbtn, "ACTIVE", canabandon ? "YES" : "NO");
-    IupSetAttribute(self->deletebtn, "ACTIVE", "YES");
+    IupSetAttribute(self->deletebtn, "ACTIVE", runid != activeid ? "YES" : "NO");
 
     IupSetAttribute(self->rmtx, "REDRAW", "ALL");
 
