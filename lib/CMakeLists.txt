@@ -1,1 +1,3 @@
-add_subdirectory(minicrt)
+if (BUILD_CLIENT)
+    add_subdirectory(minicrt)
+endif()
