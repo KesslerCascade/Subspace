@@ -2,8 +2,7 @@
 
 // Miscellaneous utilities for dealing with executable images in memory
 
-typedef unsigned long addr_t;
-extern addr_t ftlbase;
+#include "loader/loader.h"
 
 #define rva(b, v) ((addr_t)(b) + (addr_t)(v))
 

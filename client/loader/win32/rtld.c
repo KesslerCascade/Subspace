@@ -1,4 +1,5 @@
 #include <windows.h>
+#include "minicrt.h"
 
 #include "rtld.h"
 
@@ -375,7 +376,6 @@ static int copyTLS(addr_t imagebase, IMAGE_DATA_DIRECTORY* data)
     return 1;
 }
 
-#include <stdio.h>
 addr_t getSymbol(addr_t imagebase, const char* name)
 {
     IMAGE_DATA_DIRECTORY* data   = &datadir(imagebase, IMAGE_DIRECTORY_ENTRY_EXPORT);

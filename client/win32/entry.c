@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <windows.h>
-#include "loader/rtld.h"
+#include "loader/loader.h"
+#include "minicrt.h"
 
 // IMPORTANT: This program is bare and jumps directly into its entry point. It does
 // not have the C runtime library available at startup. It does not perform CRT0
@@ -16,7 +17,6 @@
 
 addr_t ftlbase = 0;
 
-typedef (*entrypoint)();
 entrypoint ftlentry;
 
 typedef int(WINAPI* WinMain_t)(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
@@ -24,6 +24,8 @@ typedef int(WINAPI* WinMain_t)(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPS
 
 int __stdcall entry()
 {
+    minicrt_init();
+
     SetCurrentDirectoryA("M:\\games\\sync\\FTL");
     SetEnvironmentVariableA("USERPROFILE", "M:\\games\\sync\\FTL");
 
@@ -37,11 +39,9 @@ int __stdcall entry()
     //    setvbuf(stdout, NULL, _IONBF, 0);
     // setvbuf(stderr, NULL, _IONBF, 0);
 
-    ftlbase = loadExe("FTLGame.exe");
-    importResources(ftlbase);
-    importTLSInitializers(ftlbase);
+    ftlbase = loadProgram("FTLGame.exe");
 
-    ftlentry = (entrypoint)crva(nthdr(ftlbase)->OptionalHeader.AddressOfEntryPoint);
+    ftlentry = getProgramEntry(ftlbase);
     ftlentry();
 
     // probably will never reach this, but just in case
