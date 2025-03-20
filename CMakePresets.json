@@ -1,0 +1,40 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+        "name": "base",
+        "hidden": true,
+        "binaryDir": "${sourceDir}/build/${presetName}"
+        },
+        {
+            "name": "client",
+            "inherits": "base",
+            "generator": "Visual Studio 16 2019",
+            "architecture": {
+                "value": "Win32",
+                "strategy": "set"
+            },
+            "toolset": {
+                "value": "v141_xp",
+                "strategy": "set"
+            },
+            "cacheVariables": {
+                "BUILD_CLIENT": true
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "client-debug",
+            "displayName": "Client (Debug)",
+            "configurePreset": "client",
+            "configuration": "Debug"
+        },
+        {
+            "name": "client-release",
+            "displayName": "Client (Release)",
+            "configurePreset": "client",
+            "configuration": "Release"
+        }
+    ]
+}
