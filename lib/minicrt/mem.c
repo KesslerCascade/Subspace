@@ -2,8 +2,7 @@
 
 #include <ctype.h>
 
-#pragma function(memcpy)
-void* memcpy(void* dst, const void* src, unsigned int count)
+void* _minicrt_memcpy(void* dst, const void* src, unsigned int count)
 {
     void* ret = dst;
 
@@ -16,8 +15,7 @@ void* memcpy(void* dst, const void* src, unsigned int count)
     return ret;
 }
 
-#pragma function(memcmp)
-int memcmp(const void* s1, const void* s2, unsigned int count)
+int _minicrt_memcmp(const void* s1, const void* s2, unsigned int count)
 {
     unsigned char *u1 = (unsigned char*)s1, *u2 = (unsigned char*)s2;
 
@@ -28,7 +26,7 @@ int memcmp(const void* s1, const void* s2, unsigned int count)
     return 0;
 }
 
-int _memicmp(const void* s1, const void* s2, unsigned int count)
+int _minicrt_memicmp(const void* s1, const void* s2, unsigned int count)
 {
     unsigned char *u1 = (unsigned char*)s1, *u2 = (unsigned char*)s2;
 
@@ -41,8 +39,7 @@ int _memicmp(const void* s1, const void* s2, unsigned int count)
     return 0;
 }
 
-#pragma function(memset)
-void* memset(void* s, int c, unsigned int count)
+void* _minicrt_memset(void* s, int c, unsigned int count)
 {
     unsigned char* p  = s;
     unsigned int fill = (c << 24) | (c << 16) | (c << 8) | c;
@@ -58,7 +55,7 @@ void* memset(void* s, int c, unsigned int count)
 #define wsize sizeof(int)
 #define wmask (wsize - 1)
 
-void* memmove(void* dst0, const void* src0, unsigned int length)
+void* _minicrt_memmove(void* dst0, const void* src0, unsigned int length)
 {
     char* dst       = dst0;
     const char* src = src0;

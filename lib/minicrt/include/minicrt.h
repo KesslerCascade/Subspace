@@ -7,63 +7,75 @@
 
 #ifndef MINICRT_NO_STRING
 
-char* strcat(char* d, const char* src);
-#pragma intrinsic(strcat)
-char* strcpy(char* d, const char* src);
-#pragma intrinsic(strcpy)
-int strcmp(const char* str1, const char* str2);
-#pragma intrinsic(strcmp)
-int strncmp(const char* str1, const char* str2, unsigned int count);
-int stricmp(const char* str1, const char* str2);
-char* strrchr(const char* p, int ch);
+char* _minicrt_strcat(char* d, const char* src);
+#define strcat _minicrt_strcat
+char* _minicrt_strcpy(char* d, const char* src);
+#define strcpy _minicrt_strcpy
+int _minicrt_strcmp(const char* str1, const char* str2);
+#define strcmp _minicrt_strcmp
+int _minicrt_strncmp(const char* str1, const char* str2, unsigned int count);
+#define strncmp _minicrt_strncmp
+int _minicrt_stricmp(const char* str1, const char* str2);
+#define stricmp _minicrt_stricmp
+char* _minicrt_strrchr(const char* p, int ch);
+#define strrchr _minicrt_strrchr
 
-char* strtok_r(char* s, const char* delim, char** last);
-char* strtok(char* s, const char* delim);
+char* _minicrt_strtok_r(char* s, const char* delim, char** last);
+#define strtok_r _minicrt_strtok_r
+char* _minicrt_strtok(char* s, const char* delim);
+#define strtok _minicrt_strtok
 
-int atoi(const char* str);
-long strtol(const char* nptr, char** endptr, int base);
+int _minicrt_atoi(const char* str);
+#define atoi _minicrt_
+long _minicrt_strtol(const char* nptr, char** endptr, int base);
+#define strtol _minicrt_strtol
 
-void* memcpy(void* dst, const void* src, unsigned int count);
-#pragma intrinsic(memcpy)
-void* memmove(void* dst, const void* src, unsigned int count);
-unsigned int strlen(const char* str);
-#pragma intrinsic(strlen)
-unsigned int wcslen(const wchar_t* str);
-#pragma intrinsic(wcslen)
-int memcmp(const void* s1, const void* s2, unsigned int count);
-#pragma intrinsic(memcmp)
-void* memset(void* s, int c, unsigned int count);
-#pragma intrinsic(memset)
+void* _minicrt_memcpy(void* dst, const void* src, unsigned int count);
+#define memcpy _minicrt_memcpy
+void* _minicrt_memmove(void* dst, const void* src, unsigned int count);
+#define memmove _minicrt_memmove
+unsigned int _minicrt_strlen(const char* str);
+#define strlen _minicrt_strlen
+unsigned int _minicrt_wcslen(const wchar_t* str);
+#define wcslen _minicrt_wcslen
+int _minicrt_memcmp(const void* s1, const void* s2, unsigned int count);
+#define memcmp _minicrt_memcmp
+void* _minicrt_memset(void* s, int c, unsigned int count);
+#define memset _minicrt_memset
 
-int _stricmp(const char* str1, const char* str2);
-#define stricmp _stricmp
-int _strnicmp(const char* str1, const char* str2, unsigned int count);
-#define strnicmp _strnicmp
-int _memicmp(const void* s1, const void* s2, unsigned int count);
-#define memicmp _memicmp
+int _minicrt_strnicmp(const char* str1, const char* str2, unsigned int count);
+#define strnicmp _minicrt_strnicmp
+int _minicrt_memicmp(const void* s1, const void* s2, unsigned int count);
+#define memicmp _minicrt_memicmp
 
-char* _strlwr(char* str);
-#define strlwr _strlwr
-char* _strupr(char* str);
-#define strupr _strupr
+char* _minicrt_strlwr(char* str);
+#define strlwr _minicrt_strlwr
+char* _minicrt_strupr(char* str);
+#define strupr _minicrt_strupr
 #endif
 
 #if !defined(MINICRT_NO_PRINTF) && !defined(MINICRT_NO_STRING)
 // The 'n' variants are not quite standards compliant. They always null-terminate
 // the resulting string, making them safer and generally more useful.
-int sprintf(char* buff, const char* fmt, ...);
-int snprintf(char* buff, unsigned int len, const char* fmt, ...);
-int vsnprintf(char* buff, unsigned int len, const char* fmt, va_list arp);
+int _minicrt_sprintf(char* buff, const char* fmt, ...);
+int _minicrt_snprintf(char* buff, unsigned int len, const char* fmt, ...);
+int _minicrt_vsnprintf(char* buff, unsigned int len, const char* fmt, va_list arp);
+#define sprintf  _minicrt_sprintf
+#define snprintf _minicrt_snprintf
+#ifdef vsnprintf
+#undef vsnprintf
+#endif
+#define vsnprintf _minicrt_vsnprintf
 
-int _wsprintf(wchar_t* buff, const wchar_t* fmt, ...);
-int _wsnprintf(wchar_t* buff, unsigned int len, const wchar_t* fmt, ...);
-int _wvsnprintf(wchar_t* buff, unsigned int len, const wchar_t* fmt, va_list arp);
+int _minicrt_wsprintf(wchar_t* buff, const wchar_t* fmt, ...);
+int _minicrt_wsnprintf(wchar_t* buff, unsigned int len, const wchar_t* fmt, ...);
+int _minicrt_wvsnprintf(wchar_t* buff, unsigned int len, const wchar_t* fmt, va_list arp);
 #ifdef wsprintf
 #undef wsprintf
 #endif
-#define wsprintf   _wsprintf
-#define wsnprintf  _wsnprintf
-#define wvsnprintf _wvsnprintf
+#define wsprintf   _minicrt_wsprintf
+#define wsnprintf  _minicrt_wsnprintf
+#define wvsnprintf _minicrt_wvsnprintf
 #endif
 
 long double pow10l(int p);

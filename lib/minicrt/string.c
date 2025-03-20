@@ -3,8 +3,7 @@
 #include <ctype.h>
 #include <limits.h>
 
-#pragma function(strcmp)
-int strcmp(const char* str1, const char* str2)
+int _minicrt_strcmp(const char* str1, const char* str2)
 {
     unsigned char s1;
     unsigned char s2;
@@ -17,7 +16,7 @@ int strcmp(const char* str1, const char* str2)
     return (s1 < s2) ? -1 : (s1 > s2);
 }
 
-int strncmp(const char* s1, const char* s2, unsigned int n)
+int _minicrt_strncmp(const char* s1, const char* s2, unsigned int n)
 {
     for (; n > 0; s1++, s2++, --n)
         if (*s1 != *s2)
@@ -27,7 +26,7 @@ int strncmp(const char* s1, const char* s2, unsigned int n)
     return 0;
 }
 
-int stricmp(const char* str1, const char* str2)
+int _minicrt_stricmp(const char* str1, const char* str2)
 {
     unsigned char s1;
     unsigned char s2;
@@ -39,7 +38,7 @@ int stricmp(const char* str1, const char* str2)
     return (s1 < s2) ? -1 : (s1 > s2);
 }
 
-int strnicmp(const char* str1, const char* str2, unsigned int count)
+int _minicrt_strnicmp(const char* str1, const char* str2, unsigned int count)
 {
     unsigned char s1;
     unsigned char s2;
@@ -53,8 +52,7 @@ int strnicmp(const char* str1, const char* str2, unsigned int count)
     return (s1 < s2) ? -1 : (s1 > s2);
 }
 
-#pragma function(strcat)
-char* strcat(char* d, const char* src)
+char* _minicrt_strcat(char* d, const char* src)
 {
     char* ret = d;
     for (; *d; ++d);
@@ -62,15 +60,14 @@ char* strcat(char* d, const char* src)
     return ret;
 }
 
-#pragma function(strcpy)
-char* strcpy(char* d, const char* src)
+char* _minicrt_strcpy(char* d, const char* src)
 {
     char* ret = d;
     for (; (*d = *src); ++d, ++src);
     return ret;
 }
 
-char* _strlwr(char* str)
+char* _minicrt_strlwr(char* str)
 {
     char* s = str;
     while (*s) {
@@ -81,7 +78,7 @@ char* _strlwr(char* str)
     return str;
 }
 
-char* strtok_r(char* s, const char* delim, char** last)
+char* _minicrt_strtok_r(char* s, const char* delim, char** last)
 {
     char *spanp, *tok;
     int c, sc;
@@ -126,16 +123,16 @@ cont:
     /* NOTREACHED */
 }
 
-char* strtok(char* s, const char* delim)
+char* _minicrt_strtok(char* s, const char* delim)
 {
     static char* last;
 
     return (strtok_r(s, delim, &last));
 }
 
-int atoi(const char* str)
+int _minicrt_atoi(const char* str)
 {
-    return (int)strtol(str, (char**)NULL, 10);
+    return (int)_minicrt_strtol(str, (char**)NULL, 10);
 }
 
 static __inline int _isspace(char c)
@@ -143,7 +140,7 @@ static __inline int _isspace(char c)
     return (c == ' ' || c == '\t' || c == '\n' || c == '\v' || c == '\r' || c == '\f');
 }
 
-long strtol(const char* nptr, char** endptr, int base)
+long _minicrt_strtol(const char* nptr, char** endptr, int base)
 {
     const char* s;
     unsigned long acc;
@@ -243,8 +240,7 @@ static const unsigned long mask80 = 0x80808080;
             return (p - str + x); \
     } while (0)
 
-#pragma function(strlen)
-unsigned int strlen(const char* str)
+unsigned int _minicrt_strlen(const char* str)
 {
     const char* p;
     const unsigned long* lp;
@@ -274,7 +270,7 @@ unsigned int strlen(const char* str)
     }
 }
 
-char* strrchr(const char* p, int ch)
+char* _minicrt_strrchr(const char* p, int ch)
 {
     char* save;
     char c;
