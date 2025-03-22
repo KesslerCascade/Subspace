@@ -1,12 +1,18 @@
 #pragma once
 
 #include <stdarg.h>
+#include <stdbool.h>
+#include <stdint.h>
+
+#ifndef MIN
+#define MIN(a, b) ((a) < (b) ? (a) : (b))
+#endif
+#ifndef MAX
+#define MAX(a, b) ((a) > (b) ? (a) : (b))
+#endif
 
 // Crappy fill-ins for useful standard library functions that we can't depend on
 // the compiler reliably providing intrinsics for.
-
-// Should call on program startup
-void minicrt_init(void);
 
 #ifndef MINICRT_NO_STRING
 
@@ -92,7 +98,7 @@ typedef unsigned char lock_t[24];
 
 typedef struct sm_blk_t sm_blk_t;
 typedef struct sm_chunk_t sm_chunk_t;
-typedef sm_chunk_t* (*sm_chunk_alloc_t)(size_t minsize);
+typedef sm_chunk_t* (*sm_chunk_alloc_t)(size_t* size_inout);
 typedef void (*sm_chunk_free_t)(sm_chunk_t* chunk);
 typedef struct sm_heap_t {
     sm_chunk_t* chunklist;
@@ -102,8 +108,6 @@ typedef struct sm_heap_t {
     lock_t lock;
 } sm_heap_t;
 extern sm_heap_t default_heap;
-
-void _sm_init(void);   // internal use only
 
 void sm_init_heap(sm_heap_t* heap, sm_chunk_alloc_t chunkalloc, sm_chunk_free_t chunkfree);
 void* smalloc_heap(sm_heap_t* heap, unsigned int sz);
@@ -128,3 +132,19 @@ void sfree_heap(sm_heap_t* heap, void* ptr);
 void lock_init(lock_t* lck);
 void lock_acq(lock_t* lck);
 void lock_rel(lock_t* lck);
+
+typedef struct lazy_init {
+    unsigned char init;
+    unsigned char initProgress;
+} lazy_init;
+
+typedef void (*lazy_init_callback_t)(void* user);
+
+void lazyinit_internal(unsigned char* init, unsigned char* initProgress,
+                       lazy_init_callback_t initfunc, void* user);
+
+static inline void lazyinit(lazy_init* state, lazy_init_callback_t initfunc, void* user)
+{
+    if (!state->init)
+        lazyinit_internal(&state->init, &state->initProgress, initfunc, user);
+}

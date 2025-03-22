@@ -49,22 +49,12 @@ static int lcg_random(_Inout_ uintptr_t* _state)
 #ifdef WIN32
 
 #define WIN32_MIN_CHUNK (1024 * 1024)
-static sm_chunk_t* sm_win32_chunk_alloc(size_t size)
+static sm_chunk_t* sm_win32_chunk_alloc(size_t* size_inout)
 {
     // round up to nearst 1MB
-    size = align_up(size, WIN32_MIN_CHUNK);
+    *size_inout = align_up(*size_inout, WIN32_MIN_CHUNK);
 
-    LPVOID ret        = VirtualAlloc(NULL, size, MEM_COMMIT, PAGE_READWRITE);
-    sm_chunk_t* chunk = (sm_chunk_t*)ret;
-
-    if (chunk) {
-        chunk->magic    = SM_CHUNK_MAGIC;
-        chunk->size     = size - CHUNK_OFFSET;
-        chunk->next     = NULL;
-        chunk->freelist = NULL;
-    }
-
-    return chunk;
+    return (sm_chunk_t*)VirtualAlloc(NULL, *size_inout, MEM_COMMIT, PAGE_READWRITE);
 }
 
 static void sm_win32_chunk_free(sm_chunk_t* chunk)
@@ -73,12 +63,19 @@ static void sm_win32_chunk_free(sm_chunk_t* chunk)
     VirtualFree(chunk, 0, MEM_RELEASE);
 }
 
-void _sm_init(void)
+static void _sm_os_init(void* unused)
 {
     sm_init_heap(&default_heap, sm_win32_chunk_alloc, sm_win32_chunk_free);
 }
 #endif
 /* OS DEPENDENT SECTION ENDS */
+
+static lazy_init sm_is_init;
+
+static void sm_init(void)
+{
+    lazyinit(&sm_is_init, _sm_os_init, NULL);
+}
 
 static void freelist_insert(sm_chunk_t* chunk, sm_blk_t* blk)
 {
@@ -99,11 +96,13 @@ static void freelist_insert(sm_chunk_t* chunk, sm_blk_t* blk)
 static void get_new_chunk(sm_heap_t* heap, size_t needed)
 {
     // enforce minumum chunk size
-    if (needed < ALLOC_CHUNK_SZ)
-        needed = ALLOC_CHUNK_SZ;
+    size_t size = MAX(needed, ALLOC_CHUNK_SZ);
 
-    sm_chunk_t* chunk = heap->chunkalloc(needed);
+    sm_chunk_t* chunk = heap->chunkalloc(&size);
     if (chunk) {
+        chunk->magic = SM_CHUNK_MAGIC;
+        chunk->size  = size - CHUNK_OFFSET;
+
         // populate the chunk with a single freelist entry that covers the entire usable space
         sm_blk_t* blk   = (sm_blk_t*)&chunk->blocks;
         blk->next       = NULL;
@@ -128,10 +127,9 @@ void* smalloc_heap(sm_heap_t* heap, unsigned int sz)
 {
     void* ret = NULL;
 
-    if (sz < MIN_ALLOC_SZ)
-        sz = MIN_ALLOC_SZ;
-    else
-        sz = align_up(sz, sizeof(void*));   // align everything to pointer size
+    sm_init();
+
+    sz = align_up(MAX(sz, MIN_ALLOC_SZ), sizeof(void*));   // align everything to pointer size
 
     // Try twice, once just checking freelist, then another after adding OS memory
     lock_acq(&heap->lock);
@@ -196,13 +194,17 @@ void* srealloc_heap(sm_heap_t* heap, void* ptr, unsigned int sz)
 
     sm_blk_t* blk = (sm_blk_t*)((uintptr_t)ptr - BLOCK_OFFSET);
 
-    if (sz <= blk->size)
+    // When shrinking, do a copy if we'd free up at least MIN_ALLOC_SZ bytes.
+    // Always doing a copy isn't great but is actually the best case for a simple
+    // freelist like this because it prevents excessive fragmentation.
+    if (sz <= blk->size && blk->size - sz < MIN_ALLOC_SZ)
         return ptr;
 
     // TODO: be less lazy and actually check the freelist for an adjacent block for expansion
+
     void* newptr = smalloc_heap(heap, sz);
     if (newptr) {
-        memcpy(newptr, ptr, blk->size);
+        memcpy(newptr, ptr, MIN(sz, blk->size));
         sfree_heap(heap, ptr);
     }
     return newptr;
@@ -222,6 +224,8 @@ void sfree_heap(sm_heap_t* heap, void* ptr)
 {
     if (!ptr)
         return;
+
+    sm_init();
 
     sm_blk_t* blk = (sm_blk_t*)((uintptr_t)ptr - BLOCK_OFFSET);
 

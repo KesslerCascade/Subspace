@@ -1,4 +1,5 @@
 add_library(minicrt STATIC
+    lazyinit.c
     lock.c
     mem.c
     minicrt.c
