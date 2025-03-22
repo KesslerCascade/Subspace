@@ -148,3 +148,38 @@ static inline void lazyinit(lazy_init* state, lazy_init_callback_t initfunc, voi
     if (!state->init)
         lazyinit_internal(&state->init, &state->initProgress, initfunc, user);
 }
+
+typedef struct hashtbl_ent {
+    union {
+        uintptr_t key_int;
+        const char* key_str;
+    };
+    void* data;
+} hashtbl_ent;
+
+typedef struct hashtbl {
+    hashtbl_ent* ents;
+    uint8_t* bitmap;
+    uint32_t nslots;
+    uint32_t used;
+    int flags;
+} hashtbl;
+
+#define HT_NOT_FOUND ((uint32_t)-1)
+enum HashTableFlagsEnum { HT_STRING_KEYS = 1, HT_CASE_INSENSITIVE = 2 };
+
+void hashtbl_init(hashtbl* tbl, int initsz, int flags);
+uint32_t _hashtbl_add(hashtbl* tbl, uintptr_t key, void* data);
+#define hashtbl_add(tbl, key, data)   _hashtbl_add(tbl, (uintptr_t)(key), data);
+#define hashtbl_addint(tbl, key, val) _hashtbl_add(tbl, (uintptr_t)(key), (void*)(val));
+uint32_t _hashtbl_set(hashtbl* tbl, uintptr_t key, void* data);
+#define hashtbl_set(tbl, key, data) _hashtbl_set(tbl, (uintptr_t)(key), data);
+uint32_t _hashtbl_find(hashtbl* tbl, uintptr_t key);
+#define hashtbl_find(tbl, key, data) _hashtbl_find(tbl, (uintptr_t)(key), data);
+void* _hashtbl_get(hashtbl* tbl, uintptr_t key);
+#define hashtbl_get(tbl, key) _hashtbl_get(tbl, (uintptr_t)(key));
+bool _hashtbl_getint(hashtbl* tbl, uintptr_t key, uintptr_t* pval);
+#define hashtbl_getint(tbl, key, pval) _hashtbl_getint(tbl, (uintptr_t)(key), pval);
+void* _hashtbl_del(hashtbl* tbl, uintptr_t key);
+#define hashtbl_del(tbl, key) _hashtbl_del(tbl, (uintptr_t)(key));
+void hashtbl_destroy(hashtbl* tbl);
