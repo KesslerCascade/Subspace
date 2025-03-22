@@ -52,6 +52,22 @@ void* _minicrt_memset(void* s, int c, unsigned int count)
     return s;
 }
 
+// This isn't in the header file but a duplicate copy is included to define the symbol. The
+// compiler sometimes generates calls to _memset when initializing structures, etc.
+#undef memset
+void* memset(void* s, int c, unsigned int count)
+{
+    unsigned char* p  = s;
+    unsigned int fill = (c << 24) | (c << 16) | (c << 8) | c;
+    for (; count >= 4; p += 4, count -= 4) {
+        *(unsigned int*)p = fill;
+    }
+    for (; count > 0; ++p, --count) {
+        *p = c;
+    }
+    return s;
+}
+
 #define wsize sizeof(int)
 #define wmask (wsize - 1)
 
