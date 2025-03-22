@@ -5,6 +5,10 @@ if(WIN32)
         codegen/win32/codegen.c
         codegen/win32/hookgen.c
         codegen/win32/wrapgen.c
+        hook/win32/export.c
+        hook/win32/hook.c
+        hook/win32/string.c
+        hook/win32/symbol.c
         loader/win32/loader.c
         loader/win32/rtld.c
         loader/win32/rtldoverrides.c
@@ -13,6 +17,7 @@ if(WIN32)
 endif()
 
 add_executable(subspace-client
+    hook/module.c
     patch/patch.c
     subspaceclient.c
     ${CLIENT_OSDEP})
