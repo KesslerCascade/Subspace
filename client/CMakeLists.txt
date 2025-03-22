@@ -1,6 +1,10 @@
 if(WIN32)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB /ENTRY:entry")
     set(CLIENT_OSDEP
+        codegen/win32/asm.c
+        codegen/win32/codegen.c
+        codegen/win32/hookgen.c
+        codegen/win32/wrapgen.c
         loader/win32/loader.c
         loader/win32/rtld.c
         loader/win32/rtldoverrides.c
@@ -9,6 +13,8 @@ if(WIN32)
 endif()
 
 add_executable(subspace-client
+    patch/patch.c
+    subspaceclient.c
     ${CLIENT_OSDEP})
 target_include_directories(subspace-client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(subspace-client disasm minicrt)

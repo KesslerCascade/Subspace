@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <windows.h>
 #include "loader/loader.h"
+#include "subspaceclient.h"
+
 #include "minicrt.h"
 
 // IMPORTANT: This program is bare and jumps directly into its entry point. It does
@@ -24,10 +26,16 @@ typedef int(WINAPI* WinMain_t)(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPS
 
 int __stdcall entry()
 {
-    minicrt_init();
+    scsettings.gameDir     = smalloc(MAX_PATH);
+    scsettings.gameProgram = smalloc(MAX_PATH);
+    scsettings.gamePath    = smalloc(MAX_PATH);
 
-    SetCurrentDirectoryA("M:\\games\\sync\\FTL");
-    SetEnvironmentVariableA("USERPROFILE", "M:\\games\\sync\\FTL");
+    strcpy(scsettings.gameDir, "M:\\games\\sync\\FTL");
+    strcpy(scsettings.gameProgram, "FTLGame.exe");
+    strcpy(scsettings.gamePath, "M:\\games\\sync\\FTL\\FTLGame.exe");
+
+    SetCurrentDirectoryA(scsettings.gameDir);
+    SetEnvironmentVariableA("USERPROFILE", scsettings.gameDir);
 
     if (AllocConsole()) {
         // FILE* temp;
@@ -39,7 +47,7 @@ int __stdcall entry()
     //    setvbuf(stdout, NULL, _IONBF, 0);
     // setvbuf(stderr, NULL, _IONBF, 0);
 
-    ftlbase = loadProgram("FTLGame.exe");
+    ftlbase = loadProgram(scsettings.gameProgram);
 
     ftlentry = getProgramEntry(ftlbase);
     ftlentry();
