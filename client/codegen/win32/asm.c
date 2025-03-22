@@ -77,11 +77,12 @@ bool cgAsmFinish(AsmState* as)
 {
     bool ret = true;
     if (as->reserved) {
-        void* rp = srealloc_heap(&codegen_heap, as->dest, as->p - as->dest);
-        if (rp)
-            as->dest = rp;
-        else
-            ret = false;
+        // TODO: smalloc shrink!!!
+        /*        void* rp = srealloc_heap(&codegen_heap, as->dest, as->p - as->dest);
+                if (rp)
+                    as->dest = rp;
+                else
+                    ret = false; */
         as->p         = NULL;
         as->reserved  = false;
         as->remaining = 0;
