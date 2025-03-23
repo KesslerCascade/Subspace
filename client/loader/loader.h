@@ -4,7 +4,6 @@
 #include <stdint.h>
 
 typedef uintptr_t addr_t;
-extern addr_t ftlbase;
 
 typedef struct SegInfo {
     addr_t start;

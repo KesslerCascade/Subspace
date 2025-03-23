@@ -13,7 +13,7 @@ addr_t loadProgram(const char* filename)
 
 entrypoint getProgramEntry(addr_t baseaddr)
 {
-    return (entrypoint)crva(nthdr(ftlbase)->OptionalHeader.AddressOfEntryPoint);
+    return (entrypoint)rva(baseaddr, nthdr(baseaddr)->OptionalHeader.AddressOfEntryPoint);
 }
 
 static bool getSegHelper(addr_t baseaddr, SegInfo* si, const char* name)
@@ -21,7 +21,7 @@ static bool getSegHelper(addr_t baseaddr, SegInfo* si, const char* name)
     IMAGE_SECTION_HEADER* hdr = getSection(baseaddr, name);
     if (!hdr)
         return false;
-    si->start = hdr->VirtualAddress;
+    si->start = rva(baseaddr, hdr->VirtualAddress);
     si->size  = hdr->SizeOfRawData;
     si->end   = si->start + si->size;
     return true;
@@ -54,5 +54,5 @@ uintptr_t makeSegWritable(SegInfo* si)
 bool restoreSegAccess(SegInfo* si, uintptr_t origaccess)
 {
     DWORD dummy;
-    return VirtualProtect((LPVOID)si->start, si->size, PAGE_READWRITE, &dummy);
+    return VirtualProtect((LPVOID)si->start, si->size, origaccess, &dummy);
 }

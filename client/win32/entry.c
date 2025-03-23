@@ -1,6 +1,9 @@
 #include <stdio.h>
 #include <windows.h>
+#include "ftl/ftl.h"
 #include "loader/loader.h"
+#include "patch/patch.h"
+#include "patch/seq/seq_startup.h"
 #include "subspaceclient.h"
 
 #include "minicrt.h"
@@ -16,8 +19,6 @@
 // stepping on each other's toes.
 //
 // Until that initialization happens, use ONLY low-level Win32 API calls.
-
-addr_t ftlbase = 0;
 
 entrypoint ftlentry;
 
@@ -48,6 +49,11 @@ int __stdcall entry()
     // setvbuf(stderr, NULL, _IONBF, 0);
 
     ftlbase = loadProgram(scsettings.gameProgram);
+
+    PatchState ps;
+    patchBegin(&ps, ftlbase);
+    patchApplySeq(&ps, StartupPatches);
+    patchEnd(&ps);
 
     ftlentry = getProgramEntry(ftlbase);
     ftlentry();

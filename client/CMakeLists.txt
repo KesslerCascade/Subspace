@@ -5,6 +5,7 @@ if(WIN32)
         codegen/win32/codegen.c
         codegen/win32/hookgen.c
         codegen/win32/wrapgen.c
+        ftl/win32/functions_basic.c
         hook/win32/export.c
         hook/win32/hook.c
         hook/win32/string.c
@@ -12,13 +13,18 @@ if(WIN32)
         loader/win32/loader.c
         loader/win32/rtld.c
         loader/win32/rtldoverrides.c
-        win32/entry.c)
+        patch/win32/patch_main.c
+        win32/entry.c
+        win32/kernel32_overrides.c
+        win32/winmain.c)
     set(CMAKE_WIN32_EXECUTABLE true)
 endif()
 
 add_executable(subspace-client
+    ftl/ftl.c
     hook/module.c
     patch/patch.c
+    patch/seq/seq_startup.c
     subspaceclient.c
     ${CLIENT_OSDEP})
 target_include_directories(subspace-client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
