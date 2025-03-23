@@ -16,6 +16,7 @@
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
+#pragma once
 
 #ifndef MAINPROG
 #define unique extern
@@ -698,7 +699,7 @@ typedef struct t_cmddata
     ulong          code;                 // Compare masked bytes with this
     char           len;                  // Length of the main command code
     char           bits;                 // Special bits within the command
-    char           arg1, arg2, arg3;     // Types of possible arguments
+    unsigned char  arg1, arg2, arg3;      // Types of possible arguments
     char           type;                 // C_xxx + additional information
     e_inst         inst;                 // Symbolic name for this command
 } t_cmddata;
