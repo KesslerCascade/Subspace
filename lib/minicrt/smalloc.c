@@ -34,7 +34,7 @@ sm_heap_t default_heap;
 
 #define BLOCK_OFFSET ((size_t)&(((sm_blk_t*)0)->userdata))
 #define CHUNK_OFFSET ((size_t)&(((sm_chunk_t*)0)->blocks))
-#define MIN_ALLOC_SZ (BLOCK_OFFSET + 16)
+#define MIN_ALLOC_SZ (16)
 
 // only lower 32 bits of state are used, but on 64-bit platforms we want uintptr_t to keep
 // structures aligned
@@ -148,7 +148,7 @@ void* smalloc_heap(sm_heap_t* heap, unsigned int sz)
                     ret = &cur->userdata;
 
                     // can we split the block?
-                    if (cur->size - sz >= MIN_ALLOC_SZ) {
+                    if (cur->size - sz >= MIN_ALLOC_SZ + BLOCK_OFFSET) {
                         // replace it with split block
                         sm_blk_t* newblk = (sm_blk_t*)((uintptr_t)ret + sz);
                         newblk->size     = cur->size - sz - BLOCK_OFFSET;
