@@ -105,8 +105,9 @@ void hashtbl_init(hashtbl* tbl, int initsz, int flags)
 {
     tbl->nslots = initsz;
     tbl->used   = 0;
-    tbl->bitmap = scalloc(1, (initsz + 3) >> 2);
-    tbl->ents   = smalloc(initsz * sizeof(hashtbl_ent));
+    tbl->ents   = smalloc(initsz * sizeof(hashtbl_ent) + ((initsz + 3) >> 2));
+    tbl->bitmap = (uint8_t*)tbl->ents + initsz * sizeof(hashtbl_ent);
+    memset(tbl->bitmap, 0, (initsz + 3) >> 2);
     tbl->flags  = flags;
 }
 
@@ -199,8 +200,9 @@ static void ht_grow(hashtbl* tbl)
 
     tbl->nslots = oldslots << 1;
     tbl->used   = 0;
-    tbl->ents   = smalloc(tbl->nslots * sizeof(hashtbl_ent));
-    tbl->bitmap = scalloc(1, (tbl->nslots + 3) >> 2);
+    tbl->ents   = smalloc(tbl->nslots * sizeof(hashtbl_ent) + ((tbl->nslots + 3) >> 2));
+    tbl->bitmap = (uint8_t*)tbl->ents + tbl->nslots * sizeof(hashtbl_ent);
+    memset(tbl->bitmap, 0, (tbl->nslots + 3) >> 2);
 
     for (uint32_t i = 0; i < oldslots; ++i) {
         if (oldbitmap[HT_BITMAP_IDX(i)] & HT_BITMAP_USED_BIT(i) &&
@@ -212,7 +214,6 @@ static void ht_grow(hashtbl* tbl)
     // assert(tbl->used == oldused);
 
     sfree(oldents);
-    sfree(oldbitmap);
 }
 
 uint32_t _hashtbl_add(hashtbl* tbl, uintptr_t key, void* data)
@@ -268,7 +269,6 @@ void* _hashtbl_del(hashtbl* tbl, uintptr_t key)
 
 void hashtbl_destroy(hashtbl* tbl)
 {
-    sfree(tbl->bitmap);
     sfree(tbl->ents);
     tbl->bitmap = NULL;
     tbl->ents   = NULL;
