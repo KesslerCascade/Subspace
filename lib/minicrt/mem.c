@@ -55,6 +55,9 @@ void* _minicrt_memset(void* s, int c, unsigned int count)
 // This isn't in the header file but a duplicate copy is included to define the symbol. The
 // compiler sometimes generates calls to _memset when initializing structures, etc.
 #undef memset
+#if defined(_MSC_VER) && defined(NDEBUG)
+#pragma function(memset)
+#endif
 void* memset(void* s, int c, unsigned int count)
 {
     unsigned char* p  = s;
