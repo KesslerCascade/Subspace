@@ -3,6 +3,7 @@
 #include "ftl/ftl.h"
 #include "loader/loader.h"
 #include "patch/patch.h"
+#include "patch/seq/seq_capp.h"
 #include "patch/seq/seq_osdep.h"
 #include "subspaceclient.h"
 
@@ -53,6 +54,7 @@ int __stdcall entry()
     PatchState ps;
     patchBegin(&ps, ftlbase);
     patchApplySeq(&ps, OSDepPatches);
+    patchApplySeq(&ps, CAppPatches);
     patchEnd(&ps);
 
     ftlentry = getProgramEntry(ftlbase);

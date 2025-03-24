@@ -5,6 +5,7 @@ if(WIN32)
         win32/codegen/codegen.c
         win32/codegen/hookgen.c
         win32/codegen/wrapgen.c
+        win32/ftl/functions_capp.c
         win32/ftl/functions_startup.c
         win32/hook/analysis.c
         win32/hook/disasmfind.c
@@ -24,10 +25,12 @@ if(WIN32)
 endif()
 
 add_executable(subspace-client
+    capp/onexecute.c
     ftl/ftl.c
     hook/module.c
     patch/patch.c
-    patch/seq/seq_startup.c
+    patch/capp/patch_capp_onexecute.c
+    patch/seq/seq_capp.c
     subspaceclient.c
     ${CLIENT_OSDEP})
 target_include_directories(subspace-client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
