@@ -697,10 +697,10 @@ typedef struct t_cmddata
 {
     ulong          mask;                 // Mask for first 4 bytes of the command
     ulong          code;                 // Compare masked bytes with this
-    char           len;                  // Length of the main command code
-    char           bits;                 // Special bits within the command
-    unsigned char  arg1, arg2, arg3;      // Types of possible arguments
-    char           type;                 // C_xxx + additional information
+    uchar          len;                  // Length of the main command code
+    uchar          bits;                 // Special bits within the command
+    uchar          arg1, arg2, arg3;     // Types of possible arguments
+    uchar          type;                 // C_xxx + additional information
     e_inst         inst;                 // Symbolic name for this command
 } t_cmddata;
 
@@ -757,8 +757,8 @@ typedef struct t_asm
 
 typedef struct t_asmmodel
 {              // Model to search for assembler command
-    char           code[MAXCMDSIZE];     // Binary code
-    char           mask[MAXCMDSIZE];     // Mask for binary code (0: bit ignored)
+    uchar          code[MAXCMDSIZE];     // Binary code
+    uchar          mask[MAXCMDSIZE];     // Mask for binary code (0: bit ignored)
     int            length;               // Length of code, bytes (0: empty)
     int            jmpsize;              // Offset size if relative jump
     int            jmpoffset;            // Offset relative to IP
@@ -784,9 +784,9 @@ unique int       iswindowsnt;          // When checking for dangers, assume NT
 int    Assemble(const t_asm *cmd, ulong ip, t_asmmodel *model, int attempt,
                 int constsize, char *errtext);
 int    Checkcondition(int code, ulong flags);
-ulong  Disasm(char *src, ulong srcsize, ulong srcip,
+ulong  Disasm(uchar *src, ulong srcsize, ulong srcip,
               t_disasm *disasm, int disasmmode);
-ulong  Disassembleback(char *block, ulong base, ulong size, ulong ip, int n);
-ulong  Disassembleforward(char *block, ulong base, ulong size, ulong ip, int n);
-int    Isfilling(ulong addr, char *data, ulong size, ulong align);
+ulong  Disassembleback(uchar *block, ulong base, ulong size, ulong ip, int n);
+ulong  Disassembleforward(uchar *block, ulong base, ulong size, ulong ip, int n);
+int    Isfilling(ulong addr, uchar *data, ulong size, ulong align);
 

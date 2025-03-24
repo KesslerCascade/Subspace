@@ -42,8 +42,8 @@ static int       softerror;            // Noncritical disassembler error
 static int       addcomment;           // Comment value of operand
 
 // Copy of input parameters of function Disasm()
-static char      *cmd;                 // Pointer to binary data
-static char      *pfixup;              // Pointer to possible fixups or NULL
+static uchar     *cmd;                 // Pointer to binary data
+static uchar     *pfixup;              // Pointer to possible fixups or NULL
 static ulong     size;                 // Remaining size of the command buffer
 static t_disasm  *da;                  // Pointer to disassembly results
 static int       mode;                 // Disassembly mode (DISASM_xxx)
@@ -695,7 +695,7 @@ int Checkcondition(int code, ulong flags)
     else return (cond == 0);           // Invert condition
 };
 
-ulong Disasm(char *src, ulong srcsize, ulong srcip,
+ulong Disasm(uchar *src, ulong srcsize, ulong srcip,
              t_disasm *disasm, int disasmmode)
 {
     int i, j, isprefix, is3dnow, repeated, operand, arg;
@@ -792,9 +792,9 @@ ulong Disasm(char *src, ulong srcsize, ulong srcip,
     // Fetch (if available) first 3 bytes of the command, add repeat prefix and
     // find command in the command table.
     code = 0;
-    if (size > 0) *(((char *)&code) + 0) = cmd[0];
-    if (size > 1) *(((char *)&code) + 1) = cmd[1];
-    if (size > 2) *(((char *)&code) + 2) = cmd[2];
+    if (size > 0) *(((uchar *)&code) + 0) = cmd[0];
+    if (size > 1) *(((uchar *)&code) + 1) = cmd[1];
+    if (size > 2) *(((uchar *)&code) + 2) = cmd[2];
     if (repprefix != 0)                      // REP/REPE/REPNE is considered to be
         code = (code << 8) | repprefix;      // part of command.
     if (decodevxd && (code & 0xFFFF) == 0x20CD)

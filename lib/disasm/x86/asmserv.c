@@ -604,11 +604,11 @@ const t_cmddata dangerous[] = {
 // lines back in the listing. Maximal stepback is limited to 127. In general,
 // this is rather non-trivial task. Proposed solution may cause problems which
 // however are not critical here.
-ulong Disassembleback(char *block, ulong base, ulong size, ulong ip, int n)
+ulong Disassembleback(uchar *block, ulong base, ulong size, ulong ip, int n)
 {
     int i;
     ulong abuf[131], addr, back, cmdsize;
-    char *pdata;
+    uchar *pdata;
     t_disasm da;
     if (block == NULL) return 0;           // Error, no code!
     if (n < 0) n = 0; else if (n>127) n = 127; // Try to correct obvious errors
@@ -632,11 +632,11 @@ ulong Disassembleback(char *block, ulong base, ulong size, ulong ip, int n)
 
 // Function attempts to calculate address of assembler instruction which is n
 // lines forward in the listing.
-ulong Disassembleforward(char *block, ulong base, ulong size, ulong ip, int n)
+ulong Disassembleforward(uchar *block, ulong base, ulong size, ulong ip, int n)
 {
     int i;
     ulong cmdsize;
-    char *pdata;
+    uchar *pdata;
     t_disasm da;
     if (block == NULL) return 0;           // Error, no code!
     if (ip < base) ip = base;                // Try to correct obvious errors
@@ -657,7 +657,7 @@ ulong Disassembleforward(char *block, ulong base, ulong size, ulong ip, int n)
 // filling command (usually some kind of NOP) used to align code to a specified
 // (align=power of 2, 0 means no alignment) border. Returns length of filling
 // command in bytes or 0 if command is not a recognized filling.
-int Isfilling(ulong addr, char *data, ulong size, ulong align)
+int Isfilling(ulong addr, uchar *data, ulong size, ulong align)
 {
     if (data == NULL) return 0;            // Invalid parameters
     // Convert power of 2 to bitmask.

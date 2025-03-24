@@ -216,7 +216,7 @@ int Assemble(const t_asm *cmd, ulong ip, t_asmmodel *model, int attempt,
     int hasrm, hassib, dispsize, immsize;
     int anydisp, anyimm, anyjmp;
     long l, displacement, immediate, jmpoffset;
-    char tcode[MAXCMDSIZE], tmask[MAXCMDSIZE];
+    uchar tcode[MAXCMDSIZE], tmask[MAXCMDSIZE];
     t_asmoperand aop[3], *op;             // Up to 3 operands allowed
     const t_cmddata *pd;
     if (model != NULL) model->length = 0;
@@ -602,13 +602,13 @@ retrylongjump:
         case DRX:                        // Debug register DRx
             hasrm = 1;
             if (op->index < 8) {
-                tcode[i + 1] |= (char)(op->index << 3); tmask[i + 1] |= 0x38;
+                tcode[i + 1] |= (uchar)(op->index << 3); tmask[i + 1] |= 0x38;
             };
             break;
         case RCM:                        // Integer register in command byte
         case RST:                        // FPU register (ST(i)) in command byte
             if (op->index < 8) {
-                tcode[i] |= (char)op->index; tmask[i] |= 0x07;
+                tcode[i] |= (uchar)op->index; tmask[i] |= 0x07;
             };
             break;
         case RAC:                        // Accumulator (AL/AX/EAX, implicit)
@@ -638,7 +638,7 @@ retrylongjump:
             if (op->type != MRG) {           // Register in ModRM byte
                 tcode[i + 1] |= 0xC0; tmask[i + 1] |= 0xC0;
                 if (op->index < 8) {
-                    tcode[i + 1] |= (char)op->index; tmask[i + 1] |= 0x07;
+                    tcode[i + 1] |= (uchar)op->index; tmask[i + 1] |= 0x07;
                 };
                 break;
             };                             // Note: NO BREAK, continue with address
@@ -682,7 +682,7 @@ retrylongjump:
                     if (op->segment != SEG_UNDEF && op->segment != addr32[op->base].defseg)
                         segment = op->segment;
                     tcode[i + 1] |=
-                        (char)op->base;          // Note that case [ESP] has base<0.
+                        (uchar)op->base;          // Note that case [ESP] has base<0.
                     tmask[i + 1] |= 0x07;
                 } else segment = op->segment;
             } else {                         // SIB byte necessary
@@ -725,14 +725,14 @@ retrylongjump:
                 tmask[i + 2] |= 0xC0;
                 if (op->index < 8) {
                     if (op->index < 0) op->index = 0x04;
-                    tcode[i + 2] |= (char)(op->index << 3);
+                    tcode[i + 2] |= (uchar)(op->index << 3);
                     tmask[i + 2] |= 0x38;
                 };
                 if (op->base < 8) {
                     if (op->base < 0) op->base = 0x05;
                     if (op->segment != SEG_UNDEF && op->segment != addr32[op->base].defseg)
                         segment = op->segment;
-                    tcode[i + 2] |= (char)op->base;
+                    tcode[i + 2] |= (uchar)op->base;
                     tmask[i + 2] |= 0x07;
                 } else segment = op->segment;
             };
@@ -784,7 +784,7 @@ retrylongjump:
         case SGM:                        // Segment register in ModRM byte
             hasrm = 1;
             if (op->index < 6) {
-                tcode[i + 1] |= (char)(op->index << 3); tmask[i + 1] |= 0x38;
+                tcode[i + 1] |= (uchar)(op->index << 3); tmask[i + 1] |= 0x38;
             };
             break;
         case SCM:                        // Segment register in command byte
@@ -792,16 +792,16 @@ retrylongjump:
                 tcode[0] = 0x0F; tmask[0] = 0xFF;
                 i = 1;
                 if (cmd->inst == I_PUSH)
-                    tcode[i] = (char)((op->index << 3) | 0x80);
+                    tcode[i] = (uchar)((op->index << 3) | 0x80);
                 else
-                    tcode[i] = (char)((op->index << 3) | 0x81);
+                    tcode[i] = (uchar)((op->index << 3) | 0x81);
                 tmask[i] = 0xFF;
             } else if (op->index < 6) {
                 if (op->index == SEG_CS && cmd->inst == I_POP) {
                     strcpy(errtext, "Unable to POP CS");
                     goto error;
                 };
-                tcode[i] = (char)((tcode[i] & 0xC7) | (op->index << 3));
+                tcode[i] = (uchar)((tcode[i] & 0xC7) | (op->index << 3));
             } else {
                 tcode[i] &= 0xC7;
                 tmask[i] &= 0xC7;
