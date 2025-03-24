@@ -1,9 +1,7 @@
 #pragma once
 
-#ifdef WIN32
-#include "win32/asm.h"
-#include "win32/codegen.h"
-#include "win32/funcinfo.h"
-#include "win32/hookgen.h"
-#include "win32/wrapgen.h"
-#endif
+#include "codegen/asm.h"
+#include "codegen/codegen.h"
+#include "codegen/funcinfo.h"
+#include "codegen/hookgen.h"
+#include "codegen/wrapgen.h"

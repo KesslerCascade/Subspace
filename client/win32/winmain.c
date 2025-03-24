@@ -1,6 +1,6 @@
 #include "winmain.h"
 
-#include "ftl/win32/functions_basic.h"
+#include "ftl/functions_startup.h"
 
 // Wrap WinMain to call it with the correct module handle
 int subspace_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)

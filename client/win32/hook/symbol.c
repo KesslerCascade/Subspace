@@ -2,6 +2,8 @@
 #include "hook/function.h"
 #include "hook/string.h"
 
+#include "disasmfind.h"
+
 static bool symFindOne(addr_t base, Symbol* sym, SymbolFind* find)
 {
     switch (find->type) {
@@ -10,6 +12,9 @@ static bool symFindOne(addr_t base, Symbol* sym, SymbolFind* find)
         return (sym->addr != 0);
     case SYMBOL_FIND_STRING:
         sym->addr = findString(base, find->str);
+        return (sym->addr != 0);
+    case SYMBOL_FIND_DISASM:
+        sym->addr = findByDisasm(base, find->disasm);
         return (sym->addr != 0);
     }
 

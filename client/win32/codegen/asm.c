@@ -1,5 +1,5 @@
 #include "asm.h"
-#include "codegen.h"
+#include "codegen_private.h"
 
 #include "minicrt.h"
 

@@ -1,5 +1,6 @@
 #pragma once
-#include "codegen.h"
+#include "funcinfo.h"
+#include "loader/loader.h"
 
 // Creates a hook function.
 //

@@ -1,6 +1,6 @@
 #pragma once
 #include <stdbool.h>
-#include "loader/win32/imgutil.h"
+#include "loader/imgutil.h"
 #include "disasm.h"
 #include "minicrt.h"
 

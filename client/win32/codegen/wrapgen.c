@@ -1,4 +1,5 @@
 #include "wrapgen.h"
+#include "codegen_private.h"
 #include "asm.h"
 
 // Create a wrapper to adapt the calling convention of the specified function

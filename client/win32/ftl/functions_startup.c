@@ -1,4 +1,4 @@
-#include "functions_basic.h"
+#include "functions_startup.h"
 
 INITWRAP(WinMain);
 Symbol SYM(WinMain) = {

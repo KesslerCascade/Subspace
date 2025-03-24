@@ -1,4 +1,5 @@
 #include "hookgen.h"
+#include "codegen_private.h"
 #include "asm.h"
 
 #include "minicrt.h"

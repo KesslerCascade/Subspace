@@ -6,43 +6,37 @@ static lazy_init modulehash_is_init;
 static lock_t modulehash_lock;
 static hashtbl modulehash;
 
-typedef struct ModuleInfo {
-    hashtbl exporthash;
-    hashtbl relcallhash;
-    hashtbl stringhash;
-    bool exporthash_init;
-    bool relcallhash_init;
-    bool stringhash_init;
-} ModuleInfo;
-
 static void modulehash_init(void* dummy)
 {
     hashtbl_init(&modulehash, 8, 0);
     lock_init(&modulehash_lock);
 }
 
-#define MODINFO_IMPL(funcname, hashname)                        \
-    hashtbl* funcname(addr_t base, modinfo_initfunc_t initfunc) \
-    {                                                           \
-        lazyinit(&modulehash_is_init, modulehash_init, NULL);   \
-        lock_acq(&modulehash_lock);                             \
-                                                                \
-        ModuleInfo* mi = hashtbl_get(&modulehash, base);        \
-        if (!mi) {                                              \
-            mi = scalloc(1, sizeof(ModuleInfo));                \
-            hashtbl_set(&modulehash, base, mi);                 \
-        }                                                       \
-                                                                \
-        if (!mi->hashname##_init) {                             \
-            initfunc(base, &mi->hashname);                      \
-            mi->hashname##_init = true;                         \
-        }                                                       \
-                                                                \
-        lock_rel(&modulehash_lock);                             \
-                                                                \
-        return &mi->hashname;                                   \
+ModuleInfo* moduleInfo(addr_t base)
+{
+    lazyinit(&modulehash_is_init, modulehash_init, NULL);
+    lock_acq(&modulehash_lock);
+
+    ModuleInfo* mi = hashtbl_get(&modulehash, base);
+    if (!mi) {
+        mi = scalloc(1, sizeof(ModuleInfo));
+        hashtbl_set(&modulehash, base, mi);
     }
 
-MODINFO_IMPL(moduleExportHash, exporthash)
-MODINFO_IMPL(moduleRelcallHash, relcallhash)
-MODINFO_IMPL(moduleStringHash, stringhash)
+    if (!mi->init) {
+        hashtbl_init(&mi->exporthash, 256, HT_STRING_KEYS);
+        hashtbl_init(&mi->stringhash, 256, HT_STRING_KEYS);
+        hashtbl_init(&mi->stringrefhash, 256, HT_STRING_KEYS);
+        hashtbl_init(&mi->stringlochash, 256, 0);
+        hashtbl_init(&mi->relochash, 256, 0);
+        hashtbl_init(&mi->ptrhash, 256, 0);
+        hashtbl_init(&mi->ptrrefhash, 256, 0);
+        hashtbl_init(&mi->relcallhash, 256, 0);
+        hashtbl_init(&mi->funccallhash, 256, 0);
+        analyzeModule(base, mi);
+        mi->init = true;
+    }
+
+    lock_rel(&modulehash_lock);
+    return mi;
+}
