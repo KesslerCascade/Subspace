@@ -9,8 +9,10 @@ enum SymbolFindEnum {
     SYMBOL_FIND_EXPORT,              // look in executable's export table
     SYMBOL_FIND_IMPORT,              // imported from a DLL
     SYMBOL_FIND_STRING,              // find in string table
+    SYMBOL_FIND_DISASM               // find a matching disassembly sequence in code
 };
 
+typedef struct DisasmFind DisasmFind;
 typedef struct SymbolFind {
     int type;           // from SymbolFindEnum
     const char* name;   // name as it appears in import/export table
@@ -18,6 +20,9 @@ typedef struct SymbolFind {
     // For SYMBOL_FIND_IMPORT, the name of the library it's located in
     // For SYMBOL_FIND_STRING, the literal string to search for
     const char* str;
+
+    // for SYMBOL_FIND_DISASM, the parameters to find via dissembly
+    DisasmFind* disasm;
 } SymbolFind;
 
 typedef struct Symbol {

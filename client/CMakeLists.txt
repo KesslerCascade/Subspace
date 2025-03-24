@@ -7,6 +7,7 @@ if(WIN32)
         win32/codegen/wrapgen.c
         win32/ftl/functions_startup.c
         win32/hook/analysis.c
+        win32/hook/disasmfind.c
         win32/hook/export.c
         win32/hook/hook.c
         win32/hook/string.c
