@@ -1,10 +1,5 @@
 #include <stdio.h>
 #include <windows.h>
-#include "ftl/ftl.h"
-#include "loader/loader.h"
-#include "patch/patch.h"
-#include "patch/seq/seq_capp.h"
-#include "patch/seq/seq_osdep.h"
 #include "subspaceclient.h"
 
 #include "minicrt.h"
@@ -21,8 +16,6 @@
 //
 // Until that initialization happens, use ONLY low-level Win32 API calls.
 
-entrypoint ftlentry;
-
 typedef int(WINAPI* WinMain_t)(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
                                int nShowCmd);
 
@@ -32,34 +25,32 @@ int __stdcall entry()
     scsettings.gameProgram = smalloc(MAX_PATH);
     scsettings.gamePath    = smalloc(MAX_PATH);
 
+#if 1
     strcpy(scsettings.gameDir, "M:\\games\\sync\\FTL");
     strcpy(scsettings.gameProgram, "FTLGame.exe");
     strcpy(scsettings.gamePath, "M:\\games\\sync\\FTL\\FTLGame.exe");
+#else
+    strcpy(scsettings.gameDir, "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light");
+    strcpy(scsettings.gameProgram, "FTLGame.exe");
+    strcpy(scsettings.gamePath,
+           "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light\\FTLGame.exe");
+#endif
 
     SetCurrentDirectoryA(scsettings.gameDir);
     SetEnvironmentVariableA("USERPROFILE", scsettings.gameDir);
 
-    if (AllocConsole()) {
-        // FILE* temp;
-        // freopen_s(&temp, "CONIN$", "r", stdin);
-        // freopen_s(&temp, "CONOUT$", "w", stdout);
-        // freopen_s(&temp, "CONOUT$", "w", stderr);
-    }
+    // if (AllocConsole()) {
+    //  FILE* temp;
+    //  freopen_s(&temp, "CONIN$", "r", stdin);
+    //  freopen_s(&temp, "CONOUT$", "w", stdout);
+    //  freopen_s(&temp, "CONOUT$", "w", stderr);
+    //}
 
     //    setvbuf(stdout, NULL, _IONBF, 0);
     // setvbuf(stderr, NULL, _IONBF, 0);
 
-    ftlbase = loadProgram(scsettings.gameProgram);
-
-    PatchState ps;
-    patchBegin(&ps, ftlbase);
-    patchApplySeq(&ps, OSDepPatches);
-    patchApplySeq(&ps, CAppPatches);
-    patchEnd(&ps);
-
-    ftlentry = getProgramEntry(ftlbase);
-    ftlentry();
+    int ret = sscmain();
 
     // probably will never reach this, but just in case
-    ExitProcess(0);
+    ExitProcess(ret);
 }
