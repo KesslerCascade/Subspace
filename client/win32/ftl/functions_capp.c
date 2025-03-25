@@ -1,23 +1,20 @@
 #include "ftl/functions_capp.h"
 #include "hook/disasmfind.h"
 
+// CApp::OnExecute is called from sil_main
 INITWRAP(CApp_OnExecute);
 DisasmFind CApp_OnExecute_Disasm = {
     .candidates = DISASM_SEARCH_STRREF,
     .cstr       = "Starting up\n",
-    .ops        = { { .type = DISASM_INSTR, .inst = I_MOV },
-                   { .type = DISASM_INSTR, .inst = I_CALL },
-                   { .type      = DISASM_INSTR,
-                      .inst      = I_LEA,
-                      .argfilter = { ARG_MATCH },
-                      .args      = { { .base = REG_ECX, .idx = REG_UNDEF } } },
-                   { .type = DISASM_MARK, .argfilter = { ARG_MARK, 0, 0 } },
-                   { .type = DISASM_INSTR, .inst = I_CALL },
-                   { 0 } }
+    .ops        = { { .inst = I_MOV },
+                   { .inst = I_CALL },
+                   { .inst = I_LEA, .argfilter = { ARG_REG }, .args = { { .base = REG_ECX } } },
+                   { .inst = I_CALL, .mark = MARK_ARG1 },   // result is arg1 of the CALL
+                    { DISASM_FINISH } }
 };
 Symbol SYM(CApp_OnExecute) = {
-    .find = { { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp9OnExecuteEv" },
-             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_Disasm },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_Disasm },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp9OnExecuteEv" },
              { 0 } }
 };
 FuncInfo FUNCINFO(CApp_OnExecute) = { .nargs = 1, .args = { { 4, ARG_PTR, REG_ECX, false } } };

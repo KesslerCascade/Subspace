@@ -1,35 +1,43 @@
-#include "hook/symbol.h"
+#include <windows.h>
+
 #include "hook/function.h"
 #include "hook/string.h"
+#include "hook/symbol.h"
+#include "loader/rtld.h"
 
 #include "disasmfind.h"
 
-static bool symFindOne(addr_t base, Symbol* sym, SymbolFind* find)
+static addr_t symFindOne(addr_t base, Symbol* sym, SymbolFind* find)
 {
     switch (find->type) {
+    case SYMBOL_FIND_IMPORT: {
+        HMODULE lib = getLib(find->str);
+        if (lib)
+            return (addr_t)GetProcAddress(lib, find->name);
+        return 0;
+    }
     case SYMBOL_FIND_EXPORT:
-        sym->addr = getExport(base, find->name);
-        return (sym->addr != 0);
+        return getExport(base, find->name);
     case SYMBOL_FIND_STRING:
-        sym->addr = findString(base, find->str);
-        return (sym->addr != 0);
+        return findString(base, find->str);
     case SYMBOL_FIND_DISASM:
-        sym->addr = findByDisasm(base, find->disasm);
-        return (sym->addr != 0);
+        return findByDisasm(base, find->disasm);
     }
 
-    return false;
+    return 0;
 }
 
-bool _symResolve(addr_t base, Symbol* sym)
+addr_t _symResolve(addr_t base, Symbol* sym)
 {
     if (sym->addr)
-        return true;
+        return sym->addr;
 
     // go down the list of ways to find this symbol
     for (SymbolFind* find = sym->find; find->type != 0; ++find) {
-        if (symFindOne(base, sym, find))
-            return true;
+        sym->addr = symFindOne(base, sym, find);
+        if (sym->addr)
+            return sym->addr;
     }
-    return false;
+
+    return 0;
 }

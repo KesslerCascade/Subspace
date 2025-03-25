@@ -12,6 +12,8 @@ int enumSections(addr_t imagebase, SectionCallback scb, void* userdata);
 IMAGE_SECTION_HEADER* getSection(addr_t imagebase, const char* name);
 addr_t getSymbol(addr_t imagebase, const char* name);
 
+HMODULE getLib(const char* name);
+
 #define OVERRIDE_ALL      0x80000000
 #define OVERRIDE_ALL_MASK 0x7fffffff
 #define overrideAll(x)    ((x & OVERRIDE_ALL) != 0)

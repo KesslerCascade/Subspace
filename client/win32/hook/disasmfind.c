@@ -5,18 +5,11 @@
 #include "hook/symbol.h"
 #include "disasm.h"
 
-enum MarkTypeEnum {
-    MARK_NONE     = 0,
-    MARK_INSTR    = 1,      // next instruction
-    MARK_ARG      = 0x10,   // Mask out low bits to get which args
-    MARK_ARG_MASK = 0x0f
-};
-
 typedef struct DisasmFindState {
     // current skip
     int skipmin;
     int skipmax;
-    int mark;
+    t_arg cap[16];   // captured arguments
 } DisasmFindState;
 
 static addr_t checkCandidate(addr_t base, DisasmFind* find, addr_t start)
@@ -38,14 +31,6 @@ static addr_t checkCandidate(addr_t base, DisasmFind* find, addr_t start)
             df.skipmax = op->imax;
             ++op;
             continue;
-        } else if (op->type == DISASM_MARK) {
-            df.mark = MARK_INSTR;
-            for (int i = 0; i < 3; i++) {
-                if (op->argfilter[i] == ARG_MARK)
-                    df.mark = MARK_ARG | i;
-            }
-            ++op;
-            continue;
         }
 
         // pseudo-ops are done, we're disassembling something!
@@ -58,41 +43,62 @@ static addr_t checkCandidate(addr_t base, DisasmFind* find, addr_t start)
                 bool match = (op->inst == disasm.inst);   // is this even the right instruction?
 
                 // check arg filters
-                for (int i = 0; i < 3; i++) {
-                    if (op->argfilter[i] == ARG_MATCH) {
-                        if (op->argsym[i]) {
-                            // if we have a symbol, just directly compare against it
-                            if (disasm.arg[i].addr != _symResolve(base, op->argsym[i]))
-                                match = false;
-                        } else if (op->argstr[i]) {
-                            // for a string we have to check every stringtable match because
-                            // duplicate strings exist
-                            AddrList* valid = findAllStrings(base, op->argstr[i]);
-                            bool strmatch   = false;
-                            for (uint32_t j = 0; j < valid->num; j++) {
-                                if (disasm.arg[i].addr == valid->addrs[j])
-                                    strmatch = true;
-                            }
-                            if (!strmatch)
-                                match = false;
-                        } else {
+                for (int i = 0; match && i < 3; i++) {
+                    if (op->argfilter[i] == ARG_IGNORE)
+                        continue;
+
+                    if (op->argsym[i]) {
+                        // if we have a symbol, see if the address matches
+                        uint32_t matchval = (op->argfilter[i] == ARG_DISP) ?
+                            disasm.arg[i].disp :
+                            disasm.arg[i].addr;
+                        if (matchval != _symResolve(base, op->argsym[i]))
+                            match = false;
+                    } else if (op->argstr[i]) {
+                        // for a string we have to check every stringtable match because
+                        // duplicate strings exist
+                        AddrList* valid = findAllStrings(base, op->argstr[i]);
+                        bool strmatch   = false;
+                        for (uint32_t j = 0; j < valid->num; j++) {
+                            if (disasm.arg[i].addr == valid->addrs[j])
+                                strmatch = true;
+                        }
+                        if (!strmatch)
+                            match = false;
+                    } else {
+                        t_arg comp = op->args[i];   // arg to compare to
+
+                        // check for comparing against a captured argument
+                        if (op->argcap[i] & CT_MATCH)
+                            comp = df.cap[op->argcap[i] & CT_ARG_MASK];
+
+                        if (op->argfilter[i] == ARG_MATCH) {
                             // just a basic register and displacement compare.
-                            if (disasm.arg[i].base != op->args[i].base ||
-                                disasm.arg[i].idx != op->args[i].idx ||
-                                disasm.arg[i].disp != op->args[i].disp)
+                            if (disasm.arg[i].base != comp.base || disasm.arg[i].idx != comp.idx ||
+                                disasm.arg[i].disp != comp.disp)
+                                match = false;
+                        } else if (op->argfilter[i] == ARG_REG) {
+                            // check base register only
+                            if (disasm.arg[i].base != comp.base)
                                 match = false;
                         }
                     }
                 }
 
                 if (match) {
-                    if (df.mark == MARK_INSTR) {
+                    // is this the instruction we're looking for?
+                    if (op->mark == MARK_INSTR) {
                         ret = p;
-                    } else if (df.mark & MARK_ARG) {
-                        ret = disasm.arg[df.mark & 3].addr;
+                    } else if (op->mark & MARK_ARG) {
+                        ret = disasm.arg[op->mark & 3].addr;
                     }
 
-                    df.mark = 0;
+                    // capture any args from this match
+                    for (int i = 0; i < 3; i++) {
+                        if (op->argcap[i] & CT_CAPTURE)
+                            df.cap[op->argcap[i] & CT_ARG_MASK] = disasm.arg[i];
+                    }
+
                     df.skipmax = 0;   // stop any skip in progress
                     ++op;
                 } else if (df.skipmax == 0) {
@@ -102,7 +108,7 @@ static addr_t checkCandidate(addr_t base, DisasmFind* find, addr_t start)
             } else if (op->type == DISASM_CALL || op->type == DISASM_JMP) {
                 bool instmatch = false;
                 // these two are basically the same thing, just different instructions
-                if (op->type = DISASM_CALL) {
+                if (op->type == DISASM_CALL) {
                     instmatch = (disasm.inst == I_CALL);
                 } else {
                     // use command type to avoid having to check every jump instruction -- we want

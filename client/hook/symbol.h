@@ -35,9 +35,8 @@ typedef struct Symbol {
 #define DECLSYM(name) extern Symbol SYM(name)
 
 addr_t getExport(addr_t base, const char* name);
-bool _symResolve(addr_t base, Symbol* sym);
+addr_t _symResolve(addr_t base, Symbol* sym);
 #define symResolve(base, name) _symResolve(base, &SYM(name));
 
-#define symAddr(base, name) \
-    (SYM(name).addr ? SYM(name).addr : (_symResolve(base, &SYM(name)), SYM(name).addr))
+#define symAddr(base, name)      (SYM(name).addr ? SYM(name).addr : _symResolve(base, &SYM(name)))
 #define symPtr(type, base, name) ((type*)symAddr(base, name))

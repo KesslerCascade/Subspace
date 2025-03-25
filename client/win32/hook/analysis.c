@@ -5,6 +5,11 @@
 #include "loader/rtld.h"
 #include "disasm.h"
 
+typedef struct ImportTrackerEnt {
+    const char* lib;
+    const char* funcname;
+} ImportTrackerEnt;
+
 static bool scanExports(addr_t base, hashtbl* tbl)
 {
     IMAGE_DATA_DIRECTORY* data   = &datadir(base, IMAGE_DIRECTORY_ENTRY_EXPORT);
@@ -21,6 +26,48 @@ static bool scanExports(addr_t base, hashtbl* tbl)
     }
 
     return true;
+}
+
+static void addImportTracker(hashtbl* tbl, const char* lib, const char* funcname, addr_t loc)
+{
+    ImportTrackerEnt* ent = smalloc(sizeof(ImportTrackerEnt));
+    ent->lib              = lib;
+    ent->funcname         = funcname;
+    if (hashtbl_add(tbl, loc, ent) == HT_NOT_FOUND) {
+        sfree(ent);
+    }
+}
+
+static bool scanImports(addr_t base, hashtbl* tbl)
+{
+    IMAGE_DATA_DIRECTORY* data = &nthdr(base)
+                                      ->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT];
+    IMAGE_IMPORT_DESCRIPTOR* imp = datadirptr(base, data, IMAGE_IMPORT_DESCRIPTOR);
+    IMAGE_IMPORT_DESCRIPTOR* end = datadirend(base, data, IMAGE_IMPORT_DESCRIPTOR);
+
+    while (imp < end && imp->Name) {
+        DWORD* lookup       = dwprva(base,
+                               imp->OriginalFirstThunk ? imp->OriginalFirstThunk : imp->FirstThunk);
+        DWORD* addr         = dwprva(base, imp->FirstThunk);
+        const char* libname = chprva(base, imp->Name);
+
+        while (*lookup) {
+            DWORD iname = *lookup;
+            if (!iname)
+                break;
+
+            if (!IMAGE_SNAP_BY_ORDINAL(iname) && *addr) {
+                // subtract 1 from addr to position at the jump instruction
+                addImportTracker(tbl, libname, chprva(base, iname + sizeof(WORD)), (addr_t)addr);
+            }
+
+            ++lookup;
+            ++addr;
+        }
+
+        ++imp;
+    }
+    return 1;
 }
 
 static void addString(hashtbl* tbl, const char* str, addr_t loc)
@@ -46,7 +93,7 @@ static bool scanStrings(addr_t base, ModuleInfo* mi)
         char c = *p;
         p++;
         if (c == '\0') {
-            if (p - s >= 5) {
+            if (p - s >= 4) {
                 hashtbl_set(&mi->stringlochash, s, s);
                 addString(&mi->stringhash, (const char*)s, (addr_t)s);
             }
@@ -97,8 +144,19 @@ static bool scanRelocs(addr_t base, ModuleInfo* mi)
     return true;
 }
 
+static void addImport(hashtbl* tbl, const char* lib, const char* funcname, addr_t loc)
+{
+    hashtbl* fhash = hashtbl_get(tbl, lib);
+    if (!fhash) {
+        fhash = smalloc(sizeof(hashtbl));
+        hashtbl_init(fhash, 32, HT_STRING_KEYS);
+        hashtbl_set(tbl, lib, fhash);
+    }
+    hashtbl_setint(fhash, funcname, loc);
+}
+
 // basic code analysis via disassembly
-static bool scanCode(addr_t base, ModuleInfo* mi)
+static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers)
 {
     SegInfo code;
     SegInfo rdata;
@@ -135,6 +193,12 @@ static bool scanCode(addr_t base, ModuleInfo* mi)
                 arg->addr <= code.end) {
                 addPtr(&mi->funccallhash, disasm.arg[0].addr, p);
             }
+        } else if (disasm.inst == I_JMP &&
+                   hashtbl_find(importtrackers, disasm.arg[0].addr) != HT_NOT_FOUND) {
+            ImportTrackerEnt* trk = hashtbl_get(importtrackers, disasm.arg[0].addr);
+            // this is a jump into the thunk table; record its location so imported symbols can be
+            // used as waypoints in the code
+            addImport(&mi->importhash, trk->lib, trk->funcname, p);
         } else {
             // check args for pointers
             for (int i = 0; i < 3; i++) {
@@ -160,14 +224,25 @@ static bool scanCode(addr_t base, ModuleInfo* mi)
 
 bool analyzeModule(addr_t base, ModuleInfo* mi)
 {
+    hashtbl importtrackers;
+    hashtbl_init(&importtrackers, 64, 0);
+
+    if (!scanImports(base, &importtrackers))
+        return false;
     if (!scanExports(base, &mi->exporthash))
         return false;
     if (!scanStrings(base, mi))
         return false;
     if (!scanRelocs(base, mi))
         return false;
-    if (!scanCode(base, mi))
+    if (!scanCode(base, mi, &importtrackers))
         return false;
+
+    for (int i = 0; i < importtrackers.nslots; i++) {
+        if (importtrackers.ents[i].data)
+            sfree(importtrackers.ents[i].data);
+    }
+    hashtbl_destroy(&importtrackers);
 
     return true;
 }

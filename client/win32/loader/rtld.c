@@ -12,7 +12,7 @@
 // This whole module is basically a userspace-only reimplementaton of the Windows
 // process loader and runtime linker. The only thing it doesn't handle is WOW64,
 // but since this program is compiled as a 32-bit executable, that is already set
-// up for us.
+// up for us.*
 
 typedef struct EXE_HEADERS {
     IMAGE_DOS_HEADER dos;
@@ -53,6 +53,33 @@ __declspec(allocate(".rdata$T")) extern const IMAGE_TLS_DIRECTORY _tls_used = {
         return 0;
 
 #define imageptr ptr(imagebase)
+
+static lazy_init libhash_is_init;
+static lock_t liblock;
+static hashtbl libhash;
+
+static void libhash_init(void* unused)
+{
+    lock_init(&liblock);
+    hashtbl_init(&libhash, 32, HT_STRING_KEYS | HT_CASE_INSENSITIVE);
+}
+
+HMODULE getLib(const char* name)
+{
+    lazyinit(&libhash_is_init, libhash_init, NULL);
+
+    HMODULE ret = NULL;
+    lock_acq(&liblock);
+    ret = (HMODULE)hashtbl_get(&libhash, name);
+    if (!ret) {
+        ret = LoadLibraryA(name);
+        if (ret) {
+            hashtbl_set(&libhash, name, ret);
+        }
+    }
+    lock_rel(&liblock);
+    return ret;
+}
 
 static int getHeader(HANDLE hFile, EXE_HEADERS* out)
 {
@@ -258,7 +285,7 @@ static int importDeps(addr_t imagebase, IMAGE_DATA_DIRECTORY* data)
                             }
                             glBindSym(hModule);
                         } else { */
-            hModule = LoadLibraryA(name);
+            hModule = getLib(name);
             /* } */
             if (!hModule)
                 continue;

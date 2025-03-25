@@ -5,6 +5,10 @@ typedef struct ModuleInfo {
     // Hash table of exported function names to function addresses
     hashtbl exporthash;
 
+    // Hash table of library names to hash table of imported function names to import function jump
+    // table entries
+    hashtbl importhash;
+
     // Hash table of function addresses to address list of all places that function is the target of
     // a relative CALL instruction. Note this points to the function address, not the start of the
     // CALL instruction.

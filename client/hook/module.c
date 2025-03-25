@@ -25,6 +25,7 @@ ModuleInfo* moduleInfo(addr_t base)
 
     if (!mi->init) {
         hashtbl_init(&mi->exporthash, 256, HT_STRING_KEYS);
+        hashtbl_init(&mi->importhash, 8, HT_STRING_KEYS | HT_CASE_INSENSITIVE);
         hashtbl_init(&mi->stringhash, 256, HT_STRING_KEYS);
         hashtbl_init(&mi->stringrefhash, 256, HT_STRING_KEYS);
         hashtbl_init(&mi->stringlochash, 256, 0);
