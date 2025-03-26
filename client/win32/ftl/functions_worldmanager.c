@@ -20,7 +20,9 @@ Symbol SYM(WorldManager_ctor) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManagerC1Ev" },
              { 0 } }
 };
-FuncInfo FUNCINFO(WorldManager_ctor) = { .nargs = 1, .args = { { 4, ARG_PTR, REG_ECX, false } } };
+FuncInfo FUNCINFO(WorldManager_ctor) = { .nargs   = 1,
+                                         .stdcall = true,
+                                         .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
 DisasmFind WorldManager_OnInit_Disasm = {
     .candidates = DISASM_SEARCH_STRREF,

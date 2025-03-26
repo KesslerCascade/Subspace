@@ -6,9 +6,11 @@ if(WIN32)
         win32/codegen/hookgen.c
         win32/codegen/wrapgen.c
         win32/ftl/functions_capp.c
+        win32/ftl/functions_cevent.c
         win32/ftl/functions_cfps.c
         win32/ftl/functions_misc.c
         win32/ftl/functions_msvcrt.c
+        win32/ftl/functions_osdep.c
         win32/ftl/functions_startup.c
         win32/ftl/functions_worldmanager.c
         win32/hook/analysis.c
@@ -30,11 +32,13 @@ endif()
 
 add_executable(subspace-client
     capp/onexecute.c
+    capp/onkeydown.c
     capp/onloop.c
     ftl/ftl.c
     hook/module.c
     patch/patch.c
     patch/capp/patch_capp_onexecute.c
+    patch/capp/patch_capp_onkeydown.c
     patch/capp/patch_capp_onloop.c
     patch/seq/seq_capp.c
     subspaceclient.c

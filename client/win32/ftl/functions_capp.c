@@ -1,6 +1,8 @@
 #include "ftl/functions_capp.h"
+#include "ftl/functions_cevent.h"
 #include "ftl/functions_cfps.h"
 #include "ftl/functions_misc.h"
+#include "ftl/functions_startup.h"
 #include "ftl/functions_worldmanager.h"
 #include "hook/disasmfind.h"
 
@@ -20,7 +22,9 @@ Symbol SYM(CApp_OnExecute) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp9OnExecuteEv" },
              { 0 } }
 };
-FuncInfo FUNCINFO(CApp_OnExecute) = { .nargs = 1, .args = { { 4, ARG_PTR, REG_ECX, false } } };
+FuncInfo FUNCINFO(CApp_OnExecute) = { .nargs   = 1,
+                                      .stdcall = true,
+                                      .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
 // Find the offset of "WorldManager *world" within CApp, it's stored right after being
 // constructed
@@ -85,4 +89,65 @@ Symbol SYM(CApp_OnLoop) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp6OnLoopEv" },
              { 0 } }
 };
-FuncInfo FUNCINFO(CApp_OnLoop) = { .nargs = 1, .args = { { 4, ARG_PTR, REG_ECX, false } } };
+FuncInfo FUNCINFO(CApp_OnLoop) = { .nargs   = 1,
+                                   .stdcall = true,
+                                   .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+DisasmFind CApp_vtable_Disasm = {
+    .candidates = DISASM_SEARCH_ADDR,
+    .sym        = &SYM(sil_main),
+    .ops        = { { DISASM_SKIP, .imin = 10, .imax = 40 },
+                   { .inst = I_LEA, .argfilter = { ARG_REG }, .args = { { .base = REG_ECX } } },
+                   { .inst = I_LEA, .argfilter = { ARG_REG }, .args = { { .base = REG_EDI } } },
+                   { DISASM_SKIP, .imin = 0, .imax = 5 },
+                   { .inst = I_CALL },   // CEvent constructor
+                    { .inst = I_LEA, .argfilter = { ARG_REG }, .args = { { .base = REG_ECX } } },
+                   { .inst      = I_MOV,
+                      .argfilter = { ARG_REG },
+                      .args      = { { .base = REG_EBP } },
+                      .mark      = MARK_ARG2 },   // offset of vtable
+                    { DISASM_FINISH } }
+};
+Symbol SYM(CApp_vtable) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_vtable_Disasm }, { 0 } }
+};
+
+DisasmFind CApp_vtable_OnKeyDown_offset_Disasm = {
+    .candidates = DISASM_SEARCH_ADDR,
+    .sym        = &SYM(CEvent_OnEvent_InputEvent),
+    .ops        = { { DISASM_SKIP, .imin = 10, .imax = 18 },
+                   { .inst      = I_SUB,
+                      .argfilter = { ARG_REG, ARG_DISP },
+                      .args      = { { .base = REG_EAX }, { .disp = 7 } } },
+                   { DISASM_SKIP, .imin = 2, .imax = 7 },
+                   { DISASM_JMPTBL, .val = 0 },   // follow switch() case 7 (SUB 7 above makes it entry 0)
+                    { .inst = I_CMP },
+                   { .inst = I_JNZ },
+                   { .inst      = I_MOV,
+                      .argfilter = { 0, ARG_REG },
+                      .args      = { { 0 }, { .base = REG_ECX } },
+                      .argcap = { CT_CAPTURE0 } },   // vtable being pulled out of instance pointer (ECX)
+                    { DISASM_SKIP, .imin = 0, .imax = 3 },
+                   { .inst      = I_MOV,
+                      .argfilter = { 0, ARG_REG },
+                      .argcap    = { 0, CT_MATCH0 },   // match the register the vtable is in
+                      .mark      = MARK_ARG2 },             // and mark the offset
+                    { DISASM_FINISH } }
+};
+Symbol SYM(CApp_vtable_OnKeyDown_offset) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_vtable_OnKeyDown_offset_Disasm },
+             { 0 } }
+};
+
+Symbol(SYM(CApp_OnKeyDown)) = {
+    .find = { { .type   = SYMBOL_FIND_VIRTUAL,
+                .vtable = &SYM(CApp_vtable),
+                .offset = &SYM(CApp_vtable_OnKeyDown_offset) },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp9OnKeyDownEi" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CApp_OnKeyDown) = {
+    .nargs   = 2,
+    .stdcall = true, // thiscall is essentially stdcall with ECX
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } }
+};

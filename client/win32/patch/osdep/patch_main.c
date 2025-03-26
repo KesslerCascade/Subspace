@@ -1,6 +1,6 @@
 #include <windows.h>
 #include "ftl/ftl.h"
-#include "ftl/functions_startup.h"
+#include "ftl/functions_osdep.h"
 #include "hook/hook.h"
 #include "patch/patch.h"
 #include "win32/winmain.h"
