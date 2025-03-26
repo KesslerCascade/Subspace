@@ -11,6 +11,7 @@ typedef enum DisasmOpType {
     DISASM_JMP,         // follow a jump or conditional jump instead of disassembling it
     DISASM_CALL,        // follow a call instead of disassembling it (there is no return logic, it's
                         // treated like a jump)
+    DISASM_JMPTBL,      // follow entry number [val] of a jump table, i.e. for a switch statement
     DISASM_FINISH,      // end of op list
 } DisasmOpType;
 
@@ -77,6 +78,7 @@ typedef struct DisasmOp {
                            // DISASM_SKIP
 
     e_inst inst;           // instruction to match for DISASM_INSTR
+    uint32_t val;          // misc value used for certain ops
     DisasmMarkType mark;   // mark this instruction or an argument as the result
     DisasmArgOp argfilter[3];         // argument filter
     const char* argstr[3];            // if set, overrides the argument with a stringtable address

@@ -17,9 +17,12 @@ static addr_t checkCandidate(addr_t base, DisasmFind* find, addr_t start)
     DisasmFindState df = { 0 };
     DisasmOp* op       = find->ops;
     SegInfo code;
+    SegInfo rdata;
     t_disasm disasm;
 
     if (!getCodeSeg(base, &code))
+        return 0;
+    if (!getRDataSeg(base, &rdata))
         return 0;
 
     addr_t p   = start;
@@ -129,6 +132,22 @@ static addr_t checkCandidate(addr_t base, DisasmFind* find, addr_t start)
                     // it wasn't a call and we're can't skip it so... just fail
                     break;
                 }
+            } else if (op->type == DISASM_JMPTBL) {
+                uchar cmdtype  = disasm.command->type & C_TYPEMASK;
+                addr_t destptr = disasm.arg[0].addr + op->val * 4;
+                if ((cmdtype == C_JMP || cmdtype == C_JMC) && disasm.arg[0].scale == 4 &&
+                    destptr >= rdata.start && destptr < rdata.end &&
+                    *(uint32_t*)destptr >= code.start && *(uint32_t*)destptr < code.end) {
+                    // follow the first argument, which we've verified is a destination within the
+                    // same module
+                    p          = *(uint32_t*)destptr;
+                    df.skipmax = 0;   // stop any skip in progress
+                    isize      = 0;   // don't advance pointer
+                    ++op;
+                } else if (df.skipmax == 0) {
+                    // it wasn't a valid jump table and we're can't skip it so... just fail
+                    break;
+                }
             }
         }
 
@@ -161,8 +180,7 @@ addr_t findByDisasm(addr_t base, DisasmFind* find)
 
     switch (find->candidates) {
     case DISASM_SEARCH_ADDR:
-        ret = checkCandidate(base, find, saddr);
-        break;
+        return checkCandidate(base, find, saddr);
     case DISASM_SEARCH_REF:
         al = hashtbl_get(&mi->ptrrefhash, saddr);
         break;
