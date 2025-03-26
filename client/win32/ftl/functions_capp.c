@@ -4,6 +4,7 @@
 #include "ftl/functions_misc.h"
 #include "ftl/functions_startup.h"
 #include "ftl/functions_worldmanager.h"
+#include "ftl/globals.h"
 #include "hook/disasmfind.h"
 
 // CApp::OnExecute is called from sil_main
@@ -151,3 +152,23 @@ FuncInfo FUNCINFO(CApp_OnKeyDown) = {
     .stdcall = true, // thiscall is essentially stdcall with ECX
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } }
 };
+
+DisasmFind CApp_GenInputEvents_Disasm = {
+    .candidates = DISASM_SEARCH_STRREF,
+    .cstr       = "Running Game!\n",
+    .ops        = { { DISASM_SKIP, .imin = 17, .imax = 30 },
+                   { .inst = I_CMP, .argfilter = { ARG_MATCH }, .argsym = &SYM(opt_framelimit) },
+                   { DISASM_SKIP, .imin = 2, .imax = 7 },
+                   { .inst = I_CALL },                      // input_update
+                    { .inst = I_MOV },
+                   { .inst = I_CALL, .mark = MARK_ARG1 },   // GenInputEvents
+                    { DISASM_FINISH } }
+};
+Symbol(SYM(CApp_GenInputEvents)) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_GenInputEvents_Disasm },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp14GenInputEventsEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CApp_GenInputEvents) = { .nargs   = 1,
+                                           .stdcall = true,
+                                           .args    = { { 4, ARG_PTR, REG_ECX, false } } };

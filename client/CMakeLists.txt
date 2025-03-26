@@ -14,6 +14,7 @@ if(WIN32)
         win32/ftl/functions_osdep.c
         win32/ftl/functions_startup.c
         win32/ftl/functions_worldmanager.c
+        win32/ftl/globals.c
         win32/hook/analysis.c
         win32/hook/disasmfind.c
         win32/hook/export.c

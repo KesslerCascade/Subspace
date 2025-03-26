@@ -26,10 +26,44 @@ DisasmFind CommandGui_KeyDown_Disasm = {
 };
 Symbol SYM(CommandGui_KeyDown) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_KeyDown_Disasm },
-             //             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui7KeyDownEib" },
-              { 0 } }
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui7KeyDownEib" },
+             { 0 } }
 };
 FuncInfo FUNCINFO(CommandGui_KeyDown) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_INT, 0, true } }
+};
+
+INITWRAP(CommandGui_SetPaused);
+DisasmFind CommandGui_SetPaused_Disasm = {
+    .candidates = DISASM_SEARCH_ADDR,
+    .sym        = &SYM(CApp_GenInputEvents),
+    .ops        = { { DISASM_SKIP, .imin = 20, .imax = 25 },
+                   { .inst = I_CMP },
+                   { .inst      = I_MOV,
+                      .argfilter = { ARG_REG },
+                      .args      = { { .base = REG_EAX } },
+                      .argcap    = { 0, CT_CAPTURE0 } },
+                   { DISASM_SKIP, .imin = 0, .imax = 10 },
+                   { .inst      = I_MOV,
+                      .argfilter = { ARG_REG, ARG_MATCH },
+                      .args      = { { .base = REG_EAX } },
+                      .argcap    = { 0, CT_MATCH0 } },
+                   { DISASM_SKIP, .imin = 3, .imax = 10 },
+                   { .inst = I_MOV, .argfilter = { 0, ARG_DISP }, .args = { { 0 }, { .disp = 8 } } },
+                   { .inst = I_MOV, .argfilter = { 0, ARG_DISP }, .args = { { 0 }, { .disp = 4 } } },
+                   { .inst = I_MOV, .argfilter = { 0, ARG_DISP }, .args = { { 0 }, { .disp = -9 } } },
+                   { .inst = I_MOV, .argfilter = { ARG_REG }, .args = { { .base = REG_ESP } } },
+                   { .inst = I_CALL, .mark = MARK_ARG1 },
+                   { DISASM_FINISH } }
+};
+Symbol SYM(CommandGui_SetPaused) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SetPaused_Disasm },
+             //{ .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui9SetPausedEbb" },
+              { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_SetPaused) = {
     .nargs   = 3,
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_INT, 0, true } }
