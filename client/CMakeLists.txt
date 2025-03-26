@@ -8,6 +8,7 @@ if(WIN32)
         win32/ftl/functions_capp.c
         win32/ftl/functions_cevent.c
         win32/ftl/functions_cfps.c
+        win32/ftl/functions_commandgui.c
         win32/ftl/functions_misc.c
         win32/ftl/functions_msvcrt.c
         win32/ftl/functions_osdep.c
@@ -34,13 +35,16 @@ add_executable(subspace-client
     capp/onexecute.c
     capp/onkeydown.c
     capp/onloop.c
+    commandgui/keydown.c
     ftl/ftl.c
     hook/module.c
     patch/patch.c
     patch/capp/patch_capp_onexecute.c
     patch/capp/patch_capp_onkeydown.c
     patch/capp/patch_capp_onloop.c
+    patch/commandgui/patch_commandgui_keydown.c
     patch/seq/seq_capp.c
+    patch/seq/seq_commandgui.c
     subspaceclient.c
     ${CLIENT_OSDEP})
 target_include_directories(subspace-client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

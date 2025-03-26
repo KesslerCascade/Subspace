@@ -1,0 +1,17 @@
+#include "ftl/ftl.h"
+#include "ftl/functions_commandgui.h"
+#include "hook/hook.h"
+#include "patch/patch.h"
+#include "commandgui/commandgui.h"
+
+static bool validate(addr_t base, Patch* p, PatchState* ps)
+{
+    return symAddr(base, CommandGui_KeyDown) != 0;
+}
+
+static bool apply(addr_t base, Patch* p, PatchState* ps)
+{
+    return hookFunction(base, CommandGui_KeyDown, subspace_CommandGui_KeyDown_pre, NULL);
+}
+
+Patch patch_CommandGui_KeyDown = { .Relevant = AlwaysRequired, .Validate = validate, .Apply = apply };
