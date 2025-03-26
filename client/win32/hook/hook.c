@@ -38,7 +38,7 @@ static int replacePointers(addr_t base, addr_t oldfunc, addr_t newfunc)
     if (fcl) {
         for (uint32_t i = 0; i < fcl->num; i++) {
             addr_t p      = fcl->addrs[i];
-            *(addr_t*)(p) = newfunc - (p + 4);
+            *(addr_t*)(p) = newfunc;
             ++count;
         }
     }
