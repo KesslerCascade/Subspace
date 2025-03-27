@@ -13,4 +13,5 @@ typedef struct Pointf {
 
 typedef struct basic_string {
     char* buf;
+    uint32_t len;
 } basic_string;

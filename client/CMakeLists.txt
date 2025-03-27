@@ -10,8 +10,8 @@ if(WIN32)
         win32/ftl/functions_cevent.c
         win32/ftl/functions_cfps.c
         win32/ftl/functions_commandgui.c
+        win32/ftl/functions_mem.c
         win32/ftl/functions_misc.c
-        win32/ftl/functions_msvcrt.c
         win32/ftl/functions_osdep.c
         win32/ftl/functions_starmap.c
         win32/ftl/functions_startup.c

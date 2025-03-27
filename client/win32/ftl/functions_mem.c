@@ -1,4 +1,4 @@
-#include "functions_msvcrt.h"
+#include "ftl/functions_mem.h"
 
 INITWRAP(msvcrt_malloc);
 Symbol SYM(msvcrt_malloc) = {
