@@ -3,6 +3,7 @@
 #include "ftl/functions_cfps.h"
 #include "ftl/functions_commandgui.h"
 #include "ftl/functions_misc.h"
+#include "ftl/functions_mousecontrol.h"
 #include "ftl/functions_startup.h"
 #include "ftl/functions_worldmanager.h"
 #include "ftl/globals.h"
@@ -82,13 +83,17 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
               { DT_OP(JMP) },               // follow the JE
               { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
              { I_CALL, .argout = { DT_OUT_SYM9 } },   // call to CApp::OnLoop
-              { DT_OP(GOTO), .val = 1 },               // go back to before the JMP
+              { I_CMP },
+             { I_JZ },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { I_CALL, .argout = { DT_OUT_SYM10 } },   // call to CApp::OnRender
+              { DT_OP(GOTO), .val = 1 },                // go back to before the JMP
               { I_JZ },
              { I_CMP, .argf = { ARG_MATCH }, .argsym = &SYM(opt_framelimit) },
              { DT_OP(SKIP), .imin = 2, .imax = 7 },
              { I_CALL },                               // CALL input_update
               { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
-             { I_CALL, .argout = { DT_OUT_SYM10 } },   // CALL CApp::GenInputEvents
+             { I_CALL, .argout = { DT_OUT_SYM11 } },   // CALL CApp::GenInputEvents
               { DT_OP(FINISH) } },
     .out  = { &SYM(ftl_log),                            // DT_OUT_SYM1
               &SYM(operator_new),                       // DT_OUT_SYM2
@@ -99,6 +104,7 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
               &SYM(CFPS_FPSControl),                    // DT_OUT_SYM7
               &SYM(CFPS_GetTime),                       // DT_OUT_SYM8
               &SYM(CApp_OnLoop),                        // DT_OUT_SYM9
+              &SYM(CApp_OnRender),                      // DT_OUT_SYM10
               &SYM(CApp_GenInputEvents) }
 };
 
@@ -161,6 +167,12 @@ FuncInfo FUNCINFO(CApp_GenInputEvents) = { .nargs   = 1,
                                            .stdcall = true,
                                            .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
+Symbol SYM(CApp_OnRender) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_worldgen_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp8OnRenderEv" },
+             { 0 } }
+};
+
 DisasmTrace CApp_OnKeyDown_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(CApp_OnKeyDown),
@@ -201,4 +213,20 @@ DisasmTrace CApp_GenInputEvents_trace = {
              { I_CALL, .argout = { DT_OUT_SYM1 } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(CommandGui_SetPaused) }
+};
+
+DisasmTrace CApp_OnRender_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CApp_OnRender),
+    // TODO: Make this better and more comprehensive
+    .ops  = { { DT_OP(SKIP), .imin = 60, .imax = 70 },
+             { I_CALL },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { I_CALL },
+             { I_CMP },
+             { I_JNZ },
+             { DT_OP(FINISH) } },
+    .out  = (&SYM(MouseControl_OnRender))
 };

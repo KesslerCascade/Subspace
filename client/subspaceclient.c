@@ -6,6 +6,7 @@
 #include "patch/patch.h"
 #include "patch/seq/seq_capp.h"
 #include "patch/seq/seq_commandgui.h"
+#include "patch/seq/seq_mousecontrol.h"
 #include "patch/seq/seq_osdep.h"
 
 SubspaceClientSettings scsettings;
@@ -21,7 +22,7 @@ int sscmain(void)
         return 1;
     }
     if (!patchApplySeq(&ps, OSDepPatches) || !patchApplySeq(&ps, CAppPatches) ||
-        !patchApplySeq(&ps, CommandGuiPatches)) {
+        !patchApplySeq(&ps, CommandGuiPatches) || !patchApplySeq(&ps, MouseControlPatches)) {
         // log
         return 1;
     }

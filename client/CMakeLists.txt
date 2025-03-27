@@ -12,6 +12,7 @@ if(WIN32)
         win32/ftl/functions_commandgui.c
         win32/ftl/functions_mem.c
         win32/ftl/functions_misc.c
+        win32/ftl/functions_mousecontrol.c
         win32/ftl/functions_osdep.c
         win32/ftl/functions_starmap.c
         win32/ftl/functions_startup.c
@@ -42,13 +43,16 @@ add_executable(subspace-client
     ftl/ftl.c
     hook/module.c
     hook/symbol.c
+    mousecontrol/onrender.c
     patch/patch.c
     patch/capp/patch_capp_onexecute.c
     patch/capp/patch_capp_onkeydown.c
     patch/capp/patch_capp_onloop.c
     patch/commandgui/patch_commandgui_keydown.c
+    patch/mousecontrol/patch_mousecontrol_onrender.c
     patch/seq/seq_capp.c
     patch/seq/seq_commandgui.c
+    patch/seq/seq_mousecontrol.c
     subspaceclient.c
     ${CLIENT_OSDEP})
 target_include_directories(subspace-client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
