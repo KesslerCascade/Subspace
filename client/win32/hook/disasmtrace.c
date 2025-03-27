@@ -8,6 +8,7 @@
 #define MAX_UNWIND 5
 
 typedef struct DisasmTraceState {
+    DisasmOp* op;
     addr_t p;
     // current skip
     int skipmin;
@@ -56,7 +57,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
     DisasmTraceState unwind[MAX_UNWIND];
     int nunwind = 0;
 
-    DisasmOp* op = trace->ops;
+    dts.op = trace->ops;
     SegInfo code;
     SegInfo rdata;
     t_disasm disasm;
@@ -69,26 +70,26 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
     dts.p     = start;
     bool fail = false;
 
-    while (dts.p >= code.start && dts.p < code.end && op->op != DT_FINISH) {
-        if (op->op == DT_SKIP) {
-            dts.skipmin = op->imin;
-            dts.skipmax = op->imax;
-            ++op;
+    while (dts.p >= code.start && dts.p < code.end && dts.op->op != DT_FINISH) {
+        if (dts.op->op == DT_SKIP) {
+            dts.skipmin = dts.op->imin;
+            dts.skipmax = dts.op->imax;
+            ++dts.op;
             continue;
-        } else if (op->op == DT_LABEL) {
+        } else if (dts.op->op == DT_LABEL) {
             // just mark the current address as a label
-            if (op->val > 0 && op->val <= 16)
-                dts.labels[op->val - 1] = dts.p;
-            ++op;
+            if (dts.op->val > 0 && dts.op->val <= 16)
+                dts.labels[dts.op->val - 1] = dts.p;
+            ++dts.op;
             continue;
-        } else if (op->op == DT_GOTO) {
+        } else if (dts.op->op == DT_GOTO) {
             // move directly to a saved label with no additional processing
-            if (op->val > 0 && op->val <= 16) {
-                addr_t addr = dts.labels[op->val - 1];
+            if (dts.op->val > 0 && dts.op->val <= 16) {
+                addr_t addr = dts.labels[dts.op->val - 1];
                 if (addr >= code.start && addr < code.end)
                     dts.p = addr;
             }
-            ++op;
+            ++dts.op;
         }
 
         // pseudo-ops are done, we're disassembling something!
@@ -101,22 +102,22 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
 
         // if skipmin > 0 then we're skipping this instruction no matter what
         if (dts.skipmin == 0) {
-            if (op->op == DT_INST) {
-                bool match = (op->inst == disasm.inst);   // is this even the right instruction?
+            if (dts.op->op == DT_INST) {
+                bool match = (dts.op->inst == disasm.inst);   // is this even the right instruction?
 
                 // check arg filters
                 for (int i = 0; match && i < 3; i++) {
-                    if (op->argf[i] == ARG_IGNORE)
+                    if (dts.op->argf[i] == ARG_IGNORE)
                         continue;
 
-                    if (op->argsym[i]) {
+                    if (dts.op->argsym[i]) {
                         // if we have a symbol, see if the address matches
-                        if (disasm.arg[i].addr != _symAddr(base, op->argsym[i]))
+                        if (disasm.arg[i].addr != _symAddr(base, dts.op->argsym[i]))
                             match = false;
-                    } else if (op->argstr[i]) {
+                    } else if (dts.op->argstr[i]) {
                         // for a string we have to check every stringtable match because
                         // duplicate strings exist
-                        AddrList* valid = findAllStrings(base, op->argstr[i]);
+                        AddrList* valid = findAllStrings(base, dts.op->argstr[i]);
                         bool strmatch   = false;
                         for (uint32_t j = 0; j < valid->num; j++) {
                             if (disasm.arg[i].addr == valid->addrs[j])
@@ -125,22 +126,22 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                         if (!strmatch)
                             match = false;
                     } else {
-                        t_arg comp = op->args[i];   // arg to compare to
+                        t_arg comp = dts.op->args[i];   // arg to compare to
 
                         // check for comparing against a captured argument
-                        if (op->argcap[i] & CT_MATCH)
-                            comp = dts.cap[op->argcap[i] & CT_ARG_MASK];
+                        if (dts.op->argcap[i] & CT_MATCH)
+                            comp = dts.cap[dts.op->argcap[i] & CT_ARG_MASK];
 
-                        if (op->argf[i] == ARG_MATCH) {
+                        if (dts.op->argf[i] == ARG_MATCH) {
                             // just a basic register and displacement compare.
                             if (disasm.arg[i].base != comp.base || disasm.arg[i].idx != comp.idx ||
                                 disasm.arg[i].disp != comp.disp)
                                 match = false;
-                        } else if (op->argf[i] == ARG_REG) {
+                        } else if (dts.op->argf[i] == ARG_REG) {
                             // check base register only
                             if (disasm.arg[i].base != comp.base)
                                 match = false;
-                        } else if (op->argf[i] == ARG_ADDR) {
+                        } else if (dts.op->argf[i] == ARG_ADDR) {
                             // check address (same as disp) only
                             if (disasm.arg[i].addr != comp.addr)
                                 match = false;
@@ -150,19 +151,19 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
 
                 if (match) {
                     // is this the instruction we're looking for?
-                    if (op->outip > 0) {
-                        dts.outaddr[op->outip - 1] = dts.p;
-                        dts.outset[op->outip - 1]  = true;
+                    if (dts.op->outip > 0) {
+                        dts.outaddr[dts.op->outip - 1] = dts.p;
+                        dts.outset[dts.op->outip - 1]  = true;
                     }
 
                     for (int i = 0; i < 3; i++) {
                         // capture any args from this match
-                        if (op->argcap[i] & CT_CAPTURE)
-                            dts.cap[op->argcap[i] & CT_ARG_MASK] = disasm.arg[i];
+                        if (dts.op->argcap[i] & CT_CAPTURE)
+                            dts.cap[dts.op->argcap[i] & CT_ARG_MASK] = disasm.arg[i];
                         // and stage them for output if needed
-                        if (op->argout[i] > 0) {
-                            dts.outaddr[op->argout[i] - 1] = disasm.arg[i].addr;
-                            dts.outset[op->argout[i] - 1]  = true;
+                        if (dts.op->argout[i] > 0) {
+                            dts.outaddr[dts.op->argout[i] - 1] = disasm.arg[i].addr;
+                            dts.outset[dts.op->argout[i] - 1]  = true;
                         }
                     }
 
@@ -171,16 +172,16 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                                &nunwind,
                                isize);   // save state in case it doesn't work out later
                     dts.skipmax = 0;     // stop any skip in progress
-                    ++op;
+                    ++dts.op;
                 } else if (dts.skipmax == 0) {
                     // can't skip; so we backtrack or fail
                     if (!popUnwind(&dts, unwind, &nunwind, &isize))
                         break;
                 }
-            } else if (op->op == DT_CALL || op->op == DT_JMP) {
+            } else if (dts.op->op == DT_CALL || dts.op->op == DT_JMP) {
                 bool instmatch = false;
                 // these two are basically the same thing, just different instructions
-                if (op->op == DT_CALL) {
+                if (dts.op->op == DT_CALL) {
                     instmatch = (disasm.inst == I_CALL);
                 } else {
                     // use command type to avoid having to check every jump instruction -- we want
@@ -199,15 +200,15 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     dts.p       = disasm.arg[0].addr;
                     dts.skipmax = 0;   // stop any skip in progress
                     isize       = 0;   // don't advance pointer
-                    ++op;
+                    ++dts.op;
                 } else if (dts.skipmax == 0) {
                     // it wasn't a call and we're can't skip it so... just fail
                     if (!popUnwind(&dts, unwind, &nunwind, &isize))
                         break;
                 }
-            } else if (op->op == DT_JMPTBL) {
+            } else if (dts.op->op == DT_JMPTBL) {
                 uchar cmdtype  = disasm.command->type & C_TYPEMASK;
-                addr_t destptr = disasm.arg[0].addr + op->val * 4;
+                addr_t destptr = disasm.arg[0].addr + dts.op->val * 4;
                 if ((cmdtype == C_JMP || cmdtype == C_JMC) && disasm.arg[0].scale == 4 &&
                     destptr >= rdata.start && destptr < rdata.end &&
                     *(uint32_t*)destptr >= code.start && *(uint32_t*)destptr < code.end) {
@@ -219,7 +220,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     dts.p       = *(uint32_t*)destptr;
                     dts.skipmax = 0;   // stop any skip in progress
                     isize       = 0;   // don't advance pointer
-                    ++op;
+                    ++dts.op;
                 } else if (dts.skipmax == 0) {
                     // it wasn't a valid jump table and we're can't skip it so... just fail
                     if (!popUnwind(&dts, unwind, &nunwind, &isize))
@@ -234,7 +235,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
     }
 
     // check if we made it all the way to the end of the sequence
-    if (op->op != DT_FINISH)
+    if (dts.op->op != DT_FINISH)
         return false;
 
     // save outputs
