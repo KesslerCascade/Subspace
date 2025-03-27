@@ -6,3 +6,11 @@
 
 #define MEMBER(base, ParentType, parent, MemberType, member) \
     (*(MemberType*)((((uintptr_t)(parent)) + (symAddr(base, ParentType##_##member##_offset)))))
+
+typedef struct Pointf {
+    float x, y;
+} Pointf;
+
+typedef struct basic_string {
+    char* buf;
+} basic_string;
