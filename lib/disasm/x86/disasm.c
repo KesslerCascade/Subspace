@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// clang-format off
 
 
 #define STRICT
@@ -111,6 +112,15 @@ static void DecodeNR(int index)
     parg->base = REG_MM0 + index;
 };
 
+// Disassemble name of 128-bit SSE register.
+static void DecodeXMM(int index)
+{
+    if (mode < DISASM_FILE)
+        return;   // No need to decode
+    index &= 0x07;
+    parg->base = REG_XMM0 + index;
+};
+
 static void Memadr(e_seg defseg, e_reg base, e_reg idx, int scale, ulong addr, int dsize)
 {
     e_seg seg;
@@ -169,12 +179,16 @@ static void DecodeMR(int type)
             if (inmemory) da->memtype = DEC_WORD; break;
         case MR4:                        // 4-byte memory/register in ModRM byte
         case RR4:                        // 4-byte memory/register (register only)
+        case MX4:
             dsize = regsize = 4;
             if (inmemory) da->memtype = DEC_DWORD; break;
         case MR8:                        // 8-byte memory/MMX register in ModRM
         case RR8:                        // 8-byte MMX register only in ModRM
             dsize = 8;
             if (inmemory) da->memtype = DEC_QWORD; break;
+        case MR0:
+            dsize = 16;
+            if (inmemory) da->memtype = DEC_DQWORD; break;
         case MRD:                        // 8-byte memory/3DNow! register in ModRM
         case RRD:                        // 8-byte memory/3DNow! (register only)
             dsize = 8;
@@ -239,6 +253,8 @@ static void DecodeMR(int type)
     if ((c & 0xC0) == 0xC0) {                  // Decode register operand
         if (type == MR8 || type == RR8)
             DecodeMX(c);                       // MMX register
+        else if (type == MR0 || type == MX4)
+            DecodeXMM(c);                      // SSE register
         else if (type == MRD || type == RRD)
             DecodeNR(c);                       // 3DNow! register
         else
@@ -702,13 +718,14 @@ ulong Disasm(uchar *src, ulong srcsize, ulong srcip,
     ulong u, code;
     int lockprefix;                      // Non-zero if lock prefix present
     int repprefix;                       // REPxxx prefix or 0
+    int tryprefix;                       // Prefix that may indicate a special command encoding
     int cxsize;
     const t_cmddata *pd, *pdan;
     // Prepare disassembler variables and initialize structure disasm.
     datasize = addrsize = 4;                 // 32-bit code and data segments only!
     segprefix = SEG_UNDEF;
     hasrm = hassib = 0; dispsize = immsize = 0;
-    lockprefix = 0; repprefix = 0;
+    lockprefix = 0; repprefix = 0; tryprefix = 0;
     cmd = src; size = srcsize; pfixup = NULL;
     softerror = 0; is3dnow = 0;
     da = disasm;
@@ -754,7 +771,7 @@ ulong Disasm(uchar *src, ulong srcsize, ulong srcip,
                    else repeated = 1; break;
         case 0x65: if (segprefix == SEG_UNDEF) segprefix = SEG_GS;
                    else repeated = 1; break;
-        case 0x66: if (datasize == 4) datasize = 2;
+        case 0x66: if (datasize == 4) { tryprefix = 0x66; datasize = 2; }
                    else repeated = 1; break;
         case 0x67: if (addrsize == 4) addrsize = 2;
                    else repeated = 1; break;
@@ -795,19 +812,36 @@ ulong Disasm(uchar *src, ulong srcsize, ulong srcip,
     if (size > 0) *(((uchar *)&code) + 0) = cmd[0];
     if (size > 1) *(((uchar *)&code) + 1) = cmd[1];
     if (size > 2) *(((uchar *)&code) + 2) = cmd[2];
-    if (repprefix != 0)                      // REP/REPE/REPNE is considered to be
-        code = (code << 8) | repprefix;      // part of command.
-    if (decodevxd && (code & 0xFFFF) == 0x20CD)
-        pd = &vxdcmd;                        // Decode VxD call (Win95/98)
-    else {
+
+    if (tryprefix != 0) {
+        ulong trycode = (code << 8) | tryprefix;
         for (pd = cmddata; pd->mask != 0; pd++) {
-            if (((code^pd->code) & pd->mask) != 0) continue;
+            if (((trycode^pd->code) & pd->mask) != 0) continue;
             if (mode >= DISASM_FILE && shortstringcmds &&
                 (pd->arg1 == MSO || pd->arg1 == MDE || pd->arg2 == MSO || pd->arg2 == MDE))
                 continue;                    // Search short form of string command
             break;
         };
-    };
+
+        if (pd->mask == 0)
+            tryprefix = 0;                   // Didn't find anything, process normally
+    }
+
+    if (tryprefix == 0) {
+        if (repprefix != 0)                      // REP/REPE/REPNE is considered to be
+            code = (code << 8) | repprefix;      // part of command.
+        if (decodevxd && (code & 0xFFFF) == 0x20CD)
+            pd = &vxdcmd;                        // Decode VxD call (Win95/98)
+        else {
+            for (pd = cmddata; pd->mask != 0; pd++) {
+                if (((code^pd->code) & pd->mask) != 0) continue;
+                if (mode >= DISASM_FILE && shortstringcmds &&
+                    (pd->arg1 == MSO || pd->arg1 == MDE || pd->arg2 == MSO || pd->arg2 == MDE))
+                    continue;                    // Search short form of string command
+                break;
+            };
+        };
+    }
     if ((pd->type & C_TYPEMASK) == C_NOW) {
         // 3DNow! commands require additional search.
         is3dnow = 1;
@@ -928,6 +962,13 @@ ulong Disasm(uchar *src, ulong srcsize, ulong srcip,
                 if (size < 2) da->error = DAE_CROSS;
                 else DecodeMX(cmd[1] >> 3);
                 hasrm = 1; break;
+            case RXM:   // MMX register MMx
+                if (size < 2)
+                    da->error = DAE_CROSS;
+                else
+                    DecodeXMM(cmd[1] >> 3);
+                hasrm = 1;
+                break;
             case R3D:                      // 3DNow! register MMx
                 if (size < 2) da->error = DAE_CROSS;
                 else DecodeNR(cmd[1] >> 3);
@@ -939,6 +980,7 @@ ulong Disasm(uchar *src, ulong srcsize, ulong srcip,
             case MR4:                      // 4-byte memory/register in ModRM byte
             case MR8:                      // 8-byte memory/MMX register in ModRM
             case MRD:                      // 8-byte memory/3DNow! register in ModRM
+            case MR0:                      // 16-byte memory/SSE register in ModRM
             case MMA:                      // Memory address in ModRM byte for LEA
             case MML:                      // Memory in ModRM byte (for LES)
             case MM6:                      // Memory in ModRm (6-byte descriptor)
@@ -954,6 +996,7 @@ ulong Disasm(uchar *src, ulong srcsize, ulong srcip,
             case MFE:                      // Memory in ModRM byte (FPU environment)
             case MFS:                      // Memory in ModRM byte (FPU state)
             case MFX:                      // Memory in ModRM byte (ext. FPU state)
+            case MX4:                      // 4-byte memory/SSE register in ModRM
                 DecodeMR(arg); break;
             case MMS:                      // Memory in ModRM byte (as SEG:OFFS)
                 DecodeMR(arg);

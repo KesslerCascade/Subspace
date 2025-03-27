@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
 // 16.01.2002 - corrected error in processing of immediate constants.
+// clang-format off
 
 
 #define STRICT
@@ -160,6 +161,9 @@ static void Parseasmoperand(t_asmoperand *op, const t_arg *arg)
         } else if (arg->base >= REG_DR0 && arg->base <= REG_DR7) {
             op->type = DRX;
             op->index = arg->base - REG_DR0;
+        } else if (arg->base >= REG_XMM0 && arg->base <= REG_XMM7) {
+            op->type = RXM;
+            op->index = arg->base - REG_XMM0;
         }
     } else if (arg->base == REG_UNDEF && arg->idx == REG_UNDEF && arg->ptrsize <= 0) {
         // Immediate value
@@ -341,6 +345,8 @@ retrylongjump:
             case RMX:                      // MMX register MMx
             case R3D:                      // 3DNow! register MMx
                 if (op->type != RMX) match |= MA_TYP; break;
+            case RXM:
+                if (op->type != RXM) match |= MA_TYP; break;
             case MRG:                      // Memory/register in ModRM byte
                 if (op->type != MRG && op->type != REG) match |= MA_TYP;
                 if (bytesize == 0 && op->size == 1) match |= MA_SIZ;
@@ -359,6 +365,10 @@ retrylongjump:
                 if (op->type != MRG && op->type != REG) match |= MA_TYP;
                 if (op->size != 0 && op->size != 4) match |= MA_SIZ;
                 break;
+            case MX4:
+                if (op->type != MRG && op->type != RXM) match |= MA_TYP;
+                if (op->size != 0 && op->size != 4) match |= MA_SIZ;
+                break;
             case RR4:                      // 4-byte memory/register (register only)
                 if (op->type != REG) match |= MA_TYP;
                 if (op->size != 0 && op->size != 4) match |= MA_SIZ;
@@ -372,6 +382,10 @@ retrylongjump:
             case MRD:                      // 8-byte memory/3DNow! register in ModRM
                 if (op->type != MRG && op->type != RMX) match |= MA_TYP;
                 if (op->size != 0 && op->size != 8) match |= MA_SIZ;
+                break;
+            case MR0:                      // 16-byte memory/SSE register in ModRM byte
+                if (op->type != MRG && op->type != RXM) match |= MA_TYP;
+                if (op->size != 0 && op->size != 16) match |= MA_SIZ;
                 break;
             case RR8:                      // 8-byte MMX register only in ModRM
             case RRD:                      // 8-byte memory/3DNow! (register only)
@@ -597,6 +611,7 @@ retrylongjump:
         case REG:                        // Integer register in Reg field
         case RG4:                        // Integer 4-byte register in Reg field
         case RMX:                        // MMX register MMx
+        case RXM:                        // SSE register XMMx
         case R3D:                        // 3DNow! register MMx
         case CRX:                        // Control register CRx
         case DRX:                        // Debug register DRx
@@ -629,11 +644,13 @@ retrylongjump:
         case MR1:                        // 1-byte memory/register in ModRM byte
         case MR2:                        // 2-byte memory/register in ModRM byte
         case MR4:                        // 4-byte memory/register in ModRM byte
+        case MX4:                        // 4-byte memory/SSE register in ModRM byte
         case RR4:                        // 4-byte memory/register (register only)
         case MR8:                        // 8-byte memory/MMX register in ModRM
         case RR8:                        // 8-byte MMX register only in ModRM
         case MRD:                        // 8-byte memory/3DNow! register in ModRM
         case RRD:                        // 8-byte memory/3DNow! (register only)
+        case MR0:                        // 16-byte memory/SSE register in ModRM
             hasrm = 1;
             if (op->type != MRG) {           // Register in ModRM byte
                 tcode[i + 1] |= 0xC0; tmask[i + 1] |= 0xC0;

@@ -17,6 +17,7 @@
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 //
 // 05.03.2002: Corrected error, FSTSW AX assembled with data size prefix
+// clang-format off
 
 #define STRICT
 
@@ -584,6 +585,11 @@ const t_cmddata cmddata[] = {
     { 0x00FFFF, 0x8E0F0F, 2,00,  R3D,MRD,NNN, C_NOW + 4,          I_PFPNACC },
     { 0x00FFFF, 0x0C0F0F, 2,00,  R3D,MR8,NNN, C_NOW + 4,          I_PI2FW },
     { 0x00FFFF, 0xBB0F0F, 2,00,  R3D,MRD,NNN, C_NOW + 4,          I_PSWAPD },
+    // SSE instructions
+    { 0xFFFFFF, 0x100FF3, 2,00,  RXM,MX4,NNN, C_SSE + 2,          I_MOVSS },
+    { 0xFFFFFF, 0x110FF3, 2,00,  MX4,RXM,NNN, C_SSE + 2,          I_MOVSS },
+    { 0xFFFFFF, 0x2A0FF3, 2,00,  RXM,MR4,NNN, C_SSE + 2,          I_CVTSI2SS },
+    { 0xFFFFFF, 0xEF0F66, 2,00,  RXM,MR0,NNN, C_SSE + 0,          I_PXOR },    
     // End of command table.
     { 0x000000, 0x000000, 0,00,  NNN,NNN,NNN, C_CMD + 0,          I_NONE }
 };

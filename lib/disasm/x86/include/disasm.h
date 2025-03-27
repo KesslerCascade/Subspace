@@ -15,6 +15,7 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program; if not, write to the Free Software
 //  Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+// clang-format off
 
 #pragma once
 
@@ -97,6 +98,10 @@
 #define SCM            54              // Segment register in command byte
 #define CRX            55              // Control register CRx
 #define DRX            56              // Debug register DRx
+#define RXM            57              // SSE register XMMx
+#define MX4            58              // 4-byte memory/SSE register in ModRM byte
+#define MR0            59              // 16-byte memory/SSE register in ModRM
+
 // Pseudooperands (implicit operands, never appear in assembler commands). Must
 // have index equal to or exceeding PSEUDOOP.
 #define PRN            (PSEUDOOP+0)    // Near return address
@@ -190,6 +195,16 @@ typedef enum e_reg
     REG_MM5,
     REG_MM6,
     REG_MM7,
+
+    // SSE registeres
+    REG_XMM0,
+    REG_XMM1,
+    REG_XMM2,
+    REG_XMM3,
+    REG_XMM4,
+    REG_XMM5,
+    REG_XMM6,
+    REG_XMM7,
 
     // Ring 0 control registers
     REG_CR0,
@@ -607,25 +622,30 @@ typedef enum e_inst
     I_PMULHRW,
     I_PSWAPD,
     I_VXDCALL,
+
+    // SSE
+    I_CVTSI2SS,
+    I_MOVSS
 } e_inst;
 
-#define C_TYPEMASK     0xF0            // Mask for command type
-#define   C_CMD        0x00            // Ordinary instruction
-#define   C_PSH        0x10            // 1-word PUSH instruction
-#define   C_POP        0x20            // 1-word POP instruction
-#define   C_MMX        0x30            // MMX instruction
-#define   C_FLT        0x40            // FPU instruction
-#define   C_JMP        0x50            // JUMP instruction
-#define   C_JMC        0x60            // Conditional JUMP instruction
-#define   C_CAL        0x70            // CALL instruction
-#define   C_RET        0x80            // RET instruction
-#define   C_FLG        0x90            // Changes system flags
-#define   C_RTF        0xA0            // C_JMP and C_FLG simultaneously
-#define   C_REP        0xB0            // Instruction with REPxx prefix
-#define   C_PRI        0xC0            // Privileged instruction
-#define   C_DAT        0xD0            // Data (address) doubleword
-#define   C_NOW        0xE0            // 3DNow! instruction
-#define   C_BAD        0xF0            // Unrecognized command
+#define C_TYPEMASK     0x1F0            // Mask for command type
+#define   C_CMD        0x000            // Ordinary instruction
+#define   C_PSH        0x010            // 1-word PUSH instruction
+#define   C_POP        0x020            // 1-word POP instruction
+#define   C_MMX        0x030            // MMX instruction
+#define   C_FLT        0x040            // FPU instruction
+#define   C_JMP        0x050            // JUMP instruction
+#define   C_JMC        0x060            // Conditional JUMP instruction
+#define   C_CAL        0x070            // CALL instruction
+#define   C_RET        0x080            // RET instruction
+#define   C_FLG        0x090            // Changes system flags
+#define   C_RTF        0x0A0            // C_JMP and C_FLG simultaneously
+#define   C_REP        0x0B0            // Instruction with REPxx prefix
+#define   C_PRI        0x0C0            // Privileged instruction
+#define   C_DAT        0x0D0            // Data (address) doubleword
+#define   C_NOW        0x0E0            // 3DNow! instruction
+#define   C_BAD        0x0F0            // Unrecognized command
+#define   C_SSE        0x110            // SSE instruction
 #define C_RARE         0x08            // Rare command, seldom used in programs
 #define C_SIZEMASK     0x07            // MMX data size or special flag
 #define   C_EXPL       0x01            // (non-MMX) Specify explicit memory size
@@ -649,6 +669,7 @@ typedef enum e_inst
 #define   DEC_STRING   0x0B            // Zero-terminated ASCII string
 #define   DEC_UNICODE  0x0C            // Zero-terminated UNICODE string
 #define   DEC_3DNOW    0x0D            // Accessed as 3Dnow operand
+#define   DEC_DQWORD   0x0E            // Accessed as 16-byte integer
 #define   DEC_BYTESW   0x11            // Accessed as byte index to switch
 #define   DEC_NEXTCODE 0x13            // Subsequent byte of command
 #define   DEC_COMMAND  0x1D            // First byte of command
@@ -700,7 +721,7 @@ typedef struct t_cmddata
     uchar          len;                  // Length of the main command code
     uchar          bits;                 // Special bits within the command
     uchar          arg1, arg2, arg3;     // Types of possible arguments
-    uchar          type;                 // C_xxx + additional information
+    ushort         type;                 // C_xxx + additional information
     e_inst         inst;                 // Symbolic name for this command
 } t_cmddata;
 
