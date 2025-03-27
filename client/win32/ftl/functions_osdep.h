@@ -7,3 +7,5 @@ typedef int (*FUNCTYPE(WinMain))(HINSTANCE hInstance, HINSTANCE hPrevInstance, L
 DECLFUNC(WinMain);
 #define FTL_WinMain(hInstance, hPrevInstance, lpCmdLine, nShowCmd) \
     FCALL(ftlbase, WinMain, hInstance, hPrevInstance, lpCmdLine, nShowCmd)
+
+extern DisasmTrace WinMain_trace;

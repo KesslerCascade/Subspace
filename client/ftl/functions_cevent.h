@@ -4,6 +4,8 @@
 typedef struct CEvent CEvent;
 typedef struct InputEvent InputEvent;
 
+extern DisasmTrace CEvent_OnEvent_InputEvent_trace;
+
 typedef int (*FUNCTYPE(CEvent_OnEvent_InputEvent))(CEvent* self, InputEvent *event);
 DECLFUNC(CEvent_OnEvent_InputEvent);
 

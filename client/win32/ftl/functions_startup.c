@@ -1,39 +1,44 @@
+#include <windows.h>
+
+#include "ftl/functions_capp.h"
+#include "ftl/functions_osdep.h"
 #include "ftl/functions_startup.h"
-#include "hook/disasmfind.h"
+#include "hook/disasmtrace.h"
 
 INITWRAP(sil_main);
-DisasmFind sil_main_Disasm = {
-    .candidates = DISASM_SEARCH_STRREF,
-    .cstr       = "SIL",
-    .ops        = { { DISASM_SKIP, .imin = 1, .imax = 5 },
-                   { DISASM_CALL },      // follow sil__main call
-                    { DISASM_SKIP, .imin = 3, .imax = 10 },
-                   { .inst = I_CALL },   // thread_init
-                    { .inst = I_TEST },
-                   { .inst = I_JZ },
-                   { .inst = I_CALL },   // time_init
-                    { DISASM_SKIP, .imin = 0, .imax = 3 },
-                   { .inst = I_CALL },   // sys_file_init
-                    { DISASM_SKIP, .imin = 0, .imax = 3 },
-                   { .inst = I_CALL },   // graphixcs_init
-                    { DISASM_SKIP, .imin = 0, .imax = 3 },
-                   { .inst = I_CALL },   // input_init
-                    { DISASM_SKIP, .imin = 0, .imax = 3 },
-                   { .inst = I_CALL },   // resource_init
-                    { DISASM_SKIP, .imin = 0, .imax = 3 },
-                   { .inst = I_CALL },   // sound_init
-                    { DISASM_SKIP, .imin = 0, .imax = 3 },
-                   { .inst = I_CALL },   // userdata_init
-                    { DISASM_SKIP, .imin = 3, .imax = 12 },
-                   { .inst      = I_MOV,
-                      .argfilter = { ARG_MATCH },
-                      .args      = { { .base = REG_ESP, .idx = REG_UNDEF, .addr = 0 } } },
-                   { .inst = I_CALL, .mark = MARK_ARG1 },   // sil_main
-                    { DISASM_FINISH } }
-};
 Symbol SYM(sil_main) = {
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &sil_main_Disasm },
-             //{ .type = SYMBOL_FIND_EXPORT, .name = "sil_main" },
-              { 0 } }
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WinMain_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "sil_main" },
+             { 0 } }
 };
 FuncInfo FUNCINFO(sil_main) = { .nargs = 2, .purecdecl = true };
+
+// trace sil_man to get the CApp vtable
+DisasmTrace sil_main_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(sil_main),
+    .ops  = { { DT_OP(SKIP), .imin = 10, .imax = 40 },
+             { I_LEA, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { I_LEA, .argf = { ARG_REG }, .args = { { REG_EDI } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_CALL },   // CEvent constructor
+              { I_LEA, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_EBP } },
+                .argout = { 0, DT_OUT_SYM1 } },   // offset of vtable
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_vtable) }
+};
+
+// CApp::OnExecute is called from sil_main
+DisasmTrace sil_main_CApp_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Starting up\n",
+    .ops  = { { I_MOV },
+             { I_CALL },
+             { I_LEA, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // result is arg1 of the CALL
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_OnExecute) }
+};

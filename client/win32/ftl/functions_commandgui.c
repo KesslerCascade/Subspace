@@ -1,31 +1,10 @@
 #include "ftl/functions_commandgui.h"
 #include "ftl/functions_capp.h"
 #include "ftl/functions_misc.h"
-#include "hook/disasmfind.h"
 
-// CApp::OnExecute is called from sil_main
 INITWRAP(CommandGui_KeyDown);
-DisasmFind CommandGui_KeyDown_Disasm = {
-    .candidates = DISASM_SEARCH_ADDR,
-    .sym        = &SYM(CApp_OnKeyDown),
-    .ops        = { { DISASM_SKIP, .imin = 35, .imax = 45 },
-                   { .inst = I_CALL, .argcap = { CT_CAPTURE0 } },
-                   { DISASM_SKIP, .imin = 3, .imax = 10 },
-                   { .inst = I_CALL, .argfilter = { ARG_MATCH }, .argsym = &SYM(operator_delete) },
-                   { DISASM_SKIP,
-                      .imin = 10,
-                      .imax = 50 },   // steam version reorders this with the MainMenu::OnKeyDown call
-                    { .inst = I_CALL, .argfilter = { ARG_MATCH }, .argcap = { CT_MATCH0 } },
-                   { DISASM_SKIP, .imin = 3, .imax = 10 },
-                   { .inst = I_CALL, .argfilter = { ARG_MATCH }, .argsym = &SYM(operator_delete) },
-                   { DISASM_SKIP, .imin = 3, .imax = 10 },
-                   { .inst = I_MOV, .argfilter = { ARG_REG }, .args = { { .base = REG_ESP } } },
-                   { .inst = I_MOV, .argfilter = { ARG_REG }, .args = { { .base = REG_ESP } } },
-                   { .inst = I_CALL, .mark = MARK_ARG1 },
-                   { DISASM_FINISH } }
-};
 Symbol SYM(CommandGui_KeyDown) = {
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_KeyDown_Disasm },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnKeyDown_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui7KeyDownEib" },
              { 0 } }
 };
@@ -36,32 +15,10 @@ FuncInfo FUNCINFO(CommandGui_KeyDown) = {
 };
 
 INITWRAP(CommandGui_SetPaused);
-DisasmFind CommandGui_SetPaused_Disasm = {
-    .candidates = DISASM_SEARCH_ADDR,
-    .sym        = &SYM(CApp_GenInputEvents),
-    .ops        = { { DISASM_SKIP, .imin = 20, .imax = 25 },
-                   { .inst = I_CMP },
-                   { .inst      = I_MOV,
-                      .argfilter = { ARG_REG },
-                      .args      = { { .base = REG_EAX } },
-                      .argcap    = { 0, CT_CAPTURE0 } },
-                   { DISASM_SKIP, .imin = 0, .imax = 10 },
-                   { .inst      = I_MOV,
-                      .argfilter = { ARG_REG, ARG_MATCH },
-                      .args      = { { .base = REG_EAX } },
-                      .argcap    = { 0, CT_MATCH0 } },
-                   { DISASM_SKIP, .imin = 3, .imax = 10 },
-                   { .inst = I_MOV, .argfilter = { 0, ARG_DISP }, .args = { { 0 }, { .disp = 8 } } },
-                   { .inst = I_MOV, .argfilter = { 0, ARG_DISP }, .args = { { 0 }, { .disp = 4 } } },
-                   { .inst = I_MOV, .argfilter = { 0, ARG_DISP }, .args = { { 0 }, { .disp = -9 } } },
-                   { .inst = I_MOV, .argfilter = { ARG_REG }, .args = { { .base = REG_ESP } } },
-                   { .inst = I_CALL, .mark = MARK_ARG1 },
-                   { DISASM_FINISH } }
-};
 Symbol SYM(CommandGui_SetPaused) = {
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SetPaused_Disasm },
-             //{ .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui9SetPausedEbb" },
-              { 0 } }
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_GenInputEvents_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui9SetPausedEbb" },
+             { 0 } }
 };
 FuncInfo FUNCINFO(CommandGui_SetPaused) = {
     .nargs   = 3,

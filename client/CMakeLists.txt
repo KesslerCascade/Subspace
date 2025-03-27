@@ -16,7 +16,7 @@ if(WIN32)
         win32/ftl/functions_worldmanager.c
         win32/ftl/globals.c
         win32/hook/analysis.c
-        win32/hook/disasmfind.c
+        win32/hook/disasmtrace.c
         win32/hook/export.c
         win32/hook/hook.c
         win32/hook/string.c
@@ -39,6 +39,7 @@ add_executable(subspace-client
     commandgui/keydown.c
     ftl/ftl.c
     hook/module.c
+    hook/symbol.c
     patch/patch.c
     patch/capp/patch_capp_onexecute.c
     patch/capp/patch_capp_onkeydown.c
