@@ -1,5 +1,5 @@
 #include "textlibrary.h"
-#include "subspaceclient.h"
+#include "subspacegame.h"
 
 basic_string* subspace_TextLibrary_GetText(TextLibrary* self, basic_string* text, basic_string* out, basic_string* lang) {
     if(tgd.overrideHullText && text && !strcmp(text->buf, "status_hull")) {

@@ -1,6 +1,6 @@
 if(WIN32)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB /ENTRY:entry")
-    set(CLIENT_OSDEP
+    set(GAME_OSDEP
         win32/codegen/asm.c
         win32/codegen/codegen.c
         win32/codegen/hookgen.c
@@ -42,7 +42,7 @@ if(WIN32)
     set(CMAKE_WIN32_EXECUTABLE true)
 endif()
 
-add_executable(subspace-client
+add_executable(subspacegame
     capp/onexecute.c
     capp/onkeydown.c
     capp/onloop.c
@@ -68,11 +68,11 @@ add_executable(subspace-client
     patch/textlibrary/patch_textlibrary_gettext.c
     shipstatus/renderhealth.c
     textlibrary/gettext.c
-    subspaceclient.c
-    ${CLIENT_OSDEP})
-target_include_directories(subspace-client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_link_libraries(subspace-client disasm minicrt)
+    subspacegame.c
+    ${GAME_OSDEP})
+target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_link_libraries(subspacegame disasm minicrt)
 if (WIN32)
-    target_include_directories(subspace-client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/win32)
-    target_link_libraries(subspace-client ${CMAKE_CURRENT_SOURCE_DIR}/tlsarray.lib)
+    target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/win32)
+    target_link_libraries(subspacegame ${CMAKE_CURRENT_SOURCE_DIR}/tlsarray.lib)
 endif()

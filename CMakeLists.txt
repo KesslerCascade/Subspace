@@ -10,7 +10,7 @@ enable_language(CXX)
 
 include_directories(${TOP_SOURCE_DIR}/shared)
 
-if (BUILD_CLIENT AND WIN32)
+if (BUILD_GAME AND WIN32)
     # Disable compiler features that depend on the standard library
     add_definitions(/GS-) # no buffer security check
     STRING (REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}") # no runtime checks
@@ -19,6 +19,6 @@ endif()
 
 add_subdirectory(lib)
 
-if (BUILD_CLIENT)
-    add_subdirectory(client)
+if (BUILD_GAME)
+    add_subdirectory(game)
 endif()

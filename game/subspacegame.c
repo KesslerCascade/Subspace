@@ -1,4 +1,4 @@
-#include "subspaceclient.h"
+#include "subspacegame.h"
 // NOTE: the entry point (i.e. "main" equivalent) is not located here, but is instead in entry.c in one of the playform-specific subdirectories
 
 #include "ftl/ftl.h"
@@ -8,12 +8,12 @@
 #include "patch/seq/seq_osdep.h"
 #include "patch/seq/seq_required.h"
 
-SubspaceClientSettings scsettings;
+SubspaceGameSettings settings;
 
 entrypoint ftlentry;
 int sscmain(void)
 {
-    ftlbase = loadProgram(scsettings.gameProgram);
+    ftlbase = loadProgram(settings.gameProgram);
 
     PatchState ps;
     if (!patchBegin(&ps, ftlbase)) {

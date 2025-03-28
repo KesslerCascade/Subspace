@@ -79,7 +79,7 @@ static void emitWarnings(const FuncInfo* fi, const char* funcname)
 #endif
 */
 
-#ifdef DEBUG
+#ifdef _DEBUG
 bool _hookFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* pre, void* post,
                    const char* funcname)
 #else
@@ -100,7 +100,7 @@ bool _hookFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* pre, void
     return (count > 0);
 }
 
-#ifdef DEBUG
+#ifdef _DEBUG
 bool _replaceFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* replacement,
                       const char* funcname)
 #else

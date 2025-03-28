@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <windows.h>
-#include "subspaceclient.h"
+#include "subspacegame.h"
 
 #include "minicrt.h"
 
@@ -21,27 +21,27 @@ typedef int(WINAPI* WinMain_t)(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPS
 
 int __stdcall entry()
 {
-    scsettings.gameDir     = smalloc(MAX_PATH);
-    scsettings.gameProgram = smalloc(MAX_PATH);
-    scsettings.gamePath    = smalloc(MAX_PATH);
+    settings.gameDir     = smalloc(MAX_PATH);
+    settings.gameProgram = smalloc(MAX_PATH);
+    settings.gamePath    = smalloc(MAX_PATH);
 
 #if 0
-    strcpy(scsettings.gameDir, "M:\\Dev\\FTLCopy");
-    strcpy(scsettings.gameProgram, "FTLGame.exe");
-    strcpy(scsettings.gamePath, "M:\\Dev\\FTLCopy\\FTLGame.exe");
+    strcpy(settings.gameDir, "M:\\Dev\\FTLCopy");
+    strcpy(settings.gameProgram, "FTLGame.exe");
+    strcpy(settings.gamePath, "M:\\Dev\\FTLCopy\\FTLGame.exe");
 #elif 0
-    strcpy(scsettings.gameDir, "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light");
-    strcpy(scsettings.gameProgram, "FTLGame.exe");
-    strcpy(scsettings.gamePath,
+    strcpy(settings.gameDir, "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light");
+    strcpy(settings.gameProgram, "FTLGame.exe");
+    strcpy(settings.gamePath,
            "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light\\FTLGame.exe");
 #elif 1
-    strcpy(scsettings.gameDir, "M:\\Games\\Sync\\FTL");
-    strcpy(scsettings.gameProgram, "FTLGame.exe");
-    strcpy(scsettings.gamePath, "M:\\Games\\Sync\\FTL\\FTLGame.exe");
+    strcpy(settings.gameDir, "M:\\Games\\Sync\\FTL");
+    strcpy(settings.gameProgram, "FTLGame.exe");
+    strcpy(settings.gamePath, "M:\\Games\\Sync\\FTL\\FTLGame.exe");
 #endif
 
-    SetCurrentDirectoryA(scsettings.gameDir);
-    SetEnvironmentVariableA("USERPROFILE", scsettings.gameDir);
+    SetCurrentDirectoryA(settings.gameDir);
+    SetEnvironmentVariableA("USERPROFILE", settings.gameDir);
 
     // if (AllocConsole()) {
     //  FILE* temp;

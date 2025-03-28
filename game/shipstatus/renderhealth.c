@@ -1,10 +1,10 @@
 #include "shipmanager/shipmanager.h"
-#include "combatcontrol.h"
-#include "subspaceclient.h"
+#include "shipstatus.h"
+#include "subspacegame.h"
 
-int subspace_CombatControl_RenderTarget_pre(CombatControl* self)
+int subspace_ShipStatus_RenderHealth_pre(ShipStatus* self, bool renderText)
 {
-    ShipManager* sm = CombatControl_GetCurrentTarget(self);
+    ShipManager* sm = ShipStatus_ship(self);
     Ship* ship      = sm ? ShipManager_ship(sm) : NULL;
 
     if (ship) {
@@ -14,7 +14,7 @@ int subspace_CombatControl_RenderTarget_pre(CombatControl* self)
     return 1;
 }
 
-int subspace_CombatControl_RenderTarget_post(int ret, CombatControl* self)
+int subspace_ShipStatus_RenderHealth_post(int ret, ShipStatus* self, bool renderText)
 {
     tgd.overrideHullText = false;
     return ret;

@@ -19,7 +19,7 @@ int replaceVariable(addr_t base, addr_t from, const void* to);
 // pre is called before, if it returns 0, the original function is not called.
 // post is called after, with an extra first argument that is the return of the original.
 // Whatever post returns is substituted.
-#ifdef DEBUG
+#ifdef _DEBUG
 #define hookFunction(base, func, pre, post) \
     _hookFunction(base, symAddr(base, func), &FUNCINFO(func), pre, post, #func)
 #define hookFunctionP(base, func, pre, post) \
@@ -35,7 +35,7 @@ bool _hookFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* pre, void
 #endif
 
 // Just a simple (hah!) replacement
-#ifdef DEBUG
+#ifdef _DEBUG
 #define replaceFunction(base, func, replacement) \
     _replaceFunction(base, symAddr(base, func), &FUNCINFO(func), replacement, #func)
 #define replaceFunctionP(base, func, replacement) \

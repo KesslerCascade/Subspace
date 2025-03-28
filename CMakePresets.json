@@ -7,7 +7,7 @@
         "binaryDir": "${sourceDir}/build/${presetName}"
         },
         {
-            "name": "client",
+            "name": "game",
             "inherits": "base",
             "generator": "Visual Studio 16 2019",
             "architecture": {
@@ -19,21 +19,21 @@
                 "strategy": "set"
             },
             "cacheVariables": {
-                "BUILD_CLIENT": true
+                "BUILD_GAME": true
             }
         }
     ],
     "buildPresets": [
         {
-            "name": "client-debug",
-            "displayName": "Client (Debug)",
-            "configurePreset": "client",
+            "name": "game-debug",
+            "displayName": "Game (Debug)",
+            "configurePreset": "game",
             "configuration": "Debug"
         },
         {
-            "name": "client-release",
-            "displayName": "Client (Release)",
-            "configurePreset": "client",
+            "name": "game-release",
+            "displayName": "Game (Release)",
+            "configurePreset": "game",
             "configuration": "Release"
         }
     ]
