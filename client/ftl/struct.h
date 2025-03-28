@@ -13,5 +13,8 @@ typedef struct Pointf {
 
 typedef struct basic_string {
     char* buf;
-    uint32_t len;
+    unsigned long len;
+    char stackbuf[15];
 } basic_string;
+void basic_string_set(basic_string* str, const char* src);
+void basic_string_destroy(basic_string* str);

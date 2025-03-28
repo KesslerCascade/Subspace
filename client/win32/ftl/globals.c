@@ -1,4 +1,5 @@
 #include "ftl/globals.h"
+#include "ftl/functions_capp.h"
 #include "hook/disasmtrace.h"
 
 // Move to Settings module if we ever hook it
@@ -17,4 +18,17 @@ DisasmTrace Settings_SaveSettings_trace = {
 
 Symbol SYM(opt_framelimit) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Settings_SaveSettings_trace }, { 0 } }
+};
+
+Symbol SYM(Globals_Library) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v1_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v2_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7Globals7LibraryE" },
+             { 0 } }
+};
+
+Symbol SYM(Globals_Library_currentLanguage) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v2_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v1_trace },
+             { 0 } }
 };

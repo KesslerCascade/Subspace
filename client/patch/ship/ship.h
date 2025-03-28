@@ -1,4 +1,4 @@
 #pragma once
 #include "patch/patch.h"
 
-extern PatchSequence CAppPatches;
+extern Patch validate_Ship;

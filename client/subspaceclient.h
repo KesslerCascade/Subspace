@@ -10,6 +10,12 @@ typedef struct SubspaceClientSettings {
     char* gamePath;      // fill path to game executable
 } SubspaceClientSettings;
 
+typedef struct TransientGlobalData {
+    bool overrideHullText;
+    int hull;
+} TransientGlobalData;
+
 extern SubspaceClientSettings scsettings;
+TransientGlobalData tgd;
 
 int sscmain(void);

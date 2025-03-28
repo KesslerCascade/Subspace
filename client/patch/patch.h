@@ -40,6 +40,7 @@ bool patchApplySeq(PatchState* ps, PatchSequence seq);
 PatchRelevancy AlwaysRequired(addr_t base, Patch* p, PatchState* ps);
 PatchRelevancy AlwaysOptional(addr_t base, Patch* p, PatchState* ps);
 bool NoValidation(addr_t base, Patch* p, PatchState* ps);
+bool NoPatch(addr_t base, Patch* p, PatchState* ps);
 
 // Generic function that can be used for replacements
 int DoNothing();

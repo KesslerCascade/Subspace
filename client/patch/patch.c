@@ -85,6 +85,11 @@ bool NoValidation(addr_t base, Patch* p, PatchState* ps)
     return true;
 }
 
+bool NoPatch(addr_t base, Patch* p, PatchState* ps)
+{
+    return true;
+}
+
 int DoNothing()
 {
     return 0;

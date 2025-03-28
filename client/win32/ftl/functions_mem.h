@@ -6,8 +6,8 @@
 
 typedef void * (*FUNCTYPE(msvcrt_malloc))(size_t size);
 DECLFUNC(msvcrt_malloc);
-#define malloc(sz) FCALL(ftlbase, msvcrt_malloc, size);
+#define malloc(sz) FCALL(ftlbase, msvcrt_malloc, sz);
 
 typedef void (*FUNCTYPE(msvcrt_free))(void *ptr);
 DECLFUNC(msvcrt_free);
-#define free(sz) FCALL(ftlbase, msvcrt_free, size);
+#define free(p) FCALL(ftlbase, msvcrt_free, p);

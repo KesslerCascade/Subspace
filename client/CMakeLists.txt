@@ -10,12 +10,18 @@ if(WIN32)
         win32/ftl/functions_cevent.c
         win32/ftl/functions_cfps.c
         win32/ftl/functions_commandgui.c
+        win32/ftl/functions_completeship.c
         win32/ftl/functions_mem.c
         win32/ftl/functions_misc.c
         win32/ftl/functions_mousecontrol.c
         win32/ftl/functions_osdep.c
+        win32/ftl/functions_shipmanager.c
+        win32/ftl/functions_ship.c
+        win32/ftl/functions_shipmanager.c
+        win32/ftl/functions_shipstatus.c
         win32/ftl/functions_starmap.c
         win32/ftl/functions_startup.c
+        win32/ftl/functions_textlibrary.c
         win32/ftl/functions_worldmanager.c
         win32/ftl/globals.c
         win32/hook/analysis.c
@@ -41,6 +47,7 @@ add_executable(subspace-client
     capp/onloop.c
     commandgui/keydown.c
     ftl/ftl.c
+    ftl/struct.c
     hook/module.c
     hook/symbol.c
     mousecontrol/onrender.c
@@ -50,9 +57,14 @@ add_executable(subspace-client
     patch/capp/patch_capp_onloop.c
     patch/commandgui/patch_commandgui_keydown.c
     patch/mousecontrol/patch_mousecontrol_onrender.c
-    patch/seq/seq_capp.c
-    patch/seq/seq_commandgui.c
-    patch/seq/seq_mousecontrol.c
+    patch/seq/seq_numerichull.c
+    patch/seq/seq_required.c
+    patch/ship/validate_ship.c
+    patch/shipstatus/patch_shipstatus_renderhealth.c
+    patch/shipstatus/validate_shipstatus.c
+    patch/textlibrary/patch_textlibrary_gettext.c
+    shipstatus/renderhealth.c
+    textlibrary/gettext.c
     subspaceclient.c
     ${CLIENT_OSDEP})
 target_include_directories(subspace-client PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

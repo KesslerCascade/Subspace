@@ -1,6 +1,10 @@
 #include "ftl/functions_commandgui.h"
 #include "ftl/functions_capp.h"
+#include "ftl/functions_completeship.h"
 #include "ftl/functions_misc.h"
+#include "ftl/functions_shipmanager.h"
+#include "ftl/functions_shipstatus.h"
+#include "hook/disasmtrace.h"
 
 INITWRAP(CommandGui_KeyDown);
 Symbol SYM(CommandGui_KeyDown) = {
@@ -24,4 +28,134 @@ FuncInfo FUNCINFO(CommandGui_SetPaused) = {
     .nargs   = 3,
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_INT, 0, true } }
+};
+
+INITWRAP(CommandGui_RenderStatic);
+Symbol SYM(CommandGui_RenderStatic) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui12RenderStaticEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_RenderStatic) = { .nargs   = 1,
+                                               .stdcall = true,
+                                               .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+Symbol SYM(CommandGui_SpaceBar) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnKeyDown_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui8SpaceBarEv" },
+             { 0 } }
+};
+
+DisasmTrace CommandGui_SpaceBar_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CommandGui_SpaceBar),
+    .ops  = { { DT_OP(SKIP), .imin = 3, .imax = 7 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { CT_CAPTURE1 },
+                .argout = { 0, DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 2, .imax = 5 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .argcap = { CT_CAPTURE2, CT_MATCH1 },
+                .argout = { 0, DT_OUT_SYM2 } },
+             { I_MOV, .argf = { 0, ARG_REG }, .argcap = { CT_CAPTURE3, CT_MATCH2 } },
+             { I_MOV, .argf = { 0, ARG_REG }, .argcap = { CT_CAPTURE4, CT_MATCH3 } },
+             { I_CMP, .argf = { ARG_REG }, .argcap = { CT_MATCH4 }, .argout = { 0, DT_OUT_SYM3 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_shipComplete_offset),    // DT_OUT_SYM1
+              &SYM(CompleteShip_shipManager_offset),   // DT_OUT_SYM2
+              &SYM(ShipManager_GetIsJumping) }
+};
+
+Symbol SYM(CommandGui_shipComplete_offset) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SpaceBar_trace }, { 0 } }
+};
+
+DisasmTrace CommandGui_RenderStatic_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CommandGui_RenderStatic),
+    // For now, just check every CALL. This trace is very much a brute force and a big TODO is to
+    // replace it with something better.
+    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 1000 },
+             { DT_OP(CALL) },
+             { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 0, .imax = 30 },
+             { DT_OP(CALL) },
+             { I_PUSH, .outip = DT_OUT_SYM2 },
+             { DT_OP(SKIP), .imin = 0, .imax = 50 },
+             { I_MOV,
+                .argf = { 0, ARG_ADDR },
+                .args = { { 0 }, { .addr = 0x74617473 } } },   // "stat"
+              { I_MOV,
+                .argf = { 0, ARG_ADDR },
+                .args = { { 0 }, { .addr = 0x685f7375 } } },   // "us_h" (ull)
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipStatus_OnRender), &SYM(ShipStatus_RenderHealth) }
+};
+
+DisasmTrace CommandGui_RunCommand_HULL_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "HULL ", // yes, with a space at the end
+    .ops  = { { DT_OP(SKIP), .imin = 20, .imax = 28 },
+             { I_NEG, .argcap = { CT_CAPTURE1 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_REG },
+                .args   = { { REG_ESP } },
+                .argcap = { 0, CT_MATCH1 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // ShipManager::DamageHull
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_DamageHull) }
+};
+
+INITWRAP(CommandGui_IsPaused);
+Symbol SYM(CommandGui_IsPaused) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui8IsPausedEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_IsPaused) = { .nargs   = 1,
+                                           .stdcall = true,
+                                           .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+INITWRAP(CommandGui_IsGameOver);
+Symbol SYM(CommandGui_IsGameOver) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui10IsGameOverEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_IsGameOver) = { .nargs   = 1,
+                                             .stdcall = true,
+                                             .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+INITWRAP(CommandGui_Restart);
+Symbol SYM(CommandGui_Restart) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui7RestartEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_Restart) = { .nargs   = 1,
+                                          .stdcall = true,
+                                          .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+DisasmTrace CommandGui_Restart_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CommandGui_Restart),
+    .ops  = { { DT_OP(SKIP), .imin = 7, .imax = 17 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { CT_CAPTURE1 } },   // remember which reg holds this
+              { DT_OP(SKIP), .imin = 15, .imax = 30 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },      // somewhere it gets set back as
+                .args   = { { REG_ECX } },             // ECX for a CALL, because CommandGui
+                .argcap = { 0, CT_MATCH1 } },          // starts with embedded ShipManager
+              { DT_OP(SKIP), .imin = 2, .imax = 5 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ShipStatus::LinkShipManager
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipStatus_LinkShip) }
 };
