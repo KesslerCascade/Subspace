@@ -113,10 +113,8 @@ void xfputs (                   /* Put a string to the specified device */
     xprintf("%f", 10.0);            <xprintf lacks floating point support>
 */
 
-static
-void xvprintf (
-    const char* fmt,    /* Pointer to the format string */
-    va_list arp         /* Pointer to arguments */
+static void _minicrt_xvprintf(const char* fmt, /* Pointer to the format string */
+                              va_list arp      /* Pointer to arguments */
 )
 {
     unsigned int r, i, j, w, f;
@@ -190,11 +188,9 @@ void xvprintf (
     }
 }
 
-static
-void wxvprintf(
-    const wchar_t*  fmt,    /* Pointer to the format string */
-    va_list arp         /* Pointer to arguments */
-    )
+static void _minicrt_wxvprintf(const wchar_t* fmt, /* Pointer to the format string */
+                               va_list arp         /* Pointer to arguments */
+)
 {
     unsigned int r, i, j, w, f;
     unsigned long v;
@@ -295,43 +291,43 @@ void xprintf (          /* Put a formatted string to the default device */
 }
 #endif
 
-int sprintf (           /* Put a formatted string to the memory */
-    char* buff,         /* Pointer to the output buffer */
-    const char* fmt,    /* Pointer to the format string */
-    ...                 /* Optional arguments */
+int _minicrt_sprintf(                 /* Put a formatted string to the memory */
+                     char* buff,      /* Pointer to the output buffer */
+                     const char* fmt, /* Pointer to the format string */
+                     ...              /* Optional arguments */
 )
 {
     va_list arp;
     int len;
 
     va_start(arp, fmt);
-    len = vsnprintf(buff, 0, fmt, arp);
+    len = _minicrt_vsnprintf(buff, 0, fmt, arp);
     va_end(arp);
     return len;
 }
 
-int snprintf(           /* Put a formatted string to the memory */
-            char* buff,         /* Pointer to the output buffer */
-            unsigned int size,  /* Maximum size of buffer */
-            const char* fmt,    /* Pointer to the format string */
-            ...                 /* Optional arguments */
-            )
+int _minicrt_snprintf(                   /* Put a formatted string to the memory */
+                      char* buff,        /* Pointer to the output buffer */
+                      unsigned int size, /* Maximum size of buffer */
+                      const char* fmt,   /* Pointer to the format string */
+                      ...                /* Optional arguments */
+)
 {
     va_list arp;
     int len;
 
     va_start(arp, fmt);
-    len = vsnprintf(buff, size, fmt, arp);
+    len = _minicrt_vsnprintf(buff, size, fmt, arp);
     va_end(arp);
     return len;
 }
 
-int vsnprintf(          /* Put a formatted string to the memory */
-             char* buff,            /* Pointer to the output buffer */
-             unsigned int size,     /* Maximum size of buffer */
-             const char*    fmt,    /* Pointer to the format string */
-             va_list arp            /* Optional arguments */
-             )
+int _minicrt_vsnprintf(                   /* Put a formatted string to the memory */
+                       char* buff,        /* Pointer to the output buffer */
+                       unsigned int size, /* Maximum size of buffer */
+                       const char* fmt,   /* Pointer to the format string */
+                       va_list arp        /* Optional arguments */
+)
 {
     int len;
 
@@ -339,7 +335,7 @@ int vsnprintf(          /* Put a formatted string to the memory */
     if (size > 0)
         outptrend = buff + size - 1;        // leave room for terminating null
 
-    xvprintf(fmt, arp);
+    _minicrt_xvprintf(fmt, arp);
 
     *outptr = 0;        /* Terminate output string with a \0 */
     len = outptr - buff;
@@ -348,30 +344,29 @@ int vsnprintf(          /* Put a formatted string to the memory */
     return len;
 }
 
-int _wsprintf(wchar_t *buff, const wchar_t *fmt, ...)
+int _minicrt_wsprintf(wchar_t* buff, const wchar_t* fmt, ...)
 {
     va_list arp;
     int len;
 
     va_start(arp, fmt);
-    len = wvsnprintf(buff, 0, fmt, arp);
+    len = _minicrt_wvsnprintf(buff, 0, fmt, arp);
     va_end(arp);
     return len;
 }
 
-int _wsnprintf(wchar_t *buff, unsigned int size, const wchar_t *fmt, ...)
+int _minicrt_wsnprintf(wchar_t* buff, unsigned int size, const wchar_t* fmt, ...)
 {
     va_list arp;
     int len;
 
     va_start(arp, fmt);
-    len = wvsnprintf(buff, size, fmt, arp);
+    len = _minicrt_wvsnprintf(buff, size, fmt, arp);
     va_end(arp);
     return len;
 }
 
-
-int _wvsnprintf(wchar_t *buff, unsigned int size, const wchar_t *fmt, va_list arp)
+int _minicrt_wvsnprintf(wchar_t* buff, unsigned int size, const wchar_t* fmt, va_list arp)
 {
     int len;
 
@@ -379,7 +374,7 @@ int _wvsnprintf(wchar_t *buff, unsigned int size, const wchar_t *fmt, va_list ar
     if (size > 0)
         woutptrend = buff + size;
 
-    wxvprintf(fmt, arp);
+    _minicrt_wxvprintf(fmt, arp);
 
     *woutptr = 0;
     len = woutptr - buff;
