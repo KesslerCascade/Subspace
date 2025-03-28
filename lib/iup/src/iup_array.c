@@ -9,6 +9,7 @@
 #include <string.h>
 #include <memory.h>
 
+#include "iup.h"
 #include "iup_export.h"
 #include "iup_array.h"
 #include "iup_assert.h"

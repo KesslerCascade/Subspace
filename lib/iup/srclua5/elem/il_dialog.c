@@ -151,6 +151,13 @@ static int dialog_unmap_cb(Ihandle *self)
   return iuplua_call(L, 0);
 }
 
+static int dialog_dpichange_cb(Ihandle *self, int p0)
+{
+    lua_State *L = iuplua_call_start(self, "dpichange_cb");
+    lua_pushinteger(L, p0);
+    return iuplua_call(L, 1);
+}
+
 static int Dialog(lua_State *L)
 {
   Ihandle *ih = IupDialog(iuplua_checkihandleornil(L, 1));
@@ -168,6 +175,7 @@ int iupdialoglua_open(lua_State * L)
   iuplua_register_cb(L, "CUSTOMFRAMEACTIVATE_CB", (lua_CFunction)dialog_customframeactivate_cb, NULL);
   iuplua_register_cb(L, "CUSTOMFRAMEDRAW_CB", (lua_CFunction)dialog_customframedraw_cb, NULL);
   iuplua_register_cb(L, "DESTROY_CB", (lua_CFunction)dialog_destroy_cb, NULL);
+  iuplua_register_cb(L, "DPICHANGE_CB", (lua_CFunction)dialog_dpichange_cb, NULL);
   iuplua_register_cb(L, "DRAGBEGIN_CB", (lua_CFunction)dialog_dragbegin_cb, NULL);
   iuplua_register_cb(L, "DRAGDATA_CB", (lua_CFunction)dialog_dragdata_cb, NULL);
   iuplua_register_cb(L, "DRAGDATASIZE_CB", (lua_CFunction)dialog_dragdatasize_cb, NULL);

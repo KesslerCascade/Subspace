@@ -112,7 +112,7 @@ wdMeasureString(WD_HCANVAS hCanvas, WD_HFONT hFont, const WD_RECT* pRect,
         pResult->y1 = pResult->y0 + tm.height;
 
         dummy_IDWriteTextLayout_Release(layout);
-    } else {
+    } else if (hCanvas) {
         gdix_canvas_t* c = (gdix_canvas_t*) hCanvas;
         dummy_GpRectF r;
         dummy_GpFont* f = (dummy_GpFont*) hFont;

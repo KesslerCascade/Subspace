@@ -11,6 +11,8 @@
 #endif
 #endif
 
+#include <cx/cx.h>
+
 #ifdef IUP_USE_GTK
 #include <glib.h>
 /* #include <gthread.h> */

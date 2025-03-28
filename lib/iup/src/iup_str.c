@@ -16,6 +16,7 @@
 #include <locale.h>
 #include <ctype.h>
 
+#include "iup.h"
 #include "iup_export.h"
 #include "iup_str.h"
 

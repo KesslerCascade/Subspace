@@ -10,6 +10,8 @@
 #ifndef __IUP_H 
 #define __IUP_H
 
+#include <cx/cx.h>
+
 #include "iupkey.h"
 #include "iupdef.h"
 #include "iup_export.h"
@@ -53,6 +55,7 @@ IUP_API int       IupPlayInput(const char* filename);
 
 IUP_API void      IupUpdate        (Ihandle* ih);
 IUP_API void      IupUpdateChildren(Ihandle* ih);
+IUP_API void      IupUpdateRect    (Ihandle* ih, int x1, int y1, int x2, int y2);
 IUP_API void      IupRedraw        (Ihandle* ih, int children);
 IUP_API void      IupRefresh       (Ihandle* ih);
 IUP_API void      IupRefreshChildren(Ihandle* ih);

@@ -4,6 +4,7 @@
  * See Copyright Notice in "iup.h"
  */
 
+#include <cx/cx.h>
 #include <windows.h>
 #include <uxtheme.h>
 
@@ -281,8 +282,10 @@ void iupwinDrawBitmap(HDC hDC, HBITMAP hBitmap, int x, int y, int w, int h, int 
   {
     if (w == img_w && h == img_h)
       BitBlt(hDC, x, y, img_w, img_h, hMemDC, 0, 0, SRCCOPY);
-    else
+    else {
+      SetStretchBltMode(hDC, COLORONCOLOR);
       StretchBlt(hDC, x, y, w, h, hMemDC, 0, 0, img_w, img_h, SRCCOPY);
+    }
   }
 
   SelectObject(hMemDC, oldBitmap);

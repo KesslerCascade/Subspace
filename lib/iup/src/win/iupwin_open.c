@@ -3,6 +3,7 @@
  *
  * See Copyright Notice in "iup.h"
  */
+#include <cx/cx.h>
 #include <windows.h>
 #include <commctrl.h>
 #include <ole2.h>
@@ -140,8 +141,10 @@ int iupdrvOpen(int *argc, char ***argv)
   iupwinDrawInit();
   iupwinKeyInit();
 
+#if _WIN32_WINNT >= 0x0601
   if (iupwinIsWin7OrNew())
     iupwinTouchInit();
+#endif
 
 #ifdef __WATCOMC__ 
   {

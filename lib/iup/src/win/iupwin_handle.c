@@ -4,6 +4,7 @@
  * See Copyright Notice in "iup.h"
  */
 
+#include <cx/cx.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>  

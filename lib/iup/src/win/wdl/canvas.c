@@ -416,7 +416,7 @@ wdSetClip(WD_HCANVAS hCanvas, const WD_RECT* pRect, const WD_HPATH hPath)
 
         if(pRect != NULL) {
             gdix_vtable->fn_SetClipRect(c->graphics, pRect->x0, pRect->y0,
-                             pRect->x1, pRect->y1, mode);
+                             pRect->x1 - pRect->x0, pRect->y1 - pRect->y0, mode);
             mode = dummy_CombineModeIntersect;
         }
 

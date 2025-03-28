@@ -4,6 +4,7 @@
  * See Copyright Notice in "iup.h"
  */
 
+#include <cx/cx.h>
 #include <windows.h>
 
 #include <stdlib.h>
@@ -18,6 +19,7 @@
 #include "iup_class.h"
 #include "iup_image.h"
 #include "iup_drvdraw.h"
+#include "iup_drvfont.h"
 #include "iup_draw.h"
 
 #include "iupwin_drv.h"
@@ -26,6 +28,7 @@
 #include "iupwin_str.h"
 
 #include "backend-gdix.h"
+#include "backend-d2d.h"
 #define iupColor2ARGB(_c) WD_ARGB(iupDrawAlpha(_c), iupDrawRed(_c), iupDrawGreen(_c), iupDrawBlue(_c))
 
 /* From iupwin_draw_wdl.c */
@@ -41,6 +44,7 @@ void iupdrvDrawRectangleWDL(IdrawCanvas* dc, int x1, int y1, int x2, int y2, lon
 void iupdrvDrawArcWDL(IdrawCanvas* dc, int x1, int y1, int x2, int y2, double a1, double a2, long color, int style, int line_width);
 void iupdrvDrawPolygonWDL(IdrawCanvas* dc, int* points, int count, long color, int style, int line_width);
 void iupdrvDrawTextWDL(IdrawCanvas* dc, const char* text, int len, int x, int y, int w, int h, long color, const char* font, int flags, double text_orientation);
+void iupdrvDrawGetTextSizeWDL(IdrawCanvas* dc, const char* font, const char* str, int len, int *w, int *h);
 void iupdrvDrawImageWDL(IdrawCanvas* dc, const char* name, int make_inactive, const char* bgcolor, int x, int y, int w, int h);
 void iupdrvDrawSetClipRectWDL(IdrawCanvas* dc, int x1, int y1, int x2, int y2);
 void iupdrvDrawResetClipWDL(IdrawCanvas* dc);
@@ -748,6 +752,21 @@ IUP_SDK_API void iupdrvDrawText(IdrawCanvas* dc, const char* text, int len, int 
     SelectObject(dc->hBitmapDC, hOldFont);
     if (text_orientation)
       gdiResetWorld(dc->hBitmapDC);
+  }
+}
+
+IUP_SDK_API void iupdrvDrawGetTextSize(Ihandle* ih, const char* font, const char* str, int len, int *w, int *h)
+{
+  IdrawCanvas *dc = (IdrawCanvas*)iupAttribGet(ih, "_IUP_DRAW_DC");
+
+  if (dc && dc->wdl_gc) {
+    iupdrvDrawGetTextSizeWDL(dc->wdl_gc, font, str, len, w, h);
+  } else if ((iupAttribGetBoolean(ih, "DRAWUSEDIRECT2D") || IupGetInt(NULL, "DRAWUSEDIRECT2D")) && d2d_enabled()) {
+    /* if direct2d is in use, we can cheat a little because it doesn't actually need the draw context */
+    iupdrvDrawGetTextSizeWDL(NULL, font, str, len, w, h);
+  } else {
+    /* fall back to GDI */
+    iupdrvFontGetTextSize(font, str, len, w, h);
   }
 }
 

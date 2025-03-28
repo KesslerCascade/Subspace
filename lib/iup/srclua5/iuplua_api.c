@@ -987,6 +987,16 @@ static int Update (lua_State *L)
   return 0;
 }
 
+static int UpdateRect (lua_State *L)
+{
+  IupUpdateRect(iuplua_checkihandle(L, 1),
+                luaL_checkinteger(L, 2),
+                luaL_checkinteger(L, 3),
+                luaL_checkinteger(L, 4),
+                luaL_checkinteger(L, 5));
+  return 0;
+}
+
 static int UpdateChildren (lua_State *L)
 {
   IupUpdateChildren(iuplua_checkihandle(L,1));
@@ -1197,6 +1207,7 @@ void iupluaapi_open(lua_State * L)
     {"RefreshChildren", RefreshChildren},
     {"Update", Update},
     {"UpdateChildren", UpdateChildren},
+    {"UpdateRect", UpdateRect},
     {"SaveImageAsText", SaveImageAsText},
     {"ImageGetHandle", ImageGetHandle},
     {"Redraw", Redraw},

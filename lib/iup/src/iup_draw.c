@@ -253,16 +253,16 @@ IUP_SDK_API char* iupDrawGetTextSize(Ihandle* ih, const char* text, int len, int
   if (text_orientation)
   {
     if (text_orientation == 90)
-      iupdrvFontGetTextSize(font, text, len, h, w);
+      iupdrvDrawGetTextSize(ih, font, text, len, h, w);
     else
     {
       int txt_w, txt_h;
-      iupdrvFontGetTextSize(font, text, len, &txt_w, &txt_h);
+      iupdrvDrawGetTextSize(ih, font, text, len, &txt_w, &txt_h);
       iDrawGetTextBounds(txt_w, txt_h, text_orientation, w, h);
     }
   }
   else
-    iupdrvFontGetTextSize(font, text, len, w, h);
+    iupdrvDrawGetTextSize(ih, font, text, len, w, h);
 
   return font;
 }

@@ -9,6 +9,7 @@
 #include <string.h>
 #include <locale.h>
 
+#include "iup.h"
 #include "iup_export.h"
 #include "iup_maskparse.h"
 #include "iup_mask.h"

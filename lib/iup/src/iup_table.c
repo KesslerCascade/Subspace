@@ -10,6 +10,7 @@
 #include <string.h>
 #include <memory.h>
 
+#include "iup.h"
 #include "iup_export.h"
 #include "iup_table.h"
 #include "iup_str.h"

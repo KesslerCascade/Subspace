@@ -91,6 +91,7 @@ void iupdrvDialogGetSize(Ihandle* ih, InativeHandle* handle, int *w, int *h);
 int iupdrvDialogIsVisible(Ihandle* ih);
 int iupDialogSetClientSizeAttrib(Ihandle* ih, const char* value);
 char* iupDialogGetClientSizeAttrib(Ihandle *ih);
+void iupdrvDialogGetDPI(Ihandle* ih, InativeHandle* handle, int *dpi);
 
 
 #endif

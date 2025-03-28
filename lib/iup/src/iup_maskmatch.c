@@ -9,6 +9,7 @@
 #include <string.h>
 #include <ctype.h>
 
+#include "iup.h"
 #include "iup_maskparse.h"
 #include "iup_maskmatch.h"
 

@@ -25,6 +25,7 @@ local ctrl = {
     customframedraw_cb = "",
     customframeactivate_cb = "n",
     postmessage_cb = "sndo",
+    dpichange_cb = "n"
   }
 }
 

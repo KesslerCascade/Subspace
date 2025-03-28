@@ -94,6 +94,16 @@ IUP_API void IupUpdate(Ihandle* ih)
     iupdrvPostRedraw(ih);
 }
 
+IUP_API void IupUpdateRect(Ihandle* ih, int x1, int y1, int x2, int y2)
+{
+    iupASSERT(iupObjectCheck(ih));
+    if (!iupObjectCheck(ih))
+        return;
+
+    if (ih->handle && ih->iclass->nativetype != IUP_TYPEVOID)
+        iupdrvPostRedrawRect(ih, x1, y1, x2, y2);
+}
+
 static void iLayoutDisplayUpdateChildren(Ihandle *ih)
 {
   Ihandle* child;

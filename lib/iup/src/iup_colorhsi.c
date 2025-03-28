@@ -8,6 +8,7 @@
 
 #include <math.h>
 #include <stdio.h>
+#include "iup.h"
 #include "iup_colorhsi.h"
 
 static const double rad60 =  1.0471975;

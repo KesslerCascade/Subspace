@@ -4,6 +4,7 @@
  * See Copyright Notice in "iup.h"
  */
 
+#include <cx/cx.h>
 #include <windows.h>
 
 #include <stdlib.h> /* declaration of __argc and __argv */
@@ -35,7 +36,7 @@ BOOL WINAPI DllMain(HINSTANCE hinstDLL, DWORD fdwReason, LPVOID lpvReserved)
 
   return TRUE;
 }
-#else
+#elif 0
 /* this module is always linked in the makefile, 
    But it must not define WinMain if building the DLL */
 int WINAPI WinMain (HINSTANCE hinst, HINSTANCE hprev, LPSTR cmdline, int ncmdshow)

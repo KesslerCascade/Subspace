@@ -4,6 +4,7 @@
  * See Copyright Notice in "iup.h"
  */
 
+#include <cx/cx.h>
 #include <windows.h>
 
 #include <stdio.h>
@@ -446,8 +447,12 @@ IUP_SDK_API char* iupdrvGetGlobal(const char* name)
   }
   if (iupStrEqual(name, "TOUCHREADY"))
   {
+#if _WIN32_WINNT >= 0x0601
     int value = GetSystemMetrics(SM_DIGITIZER);
     return iupStrReturnBoolean(value & NID_READY);
+#else
+    return iupStrReturnBoolean(0);
+#endif
   }
   if (iupStrEqual(name, "LASTERROR"))
   {

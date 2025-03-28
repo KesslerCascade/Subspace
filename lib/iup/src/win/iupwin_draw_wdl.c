@@ -4,6 +4,7 @@
 * See Copyright Notice in "iup.h"
 */
 
+#include <cx/cx.h>
 #include <windows.h>
 
 #include <stdlib.h>
@@ -26,6 +27,7 @@
 #include "iupwin_draw.h"
 #include "iupwin_str.h"
 
+#include "misc.h"
 #include "wdl.h"
 
 /* From iupwin_image_wdl.c - can be used only here */
@@ -336,7 +338,7 @@ void iupdrvDrawSetClipRectWDL(IdrawCanvas* dc, int x1, int y1, int x2, int y2)
   if (x1 >= x2) x1 = x2;
   if (y1 >= y2) y1 = y2;
 
-  if (x1 == x2 || y1 == y2)
+  if (x1 == x2 && y1 == y2)
   {
     rect.x0 = iupInt2Float(x1);
     rect.y0 = iupInt2Float(y1);
@@ -438,6 +440,23 @@ void iupdrvDrawTextWDL(IdrawCanvas* dc, const char* text, int len, int x, int y,
   /* restore settings */
   if (text_orientation)
     wdResetWorld(dc->hCanvas);
+}
+
+void iupdrvDrawGetTextSizeWDL(IdrawCanvas* dc, const char* font, const char* str, int len, int *w, int *h)
+{
+  HFONT hFont = (HFONT)iupwinGetHFont(font);
+  WD_HFONT wdFont = wdCreateFontWithGdiHandle(hFont);
+  WCHAR *wtext = iupwinStrToSystemLen(str, &len);
+
+  const WD_RECT rcClip = { 0.0f, 0.0f, 10000.0f, 10000.0f };
+  WD_RECT rcResult;
+  wdMeasureString(dc ? dc->hCanvas : NULL, wdFont, &rcClip, wtext, len,
+                  &rcResult, WD_STR_LEFTALIGN | WD_STR_NOWRAP);
+
+  wdDestroyFont(wdFont);
+
+  *w = (int)ceil(WD_ABS(rcResult.x1 - rcResult.x0));
+  *h = (int)ceil(WD_ABS(rcResult.y1 - rcResult.y0));
 }
 
 void iupdrvDrawImageWDL(IdrawCanvas* dc, const char* name, int make_inactive, const char* bgcolor, int x, int y, int w, int h)

@@ -9,6 +9,7 @@
 #include <memory.h>
 #include <string.h>
 
+#include "iup.h"
 #include "iup_export.h"
 #include "iup_linefile.h"
 

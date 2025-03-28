@@ -154,7 +154,7 @@ dwrite_create_text_format(const WCHAR* locale_name, const LOGFONTW* logfont,
         goto err_IDWriteLocalizedStrings_GetStringLength;
     }
 
-    family_name_buffer = (WCHAR*) _malloca(sizeof(WCHAR) * (family_name_buffer_size + 1));
+    family_name_buffer = (WCHAR*) malloc(sizeof(WCHAR) * (family_name_buffer_size + 1));
     if(family_name_buffer == NULL) {
         WD_TRACE("dwrite_create_text_format: _malloca() failed.");
         goto err_malloca;
@@ -188,7 +188,7 @@ dwrite_create_text_format(const WCHAR* locale_name, const LOGFONTW* logfont,
 
 err_IDWriteFactory_CreateTextFormat:
 err_IDWriteLocalizedStrings_GetString:
-    _freea(family_name_buffer);
+    free(family_name_buffer);
 err_malloca:
 err_IDWriteLocalizedStrings_GetStringLength:
     dummy_IDWriteLocalizedStrings_Release(family_names);

@@ -348,6 +348,7 @@ IUPLUA_API int iuplua_dofile(lua_State *L, const char *filename)
   return report(L, status);
 }
 
+/*
 IUPLUA_API int iuplua_dostring(lua_State *L, const char *s, const char *chunk_name)
 {
   int status = luaL_loadbuffer(L, s, strlen(s), chunk_name);
@@ -355,6 +356,7 @@ IUPLUA_API int iuplua_dostring(lua_State *L, const char *s, const char *chunk_na
     status = docall(L, 0, LUA_MULTRET);
   return report(L, status);
 }
+*/
 
 IUPLUA_API int iuplua_dobuffer(lua_State *L, const char *s, int len, const char *chunk_name)
 {
@@ -364,6 +366,7 @@ IUPLUA_API int iuplua_dobuffer(lua_State *L, const char *s, int len, const char 
   return report(L, status);
 }
 
+/*
 static int il_dofile(lua_State *L)
 {
   int old_top = lua_gettop(L);
@@ -392,6 +395,7 @@ static int il_dostring(lua_State *L)
   else
     return 0;
 }
+*/
 
 IUPLUA_SDK_API Ihandle *iuplua_checkihandleornil(lua_State *L, int pos)
 {
@@ -1437,8 +1441,8 @@ IUPLUA_API int iuplua_open(lua_State * L)
     {"ihandle_compare", ihandle_compare},
     {"ihandle_tostring", ihandle_tostring},
     {"_ERRORMESSAGE", il_error_message},
-    {"dostring", il_dostring},
-    {"dofile", il_dofile},
+//    {"dostring", il_dostring},
+//    {"dofile", il_dofile},
     { "StringCompare", StringCompare },
     { "StringChangeCase", StringChangeCase },
     { "StringConvertToUTF8", StringConvertToUTF8 },

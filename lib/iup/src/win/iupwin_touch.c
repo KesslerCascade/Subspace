@@ -3,6 +3,7 @@
  *
  * See Copyright Notice in "iup.h"
  */
+#include <cx/cx.h>
 #include <windows.h>
 #include <commctrl.h>
 
@@ -21,6 +22,7 @@
 #include "iupwin_drv.h"
 #include "iupwin_handle.h"
 
+#if _WIN32_WINNT >= 0x0601
 
 #ifndef WM_TOUCH
 #define WM_TOUCH                        0x0240
@@ -184,3 +186,5 @@ void iupwinTouchProcessInput(Ihandle* ih, int count, void* lp)
     free(ti);
   }
 }
+
+#endif

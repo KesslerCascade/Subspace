@@ -66,6 +66,10 @@ IUP_SDK_API void iupdrvSetActive(Ihandle* ih, int enable);
  * \ingroup drv */
 IUP_SDK_API void iupdrvPostRedraw(Ihandle *ih);
 
+/** Post a redraw of a rectangular region of a control and children.
+ * \ingroup drv */
+IUP_SDK_API void iupdrvPostRedrawRect(Ihandle *ih, int x1, int y1, int x2, int y2);
+
 /** Force a redraw of a control and children.
  * \ingroup drv */
 IUP_SDK_API void iupdrvRedrawNow(Ihandle *ih);

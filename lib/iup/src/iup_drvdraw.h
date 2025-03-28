@@ -76,6 +76,10 @@ IUP_SDK_API void iupdrvDrawPolygon(IdrawCanvas* dc, int* points, int count, long
  * \ingroup drvdraw */
 IUP_SDK_API void iupdrvDrawText(IdrawCanvas* dc, const char* text, int len, int x, int y, int w, int h, long color, const char* font, int flags, double text_orientation);
 
+/** Retrieves the actual size of text as it would be drawn by the backend.
+ *\ingroup drvdraw */
+IUP_SDK_API void iupdrvDrawGetTextSize(Ihandle* ih, const char* font, const char* str, int len, int *w, int *h);
+
 /** Draws an image.
  * x,y is at left,top corner of the image.
  * \ingroup drvdraw */

@@ -1348,6 +1348,7 @@ static int iFlatListSetValueAttrib(Ihandle* ih, const char* value)
         }
 
         items[pos - 1].selected = 1;
+        ih->data->focus_pos = pos;
         iupAttribSetInt(ih, "_IUPFLATLIST_LASTSELECTED", pos);
       }
     }

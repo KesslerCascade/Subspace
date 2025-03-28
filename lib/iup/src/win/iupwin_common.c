@@ -3,6 +3,7 @@
  *
  * See Copyright Notice in "iup.h"
  */
+#include <cx/cx.h>
 #include <windows.h>
 #include <commctrl.h>
 
@@ -165,6 +166,18 @@ IUP_SDK_API void iupdrvPostRedraw(Ihandle *ih)
   /* Post a REDRAW - IupUpdate */
   /* can NOT use RDW_NOCHILDREN because IupList has internal children that needs to be redraw */
   RedrawWindow(ih->handle,NULL,NULL,RDW_ERASE|RDW_INVALIDATE|RDW_INTERNALPAINT);  
+}
+
+IUP_SDK_API void iupdrvPostRedrawRect(Ihandle *ih, int x1, int y1, int x2, int y2)
+{
+  /* Post a REDRAW - IupUpdate */
+  /* can NOT use RDW_NOCHILDREN because IupList has internal children that needs to be redraw */
+    RECT r;
+    r.left = x1;
+    r.top = y1;
+    r.right = x2;
+    r.bottom = y2;
+    InvalidateRect(ih->handle, &r, FALSE);
 }
 
 IUP_SDK_API void iupdrvScreenToClient(Ihandle* ih, int *x, int *y)
@@ -382,6 +395,7 @@ IUP_DRV_API int iupwinBaseMsgProc(Ihandle* ih, UINT msg, WPARAM wp, LPARAM lp, L
       }
       break; 
     } 
+#if _WIN32_WINNT >= 0x0601
   case WM_TOUCH:
     /* TODO: 
      - considering touch messages are greedy, one window got it all?
@@ -391,6 +405,7 @@ IUP_DRV_API int iupwinBaseMsgProc(Ihandle* ih, UINT msg, WPARAM wp, LPARAM lp, L
     if (LOWORD(wp))
       iupwinTouchProcessInput(ih, (int)LOWORD(wp), (void*)lp);
     break;
+#endif
   case WOM_CLOSE:
   case WOM_DONE:
   case WOM_OPEN:
@@ -897,8 +912,10 @@ IUP_SDK_API void iupdrvBaseRegisterCommonAttrib(Iclass* ic)
 
 IUP_SDK_API void iupdrvBaseRegisterVisualAttrib(Iclass* ic)
 {
+#if _WIN32_WINNT >= 0x0601
   if (iupwinIsWin7OrNew())
     iupwinTouchRegisterAttrib(ic);
+#endif
 
   iupClassRegisterAttribute(ic, "TIPBALLOON", NULL, NULL, IUPAF_SAMEASSYSTEM, NULL, IUPAF_DEFAULT);
   iupClassRegisterAttribute(ic, "TIPBALLOONTITLE", NULL, NULL, IUPAF_SAMEASSYSTEM, NULL, IUPAF_DEFAULT);

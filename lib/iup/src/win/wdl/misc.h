@@ -25,6 +25,7 @@
 #define WD_MISC_H
 
 
+#include <cx/cx.h>
 #include <float.h>
 #include <math.h>
 #include <tchar.h>

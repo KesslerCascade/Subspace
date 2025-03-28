@@ -3,6 +3,7 @@
  *
  * See Copyright Notice in "iup.h"
  */
+#include <cx/cx.h>
 #include <windows.h>
 #include <commdlg.h>
 #undef NTDDI_VERSION 
@@ -14,6 +15,7 @@
 #include <string.h>
 #include <memory.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 #include "iup.h"
 #include "iupcbs.h"
@@ -53,6 +55,14 @@ static int WM_HELPMSG;
 
 static int winDialogSetBgColorAttrib(Ihandle* ih, const char* value);
 static int winDialogSetTrayAttrib(Ihandle *ih, const char *value);
+
+typedef UINT(WINAPI *GDFW_t)(HWND hwnd);
+static GDFW_t fnGetDpiForWindow;
+#define WIN_DPI_AWARENESS_CONTEXT_SYSTEM_AWARE ((void*)-2)
+#define WIN_DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 ((void*)-4)
+typedef void*(WINAPI *STDPAC_t)(void *dpiContext);
+static STDPAC_t fnSetThreadDpiAwarenessContext;
+static bool initdpifn;
 
 /****************************************************************
                      ITaskbarList3 resources
@@ -174,6 +184,16 @@ void iupdrvDialogSetPosition(Ihandle *ih, int x, int y)
   if (iupAttribGetBoolean(ih, "SHOWNOACTIVATE"))
     flags |= SWP_NOACTIVATE;
   SetWindowPos(ih->handle, HWND_TOP, x, y, 0, 0, flags);
+}
+
+void iupdrvDialogGetDPI(Ihandle *ih, InativeHandle* handle, int *dpi)
+{
+    if (!handle)
+        handle = ih->handle;
+    UINT wdpi = 0;
+    if (fnGetDpiForWindow)
+        wdpi = fnGetDpiForWindow(handle);
+    if (dpi) *dpi = (int)wdpi;
 }
 
 static void winDialogGetWindowDecor(Ihandle* ih, int *border, int *caption, int menu)
@@ -979,9 +999,28 @@ static int winDialogBaseProc(Ihandle* ih, UINT msg, WPARAM wp, LPARAM lp, LRESUL
     }
   case WM_DPICHANGED:
     {
-      IupRefresh(ih);
+      UINT uDpi = HIWORD(wp);
+
+      RECT *lprcNewScale = (RECT*)(lp);
+
+      SetWindowPos(ih->handle, NULL, lprcNewScale->left, lprcNewScale->top,
+                   lprcNewScale->right - lprcNewScale->left, lprcNewScale->bottom - lprcNewScale->top,
+                   SWP_NOZORDER | SWP_NOACTIVATE);
+
+      IFni cb = (IFni)IupGetCallback(ih, "DPICHANGE_CB");
+      if (cb)
+          cb(ih, uDpi);
       break;
     }
+  case WM_DISPLAYCHANGE:
+    RedrawWindow(ih->handle, NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
+    break;
+  case WM_ACTIVATE:
+    if (LOWORD(wp) > 0 && HIWORD(wp) == 0) {
+      // active and not minimized
+      RedrawWindow(ih->handle, NULL, NULL, RDW_INVALIDATE | RDW_ALLCHILDREN);
+    }
+    break;
   }
 
   if (msg == (UINT)WM_HELPMSG)
@@ -1192,6 +1231,15 @@ static int winDialogMapMethod(Ihandle* ih)
   TCHAR* classname = TEXT("IupDialog");
   char* title, *value;
 
+  if (!initdpifn) {
+      HMODULE huser = GetModuleHandle(TEXT("USER32"));
+      if (huser) {
+          fnSetThreadDpiAwarenessContext = (STDPAC_t)GetProcAddress(huser, "SetThreadDpiAwarenessContext");
+          fnGetDpiForWindow = (GDFW_t)GetProcAddress(huser, "GetDpiForWindow");
+      }
+      initdpifn = true;
+  }
+
   if (iupAttribGetBoolean(ih, "CUSTOMFRAMESIMULATE"))
     iupDialogCustomFrameSimulateCheckCallbacks(ih);
 
@@ -1220,6 +1268,15 @@ static int winDialogMapMethod(Ihandle* ih)
   {
     dwStyle |= WS_MINIMIZEBOX;
     has_titlebar = 1;
+  }
+  if (iupAttribGetBoolean(ih, "MENUOPT")) {
+      dwStyle |= WS_SYSMENU;
+  }
+  if (iupAttribGetBoolean(ih, "MAXOPT")) {
+      dwStyle |= WS_MAXIMIZEBOX;
+  }
+  if (iupAttribGetBoolean(ih, "MINOPT")) {
+      dwStyle |= WS_MINIMIZEBOX;
   }
   if (iupAttribGetBoolean(ih, "BORDER") || has_titlebar)
     has_border = 1;
@@ -1302,9 +1359,10 @@ static int winDialogMapMethod(Ihandle* ih)
   value = iupAttribGet(ih, "TASKBARBUTTON");
   if (value)
   {
-    if (iupStrEqualNoCase(value, "SHOW"))
+    if (iupStrEqualNoCase(value, "SHOW")) {
       dwExStyle |= WS_EX_APPWINDOW;   /* Force Show on taskbar even with no decorations */
-    else if (iupStrEqualNoCase(value, "HIDE"))
+      dwExStyle &= ~WS_EX_NOACTIVATE;   /* This isn't actually a popup window, but CUSTOMFRAMESIMULATE or similar */
+    } else if (iupStrEqualNoCase(value, "HIDE"))
       dwExStyle |= WS_EX_TOOLWINDOW;  /* Force Hide from taskbar even with all decorations */
   }
 
@@ -1348,6 +1406,14 @@ static int winDialogMapMethod(Ihandle* ih)
     iupAttribSet(ih, "_IUPWIN_TASKBARLIST", (char*)((ITaskbarList3*)tbl));
   }
 #endif
+
+  /* set thread DPI awareness context just before creating the window */
+  if (fnSetThreadDpiAwarenessContext) {
+      if (iupAttribGetBoolean(ih, "DYNAMICDPI"))
+          fnSetThreadDpiAwarenessContext(WIN_DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2);
+      else
+          fnSetThreadDpiAwarenessContext(WIN_DPI_AWARENESS_CONTEXT_SYSTEM_AWARE);
+  }
 
   /* size will be updated in IupRefresh -> winDialogLayoutUpdate */
   /* position will be updated in iupDialogShowXY              */

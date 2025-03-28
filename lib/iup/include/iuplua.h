@@ -42,8 +42,8 @@ IUPLUA_API int iuplua_close(lua_State * L);
 IUPLUA_API int iuplua_isihandle(lua_State *L, int pos);
 IUPLUA_API Ihandle* iuplua_checkihandle(lua_State *L, int pos);
 IUPLUA_API void iuplua_pushihandle(lua_State *L, Ihandle *n);
-IUPLUA_API int iuplua_dofile(lua_State *L, const char *filename);
-IUPLUA_API int iuplua_dostring(lua_State *L, const char *string, const char *chunk_name);
+//IUPLUA_API int iuplua_dofile(lua_State *L, const char *filename);
+//IUPLUA_API int iuplua_dostring(lua_State *L, const char *string, const char *chunk_name);
 IUPLUA_API int iuplua_dobuffer(lua_State *L, const char *buffer, int len, const char *chunk_name);
 IUPLUA_API void iuplua_show_error_message(const char *pname, const char* msg);
 

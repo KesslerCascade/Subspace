@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <setjmp.h>
 
+#include "iup.h"
 #include "iup_maskparse.h"
 #include "iup_maskmatch.h"
 

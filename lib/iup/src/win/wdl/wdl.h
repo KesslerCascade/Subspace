@@ -24,6 +24,7 @@
 #ifndef WDL_H
 #define WDL_H
 
+#include <cx/cx.h>
 #include <windows.h>
 #include <objidl.h>     /* IStream */
 
