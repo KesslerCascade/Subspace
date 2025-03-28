@@ -1,5 +1,6 @@
 #pragma once
 #include "ftl/ftl.h"
+#include "ftl/struct.h"
 #include "hook/function.h"
 
 typedef struct ShipManager ShipManager;
@@ -17,5 +18,8 @@ DECLFUNC(ShipManager_GetIsJumping);
     FCALL(ftlbase, ShipManager_GetIsJumping, self)
 
 DECLSYM(ShipManager_ship_offset);
+DECLSYM(ShipManager_current_target_offset);
 
 #define ShipManager_ship(ship_manager) (&MEMBER(ftlbase, ShipManager, ship_manager, Ship, ship))
+#define ShipManager_current_target(ship_manager) \
+    (&MEMBER(ftlbase, ShipManager, ship_manager, ShipManager, current_target))

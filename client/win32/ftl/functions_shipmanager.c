@@ -49,3 +49,7 @@ DisasmTrace ShipManager_DamageHull_trace = {
 Symbol SYM(ShipManager_ship_offset) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DamageHull_trace }, { 0 } }
 };
+
+Symbol SYM(ShipManager_current_target_offset) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SpaceBar_trace }, { 0 } }
+};

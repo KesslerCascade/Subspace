@@ -1,5 +1,6 @@
 #include "ftl/functions_commandgui.h"
 #include "ftl/functions_capp.h"
+#include "ftl/functions_combatcontrol.h"
 #include "ftl/functions_completeship.h"
 #include "ftl/functions_misc.h"
 #include "ftl/functions_shipmanager.h"
@@ -63,10 +64,13 @@ DisasmTrace CommandGui_SpaceBar_trace = {
              { I_MOV, .argf = { 0, ARG_REG }, .argcap = { CT_CAPTURE3, CT_MATCH2 } },
              { I_MOV, .argf = { 0, ARG_REG }, .argcap = { CT_CAPTURE4, CT_MATCH3 } },
              { I_CMP, .argf = { ARG_REG }, .argcap = { CT_MATCH4 }, .argout = { 0, DT_OUT_SYM3 } },
+             { I_JNZ },
+             { I_MOVZX, .argout = { 0, DT_OUT_SYM4 } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(CommandGui_shipComplete_offset),    // DT_OUT_SYM1
               &SYM(CompleteShip_shipManager_offset),   // DT_OUT_SYM2
-              &SYM(ShipManager_GetIsJumping) }
+              &SYM(ShipManager_GetIsJumping),
+             &SYM(ShipManager_current_target_offset) }
 };
 
 Symbol SYM(CommandGui_shipComplete_offset) = {
@@ -78,7 +82,18 @@ DisasmTrace CommandGui_RenderStatic_trace = {
     .csym = &SYM(CommandGui_RenderStatic),
     // For now, just check every CALL. This trace is very much a brute force and a big TODO is to
     // replace it with something better.
-    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 1000 },
+    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 500 },
+             { I_MOVZX,
+                .argf   = { 0, ARG_ADDR },
+                .argsym = { 0, &SYM(ShipManager_current_target_offset) } },
+             { I_TEST },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { DT_OP(LABEL), .val = 1 },
+             { DT_OP(JMP) },   // first follow part where current target is set
+              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL CombatControl::OnRenderCombat
+              { DT_OP(GOTO), .val = 1 },               // go back to first part
+              { DT_OP(SKIP), .imin = 0, .imax = 500 },
              { DT_OP(CALL) },
              { I_PUSH, .outip = DT_OUT_SYM1 },
              { DT_OP(SKIP), .imin = 0, .imax = 30 },
@@ -92,7 +107,9 @@ DisasmTrace CommandGui_RenderStatic_trace = {
                 .argf = { 0, ARG_ADDR },
                 .args = { { 0 }, { .addr = 0x685f7375 } } },   // "us_h" (ull)
               { DT_OP(FINISH) } },
-    .out  = { &SYM(ShipStatus_OnRender), &SYM(ShipStatus_RenderHealth) }
+    .out  = { &SYM(ShipStatus_OnRender),
+             &SYM(ShipStatus_RenderHealth),
+             &SYM(CombatControl_OnRenderCombat) }
 };
 
 DisasmTrace CommandGui_RunCommand_HULL_trace = {
@@ -109,6 +126,21 @@ DisasmTrace CommandGui_RunCommand_HULL_trace = {
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // ShipManager::DamageHull
               { DT_OP(FINISH) } },
     .out  = { &SYM(ShipManager_DamageHull) }
+};
+
+DisasmTrace CommandGui_RunCommand_DELETE_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "DELETE",
+    .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 7 },
+             { I_JNZ },
+             { DT_OP(SKIP), .imin = 2, .imax = 8 },
+             { I_CALL, .argcap = { CT_CAPTURE1 } },   // CALL CombatControl::GetCurrentTarget
+              { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_JZ },
+             { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // is called twice
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CombatControl_GetCurrentTarget) }
 };
 
 INITWRAP(CommandGui_IsPaused);

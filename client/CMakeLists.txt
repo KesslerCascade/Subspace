@@ -9,6 +9,7 @@ if(WIN32)
         win32/ftl/functions_capp.c
         win32/ftl/functions_cevent.c
         win32/ftl/functions_cfps.c
+        win32/ftl/functions_combatcontrol.c
         win32/ftl/functions_commandgui.c
         win32/ftl/functions_completeship.c
         win32/ftl/functions_mem.c
@@ -45,6 +46,7 @@ add_executable(subspace-client
     capp/onexecute.c
     capp/onkeydown.c
     capp/onloop.c
+    combatcontrol/rendertarget.c
     commandgui/keydown.c
     ftl/ftl.c
     ftl/struct.c
@@ -55,6 +57,7 @@ add_executable(subspace-client
     patch/capp/patch_capp_onexecute.c
     patch/capp/patch_capp_onkeydown.c
     patch/capp/patch_capp_onloop.c
+    patch/combatcontrol/patch_combatcontrol_rendertarget.c
     patch/commandgui/patch_commandgui_keydown.c
     patch/mousecontrol/patch_mousecontrol_onrender.c
     patch/seq/seq_numerichull.c

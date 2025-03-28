@@ -6,6 +6,7 @@ typedef struct CommandGui CommandGui;
 extern DisasmTrace CommandGui_SpaceBar_trace;
 extern DisasmTrace CommandGui_RenderStatic_trace;
 extern DisasmTrace CommandGui_RunCommand_HULL_trace;
+extern DisasmTrace CommandGui_RunCommand_DELETE_trace;
 extern DisasmTrace CommandGui_Restart_trace;
 
 typedef void (*FUNCTYPE(CommandGui_KeyDown))(CommandGui* self, int key, bool shiftHeld);
