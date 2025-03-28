@@ -37,17 +37,27 @@ typedef struct Symbol {
 } Symbol;
 
 // symbol info macro
-#define SYM(name)     _sym_##name
-#define DECLSYM(name) extern Symbol SYM(name)
+#define SYM(name)      _sym_##name
+#define SYMP(name)     _sym_p_##name
+#define DECLSYM(name)  extern Symbol SYM(name)
+#define DECLSYMP(name) extern Symbol* SYMP(name)
+
+#define SYMP_SELECT(pname, name)  \
+    do {                          \
+        SYMP(pname) = &SYM(name); \
+    } while (0)
 
 addr_t getExport(addr_t base, const char* name);
 bool _symResolve(addr_t base, Symbol* sym);
-#define symResolve(base, name) _symResolve(base, &SYM(name));
+#define symResolve(base, name)  _symResolve(base, &SYM(name))
+#define symResolveP(base, name) _symResolve(base, SYMP(name))
 
 #define _symAddr(base, sym) \
     ((sym)->resolved ? (sym)->addr : (_symResolve(base, sym) ? (sym)->addr : 0))
-#define symAddr(base, name)      _symAddr(base, &SYM(name))
-#define symPtr(type, base, name) ((type*)symAddr(base, name))
+#define symAddr(base, name)       _symAddr(base, &SYM(name))
+#define symAddrP(base, name)      _symAddr(base, SYMP(name))
+#define symPtr(type, base, name)  ((type*)symAddr(base, name))
+#define symPtrP(type, base, name) ((type*)symAddrP(base, name))
 
 // internal use only, os-specific
 void symFindLib(addr_t base, Symbol* sym, SymbolFind* find);

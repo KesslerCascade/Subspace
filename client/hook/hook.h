@@ -22,11 +22,15 @@ int replaceVariable(addr_t base, addr_t from, const void* to);
 #ifdef DEBUG
 #define hookFunction(base, func, pre, post) \
     _hookFunction(base, symAddr(base, func), &FUNCINFO(func), pre, post, #func)
+#define hookFunctionP(base, func, pre, post) \
+    _hookFunction(base, symAddrP(base, func), FUNCINFOP(func), pre, post, #func)
 bool _hookFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* pre, void* post,
                    const char* funcname);
 #else
 #define hookFunction(base, func, pre, post) \
     _hookFunction(base, symAddr(base, func), &FUNCINFO(func), pre, post)
+#define hookFunctionP(base, func, pre, post) \
+    _hookFunction(base, symAddrP(base, func), FUNCINFOP(func), pre, post)
 bool _hookFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* pre, void* post);
 #endif
 
@@ -34,10 +38,14 @@ bool _hookFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* pre, void
 #ifdef DEBUG
 #define replaceFunction(base, func, replacement) \
     _replaceFunction(base, symAddr(base, func), &FUNCINFO(func), replacement, #func)
+#define replaceFunctionP(base, func, replacement) \
+    _replaceFunction(base, symAddrP(base, func), FUNCINFOP(func), replacement, #func)
 bool _replaceFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* replacement,
                       const char* funcname);
 #else
 #define replaceFunction(base, func, replacement) \
     _replaceFunction(base, symAddr(base, func), &FUNCINFO(func), replacement)
+#define replaceFunctionP(base, func, replacement) \
+    _replaceFunction(base, symAddrP(base, func), FUNCINFOP(func), replacement)
 bool _replaceFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* replacement);
 #endif
