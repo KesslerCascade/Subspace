@@ -25,7 +25,8 @@ local int gz_load(gz_statep state, unsigned char *buf, unsigned len,
         *have += (unsigned)ret;
     } while (*have < len);
     if (ret < 0) {
-        gz_error(state, Z_ERRNO, zstrerror());
+        char buf[256];
+        gz_error(state, Z_ERRNO, zstrerror(buf, sizeof(buf)));
         return -1;
     }
     if (ret == 0)

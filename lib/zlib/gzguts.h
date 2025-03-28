@@ -39,7 +39,10 @@
 #endif
 
 #if defined(_WIN32)
-#  define WIDECHAR
+//#  define WIDECHAR
+#define WINAPI_FAMILY
+#else
+#include <unistd.h>
 #endif
 
 #ifdef WINAPI_FAMILY
@@ -129,7 +132,11 @@
 #else
 #  ifndef NO_STRERROR
 #    include <errno.h>
-#    define zstrerror() strerror(errno)
+#ifdef WIN32
+#    define zstrerror(buf, sz) (_strerror_s(buf, sz, NULL), buf)
+#else
+#    define zstrerror(buf, sz) (strcpy(buf, strerror(errno)))
+#endif
 #  else
 #    define zstrerror() "stdio error (consult errno)"
 #  endif
@@ -212,3 +219,6 @@ char ZLIB_INTERNAL *gz_strwinerror(DWORD error);
    (possible z_off64_t types off_t, off64_t, and long are all signed) */
 unsigned ZLIB_INTERNAL gz_intmax(void);
 #define GT_OFF(x) (sizeof(int) == sizeof(z_off64_t) && (x) > gz_intmax())
+
+#define XALLOC_REMAP_MALLOC
+#include <cx/xalloc/xalloc.h>

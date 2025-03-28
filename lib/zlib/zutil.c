@@ -9,6 +9,7 @@
 #ifndef Z_SOLO
 #  include "gzguts.h"
 #endif
+#include <cx/xalloc/xalloc.h>
 
 z_const char * const z_errmsg[10] = {
     (z_const char *)"need dictionary",     /* Z_NEED_DICT       2  */
@@ -285,13 +286,13 @@ extern void free(voidpf ptr);
 
 voidpf ZLIB_INTERNAL zcalloc(voidpf opaque, unsigned items, unsigned size) {
     (void)opaque;
-    return sizeof(uInt) > 2 ? (voidpf)malloc(items * size) :
-                              (voidpf)calloc(items, size);
+    return sizeof(uInt) > 2 ? (voidpf)xa_malloc(items * size) :
+                              (voidpf)xa_calloc(items, size);
 }
 
 void ZLIB_INTERNAL zcfree(voidpf opaque, voidpf ptr) {
     (void)opaque;
-    free(ptr);
+    xa_free(ptr);
 }
 
 #endif /* MY_ZCALLOC */

@@ -77,7 +77,8 @@ local int gz_comp(gz_statep state, int flush) {
             put = strm->avail_in > max ? max : strm->avail_in;
             writ = write(state->fd, strm->next_in, put);
             if (writ < 0) {
-                gz_error(state, Z_ERRNO, zstrerror());
+                char buf[256];
+                gz_error(state, Z_ERRNO, zstrerror(buf, sizeof(buf)));
                 return -1;
             }
             strm->avail_in -= (unsigned)writ;
@@ -107,7 +108,8 @@ local int gz_comp(gz_statep state, int flush) {
                       (unsigned)(strm->next_out - state->x.next);
                 writ = write(state->fd, state->x.next, put);
                 if (writ < 0) {
-                    gz_error(state, Z_ERRNO, zstrerror());
+                    char buf[256];
+                    gz_error(state, Z_ERRNO, zstrerror(buf, sizeof(buf)));
                     return -1;
                 }
                 state->x.next += writ;
