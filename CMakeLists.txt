@@ -1,5 +1,7 @@
 cmake_minimum_required (VERSION 3.21)
 
+include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/organize_targets.cmake)
+
 set(TOP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 
