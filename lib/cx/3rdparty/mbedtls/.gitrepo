@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/Mbed-TLS/mbedtls.git
+	branch = mbedtls-3.6.2
+	commit = 107ea89daaefb9867ea9121002fbbdf926780e98
+	parent = 632b81e26c62aa0f051c23c2b2abd00ebcc44879
+	method = merge
+	cmdver = 0.4.9

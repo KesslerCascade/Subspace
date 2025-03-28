@@ -1,0 +1,13 @@
+#include "tqrunner.sidl"
+
+class TaskQueue;
+class TQManualWorker;
+
+class TQManualRunner extends TQRunner {
+	object:TQManualWorker worker;
+
+	override start;
+	override stop;
+
+	factory create();
+}

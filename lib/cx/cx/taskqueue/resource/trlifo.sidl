@@ -1,0 +1,16 @@
+#include "taskresource.sidl"
+#include <cx/thread/mutex.h>
+#include <cx/taskqueue/task/complextask.sidl>
+
+// Strictly ordered LIFO
+
+// Tasks that require this resource are guaranteed to run serialized in the reverse order
+// that they registered themselves to the resource, with the most recent task running first.
+
+class TRLifo extends TaskResource {
+    Mutex _lifomtx;
+    ComplexTask *cur;
+    sarray:object:ComplexTask _lifo;
+
+    factory create();
+}

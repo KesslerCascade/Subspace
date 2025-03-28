@@ -1,0 +1,7 @@
+class ConvertTestClass implements Convertible
+{
+    int32 ival;
+    float64 fval;
+    string sval;
+    factory create(int32 ival, float64 fval, string sval);
+}

@@ -1,0 +1,33 @@
+set(SERIALIZE_SRCS
+    serialize/jsonout.c
+    serialize/jsonouttree.c
+    serialize/jsonparse.c
+    serialize/jsonparsetree.c
+    serialize/lineparse.c
+    serialize/sbfile.c
+    serialize/sbfsfile.c
+    serialize/sbstring.c
+    serialize/streambuf.c)
+set(SERIALIZE_INCLUDES
+    serialize/jsoncommon.h
+    serialize/jsonout.h
+    serialize/jsonparse.h
+    serialize/lineparse.h
+    serialize/sbfile.h
+    serialize/sbfsfile.h
+    serialize/sbstring.h
+    serialize/streambuf.h)
+
+set(CX_SRCS
+    ${CX_SRCS}
+    ${SERIALIZE_SRCS}
+    PARENT_SCOPE)
+set(CX_INCLUDES
+    ${CX_INCLUDES}
+    ${SERIALIZE_INCLUDES}
+    PARENT_SCOPE)
+
+set(CX_CMAKE_FILES
+    ${CX_CMAKE_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
+    PARENT_SCOPE)

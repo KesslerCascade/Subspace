@@ -1,0 +1,30 @@
+#include <cx/fs/fs.h>
+#include <cx/fs/file.h>
+
+interface VFSFileProvider {
+    bool close();
+
+    bool read([sal _Out_writes_bytes_to_(sz, *bytesread)] void *buf, size_t sz, [out] [sal _Deref_out_range_(0, sz)] size_t *bytesread);
+    bool write([sal _In_reads_bytes_(sz)] void *buf, size_t sz, [out] [opt] [sal _Deref_out_range_(0, sz)] size_t *byteswritten);
+    int64 tell();
+    int64 seek(int64 off, FSSeekType seektype);
+    bool flush();
+}
+
+interface VFSProvider {
+    flags_t flags();                            // VFSProviderFlags enforced for this provider
+
+    [opt] ObjInst *open(strref path, flags_t flags);    // returns an object that implements VFSFileProvider
+    FSPathStat stat(strref path, [sal _When_(return != FS_Nonexistent, _Out_opt_)] FSStat *stat);
+    bool setTimes(strref path, int64 modified, int64 accessed);
+    bool createDir(strref path);
+    bool removeDir(strref path);
+    bool deleteFile(strref path);
+    bool rename(strref oldpath, strref newpath);
+    bool getFSPath([inout] string *out, strref path);
+
+    bool searchInit([out] FSSearchIter *iter, strref path, strref pattern, bool stat);
+    bool searchValid([in] FSSearchIter *iter);
+    bool searchNext([inout] FSSearchIter *iter);
+    void searchFinish([inout] FSSearchIter *iter);
+}

@@ -1,0 +1,12 @@
+#include "basictask.sidl"
+#include <cx/closure.h>
+
+[methodprefix ftask] abstract class Task extends BasicTask {
+    string name;                // task name to be shown in monitor output
+    int64 last;                 // the last time this task was moved between queues and/or run
+    cchain oncomplete;          // functions that are called when this task has completed
+
+	override reset;
+    bool wait(int64 timeout);
+	init();
+}

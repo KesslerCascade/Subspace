@@ -1,0 +1,12 @@
+#include "tqmthreadpool.sidl"
+
+class TQDedicatedManager extends TQThreadPoolManager {
+	object:Thread mgrthread;
+	Event mgrnotify;
+
+	override notify;
+	override start;
+	override stop;
+
+	factory create();
+}

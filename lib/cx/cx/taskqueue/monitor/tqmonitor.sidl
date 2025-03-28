@@ -1,0 +1,12 @@
+#include <cx/taskqueue/taskqueue_shared.h>
+
+class TaskQueue;
+
+abstract class TQMonitor {
+	object:TaskQueue tq;
+	TaskQueueMonitorConfig conf;
+	
+	[abstract] bool start([in] TaskQueue *tq);
+	[abstract] int64 tick();
+	[abstract] bool stop();
+}

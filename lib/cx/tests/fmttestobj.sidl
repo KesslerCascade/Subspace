@@ -1,0 +1,15 @@
+#include <cx/format/formattable.sidl>
+
+class FmtTestClass implements Formattable
+{
+    int32 iv;
+    string sv;
+    factory create(int32 ival, string sval);
+}
+
+class FmtTestClass2 implements Convertible
+{
+    int32 iv;
+    string sv;
+    factory create(int32 ival, string sval);
+}

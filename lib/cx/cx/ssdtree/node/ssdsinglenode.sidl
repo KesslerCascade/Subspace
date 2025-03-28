@@ -1,0 +1,15 @@
+#include <cx/ssdtree/node/ssdnode.sidl>
+
+class SSDSingleNode extends SSDNode
+{
+    stvar storage;
+
+    factory _create(SSDTree *tree);
+}
+
+class SSDSingleIter extends SSDIterator
+{
+    bool done;
+
+    factory create(SSDSingleNode *node, SSDLockState *lstate);
+}

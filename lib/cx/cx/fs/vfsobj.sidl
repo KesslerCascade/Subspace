@@ -1,0 +1,31 @@
+#include <cx/thread/rwlock.h>
+
+struct VFSDir;
+
+class VFS {
+    VFSDir *root;           // root for namespaceless paths
+    // namespaces are never case sensitive even if the paths are
+    [noinit] hashtable namespaces;   // hashtable of string/VFSDir
+    string curdir;
+    // vfslock is for adding entires to the directory cache
+    RWLock vfslock;
+    // vfsdlock is for operations such as mounting / unmounting / invalidating cache
+    // that may destroy VFSDir entries and remove mounts
+    RWLock vfsdlock;
+    uint32 flags;
+
+    // Create an empty VFS with nothing mounted
+    factory create(uint32 flags);
+
+    // Create a VFS object configured to pass everything through to the
+    // underlying OS filesystem. The exact VFS namespace that is created
+    // is platform dependant.
+    [canfail] factory createFromFS();
+}
+
+class VFSMount {
+    object:ObjInst provider;
+    uint32 flags;
+
+    factory create(ObjInst *provider, uint32 flags);
+}

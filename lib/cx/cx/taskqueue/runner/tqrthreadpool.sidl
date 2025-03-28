@@ -1,0 +1,22 @@
+#include "tqrunner.sidl"
+#include <cx/taskqueue/worker/tqthreadworker.sidl>
+#include <cx/thread/rwlock.h>
+
+class TaskQueue;
+class TQThreadWorker;
+
+class TQThreadPoolRunner extends TQRunner {
+	TaskQueueThreadPoolConfig conf;
+	RWLock workerlock;
+	sarray:object:TQThreadWorker workers;
+	Event workershutdown;
+
+	bool addWorker();
+	bool removeWorker();
+
+	[sal _objfactory_guaranteed] TQThreadWorker *createWorker(int32 num);  // worker factory for custom queues to override
+	override start;
+	override stop;
+
+	factory create ([in] TaskQueueThreadPoolConfig *config);
+}

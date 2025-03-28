@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/PCRE2Project/pcre2.git
+	branch = pcre2-10.44
+	commit = 6ae58beca071f13ccfed31d03b3f479ab520639b
+	parent = e5ea8f0d8c09a27aa700a1a1188245073e91c029
+	method = merge
+	cmdver = 0.4.7

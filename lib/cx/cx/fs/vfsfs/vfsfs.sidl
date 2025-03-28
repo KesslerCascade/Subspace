@@ -1,0 +1,7 @@
+#include <cx/fs/vfsprovider.sidl>
+
+class VFSFS implements VFSProvider {
+    string root;
+
+    [canfail] factory create(strref rootpath);
+}

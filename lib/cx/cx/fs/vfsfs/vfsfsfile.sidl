@@ -1,0 +1,8 @@
+#include "vfsfs.sidl"
+#include <cx/fs/file.h>
+
+class VFSFSFile implements VFSFileProvider {
+    FSFile *file;
+    destroy();
+    factory create(FSFile *f);
+}

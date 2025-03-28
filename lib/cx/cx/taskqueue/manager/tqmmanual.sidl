@@ -1,0 +1,14 @@
+#include "tqmanager.sidl"
+#include <cx/thread/mutex.h>
+
+// very similar to the in-worker manager, but doesn't do any of the thread pool management
+
+class TQManualManager extends TQManager {
+	Mutex mgrlock;       // one worker can run the manager at a time
+	atomic:bool needrun; // manager needs to be run ASAP 
+
+    override notify;
+	override tick;
+
+	factory create();
+}

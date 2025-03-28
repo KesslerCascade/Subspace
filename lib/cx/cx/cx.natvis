@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+	<Type Name="str_ref">
+		<Intrinsic Name="valid" Expression="(*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)" />
+		<Intrinsic Name="flags" Expression="(valid() ? *(unsigned char*)this : 0)" />
+		<Intrinsic Name="lentype" Expression="flags() &amp; 0x03" />
+		<Intrinsic Name="isalloc" Expression="(flags() &amp; 0x10) == 0x10" />
+		<Intrinsic Name="isstack" Expression="(flags() &amp; 0x14) == 0x14" />
+		<Intrinsic Name="isrope" Expression="(flags() &amp; 0x08) == 0x08" />
+		<Intrinsic Name="length" Expression="lentype() == 1 ? (unsigned short)*((unsigned char*)this + (isalloc() ? 3 : 2)) : (lentype() == 2 ? *(unsigned short*)((unsigned char*)this + (isalloc() ? 4 : 2)) : (lentype() == 3 ? *(unsigned int*)((unsigned char*)this + 4) : 0))" />
+		<Intrinsic Name="stroffset" Expression="lentype() == 3 ? 8 : (isalloc() ? (lentype() == 2 ? 6 : (lentype() == 1 ? 4 : 3)) : (lentype() == 2 ? 4 : (lentype() == 1 ? 3 : 2)))" />
+		<Intrinsic Name="strdata" Expression="(char*)this + stroffset()" />
+		<DisplayString Condition="this == 0">[Empty]</DisplayString>
+		<DisplayString Condition="!valid()">{(const char*)this,s}</DisplayString>
+		<DisplayString Condition="isrope()">[Rope]</DisplayString>
+		<DisplayString Condition="(flags() &amp; 0x20) == 0x20">{strdata(),s8}</DisplayString>
+		<DisplayString Condition="valid()">{strdata(),s}</DisplayString>
+		<DisplayString>[Invalid cx string]</DisplayString>
+		<StringView Condition="(flags() &amp; 0x20) == 0x20">strdata(),s8</StringView>
+		<StringView Condition="valid()">strdata(),s</StringView>
+		<Expand>
+			<Item Name="Valid" Condition="this != 0">valid()</Item>
+			<Item Name="Length" Condition="lentype() != 0">length()</Item>
+			<Item Name="Bufsz" Condition="isstack() &amp;&amp; lentype() == 1">(unsigned short)*((unsigned char*)this + 2),d</Item>
+			<Item Name="Bufsz" Condition="isstack() &amp;&amp; lentype() == 2">*(unsigned short*)((unsigned char*)this + 2),d</Item>
+			<Item Name="Refs" Condition="!isstack() &amp;&amp; isalloc() &amp;&amp; lentype() == 1">(unsigned short)*((unsigned char*)this + 2),d</Item>
+			<Item Name="Refs" Condition="!isstack() &amp;&amp; isalloc() &amp;&amp; (lentype() == 2 || lentype() == 3)">*(unsigned short*)((unsigned char*)this + 2),d</Item>
+			<Item Name="Data" Condition="!isrope() &amp;&amp; (flags() &amp; 0x20) == 0x20">strdata(),s8</Item>
+			<Item Name="Data" Condition="!isrope() &amp;&amp; (flags() &amp; 0x20) == 0x00">strdata(),s</Item>
+			<Item Name="Rope" Condition="isrope()">(str_ropedata*)strdata(),na</Item>
+			<Item Name="Flags" Condition="valid()">(_nv_string_flags*)this,nanr</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="_nv_string_flags">
+		<Intrinsic Name="flags" Expression="*(unsigned char*)this" />
+		<Intrinsic Name="lentype" Expression="flags() &amp; 0x03" />
+		<DisplayString>{flags(),x}</DisplayString>
+		<Expand>
+			<Item Name="LenBits">lentype() == 3 ? 32 : (lentype() == 2 ? 16 : (lentype() == 1 ? 8 : 0))</Item>
+			<Item Name="Stack">(flags() &amp; 0x04) == 0x04</Item>
+			<Item Name="Rope">(flags() &amp; 0x08) == 0x08</Item>
+			<Item Name="Alloc">(flags() &amp; 0x10) == 0x10</Item>
+			<Item Name="UTF8">(flags() &amp; 0x20) == 0x20</Item>
+			<Item Name="ASCII">(flags() &amp; 0x40) == 0x40</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="_nv_stype">
+		<DisplayString Condition="this->id == 0x00">None</DisplayString>
+		<DisplayString Condition="this->id == 0x01">Opaque</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x00">Unknown Opaque Type</DisplayString>
+		<DisplayString Condition="this->id == 0x11">int8</DisplayString>
+		<DisplayString Condition="this->id == 0x12">int16</DisplayString>
+		<DisplayString Condition="this->id == 0x14">int32</DisplayString>
+		<DisplayString Condition="this->id == 0x18">int64</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x10">Unknown Integer Type</DisplayString>
+		<DisplayString Condition="this->id == 0x21">uint8</DisplayString>
+		<DisplayString Condition="this->id == 0x22">uint16</DisplayString>
+		<DisplayString Condition="this->id == 0x23">bool</DisplayString>
+		<DisplayString Condition="this->id == 0x24">uint32</DisplayString>
+		<DisplayString Condition="this->id == 0x28">uint64</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x20">Unknown Unsigned Type</DisplayString>
+		<DisplayString Condition="this->id == 0x34">float32</DisplayString>
+		<DisplayString Condition="this->id == 0x38">float64</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x30">Unknown Floating Type</DisplayString>
+		<DisplayString Condition="this->id == 0x44">ptr32</DisplayString>
+		<DisplayString Condition="this->id == 0x48">ptr64</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x40">Unknown Pointer Type</DisplayString>
+		<DisplayString Condition="this->id == 0xe0">string</DisplayString>
+		<DisplayString Condition="this->id == 0xe1">object</DisplayString>
+		<DisplayString Condition="this->id == 0xe2">weakref</DisplayString>
+		<DisplayString Condition="this->id == 0xe3">suid</DisplayString>
+		<DisplayString Condition="this->id == 0xe4">stvar</DisplayString>
+		<DisplayString Condition="this->id == 0xe5">closure</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0xe0">Unknown CX Type</DisplayString>
+		<DisplayString Condition="this->id == 0xf0">sarray</DisplayString>
+		<DisplayString Condition="this->id == 0xf1">hashtable</DisplayString>
+		<DisplayString Condition="this->id == 0xf2">cchain</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0xf0">Unknown Container Type</DisplayString>
+		<DisplayString>Invalid SType</DisplayString>
+		<Expand>
+			<Item Name="id">this->id,x</Item>
+			<Item Name="size">this->size,d</Item>
+			<Item Name="Flags">(_nv_stype_flags*)this,nanr</Item>
+			<Item Name="stype">this->spec,x</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="_nv_stype_flags">
+		<Intrinsic Name="flags" Expression="((_nv_stype*)this)->flags" />
+		<DisplayString>{flags(),x}</DisplayString>
+		<Expand>
+			<Item Name="Object">(flags() &amp; 0x01) == 0x01</Item>
+			<Item Name="Custom">(flags() &amp; 0x02) == 0x02</Item>
+			<Item Name="PassPtr">(flags() &amp; 0x04) == 0x04</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="_nv_sarray">
+		<Intrinsic Name="flags" Expression="*(unsigned int*)((unsigned char*)this - 4)" />
+		<Intrinsic Name="isextended" Expression="(flags() &amp; 0x8000) == 0x8000" />
+		<Intrinsic Name="hdr" Expression="(SArrayHeader*)((unsigned char*)this - (size_t)(&amp;((SArrayHeader*)0)->data))" />
+		<Intrinsic Name="type" Expression="(_nv_stype*)&amp;hdr()->elemtype" />
+		<DisplayString Condition="this != 0">SArray({type(),na})[{hdr()->count}]</DisplayString>
+		<Expand>
+			<Item Name="type">type(),na</Item>
+			<Item Name="count">hdr()->count</Item>
+			<Item Name="capacity">hdr()->capacity</Item>
+			<Item Name="ops" Condition="isextended()">hdr()->typeops</Item>
+			<Item Name="grow">(SARRAY_GROW_ENUM)(flags() &gt;&gt; 24)</Item>
+			<Item Name="Flags">(_nv_sarray_flags*)hdr(),nanr</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="_nv_sarray_flags">
+		<Intrinsic Name="hdr" Expression="(SArrayHeader*)this" />
+		<Intrinsic Name="flags" Expression="hdr()->flags" />
+		<DisplayString>{flags(),x}</DisplayString>
+		<Expand>
+			<Item Name="Ref">(flags() &amp; 0x10) == 0x10</Item>
+			<Item Name="Sorted">(flags() &amp; 0x20) == 0x20</Item>
+			<Item Name="AutoShrink">(flags() &amp; 0x40) == 0x40</Item>
+			<Item Name="Extended">(flags() &amp; 0x8000) == 0x8000</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="hashtable_ref">
+		<Intrinsic Name="isextended" Expression="(hdr()->flags &amp; 0x8000) == 0x8000" />
+		<Intrinsic Name="hdr" Expression="(HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index))" />
+		<Intrinsic Name="keytype" Expression="(_nv_stype*)&amp;hdr()->keytype" />
+		<Intrinsic Name="valtype" Expression="(_nv_stype*)&amp;hdr()->valtype" />
+		<DisplayString Condition="this != 0">hashtable({keytype(),na},{valtype(),na})[{hdr()->valid}]</DisplayString>
+		<Expand>
+			<Item Name="idxsz">hdr()->idxsz</Item>
+			<Item Name="idxused">hdr()->idxused</Item>
+			<Item Name="storsz">hdr()->storsz</Item>
+			<Item Name="storused">hdr()->storused</Item>
+			<Item Name="valid">hdr()->valid</Item>
+			<Item Name="keytype">keytype(),na</Item>
+			<Item Name="valtype">valtype(),na</Item>
+			<Item Name="growat">(HASHTABLE_GROW_ENUM)((hdr()->flags &gt;&gt; 24) &amp; HT_GROW_AT_MASK)</Item>
+			<Item Name="growby">(HASHTABLE_GROWBY_ENUM)((hdr()->flags &gt;&gt; 24) &amp; HT_GROW_BY_MASK)</Item>
+
+			<Item Name="Flags">(_nv_hashtable_flags*)hdr(),nanr</Item>
+			<Item Name="Data">(_nv_hashtable_data*)hdr(),nanr</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="_nv_hashtable_flags">
+		<Intrinsic Name="hdr" Expression="(HashTableHeader*)this" />
+		<Intrinsic Name="flags" Expression="hdr()->flags" />
+		<DisplayString>{flags(),x}</DisplayString>
+		<Expand>
+			<Item Name="CaseInsensitive">(flags() &amp; 0x01) == 0x01</Item>
+			<Item Name="RefKeys">(flags() &amp; 0x02) == 0x02</Item>
+			<Item Name="Ref">(flags() &amp; 0x04) == 0x04</Item>
+			<Item Name="InsertOpt">(flags() &amp; 0x08) == 0x08</Item>
+			<Item Name="Compact">(flags() &amp; 0x10) == 0x10</Item>
+			<Item Name="Quadratic">(flags() &amp; 0x2000) == 0x2000</Item>
+			<Item Name="Pow2">(flags() &amp; 0x4000) == 0x4000</Item>
+			<Item Name="Extended">(flags() &amp; 0x8000) == 0x8000</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="_nv_hashtable_data">
+		<Intrinsic Name="hdr" Expression="(HashTableHeader*)this" />
+		<DisplayString></DisplayString>
+		<Expand>
+			<Item Name="chunks">hdr()->chunks,[hdr()->storsz]</Item>
+			<Item Name="keystorage">hdr()->keystorage</Item>
+			<Item Name="valstorage">hdr()->valstorage</Item>
+			<Item Name="index">hdr()->index,[hdr()->idxsz]</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="cx_atomic_ptr">
+		<Expand>
+			<Item Name="ptr">(void*)this->repr</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

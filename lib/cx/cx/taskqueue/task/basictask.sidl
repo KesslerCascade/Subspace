@@ -1,0 +1,21 @@
+#include <cx/taskqueue/taskqueue_shared.h>
+// Bare minimum for a task object
+
+class TaskQueue;
+class TQWorker;
+struct TaskControl;
+
+enum BasicTaskRunResultEnum {
+    TASK_Result_Failure,
+    TASK_Result_Success,
+    TASK_Result_Basic_Count,
+};
+
+[methodprefix btask] abstract class BasicTask {
+    atomic:uint32 state;
+    [abstract] uint32 run([in] TaskQueue *tq, [in] TQWorker *worker, [inout] TaskControl *tcon);
+    void runCancelled([in] TaskQueue *tq, [in] TQWorker *worker);
+    unbound bool _setState(uint32 newstate);
+    bool cancel();
+    bool reset();
+}

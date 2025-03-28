@@ -1,0 +1,42 @@
+set(STRING_SRCS
+    string/strbase.c
+    string/strbase64.c
+    string/strcase.c
+    string/strcompare.c
+    string/strconcat.c
+    string/strencoding.c
+    string/strfind.c
+    string/striter.c
+    string/strjoin.c
+    string/strnum_fp.c
+    string/strnum_int.c
+    string/strrope.c
+    string/strsplit.c
+    string/strsubstr.c
+    string/stype_string.c)
+set(STRING_INCLUDES
+    string/strbase.h
+    string/strcompare.h
+    string/strencoding.h
+    string/strfind.h
+    string/string_private.h
+    string/string_private_utf8.h
+    string/striter.h
+    string/strmanip.h
+    string/strnum.h
+    string/strtest.h
+    string/stype_string.h)
+
+set(CX_SRCS
+    ${CX_SRCS}
+    ${STRING_SRCS}
+    PARENT_SCOPE)
+set(CX_INCLUDES
+    ${CX_INCLUDES}
+    ${STRING_INCLUDES}
+    PARENT_SCOPE)
+
+set(CX_CMAKE_FILES
+    ${CX_CMAKE_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
+    PARENT_SCOPE)

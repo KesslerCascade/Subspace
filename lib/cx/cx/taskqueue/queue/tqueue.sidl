@@ -1,0 +1,56 @@
+#include <cx/taskqueue/taskqueue_shared.h>
+#include <cx/thread/event.h>
+#include <cx/thread/thread.h>
+#include <cx/thread/prqueue.h>
+
+class TQRunner;
+class TQManager;
+class TQMonitor;
+class TQWorker;
+
+class BasicTask;
+
+typedef enum TaskQueueStateEnum {
+    TQState_Init,
+    TQState_Starting,
+    TQState_Running,
+    TQState_Stopping,
+    TQState_Shutdown,
+} TaskQueueStateEnum;
+
+class TaskQueue {
+    string name;
+    atomic:uint32 state;
+
+    object:TQRunner runner;
+    object:TQManager manager;
+    object:TQMonitor monitor;
+
+    [noinit] Event workev;  // signaled when there is work to be done
+
+    PrQueue runq;           // tasks that are ready to be picked up by workers
+    PrQueue doneq;          // tasks that are either deferred or finished
+
+    int64 gcinterval;       // how often to run a garbage collection cycle on a queue
+    uint32 flags;
+
+    int64 _lastgc;          // timestamp of last GC cycle
+    int _gccycle;           // which GC cycle ran last
+
+    bool start();           // start the queue, begin running tasks
+    bool stop(int64 timeout);   // stop the queue
+
+    bool add([in] BasicTask *btask); // add a task to the queue to run immediately
+
+    int64 tick();           // run one more more tasks -- only valid in manual mode
+
+    bool _processDone();    // internal function for manager to tell the queue to process its doneq
+    int64 _processExtra(bool taskscompleted);  // internal function for any additional processing that the queue needs to do in the manager thread
+    bool _queueMaint();     // internal function that the manager should call to perform any queue maintenance
+
+    bool _runTask([inout] BasicTask **pbtask, [in] TQWorker *worker);    // internal function workers should call to actually run a task and process the results
+    void _clear();          // deletes all tasks in queue, for internal use only
+
+    factory create(strref name, uint32 flags, int64 gcinterval, [in] TQRunner *runner, [in] TQManager *manager, [in] [opt] TQMonitor *monitor);
+    init();
+}

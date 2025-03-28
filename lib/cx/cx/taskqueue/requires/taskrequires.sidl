@@ -1,0 +1,42 @@
+class ComplexTask;
+
+// Abstract form of a requirement for a task to be executed. This encompasses task dependency
+// graphs as well as lock acquisition and serialized access.
+
+enum TaskRequiresStateEnum {
+    TASK_Requires_Wait = 0,       // The requirement is not currently satisfied, but may be sometime in the future
+    TASK_Requires_Ok,             // The requirement is satisfied for the moment, but it may change in the future
+    TASK_Requires_Ok_Permanent,   // The requirement is satisfied and will always be satisfied -- it may be removed
+    TASK_Requires_Fail_Permanent, // The requirement is not satisfied, and cannot ever be satisfied
+    TASK_Requires_Acquire,        // The requirement will be satisfied if and only if the tryAcquire method returns true
+};
+
+abstract class TaskRequires {
+    // Time after which this requires is considered timed out and expired, and will fail.
+    int64 expires;
+
+    // Calculate the current state of the requirement.
+    [abstract] uint32 state(ComplexTask *task);
+
+    // If possible, return the last progress timestamp associated with the requirement, or -1 if not applicable.
+    [abstract] int64 progress();
+
+    // For requirements that involve resource acquisition, attempts to acquire the exclusive resource on behalf
+    // of task. This should only be called if state() returns TASK_Requires_Acquire. If called, the caller MUST
+    // then call release() when the task is finished running.
+    // Implementions of this function must NOT block -- they should try to acquire a lock but return false
+    // if it cannot be acquired.
+    [abstract] bool tryAcquire(ComplexTask *task);
+
+    // Releases the resource, MUST be paired with acquire and called with the same task used to acquire.
+    [abstract] bool release(ComplexTask *task);
+
+    // The task is being cancelled and wishes to cascade the cancellation to any dependencies
+    [abstract] void cancel();
+
+    // Requests that the requirement notify the task when conditions change that may change the state of the
+    // requirement. The requirement must notify the task by advancing it out of the defer queue. This also registers
+    // the task with shared resources if needed. Such as registration is a one-shot and is consumed when the
+    // resource is acquired.
+    [abstract] bool registerTask([in] ComplexTask *task);
+}

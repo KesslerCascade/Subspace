@@ -1,0 +1,10 @@
+#include <cx/thread/threadobj.sidl>
+#include <pthread.h>
+
+[methodprefix _unixthrobj] class UnixThread extends Thread {
+    pthread_t pthr;
+    int id;
+    bool joined;
+
+    factory create();
+}

@@ -1,0 +1,41 @@
+#include "taskrequires.sidl"
+
+#include <cx/thread/mutex.h>
+#include <cx/taskqueue/task/complextask.sidl>
+
+// Gates are a means for a task to wait on a particular event that happens once. They are
+// similar in principal to a number of tasks all depending on a particular task to finish,
+// but are a bit more lightweight and flexible.
+
+// A gate blocks all tasks that depend on it from running, until some external actor calls
+// the open() method, at which point they are released. Future tasks that depend on the
+// gate will not block.
+
+// A sealed gate is permanently closed and will automatically fail any task that depends
+// on it.
+
+// Gates can optionally track the last time they made progress. This is used for task queues
+// running a monitor; and will count as progress for the tasks depending on the gate, so they
+// are not considered stuck.
+
+class TRGate {
+    string name;
+    atomic:uint32 state;
+
+    bool open();
+    bool seal();
+    void progress();
+    bool registerTask(ComplexTask *task);
+
+    Mutex _wlmtx;
+    sarray:object:ComplexTask _waitlist;
+    int64 lastprogress;
+
+    factory create(strref name);
+}
+
+class TaskRequiresGate extends TaskRequires {
+    object:TRGate gate;
+
+    factory create([in] TRGate *gate);
+}

@@ -1,0 +1,30 @@
+set(TQ_MONITOR_SRCS
+    taskqueue/monitor/tqmonitor.c
+    taskqueue/monitor/tqtpmonitor.c
+    )
+set(TQ_MONITOR_INCLUDES
+    taskqueue/monitor/tqmonitor.h
+    taskqueue/monitor/tqtpmonitor.h
+    )
+set(TQ_MONITOR_SIDL
+    taskqueue/monitor/tqmonitor.sidl
+    taskqueue/monitor/tqtpmonitor.sidl
+    )
+
+set(TASKQUEUE_SRCS
+    ${TASKQUEUE_SRCS}
+    ${TQ_MONITOR_SRCS}
+    PARENT_SCOPE)
+set(TASKQUEUE_INCLUDES
+    ${TASKQUEUE_INCLUDES}
+    ${TQ_MONITOR_INCLUDES}
+    PARENT_SCOPE)
+set(TASKQUEUE_SIDL
+    ${TASKQUEUE_SIDL}
+    ${TQ_MONITOR_SIDL}
+    PARENT_SCOPE)
+
+set(CX_CMAKE_FILES
+    ${CX_CMAKE_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
+    PARENT_SCOPE)

@@ -1,0 +1,21 @@
+#include <cx/ssdtree/node/ssdnode.sidl>
+
+class SSDArrayNode extends SSDNode
+{
+    sarray:stvar storage;
+
+    bool append(stvar val, SSDLockState *_ssdCurrentLockState);
+
+    override isArray;
+    factory _create(SSDTree *tree);
+}
+
+class SSDArrayIter extends SSDIterator
+{
+    int32 idx;
+    string lastName;
+
+    override isArray;
+
+    factory create(SSDArrayNode *node, SSDLockState *lstate);
+}

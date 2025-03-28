@@ -1,0 +1,83 @@
+#include <cx/ssdtree/ssdtreeobj.sidl>
+#include <cx/stype/stvar.h>
+
+enum SSD_INDEX_MARKER {
+    SSD_ByName = -1             // Pass as index to address a child by name
+};
+
+#define ssditeratorObj(self, clsname) objDynCast(clsname, ssditeratorObjInst(self))
+#define ssdnodeIterLocked(self) ssdnode_iterLocked(self, _ssdCurrentLockState)
+
+interface SSDIteratorIf extends IteratorIf
+{
+    stvar *ptr();
+    strref name();
+    int32 idx();
+
+    bool iterOut([sal _When_(return == true, _Out_)] int32 *idx,
+        [sal _When_(return == true, _Out_)] strref *name,
+        [sal _When_(return == true, _Out_)] stvar **val);
+}
+
+abstract class SSDIterator implements SSDIteratorIf
+{
+    object:SSDNode node;
+
+    SSDLockState *lstate;
+    SSDLockState transient_lock_state;
+
+    bool isHashtable();
+    bool isArray();
+    [opt] [valid] unbound ObjInst *objInst();
+
+    init();
+    destroy();
+}
+
+interface SSDNodeIf
+{
+    // Gets a value. Caller owns the value and must destroy it with stDestroy!
+    bool get(int32 idx, strref name, [sal _When_(return == true, _Out_)] stvar *out, [inout] SSDLockState *_ssdCurrentLockState);
+
+    // Gets a pointer to a value. This points to the internal storage within the node
+    // so it is only guaranteed to be valid while the read lock is held.
+    [opt] [valid] stvar *ptr(int32 idx, strref name, [inout] SSDLockState *_ssdCurrentLockState);
+
+    // Sets the given value
+    bool set(int32 idx, strref name, stvar val, [inout] SSDLockState *_ssdCurrentLockState);
+
+    // Same as setValue but consumes the value
+    // (consumes even on failure)
+    bool setC(int32 idx, strref name, [inout] stvar *val, [inout] SSDLockState *_ssdCurrentLockState);
+
+    // Removes a value
+    bool remove(int32 idx, strref name, [inout] SSDLockState *_ssdCurrentLockState);
+
+    // How many values / objects does this node contain?
+    int32 count([inout] SSDLockState *_ssdCurrentLockState);
+
+    // IMPORTANT NOTE: The generic object iterator interface cannot take any parameters;
+    // thus it always acquires a transient read lock and holds it until the iterator is
+    // destroyed. The caller MUST NOT already have an SSDLock held.
+    // If you want to use iterators inside a larger locked transaction or modify the tree,
+    // use iterLocked() instead.
+    [valid] SSDIterator *iter();
+
+    SSDIterator *_iterLocked([inout] SSDLockState *_ssdCurrentLockState);
+}
+
+abstract class SSDNode implements SSDNodeIf implements Iterable
+{
+    object:SSDTree tree;
+
+    // The timestamp this node was last modified
+    int64 modified;
+
+    // This node is an object that contains values or objects by name
+    bool isHashtable();
+
+    // This node is an array that contains values or objects by array index
+    bool isArray();
+
+    unbound void updateModified();
+}

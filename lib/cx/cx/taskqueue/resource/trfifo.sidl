@@ -1,0 +1,30 @@
+#include "taskresource.sidl"
+#include <cx/thread/mutex.h>
+
+class ComplexTask;
+
+// Strictly ordered FIFO
+
+// Tasks that require this resource are guaranteed to run serialized in the order that
+// they registered themselves to the resource. This is useful for ensuring ordered
+// access to a resource that cannot be accessed by multiple threads simultaneously.
+
+// Uses a linked list to track the waiting tasks so it can efficiently scale to a
+// large number of tasks.
+
+struct TRFifoNode;
+
+typedef struct TRFifoNode {
+    TRFifoNode *next;
+    ComplexTask *task;
+} TRFifoNode;
+
+class TRFifo extends TaskResource {
+
+    Mutex _fifomtx;
+    ComplexTask *cur;
+    TRFifoNode *head;
+    TRFifoNode *tail;
+
+    factory create();
+}

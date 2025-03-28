@@ -1,0 +1,10 @@
+#include <cx/taskqueue/taskqueue_shared.h>
+
+class TaskQueue;
+
+abstract class TQWorker {
+    // hooks for derived classes to override if desired
+    void onStart([in] TaskQueue *tq);      // worker is starting up
+    [abstract] int64 tick([in] TaskQueue *tq);      // worker should process tasks (call parent!)
+    void onStop([in] TaskQueue *tq);       // worker is shutting down
+}

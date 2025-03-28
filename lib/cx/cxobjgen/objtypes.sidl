@@ -1,0 +1,104 @@
+// Autogeneration is disabled to prevent dependency loops while building.
+// If any changes are made to this file, cxobjgen must be manually run on it!
+
+class Param {
+    string type;
+    string predecr;
+    string name;
+    string postdecr;
+
+    [noinit] sarray:sarray:string annotations;
+
+    factory create();
+}
+
+class Method implements Sortable {
+    Class *srcclass;
+    Interface *srcif;
+    Class *mixinsrc;
+    string srcfile;
+    string returntype;
+    string predecr;
+    string name;
+    sarray:object:Param params;
+
+    [noinit] sarray:string comments;
+    [noinit] sarray:sarray:string annotations;
+
+    bool isinit;
+    bool isdestroy;
+    bool isfactory;
+    bool canfail;
+    bool internal;
+    bool unbound;
+    bool standalone;
+    bool mixin;
+
+    [valid] Method *clone();
+    factory create();
+}
+
+class Interface implements Sortable {
+    string name;
+    Interface *parent;
+    sarray:object:Method methods;
+    bool included;
+    bool processed;
+    bool classif;
+    sarray:object:Method allmethods;
+
+    factory create();
+}
+
+class Member implements Sortable {
+    [noinit] sarray:string fulltype;
+    string vartype;
+    string predecr;
+    string name;
+    string postdecr;
+    [noinit] sarray:string comments;
+    [noinit] sarray:sarray:string annotations;
+
+    Class *mixinsrc;
+    string initstr;
+    bool init;
+    bool destroy;
+
+    factory create();
+}
+
+class Class implements Sortable {
+    string name;
+    Class *parent;
+    object:Interface classif;
+    sarray:object:Interface implements;
+    sarray:object:Class uses;
+    sarray:object:Member members;
+    sarray:object:Method methods;
+    sarray:string overrides;
+    [noinit] sarray:sarray:string annotations;
+    bool abstract;
+    bool mixin;
+    bool hasinit;
+    bool hasdestroy;
+    bool initcanfail;
+    bool included;
+    bool processed;
+    bool hasautoinit;
+    bool hasautodtors;
+
+    string methodprefix;
+
+    // runtime stuff
+    sarray:object:Member allmembers;
+    sarray:object:Method allmethods;
+
+    factory create();
+}
+
+class ComplexArrayType {
+    string tname;
+    string tsubtype;
+
+    factory create();
+}

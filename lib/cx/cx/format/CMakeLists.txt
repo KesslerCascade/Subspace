@@ -1,0 +1,35 @@
+set(FORMAT_SRCS
+    format/fmtfloat.c
+    format/fmtformat.c
+    format/fmtint.c
+    format/fmtobject.c
+    format/fmtparse.c
+    format/fmtptr.c
+    format/fmtstring.c
+    format/fmtsuid.c
+    format/format.c
+    format/formattable.c)
+set(FORMAT_INCLUDES
+    format/format.h
+    format/format_private.h
+    format/formattable.h)
+set(FORMAT_SIDL
+    format/formattable.sidl)
+
+set(CX_SRCS
+    ${CX_SRCS}
+    ${FORMAT_SRCS}
+    PARENT_SCOPE)
+set(CX_INCLUDES
+    ${CX_INCLUDES}
+    ${FORMAT_INCLUDES}
+    PARENT_SCOPE)
+set(CX_SIDL
+    ${CX_SIDL}
+    ${FORMAT_SIDL}
+    PARENT_SCOPE)
+
+set(CX_CMAKE_FILES
+    ${CX_CMAKE_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
+    PARENT_SCOPE)

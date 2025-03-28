@@ -1,0 +1,153 @@
+#include <cx/taskqueue/task/mptask.sidl>
+#include <cx/thread/event.h>
+
+class TQTest1 extends Task
+{
+    int num[2];
+    int total;
+    Event *notify;
+
+    factory create(int num1, int num2, Event *notify);
+}
+
+class TQTestFail extends Task
+{
+    int n;
+    Event *notify;
+
+    factory create(int n, Event *notify);
+}
+
+class TQTestCC1 extends Task
+{
+    int num[2];
+    TaskQueue *destq;
+    int *accum;
+    int *counter;
+    Event *notify;
+
+    factory create(int num1, int num2, TaskQueue *destq, int *accum, int *counter, Event *notify);
+}
+
+class TQTestCC2 extends Task
+{
+    int total;
+    int *accum;
+    int *counter;
+    Event *notify;
+
+    factory create(int total, int *accum, int *counter, Event *notify);
+}
+
+abstract class TQTestSched extends ComplexTask
+{
+    Event *notify;
+}
+
+class TQTestS1 extends TQTestSched
+{
+    int order;
+    int64 dtime;
+    int64 rantime;
+    factory create(int order, int64 dtime, Event *notify);
+}
+
+class TQTestS2 extends TQTestSched
+{
+    object:Task waitfor;
+    factory create(Task *waitfor, Event *notify);
+}
+
+class TQDelayTest extends Task
+{
+    int64 len;
+    factory create(int64 len);
+}
+
+class TQMTest extends ComplexTask
+{
+    Event *notify;
+    override run;
+
+    factory create(Event *notify);
+}
+
+typedef struct ReqTestState
+{
+    int sum;
+    int xor;
+    int product;
+    int count;
+    int target_count;
+    int seq;
+    atomic(bool) running;
+    atomic(bool) fail;
+    Event notify;
+} ReqTestState;
+
+typedef struct ReqTestState2
+{
+    atomic(int32) sum;
+    atomic(int32) count;
+    int target_count;
+    atomic(bool) fail;
+    Event notify;
+} ReqTestState2;
+
+class TQRTestMtx extends ComplexTask {
+    ReqTestState *rts;
+    int num;
+
+    factory create(ReqTestState *rts, int num);
+}
+
+class TQRTestFifo extends ComplexTask {
+    ReqTestState *rts;
+    int seq;
+    int num;
+
+    factory create(ReqTestState *rts, int seq, int num);
+}
+
+class TQRTestLifo extends ComplexTask {
+    ReqTestState *rts;
+    int seq;
+    int num;
+
+    factory create(ReqTestState *rts, int seq, int num);
+}
+
+class TQRTestGate extends ComplexTask {
+    ReqTestState2 *rts;
+    int num;
+
+    factory create(ReqTestState2 *rts, int num);
+}
+
+typedef struct MPTestState {
+    atomic(int32) sum;
+    atomic(bool) fail;
+    atomic(int32) count;
+    int target_count;
+    Event notify;
+} MPTestState;
+
+class TQMPTest extends MultiphaseTask {
+    MPTestState *mps;
+    int idx;
+    int variant;
+
+    override finish;
+
+    factory create(int variant, int idx, MPTestState *mps);
+}
+
+class TQTimeoutTest1 extends ComplexTask {
+    int count;
+    factory create();
+}
+class TQTimeoutTest2 extends ComplexTask {
+    ReqTestState *rts;
+
+    factory create(ReqTestState *rts);
+}

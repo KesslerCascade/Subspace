@@ -1,0 +1,12 @@
+#include <cx/thread/threadobj.sidl>
+#include <cx/platform/win.h>
+
+[methodprefix _winthrobj] class WinThread extends Thread {
+    bool background;
+
+    HANDLE handle;
+    DWORD id;
+
+    factory create();
+    destroy();
+}

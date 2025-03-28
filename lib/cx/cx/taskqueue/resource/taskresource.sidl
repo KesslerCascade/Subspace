@@ -1,0 +1,19 @@
+// Abstract base for a shared resource that a task can list as a requirement
+
+class ComplexTask;
+
+abstract class TaskResource {
+    // Registers a task with the shared resource. This enables the task to be advanced
+    // when the resource is available and reserves a slot for things like FIFO queues.
+    // This registration is consumed by a successful acquisition.
+    [abstract] bool registerTask(ComplexTask *task);
+
+    // Is it even possible for the given task to try to acquire the resource right now?
+    [abstract] bool canAcquire(ComplexTask *task);
+
+    // Try to acquire the resource. State tracking is up to the caller!
+    [abstract] bool tryAcquire(ComplexTask *task);
+
+    // Release the resource. State tracking is up to the caller!
+    [abstract] void release(ComplexTask *task);
+}

@@ -1,0 +1,45 @@
+set(THREAD_SRCS
+    thread/atomic.c
+    thread/condvar.c
+    thread/event.c
+    thread/mutex.c
+    thread/prqueue.c
+    thread/rwlock.c
+    thread/sema.c
+    thread/systhread.c
+    thread/thread.c
+    thread/threadobj.c)
+set(THREAD_INCLUDES
+    thread/aspin.h
+    thread/atomic.h
+    thread/condvar.h
+    thread/event.h
+    thread/futex.h
+    thread/mutex.h
+    thread/prqueue.h
+    thread/rwlock.h
+    thread/sema.h
+    thread/thread.h
+    thread/threadbase.h
+    thread/threadobj.h
+    thread/thread_private.h)
+set(THREAD_SIDL
+    thread/threadobj.sidl)
+
+set(CX_SRCS
+    ${CX_SRCS}
+    ${THREAD_SRCS}
+    PARENT_SCOPE)
+set(CX_INCLUDES
+    ${CX_INCLUDES}
+    ${THREAD_INCLUDES}
+    PARENT_SCOPE)
+set(CX_SIDL
+    ${CX_SIDL}
+    ${THREAD_SIDL}
+    PARENT_SCOPE)
+
+set(CX_CMAKE_FILES
+    ${CX_CMAKE_FILES}
+    ${CMAKE_CURRENT_SOURCE_DIR}/CMakeLists.txt
+    PARENT_SCOPE)

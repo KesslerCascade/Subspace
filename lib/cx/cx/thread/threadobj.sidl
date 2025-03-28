@@ -1,0 +1,22 @@
+#include <cx/stype/stvar.h>
+#include <cx/container/sarray.h>
+#include <cx/thread/atomic.h>
+#include <cx/thread/event.h>
+#include <cx/thread/threadbase.h>
+
+[methodprefix _throbj] class Thread {
+    threadFunc entry;
+    string name;
+
+    int exitCode;                       // only valid once 'running' become false
+
+    stvlist args;
+    [noinit] sarray:stvar _argsa;       // should use the stvlist instead where possible
+
+    atomic:bool running;
+    atomic:bool requestExit;
+    [noinit] Event notify;
+
+    init();
+    factory create(threadFunc func, strref name, int n, stvar args[], bool ui);
+}

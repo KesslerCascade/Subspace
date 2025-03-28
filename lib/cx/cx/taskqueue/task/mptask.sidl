@@ -1,0 +1,40 @@
+#include "complextask.sidl"
+
+// Multiphase tasks are tasks with multiple run phases that use an internal state machine to track
+// their progress. Instead of overriding run, they should add one or more phase functions in their
+// init routine, which will be called one after the after depending on the return value of the
+// previous phase.
+
+enum MultiphaseTaskFlagsEnum {
+    // Normally multiphase tasks go to the end of the task queue between phases, recording progress and
+    // giving other tasks a chance to run. If the greedy flag is set, instead they will immediately
+    // begin executing the next phase.
+    MPTASK_Greedy = 0x10
+};
+
+typedef uint32 (*MPTPhaseFunc)(void *self, TaskQueue* tq, TQWorker* worker, TaskControl *tcon);
+saDeclare(MPTPhaseFunc);
+
+// void mptaskAddPhases(MultiphaseTask* self, MPTPhaseFunc parr[]);
+// Adds task phases from a static array.
+#define mptaskAddPhases(self, parr) mptask_addPhases(self, sizeof(parr) / sizeof((parr)[0]), (parr), false)
+// void mptaskAddFailPhases(MultiphaseTask* self, MPTPhaseFunc parr[]);
+// Adds task fail phases from a static array.
+#define mptaskAddFailPhases(self, parr) mptask_addPhases(self, sizeof(parr) / sizeof((parr)[0]), (parr), true)
+
+[methodprefix mptask] abstract class MultiphaseTask extends ComplexTask {
+    [noinit] sarray:MPTPhaseFunc phases;       // phases that are run during normal task execution
+    [noinit] sarray:MPTPhaseFunc failphases;   // phases that only run on the event of failure
+    uint32 _phase;
+    bool _fail;
+
+    // Called once all phases (including fail phases) have completed. May be overridden to perform
+    // additional cleanup or change the final result.
+    uint32 finish(uint32 result, TaskControl *tcon);
+
+    // Adds phases from a static array.
+    unbound void _addPhases(int32 num, MPTPhaseFunc parr[], bool fail);
+
+    override run;
+    init();
+}

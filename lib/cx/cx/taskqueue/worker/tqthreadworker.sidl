@@ -1,0 +1,13 @@
+#include "tqworker.sidl"
+#include <cx/thread.h>
+
+class TQThreadWorker extends TQWorker {
+    object:Thread thr;      // worker thread
+    atomic:ptr curtask;     // this worker's currently running task
+    TQUICallback ui;
+    int32 num;              // worker number
+    bool shutdown;
+
+    factory create(int32 num);
+    bool startThread([in] TaskQueue *tq);
+}

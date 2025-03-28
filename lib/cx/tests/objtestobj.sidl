@@ -1,0 +1,45 @@
+interface TestIf1 {
+    int testfunc();
+}
+
+class TestCls1 implements TestIf1 {
+    int data;
+    factory create();
+}
+
+class TestCls2 extends TestCls1 {
+    factory create();
+}
+
+interface TestIf2 extends TestIf1 {
+    int testfunc2();
+}
+
+class TestCls3 extends TestCls2 implements TestIf2 {
+    int data2;
+    factory create();
+}
+
+class TestCls4 extends TestCls3 {
+    int data3;
+    override testfunc;
+    factory create();
+}
+
+interface TestIf3 {
+    int testfunc3();
+}
+
+abstract class TestCls4a extends TestCls4 implements TestIf3 {
+    int data4;
+    override testfunc;
+}
+
+class TestCls4b extends TestCls4a {
+    int data5;
+    factory create();
+}
+
+class TestCls5 extends TestCls1 implements Sortable {
+    factory create();
+}

@@ -1,0 +1,14 @@
+#include "tqmthreadpool.sidl"
+#include <cx/thread/mutex.h>
+
+class TQInWorkerManager extends TQThreadPoolManager {
+	Mutex mgrlock;       // one worker can run the manager at a time
+	atomic:bool needrun; // manager needs to be run ASAP 
+
+    override notify;
+	override tick;
+	override pretask;
+	override stop;
+
+	factory create();
+}

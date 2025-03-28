@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="string">
+    <DisplayString>{(_nv_string*)*this}</DisplayString>
+    <Expand>
+      <ExpandedItem>(_nv_string*)*this,nr</ExpandedItem >
+    </Expand>
+  </Type>
+
+  <Type Name="strref">
+    <DisplayString>{(_nv_string*)*this}</DisplayString>
+    <Expand>
+      <ExpandedItem>(_nv_string*)*this,nr</ExpandedItem>
+    </Expand>
+  </Type>
+
+	<Type Name="_nv_string">
+		<DisplayString Condition="this == 0">[Empty]</DisplayString>
+		<DisplayString Condition="!((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1))">{(const char*)this,s}</DisplayString>
+		<DisplayString Condition="(((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x08) == 0x08)">[Rope]</DisplayString>
+		<DisplayString Condition="((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x20) == 0x20">{((char*)this + (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 3 ? 8 : ((((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) ? (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 6 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 4 : 3)) : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 4 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 3 : 2))))),s8}</DisplayString>
+		<DisplayString Condition="((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1))">{((char*)this + (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 3 ? 8 : ((((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) ? (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 6 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 4 : 3)) : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 4 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 3 : 2))))),s}</DisplayString>
+		<DisplayString>[Invalid cx string]</DisplayString>
+		<StringView Condition="((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x20) == 0x20">((char*)this + (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 3 ? 8 : ((((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) ? (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 6 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 4 : 3)) : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 4 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 3 : 2))))),s8</StringView>
+		<StringView Condition="((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1))">((char*)this + (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 3 ? 8 : ((((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) ? (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 6 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 4 : 3)) : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 4 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 3 : 2))))),s</StringView>
+		<Expand>
+			<Item Name="Valid" Condition="this != 0">((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1))</Item>
+			<Item Name="Length" Condition="((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) != 0">(((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? (unsigned short)*((unsigned char*)this + ((((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) ? 3 : 2)) : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? *(unsigned short*)((unsigned char*)this + ((((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) ? 4 : 2)) : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 3 ? *(unsigned int*)((unsigned char*)this + 4) : 0)))</Item>
+			<Item Name="Bufsz" Condition="(((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x14) == 0x14) &amp;&amp; ((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1">(unsigned short)*((unsigned char*)this + 2),d</Item>
+			<Item Name="Bufsz" Condition="(((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x14) == 0x14) &amp;&amp; ((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2">*(unsigned short*)((unsigned char*)this + 2),d</Item>
+			<Item Name="Refs" Condition="!(((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x14) == 0x14) &amp;&amp; (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) &amp;&amp; ((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1">(unsigned short)*((unsigned char*)this + 2),d</Item>
+			<Item Name="Refs" Condition="!(((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x14) == 0x14) &amp;&amp; (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) &amp;&amp; (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 || ((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 3)">*(unsigned short*)((unsigned char*)this + 2),d</Item>
+			<Item Name="Data" Condition="!(((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x08) == 0x08) &amp;&amp; ((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x20) == 0x20">((char*)this + (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 3 ? 8 : ((((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) ? (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 6 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 4 : 3)) : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 4 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 3 : 2))))),s8</Item>
+			<Item Name="Data" Condition="!(((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x08) == 0x08) &amp;&amp; ((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x20) == 0x00">((char*)this + (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 3 ? 8 : ((((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) ? (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 6 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 4 : 3)) : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 4 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 3 : 2))))),s</Item>
+			<Item Name="Rope" Condition="(((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x08) == 0x08)">(str_ropedata*)((char*)this + (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 3 ? 8 : ((((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x10) == 0x10) ? (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 6 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 4 : 3)) : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 2 ? 4 : (((((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1)) ? *(unsigned char*)this : 0) &amp; 0x03) == 1 ? 3 : 2))))),na</Item>
+			<Item Name="Flags" Condition="((*(unsigned char*)this &amp; 0x80) == 0x80 &amp;&amp; (*((unsigned char*)this+1) == 0xc1))">(_nv_string_flags*)this,nr</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="_nv_string_flags">
+		<DisplayString>{(*(unsigned char*)this),x}</DisplayString>
+		<Expand>
+			<Item Name="LenBits">((*(unsigned char*)this) &amp; 0x03) == 3 ? 32 : (((*(unsigned char*)this) &amp; 0x03) == 2 ? 16 : (((*(unsigned char*)this) &amp; 0x03) == 1 ? 8 : 0))</Item>
+			<Item Name="Stack">((*(unsigned char*)this) &amp; 0x04) == 0x04</Item>
+			<Item Name="Rope">((*(unsigned char*)this) &amp; 0x08) == 0x08</Item>
+			<Item Name="Alloc">((*(unsigned char*)this) &amp; 0x10) == 0x10</Item>
+			<Item Name="UTF8">((*(unsigned char*)this) &amp; 0x20) == 0x20</Item>
+			<Item Name="ASCII">((*(unsigned char*)this) &amp; 0x40) == 0x40</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="_nv_stype">
+		<DisplayString Condition="this->id == 0x00">None</DisplayString>
+		<DisplayString Condition="this->id == 0x01">Opaque</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x00">Unknown Opaque Type</DisplayString>
+		<DisplayString Condition="this->id == 0x11">int8</DisplayString>
+		<DisplayString Condition="this->id == 0x12">int16</DisplayString>
+		<DisplayString Condition="this->id == 0x14">int32</DisplayString>
+		<DisplayString Condition="this->id == 0x18">int64</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x10">Unknown Integer Type</DisplayString>
+		<DisplayString Condition="this->id == 0x21">uint8</DisplayString>
+		<DisplayString Condition="this->id == 0x22">uint16</DisplayString>
+		<DisplayString Condition="this->id == 0x23">bool</DisplayString>
+		<DisplayString Condition="this->id == 0x24">uint32</DisplayString>
+		<DisplayString Condition="this->id == 0x28">uint64</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x20">Unknown Unsigned Type</DisplayString>
+		<DisplayString Condition="this->id == 0x34">float32</DisplayString>
+		<DisplayString Condition="this->id == 0x38">float64</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x30">Unknown Floating Type</DisplayString>
+		<DisplayString Condition="this->id == 0x44">ptr32</DisplayString>
+		<DisplayString Condition="this->id == 0x48">ptr64</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0x40">Unknown Pointer Type</DisplayString>
+		<DisplayString Condition="this->id == 0xe0">string</DisplayString>
+		<DisplayString Condition="this->id == 0xe1">object</DisplayString>
+		<DisplayString Condition="this->id == 0xe2">weakref</DisplayString>
+		<DisplayString Condition="this->id == 0xe3">suid</DisplayString>
+		<DisplayString Condition="this->id == 0xe4">stvar</DisplayString>
+		<DisplayString Condition="this->id == 0xe5">closure</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0xe0">Unknown CX Type</DisplayString>
+		<DisplayString Condition="this->id == 0xf0">sarray</DisplayString>
+		<DisplayString Condition="this->id == 0xf1">hashtable</DisplayString>
+		<DisplayString Condition="this->id == 0xf2">cchain</DisplayString>
+		<DisplayString Condition="(this->id &amp; 0xf0) == 0xf0">Unknown Container Type</DisplayString>
+		<DisplayString>Invalid SType</DisplayString>
+		<Expand>
+			<Item Name="id">this->id,x</Item>
+			<Item Name="size">this->size,d</Item>
+			<Item Name="Flags">(_nv_stype_flags*)this,nr</Item>
+			<Item Name="stype">this->spec,x</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="_nv_stype_flags">
+		<DisplayString>{((_nv_stype*)this)->flags,x}</DisplayString>
+		<Expand>
+			<Item Name="Object">(((_nv_stype*)this)->flags &amp; 0x01) == 0x01</Item>
+			<Item Name="Custom">(((_nv_stype*)this)->flags &amp; 0x02) == 0x02</Item>
+			<Item Name="PassPtr">(((_nv_stype*)this)->flags &amp; 0x04) == 0x04</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="_nv_sarray">
+		<DisplayString Condition="this != 0">SArray({(_nv_stype*)&amp;((SArrayHeader*)((unsigned char*)this - (size_t)(&amp;((SArrayHeader*)0)->data)))->elemtype,na})[{((SArrayHeader*)((unsigned char*)this - (size_t)(&amp;((SArrayHeader*)0)->data)))->count}]</DisplayString>
+		<Expand>
+			<Item Name="type">(_nv_stype*)&amp;((SArrayHeader*)((unsigned char*)this - (size_t)(&amp;((SArrayHeader*)0)->data)))->elemtype,na</Item>
+			<Item Name="count">((SArrayHeader*)((unsigned char*)this - (size_t)(&amp;((SArrayHeader*)0)->data)))->count</Item>
+			<Item Name="capacity">((SArrayHeader*)((unsigned char*)this - (size_t)(&amp;((SArrayHeader*)0)->data)))->capacity</Item>
+			<Item Name="ops" Condition="((*(unsigned int*)((unsigned char*)this - 4)) &amp; 0x8000) == 0x8000">((SArrayHeader*)((unsigned char*)this - (size_t)(&amp;((SArrayHeader*)0)->data)))->typeops</Item>
+			<Item Name="grow">(enum SARRAY_GROW_ENUM)((*(unsigned int*)((unsigned char*)this - 4)) &gt;&gt; 24)</Item>
+			<Item Name="Flags">(_nv_sarray_flags*)((SArrayHeader*)((unsigned char*)this - (size_t)(&amp;((SArrayHeader*)0)->data))),nr</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="_nv_sarray_flags">
+		<DisplayString>{((SArrayHeader*)this)->flags,x}</DisplayString>
+		<Expand>
+			<Item Name="Ref">(((SArrayHeader*)this)->flags &amp; 0x10) == 0x10</Item>
+			<Item Name="Sorted">(((SArrayHeader*)this)->flags &amp; 0x20) == 0x20</Item>
+			<Item Name="AutoShrink">(((SArrayHeader*)this)->flags &amp; 0x40) == 0x40</Item>
+			<Item Name="Extended">(((SArrayHeader*)this)->flags &amp; 0x8000) == 0x8000</Item>
+		</Expand>
+	</Type>
+
+  <Type Name="hashtable">
+    <DisplayString>{(_nv_hashtable*)*this}</DisplayString>
+    <Expand>
+      <ExpandedItem>(_nv_hashtable*)*this,nr</ExpandedItem >
+    </Expand>
+  </Type>
+
+	<Type Name="_nv_hashtable">
+		<DisplayString Condition="this != 0">hashtable({(_nv_stype*)&amp;((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->keytype,na},{(_nv_stype*)&amp;((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->valtype,na})[{((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->valid}]</DisplayString>
+		<Expand>
+			<Item Name="idxsz">((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->idxsz</Item>
+			<Item Name="idxused">((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->idxused</Item>
+			<Item Name="storsz">((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->storsz</Item>
+			<Item Name="storused">((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->storused</Item>
+			<Item Name="valid">((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->valid</Item>
+			<Item Name="keytype">(_nv_stype*)&amp;((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->keytype,na</Item>
+			<Item Name="valtype">(_nv_stype*)&amp;((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->valtype,na</Item>
+			<Item Name="growat">(enum HASHTABLE_GROW_ENUM)((((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->flags &gt;&gt; 24) &amp; HT_GROW_AT_MASK)</Item>
+			<Item Name="growby">(enum HASHTABLE_GROWBY_ENUM)((((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index)))->flags &gt;&gt; 24) &amp; HT_GROW_BY_MASK)</Item>
+
+			<Item Name="Flags">(_nv_hashtable_flags*)((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index))),nr</Item>
+			<Item Name="Data">(_nv_hashtable_data*)((HashTableHeader*)((unsigned char*)this - (size_t)(&amp;((HashTableHeader*)0)->index))),nr</Item>
+		</Expand>
+	</Type>
+	
+	<Type Name="_nv_hashtable_flags">
+		<DisplayString>{((HashTableHeader*)this)->flags,x}</DisplayString>
+		<Expand>
+			<Item Name="CaseInsensitive">(((HashTableHeader*)this)->flags &amp; 0x01) == 0x01</Item>
+			<Item Name="RefKeys">(((HashTableHeader*)this)->flags &amp; 0x02) == 0x02</Item>
+			<Item Name="Ref">(((HashTableHeader*)this)->flags &amp; 0x04) == 0x04</Item>
+			<Item Name="InsertOpt">(((HashTableHeader*)this)->flags &amp; 0x08) == 0x08</Item>
+			<Item Name="Compact">(((HashTableHeader*)this)->flags &amp; 0x10) == 0x10</Item>
+			<Item Name="Quadratic">(((HashTableHeader*)this)->flags &amp; 0x2000) == 0x2000</Item>
+			<Item Name="Pow2">(((HashTableHeader*)this)->flags &amp; 0x4000) == 0x4000</Item>
+			<Item Name="Extended">(((HashTableHeader*)this)->flags &amp; 0x8000) == 0x8000</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="_nv_hashtable_data">
+		<DisplayString></DisplayString>
+		<Expand>
+			<Item Name="chunks">((HashTableHeader*)this)->chunks</Item>
+			<Item Name="keystorage">((HashTableHeader*)this)->keystorage</Item>
+			<Item Name="valstorage">((HashTableHeader*)this)->valstorage</Item>
+			<Item Name="index">((HashTableHeader*)this)->index</Item>
+		</Expand>
+	</Type>
+
+	<Type Name="cx_atomic_ptr">
+		<Expand>
+			<Item Name="ptr">(void*)this->repr</Item>
+		</Expand>
+	</Type>
+</AutoVisualizer>

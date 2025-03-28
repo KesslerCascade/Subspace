@@ -1,0 +1,107 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}"
+        },
+        {
+            "name": "windows",
+            "inherits": "base",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "unix",
+            "inherits": "base",
+            "hidden": true,
+            "condition": {
+                "type": "notEquals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        }
+    ],
+    "compilers": [
+        {
+            "name": "msvc",
+            "displayName": "MSVC",
+            "inherits": "windows",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe"
+            }
+        },
+        {
+            "name": "gcc",
+            "displayName": "GCC",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++"
+            }
+        },
+        {
+            "name": "clang",
+            "displayName": "Clang",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++"
+            }
+        }
+    ],
+    "configs": [
+        {
+            "name": "debug",
+            "displayName": "Debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "dev",
+            "displayName": "Dev",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Dev"
+            }
+        },
+        {
+            "name": "devnoopt",
+            "displayName": "DevNoOpt",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "DevNoOpt"
+            }
+        },
+        {
+            "name": "release",
+            "displayName": "Release",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        }
+    ],
+    "tests": [
+        {
+            "name": "taskqueue",
+            "displayName": "Taskqueue Stress",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,30 @@
+#include <cx/ssdtree/ssdshared.h>
+#include <cx/thread/mutex.h>
+
+#ifdef SSD_LOCK_DEBUG
+typedef struct SSDTreeDebug {
+    Mutex mtx;
+    sa_SSDLockDebug readlocks;
+    sa_SSDLockDebug writelocks;
+} SSDTreeDebug;
+#else
+typedef struct SSDTreeDebug {
+    uint32 _dummy;
+} SSDTreeDebug;
+#endif
+
+class SSDTree {
+    RWLock lock;
+    SSDTreeDebug dbg;
+    uint32 flags;
+
+    // The most recent last-modified timestamp of any node in the tree
+    int64 modified;
+
+    // Factory functions for if this tree wants to use derived node classes
+    SSDNodeFactory factories[SSD_Create_Count];
+
+    [sal _objfactory_guaranteed] SSDNode *createNode([sal _In_range_(SSD_Create_None+1, SSD_Create_Count-1)] SSDCreateType crtype);
+
+    factory create(uint32 flags);
+}

@@ -1,0 +1,11 @@
+#include "taskrequires.sidl"
+#include <cx/taskqueue/task/task.sidl>
+
+// Task Requires Task - a basic dependency on another task to successfully complete
+
+class TaskRequiresTask extends TaskRequires {
+    object:Task task;
+    bool failok;
+
+    factory create([in] Task *deptask, bool failok);
+}

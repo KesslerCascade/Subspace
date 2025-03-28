@@ -1,0 +1,21 @@
+#include <cx/ssdtree/node/ssdnode.sidl>
+
+class SSDHashNode extends SSDNode
+{
+    [noinit] hashtable:string:stvar storage;
+
+    override isHashtable;
+    factory _create(SSDTree *tree);
+    init();
+}
+
+class SSDHashIter extends SSDIterator
+{
+    htiter iter;
+    string lastName;
+
+    override isHashtable;
+
+    factory create(SSDHashNode *node, SSDLockState *lstate);
+    destroy();
+}

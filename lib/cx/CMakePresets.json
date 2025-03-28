@@ -1,0 +1,467 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}"
+        },
+        {
+            "name": "windows",
+            "inherits": "base",
+            "hidden": true,
+            "condition": {
+                "type": "equals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "unix",
+            "inherits": "base",
+            "hidden": true,
+            "condition": {
+                "type": "notEquals",
+                "lhs": "${hostSystemName}",
+                "rhs": "Windows"
+            }
+        },
+        {
+            "name": "msvc-debug",
+            "displayName": "MSVC Debug",
+            "inherits": "windows",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "msvc-dev",
+            "displayName": "MSVC Dev",
+            "inherits": "windows",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "CMAKE_BUILD_TYPE": "Dev"
+            }
+        },
+        {
+            "name": "msvc-devnoopt",
+            "displayName": "MSVC DevNoOpt",
+            "inherits": "windows",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "CMAKE_BUILD_TYPE": "DevNoOpt"
+            }
+        },
+        {
+            "name": "msvc-release",
+            "displayName": "MSVC Release",
+            "inherits": "windows",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "cl.exe",
+                "CMAKE_CXX_COMPILER": "cl.exe",
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "gcc-debug",
+            "displayName": "GCC Debug",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "gcc-dev",
+            "displayName": "GCC Dev",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_BUILD_TYPE": "Dev"
+            }
+        },
+        {
+            "name": "gcc-devnoopt",
+            "displayName": "GCC DevNoOpt",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_BUILD_TYPE": "DevNoOpt"
+            }
+        },
+        {
+            "name": "gcc-release",
+            "displayName": "GCC Release",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "gcc",
+                "CMAKE_CXX_COMPILER": "g++",
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        },
+        {
+            "name": "clang-debug",
+            "displayName": "Clang Debug",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "clang-dev",
+            "displayName": "Clang Dev",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_BUILD_TYPE": "Dev"
+            }
+        },
+        {
+            "name": "clang-devnoopt",
+            "displayName": "Clang DevNoOpt",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_BUILD_TYPE": "DevNoOpt"
+            }
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Clang Release",
+            "inherits": "unix",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "clang",
+                "CMAKE_CXX_COMPILER": "clang++",
+                "CMAKE_BUILD_TYPE": "RelWithDebInfo"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "msvc-debug",
+            "displayName": "MSVC Debug",
+            "configurePreset": "msvc-debug"
+        },
+        {
+            "name": "msvc-dev",
+            "displayName": "MSVC Dev",
+            "configurePreset": "msvc-dev"
+        },
+        {
+            "name": "msvc-devnoopt",
+            "displayName": "MSVC DevNoOpt",
+            "configurePreset": "msvc-devnoopt"
+        },
+        {
+            "name": "msvc-release",
+            "displayName": "MSVC Release",
+            "configurePreset": "msvc-release"
+        },
+        {
+            "name": "gcc-debug",
+            "displayName": "GCC Debug",
+            "configurePreset": "gcc-debug"
+        },
+        {
+            "name": "gcc-dev",
+            "displayName": "GCC Dev",
+            "configurePreset": "gcc-dev"
+        },
+        {
+            "name": "gcc-devnoopt",
+            "displayName": "GCC DevNoOpt",
+            "configurePreset": "gcc-devnoopt"
+        },
+        {
+            "name": "gcc-release",
+            "displayName": "GCC Release",
+            "configurePreset": "gcc-release"
+        },
+        {
+            "name": "clang-debug",
+            "displayName": "Clang Debug",
+            "configurePreset": "clang-debug"
+        },
+        {
+            "name": "clang-dev",
+            "displayName": "Clang Dev",
+            "configurePreset": "clang-dev"
+        },
+        {
+            "name": "clang-devnoopt",
+            "displayName": "Clang DevNoOpt",
+            "configurePreset": "clang-devnoopt"
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Clang Release",
+            "configurePreset": "clang-release"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "msvc-debug",
+            "displayName": "MSVC Debug",
+            "configurePreset": "msvc-debug"
+        },
+        {
+            "name": "msvc-debug-taskqueue",
+            "displayName": "MSVC Debug Taskqueue Stress",
+            "configurePreset": "msvc-debug",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "msvc-dev",
+            "displayName": "MSVC Dev",
+            "configurePreset": "msvc-dev"
+        },
+        {
+            "name": "msvc-dev-taskqueue",
+            "displayName": "MSVC Dev Taskqueue Stress",
+            "configurePreset": "msvc-dev",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "msvc-devnoopt",
+            "displayName": "MSVC DevNoOpt",
+            "configurePreset": "msvc-devnoopt"
+        },
+        {
+            "name": "msvc-devnoopt-taskqueue",
+            "displayName": "MSVC DevNoOpt Taskqueue Stress",
+            "configurePreset": "msvc-devnoopt",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "msvc-release",
+            "displayName": "MSVC Release",
+            "configurePreset": "msvc-release"
+        },
+        {
+            "name": "msvc-release-taskqueue",
+            "displayName": "MSVC Release Taskqueue Stress",
+            "configurePreset": "msvc-release",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "gcc-debug",
+            "displayName": "GCC Debug",
+            "configurePreset": "gcc-debug"
+        },
+        {
+            "name": "gcc-debug-taskqueue",
+            "displayName": "GCC Debug Taskqueue Stress",
+            "configurePreset": "gcc-debug",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "gcc-dev",
+            "displayName": "GCC Dev",
+            "configurePreset": "gcc-dev"
+        },
+        {
+            "name": "gcc-dev-taskqueue",
+            "displayName": "GCC Dev Taskqueue Stress",
+            "configurePreset": "gcc-dev",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "gcc-devnoopt",
+            "displayName": "GCC DevNoOpt",
+            "configurePreset": "gcc-devnoopt"
+        },
+        {
+            "name": "gcc-devnoopt-taskqueue",
+            "displayName": "GCC DevNoOpt Taskqueue Stress",
+            "configurePreset": "gcc-devnoopt",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "gcc-release",
+            "displayName": "GCC Release",
+            "configurePreset": "gcc-release"
+        },
+        {
+            "name": "gcc-release-taskqueue",
+            "displayName": "GCC Release Taskqueue Stress",
+            "configurePreset": "gcc-release",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "clang-debug",
+            "displayName": "Clang Debug",
+            "configurePreset": "clang-debug"
+        },
+        {
+            "name": "clang-debug-taskqueue",
+            "displayName": "Clang Debug Taskqueue Stress",
+            "configurePreset": "clang-debug",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "clang-dev",
+            "displayName": "Clang Dev",
+            "configurePreset": "clang-dev"
+        },
+        {
+            "name": "clang-dev-taskqueue",
+            "displayName": "Clang Dev Taskqueue Stress",
+            "configurePreset": "clang-dev",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "clang-devnoopt",
+            "displayName": "Clang DevNoOpt",
+            "configurePreset": "clang-devnoopt"
+        },
+        {
+            "name": "clang-devnoopt-taskqueue",
+            "displayName": "Clang DevNoOpt Taskqueue Stress",
+            "configurePreset": "clang-devnoopt",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        },
+        {
+            "name": "clang-release",
+            "displayName": "Clang Release",
+            "configurePreset": "clang-release"
+        },
+        {
+            "name": "clang-release-taskqueue",
+            "displayName": "Clang Release Taskqueue Stress",
+            "configurePreset": "clang-release",
+            "filter": {
+                "include": {
+                    "name": "taskqueue:.*"
+                }
+            },
+            "execution": {
+                "repeat": {
+                    "mode": "until-fail",
+                    "count": 100
+                }
+            }
+        }
+    ]
+}

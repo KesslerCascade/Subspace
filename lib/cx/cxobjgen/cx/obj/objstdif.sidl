@@ -1,0 +1,32 @@
+// Standard interfaces that have special meaning within the framework
+
+interface Sortable {
+    intptr cmp(object other, uint32 flags);
+}
+
+interface Hashable {
+    uint32 hash(uint32 flags);
+}
+
+interface Convertible {
+    // NOTE: While this is used by stConvert, the object interface is a higher level interface.
+    // The normal convention of blindly overwriting the destination does not apply here. For
+    // example, when called to convert to a string, the destination should be properly reused
+    // or destroyed first.
+    // The layer between stConvert and Convertible takes care of making sure the destination is
+    // always initialized.
+    bool convert(stype st, stgeneric *dest, uint32 flags);
+}
+
+interface IteratorIf {
+    bool valid();
+    bool next();
+    bool get(stvar *out);
+}
+
+abstract class Iterator implements IteratorIf {
+}
+
+interface Iterable {
+    Iterator *iter();               // Caller owns the iterator and must release it with objRelease
+}

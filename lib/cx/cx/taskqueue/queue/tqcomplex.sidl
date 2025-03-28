@@ -1,0 +1,20 @@
+#include "tqueue.sidl"
+#include <cx/taskqueue/task/complextask.sidl>
+
+[methodprefix ctaskqueue] class ComplexTaskQueue extends TaskQueue {
+    PrQueue advanceq;                // tasks that are being advanced out of the defer and/or schedule lists
+    [ref] [sorted] sarray:object:ComplexTask scheduled;   // tasks that are scheduled to run at a later time, sorted by time
+    [refkeys] hashtable:object:none deferred;       // tasks that are deferred indefinitely, to be held until they are advanced
+
+    bool schedule([in] ComplexTask *task, int64 delay);   // add a task scheduled to run a relative time in the future
+    bool defer([in] ComplexTask *task);   // add a task but defer it indefinitely
+    bool advance([in] ComplexTask *task);
+
+    override add;
+    override _processDone;
+    override _processExtra;
+    override _queueMaint;
+    override _runTask;
+    override _clear;
+    factory create(strref name, uint32 flags, int64 gcinterval, [in] TQRunner *runner, [in] TQManager *manager, [in] [opt] TQMonitor *monitor);
+}

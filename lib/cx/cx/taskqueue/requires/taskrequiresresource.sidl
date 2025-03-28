@@ -1,0 +1,12 @@
+#include "taskrequires.sidl"
+#include <cx/taskqueue/resource/taskresource.sidl>
+
+// Task Requires Resource - For requiring exclusive access to a shared resource.
+// Does state tracking so it won't try to re-acquire a resource that is already owned.
+
+class TaskRequiresResource extends TaskRequires {
+    bool owned;
+    object:TaskResource res;
+
+    factory create([in] TaskResource *res);
+}

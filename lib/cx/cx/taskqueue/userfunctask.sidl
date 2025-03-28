@@ -1,0 +1,9 @@
+#include <cx/taskqueue/task/basictask.sidl>
+#include <cx/taskqueue/taskqueue.h>
+
+class UserFuncTask extends BasicTask {
+    UserTaskCB func;
+    void *udata;
+
+    factory create(UserTaskCB func, void *udata);
+}
