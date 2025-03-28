@@ -25,15 +25,19 @@ int __stdcall entry()
     scsettings.gameProgram = smalloc(MAX_PATH);
     scsettings.gamePath    = smalloc(MAX_PATH);
 
-#if 1
-    strcpy(scsettings.gameDir, "M:\\games\\sync\\FTL");
+#if 0
+    strcpy(scsettings.gameDir, "M:\\Dev\\FTLCopy");
     strcpy(scsettings.gameProgram, "FTLGame.exe");
-    strcpy(scsettings.gamePath, "M:\\games\\sync\\FTL\\FTLGame.exe");
-#else
+    strcpy(scsettings.gamePath, "M:\\Dev\\FTLCopy\\FTLGame.exe");
+#elif 0
     strcpy(scsettings.gameDir, "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light");
     strcpy(scsettings.gameProgram, "FTLGame.exe");
     strcpy(scsettings.gamePath,
            "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light\\FTLGame.exe");
+#elif 1
+    strcpy(scsettings.gameDir, "M:\\Games\\Sync\\FTL");
+    strcpy(scsettings.gameProgram, "FTLGame.exe");
+    strcpy(scsettings.gamePath, "M:\\Games\\Sync\\FTL\\FTLGame.exe");
 #endif
 
     SetCurrentDirectoryA(scsettings.gameDir);
