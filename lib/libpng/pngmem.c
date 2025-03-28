@@ -17,6 +17,7 @@
  */
 
 #include "pngpriv.h"
+#include <cx/xalloc/xalloc.h>
 
 #if defined(PNG_READ_SUPPORTED) || defined(PNG_WRITE_SUPPORTED)
 /* Free a png_struct */
@@ -94,7 +95,7 @@ png_malloc_base,(png_const_structrp png_ptr, png_alloc_size_t size),
 #  endif
 
    /* Use the system malloc */
-   return malloc((size_t)/*SAFE*/size); /* checked for truncation above */
+   return xa_malloc((size_t)/*SAFE*/size); /* checked for truncation above */
 }
 
 #if defined(PNG_TEXT_SUPPORTED) || defined(PNG_sPLT_SUPPORTED) ||\
@@ -247,7 +248,7 @@ png_free_default,(png_const_structrp png_ptr, png_voidp ptr),PNG_DEPRECATED)
       return;
 #endif /* USER_MEM */
 
-   free(ptr);
+   xa_free(ptr);
 }
 
 #ifdef PNG_USER_MEM_SUPPORTED
