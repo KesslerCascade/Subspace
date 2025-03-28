@@ -43,7 +43,7 @@ void *wrapCreate(addr_t addr, const FuncInfo *fi)
 
     // Pass 1, copy parameters to stack of function we're calling in the right order
     for (i = fi->nargs - 1; i >= 0 ; --i) {
-        if (!fi->args[i].stack)
+        if (!fi->args[i].stack || fi->args[i].type == ARG_DUMMY)
             continue;
         for (j = (fi->args[i].size / 4 - 1) * 4; j >= 0; j -= 4) {
             asmrd(as, I_MOV, REG_EAX, REG_ESP, -1, 0, argoffsets[i] + j + espoffset, 4);
@@ -55,7 +55,7 @@ void *wrapCreate(addr_t addr, const FuncInfo *fi)
 
     // Pass 2, load any register arguments
     for (i = 0; i < fi->nargs; i++) {
-        if (fi->args[i].stack)
+        if (fi->args[i].stack || fi->args[i].type == ARG_DUMMY)
             continue;
         asmrd(as, I_MOV, fi->args[i].reg, REG_ESP, -1, 0, argoffsets[i] + espoffset, fi->args[i].size);
     }

@@ -51,7 +51,18 @@ static void initArgs(AsmState* as, HookState* hs)
 
     for (i = 0; i < fi->nargs; i++) {
         const ArgInfo* arg = &fi->args[i];
-        if (arg->stack) {
+        if (arg->type == ARG_DUMMY) {
+            // not actually used, but the wrapper needs something, so push a zero
+            if (arg->size == 4) {
+                asmi(as, I_PUSH, 0);
+            } else {
+                strcpy(as->errortxt, "Ignored args must be 32 bits in size");
+                as->error = true;
+            }
+            hs->espoffset += 4;
+            hs->localsz += 4;
+            hs->argoffsets[i] = -hs->localsz;
+        } else if (arg->stack) {
             hs->argoffsets[i] = stackpos;
             if (arg->size > 0 && arg->size < 4)
                 stackpos += 4;   // shorts and chars are always extended
@@ -119,7 +130,7 @@ void* hookCreate(addr_t addr, const FuncInfo* fi, void* pre, void* post)
 
     // Pass 1, copy parameters to stack of function we're calling in the right order
     for (i = fi->nargs - 1; i >= 0; --i) {
-        if (!fi->args[i].stack)
+        if (!fi->args[i].stack || fi->args[i].type == ARG_DUMMY)
             continue;
         for (j = (fi->args[i].size / 4 - 1) * 4; j >= 0; j -= 4) {
             asmrd(as, I_MOV, REG_EAX, REG_ESP, -1, 0, hs->argoffsets[i] + j + hs->espoffset, 4);
@@ -131,7 +142,7 @@ void* hookCreate(addr_t addr, const FuncInfo* fi, void* pre, void* post)
 
     // Pass 2, load any register arguments
     for (i = 0; i < fi->nargs; i++) {
-        if (fi->args[i].stack)
+        if (fi->args[i].stack || fi->args[i].type == ARG_DUMMY)
             continue;
         asmrd(as,
               I_MOV,

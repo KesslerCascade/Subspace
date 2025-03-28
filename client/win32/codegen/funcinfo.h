@@ -5,7 +5,7 @@
 // Tightly packed function info structure containing information necessary to
 // construct wrappers and hooks.
 
-typedef enum { ARG_INT, ARG_PTR, ARG_STRUCT, ARG_FLOAT, ARG_DOUBLE } ArgType;
+typedef enum { ARG_INT, ARG_PTR, ARG_STRUCT, ARG_FLOAT, ARG_DOUBLE, ARG_DUMMY } ArgType;
 
 typedef struct ArgInfo {
     unsigned char size;
