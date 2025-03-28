@@ -2,12 +2,30 @@
     "version": 3,
     "configurePresets": [
         {
-        "name": "base",
-        "hidden": true,
-        "binaryDir": "${sourceDir}/build/${presetName}"
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/build/${presetName}"
         },
         {
-            "name": "game",
+            "name": "subspace-win32",
+            "inherits": "base",
+            "generator": "Visual Studio 16 2019",
+            "architecture": {
+                "value": "Win32",
+                "strategy": "set"
+            }
+        },
+        {
+            "name": "subspace-win64",
+            "inherits": "base",
+            "generator": "Visual Studio 16 2019",
+            "architecture": {
+                "value": "x64",
+                "strategy": "set"
+            }
+        },
+        {
+            "name": "game-win32",
             "inherits": "base",
             "generator": "Visual Studio 16 2019",
             "architecture": {
@@ -27,13 +45,37 @@
         {
             "name": "game-debug",
             "displayName": "Game (Debug)",
-            "configurePreset": "game",
+            "configurePreset": "game-win32",
             "configuration": "Debug"
         },
         {
             "name": "game-release",
             "displayName": "Game (Release)",
-            "configurePreset": "game",
+            "configurePreset": "game-win32",
+            "configuration": "Release"
+        },
+        {
+            "name": "subspace-win32-debug",
+            "displayName": "Subspace Win32 (Debug)",
+            "configurePreset": "subspace-win32",
+            "configuration": "Debug"
+        },
+        {
+            "name": "subspace-win32-release",
+            "displayName": "Subspace Win32 (Release)",
+            "configurePreset": "subspace-win32",
+            "configuration": "Release"
+        },
+        {
+            "name": "subspace-win64-debug",
+            "displayName": "Subspace Win64 (Debug)",
+            "configurePreset": "subspace-win64",
+            "configuration": "Debug"
+        },
+        {
+            "name": "subspace-win64-release",
+            "displayName": "Subspace Win64 (Release)",
+            "configurePreset": "subspace-win64",
             "configuration": "Release"
         }
     ]
