@@ -25,6 +25,8 @@ else()
     add_subdirectory(iup)
     target_compile_definitions(iup PRIVATE XALLOC_REMAP_MALLOC)
     target_compile_definitions(iuplua PRIVATE XALLOC_REMAP_MALLOC)
+
+    add_subdirectory(sqlite)
 endif()
 
 organize_targets(CLEAR_FOLDER PREPEND lib)
