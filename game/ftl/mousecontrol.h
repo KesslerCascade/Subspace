@@ -12,3 +12,8 @@ int subspace_MouseControl_OnRender_pre(MouseControl* self);
 
 typedef void (*FUNCTYPE(MouseControl_OnRender))(MouseControl* self);
 DECLFUNC(MouseControl_OnRender);
+
+typedef void (*FUNCTYPE(MouseControl_OnLoop))(MouseControl* self);
+DECLFUNC(MouseControl_OnLoop);
+
+extern DisasmTrace MouseControl_OnLoop_trace;

@@ -1,3 +1,4 @@
+#pragma once
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -18,9 +19,7 @@ typedef struct GameState {
     // Time Warp
     bool timeWarpActive;
     float warpFactor;
-    float warpFactorActual;        // set by CFPS if we're capped due to framerate
-    bool warpOriginalVSync;        // whether vsync was on or off when time warp began
-    bool warpOriginalFrameLimit;   // whether frame limit was on or off when time warp began
+    float warpFactorActual;   // set by CFPS if we're capped due to framerate
 } GameState;
 
 extern SubspaceGameSettings settings;

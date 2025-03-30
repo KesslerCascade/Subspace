@@ -50,6 +50,7 @@ add_executable(subspacegame
     hook/capp/capp_onexecute.c
     hook/capp/capp_onkeydown.c
     hook/capp/capp_onloop.c
+    hook/cfps/cfps_onloop.c
     hook/combatcontrol/combatcontrol_rendertarget.c
     hook/commandgui/commandgui_keydown.c
     hook/mousecontrol/mousecontrol_onrender.c
@@ -59,15 +60,19 @@ add_executable(subspacegame
     patch/capp/patch_capp_onexecute.c
     patch/capp/patch_capp_onkeydown.c
     patch/capp/patch_capp_onloop.c
+    patch/cfps/patch_cfps_onloop.c
+    patch/cfps/patch_cfps_targetticktime.c
     patch/combatcontrol/patch_combatcontrol_rendertarget.c
     patch/commandgui/patch_commandgui_keydown.c
     patch/mousecontrol/patch_mousecontrol_onrender.c
     patch/seq/seq_numerichull.c
     patch/seq/seq_required.c
+    patch/seq/seq_timewarp.c
     patch/ship/validate_ship.c
     patch/shipstatus/patch_shipstatus_renderhealth.c
     patch/shipstatus/validate_shipstatus.c
     patch/textlibrary/patch_textlibrary_gettext.c
+    timewarp/timewarp.c
     subspacegame.c
     ${GAME_OSDEP})
 target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

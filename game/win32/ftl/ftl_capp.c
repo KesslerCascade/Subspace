@@ -333,7 +333,21 @@ DisasmTrace CApp_OnLoop_trace = {
     .csym = &SYM(CApp_OnLoop),
     .ops  = { { DT_OP(SKIP), .imin = 8, .imax = 16 },
              { I_MOV, .argf = { 0, ARG_MATCH }, .argsym = { 0, &SYM(CFPS_FPSControl) } },
-             { DT_OP(SKIP), .imin = 8, .imax = 18 },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL CFPS::OnLoop
+              { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, CT_CAPTURE2 } },   // MOV ECX, MouseControl::Mouse
+              { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL },                         // CALL MouseControl::Reset
+              { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, CT_MATCH2 } },          // MOV ECX, MouseControl::Mouse
+              { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL MouseControl::OnLoop
+              { DT_OP(SKIP), .imin = 2, .imax = 10 },
              { I_CMP },
              { DT_OP(JMP) },   // follow the JNE
               { I_MOV },
@@ -361,5 +375,9 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argsym = { 0, &SYM(CApp_gui_offset) } },
              { I_CALL, .argout = { DT_OUT_SYM3 } },   // CommandGui_Restart
               { DT_OP(FINISH) } },
-    .out  = { &SYM(CommandGui_IsPaused), &SYM(CommandGui_IsGameOver), &SYM(CommandGui_Restart) }
+    .out  = { &SYM(CommandGui_IsPaused),
+             &SYM(CommandGui_IsGameOver),
+             &SYM(CommandGui_Restart),
+             &SYM(CFPS_OnLoop),
+             &SYM(MouseControl_OnLoop) }
 };

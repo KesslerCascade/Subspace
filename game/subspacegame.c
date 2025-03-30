@@ -7,6 +7,7 @@
 #include "patch/seq/seq_numerichull.h"
 #include "patch/seq/seq_osdep.h"
 #include "patch/seq/seq_required.h"
+#include "patch/seq/seq_timewarp.h"
 
 SubspaceGameSettings settings;
 
@@ -26,6 +27,7 @@ int sscmain(void)
     }
 
     patchApplySeq(&ps, NumericHullPatches);
+    patchApplySeq(&ps, TimeWarpPatches);
 
     if (!patchEnd(&ps)) {
         // log

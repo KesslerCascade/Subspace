@@ -1,3 +1,4 @@
+#include "ftl/cfps.h"
 #include "ftl/ftl.h"
 #include "ftl/mousecontrol.h"
 #include "hook/hook.h"
@@ -5,7 +6,7 @@
 
 static bool validate(addr_t base, Patch* p, PatchState* ps)
 {
-    return symAddr(base, MouseControl_OnRender) != 0;
+    return symResolve(base, MouseControl_OnRender) && symResolve(base, CFPS_fps_offset);
 }
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)

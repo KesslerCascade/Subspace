@@ -23,8 +23,4 @@ DECLFUNCP(TextLibrary_GetText);
 #define TextLibrary_GetText(self, text, out, lang) \
     FCALLP(ftlbase, TextLibrary_GetText, self, text, out, lang)
 #define GetText(text, out) \
-    TextLibrary_GetText(Globals_Library, text, out, Globals_Library_currentLanguage)
-
-#define Globals_Library ((TextLibrary*)symAddr(ftlbase, Globals_Library))
-#define Globals_Library_currentLanguage \
-    ((TextLibrary*)symAddr(ftlbase, Globals_Library_currentLanguage))
+    TextLibrary_GetText(g_Library, text, out, Globals_Library_currentLanguage)
