@@ -76,6 +76,9 @@ void *wrapCreate(addr_t addr, const FuncInfo *fi)
         }
     }
 
+    // Don't need to worry about return type as the wrapper function should be declared with the
+    // same type.
+
     asmn(as, I_RET);
 
     if (!cgAsmFinish(as))

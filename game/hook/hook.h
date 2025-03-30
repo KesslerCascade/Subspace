@@ -19,6 +19,8 @@ int replaceVariable(addr_t base, addr_t from, const void* to);
 // pre is called before, if it returns 0, the original function is not called.
 // post is called after, with an extra first argument that is the return of the original.
 // Whatever post returns is substituted.
+// UNLESS the function is declared with a void return type; in which case post must
+// NOT take an extra first argument.
 #ifdef _DEBUG
 #define hookFunction(base, func, pre, post) \
     _hookFunction(base, symAddr(base, func), &FUNCINFO(func), pre, post, #func)

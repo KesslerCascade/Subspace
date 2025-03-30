@@ -5,10 +5,10 @@
 typedef struct CombatControl CombatControl;
 typedef struct ShipManager ShipManager;
 
-typedef int (*FUNCTYPE(CombatControl_OnRenderCombat))(CombatControl *self);
+typedef void (*FUNCTYPE(CombatControl_OnRenderCombat))(CombatControl* self);
 DECLFUNC(CombatControl_OnRenderCombat);
 
-typedef int (*FUNCTYPE(CombatControl_RenderTarget))(CombatControl *self);
+typedef void (*FUNCTYPE(CombatControl_RenderTarget))(CombatControl* self);
 DECLFUNC(CombatControl_RenderTarget);
 
 typedef ShipManager* (*FUNCTYPE(CombatControl_GetCurrentTarget))(CombatControl *self);

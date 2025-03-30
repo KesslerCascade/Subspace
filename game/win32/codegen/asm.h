@@ -81,6 +81,17 @@ static inline void cgAsmClear(AsmState* as)
      asmargc(as).idx     = idxreg,                                \
      asmargc(as).scale   = mult,                                  \
      asmargc(as).ptrsize = sz,                                    \
-     asmarg(as).disp = offset asmarg(as).base = srcreg)
+     asmarg(as).disp     = offset,                                \
+     asmarg(as).base     = srcreg)
 #define asmdr(as, i, basereg, idxreg, mult, offset, srcreg, sz) \
     (asmdr_p(as, i, basereg, idxreg, mult, offset, srcreg, sz), cgAsm(as))
+#define asmd_p(as, i, basereg, idxreg, mult, offset, sz) \
+    (cgAsmClear(as),                                     \
+     asminst(as, i),                                     \
+     asmargc(as).base    = basereg,                      \
+     asmargc(as).idx     = idxreg,                       \
+     asmargc(as).scale   = mult,                         \
+     asmargc(as).ptrsize = sz,                           \
+     asmarg(as).disp     = offset)
+#define asmd(as, i, basereg, idxreg, mult, offset, sz) \
+    (asmd_p(as, i, basereg, idxreg, mult, offset, sz), cgAsm(as))

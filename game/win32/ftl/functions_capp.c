@@ -157,7 +157,8 @@ Symbol SYM(CApp_OnLoop) = {
 };
 FuncInfo FUNCINFO(CApp_OnLoop) = { .nargs   = 1,
                                    .stdcall = true,
-                                   .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+                                   .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                   .rettype = RET_VOID };
 
 Symbol SYM(CApp_vtable) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &sil_main_trace }, { 0 } }

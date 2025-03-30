@@ -12,7 +12,7 @@ typedef struct HookState {
     int localsz;
 } HookState;
 
-static void callAdapt(AsmState* as, HookState* hs, addr_t func, int insertreg)
+static void callAdapt(AsmState* as, HookState* hs, addr_t func, bool insertpost, int insertreg)
 {
     const FuncInfo* fi = hs->fi;
     int i, j, dstack = 0;
@@ -28,11 +28,29 @@ static void callAdapt(AsmState* as, HookState* hs, addr_t func, int insertreg)
         }
     }
 
-    // If we're inserting an extra argument, do it last so that it comes first
-    if (insertreg != REG_UNDEF) {
-        asmr(as, I_PUSH, insertreg);
-        hs->espoffset += 4;
-        fcallesp += 4;
+    // If we're inserting an extra argument (the return from the original call for a post-hook), do
+    // it last so that it comes first
+    if (insertpost) {
+        if (fi->rettype == RET_INT || fi->rettype == RET_PTR) {
+            if (insertreg != REG_UNDEF) {
+                asmr(as, I_PUSH, insertreg);
+                hs->espoffset += 4;
+                fcallesp += 4;
+            }
+        } else if (fi->rettype == RET_FLOAT32) {
+            // move ST(0) onto the stack as a 32-bit single
+            asmr(as, I_PUSH, REG_EAX);   // doesn't matter, will be overwritten
+            asmd(as, I_FSTP, REG_ESP, REG_UNDEF, 0, 0, 4);
+            hs->espoffset += 4;
+            fcallesp += 4;
+        } else if (fi->rettype == RET_FLOAT64) {
+            // move ST(0) onto the stack as a 64-bit double
+            asmri(as, I_SUB, REG_ESP, 8);
+            asmd(as, I_FSTP, REG_ESP, REG_UNDEF, 0, 0, 8);
+            hs->espoffset += 8;
+            fcallesp += 8;
+        }
+        // RET_VOID just doesn't insert anything at all
     }
 
     asmi(as, I_CALL, func);
@@ -113,7 +131,7 @@ void* hookCreate(addr_t addr, const FuncInfo* fi, void* pre, void* post)
     initArgs(as, hs);
 
     if (pre) {
-        callAdapt(as, hs, addr(pre), -1);
+        callAdapt(as, hs, addr(pre), false, -1);
         asmrr(as, I_TEST, REG_EAX, REG_EAX);
 
         // Save current location because we'll need to fix it up later.
@@ -167,7 +185,7 @@ void* hookCreate(addr_t addr, const FuncInfo* fi, void* pre, void* post)
     if (post) {
         // Save return value; EAX is used by CallAdapt
         asmrr(as, I_MOV, REG_ECX, REG_EAX);
-        callAdapt(as, hs, addr(post), REG_ECX);
+        callAdapt(as, hs, addr(post), true, REG_ECX);
     }
 
     if (pre) {
@@ -210,7 +228,7 @@ void* replacementCreate(const FuncInfo* fi, void* replacement)
     cgAsmInit(as, 16 + fi->nargs * 2);
     initArgs(as, hs);
 
-    callAdapt(as, hs, addr(replacement), -1);
+    callAdapt(as, hs, addr(replacement), false, -1);
 
     cleanupLocals(as, hs);
     if (fi->stdcall && hs->argsz > 0) {

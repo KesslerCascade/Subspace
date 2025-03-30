@@ -29,9 +29,12 @@ Symbol SYM(CombatControl_RenderTarget) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN13CombatControl12RenderTargetEv" },
              { 0 } }
 };
-FuncInfo FUNCINFO(CombatControl_RenderTarget) = { .nargs   = 1,
-                                                  .stdcall = true,
-                                                  .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+FuncInfo FUNCINFO(CombatControl_RenderTarget) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
 
 INITWRAP(CombatControl_GetCurrentTarget);
 Symbol SYM(CombatControl_GetCurrentTarget) = {

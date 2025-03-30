@@ -14,8 +14,7 @@ int subspace_CombatControl_RenderTarget_pre(CombatControl* self)
     return 1;
 }
 
-int subspace_CombatControl_RenderTarget_post(int ret, CombatControl* self)
+void subspace_CombatControl_RenderTarget_post(CombatControl* self)
 {
     tgd.overrideHullText = false;
-    return ret;
 }

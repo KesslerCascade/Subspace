@@ -5,4 +5,4 @@
 typedef struct CombatControl CombatControl;
 
 int subspace_CombatControl_RenderTarget_pre(CombatControl* self);
-int subspace_CombatControl_RenderTarget_post(int ret, CombatControl* self);
+void subspace_CombatControl_RenderTarget_post(CombatControl* self);

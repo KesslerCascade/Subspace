@@ -7,11 +7,10 @@ int subspace_CApp_OnLoop_pre(CApp* self)
 }
 
 bool test_frameadv = false;
-int subspace_CApp_OnLoop_post(int ret, CApp* self)
+void subspace_CApp_OnLoop_post(CApp* self)
 {
     if (test_frameadv) {
         CommandGui_SetPaused(MEMBER(ftlbase, CApp, self, CommandGui*, gui), true, false);
         test_frameadv = false;
     }
-    return ret;
 }
