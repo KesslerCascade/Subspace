@@ -7,9 +7,7 @@
 
 static bool validate(addr_t base, Patch* p, PatchState* ps)
 {
-    return symResolve(base, CFPS_OnLoop) &&
-    symResolve(base, CFPS_SpeedFactor_offset) &&
-    symResolve(base, TargetFrameTimeMS);
+    return symResolve(base, CFPS_OnLoop) && symResolve(base, CFPS_SpeedFactor_offset);
 }
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)

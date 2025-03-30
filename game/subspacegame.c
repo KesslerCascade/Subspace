@@ -1,15 +1,21 @@
 #include "subspacegame.h"
 // NOTE: the entry point (i.e. "main" equivalent) is not located here, but is instead in entry.c in one of the playform-specific subdirectories
 
+#include "feature/frameadv.h"
+#include "feature/numerichull.h"
+#include "feature/timewarp.h"
 #include "ftl/ftl.h"
 #include "loader/loader.h"
 #include "patch/patch.h"
-#include "patch/seq/seq_numerichull.h"
 #include "patch/seq/seq_osdep.h"
 #include "patch/seq/seq_required.h"
-#include "patch/seq/seq_timewarp.h"
 
-SubspaceGameSettings settings;
+SubspaceGameSettings settings = {
+    .frameAdv = &FrameAdv_feature,
+    //.numericHull = &NumericHull_feature,
+    .timeWarp = &TimeWarp_feature,
+};
+GameState gs;
 
 entrypoint ftlentry;
 int sscmain(void)
@@ -26,8 +32,8 @@ int sscmain(void)
         return 1;
     }
 
-    patchApplySeq(&ps, NumericHullPatches);
-    patchApplySeq(&ps, TimeWarpPatches);
+    if (initFeature(&TimeWarp_feature, &ps))
+        enableFeature(&TimeWarp_feature, true);
 
     if (!patchEnd(&ps)) {
         // log

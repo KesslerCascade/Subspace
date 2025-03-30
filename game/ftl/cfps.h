@@ -15,6 +15,7 @@ DECLSYM(CFPS_FPSControl);
 
 typedef double (*FUNCTYPE(CFPS_GetTime))(CFPS* self);
 DECLFUNC(CFPS_GetTime);
+#define CFPS_GetTime(self) FCALL(ftlbase, CFPS_GetTime, self)
 
 typedef void (*FUNCTYPE(CFPS_OnLoop))(CFPS* self);
 DECLFUNC(CFPS_OnLoop);

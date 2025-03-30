@@ -39,8 +39,10 @@ DECLFUNC(CommandGui_RenderStatic);
 typedef void (*FUNCTYPE(CommandGui_Restart))(CommandGui* self);
 DECLFUNC(CommandGui_Restart);
 
-DECLSYM(CommandGui_SpaceBar);
+typedef void (*FUNCTYPE(CommandGui_OnLoop))(CommandGui* self);
+DECLFUNC(CommandGui_OnLoop);
 
+DECLSYM(CommandGui_SpaceBar);
 DECLSYM(CommandGui_shipComplete_offset);
 
 #define CommandGui_shipComplete(cgui) MEMBER(ftlbase, CommandGui, cgui, CompleteShip*, shipComplete)

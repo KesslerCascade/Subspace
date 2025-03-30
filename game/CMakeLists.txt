@@ -43,6 +43,10 @@ if(WIN32)
 endif()
 
 add_executable(subspacegame
+    feature/feature.c
+    feature/frameadv.c
+    feature/numerichull.c
+    feature/timewarp.c
     ftl/ftl.c
     ftl/struct.c
     hook/module.c
@@ -53,9 +57,11 @@ add_executable(subspacegame
     hook/cfps/cfps_onloop.c
     hook/combatcontrol/combatcontrol_rendertarget.c
     hook/commandgui/commandgui_keydown.c
+    hook/commandgui/commandgui_onloop.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/shipstatus/shipstatus_renderhealth.c
     hook/textlibrary/textlibrary_gettext.c
+    input/keyboard.c
     patch/patch.c
     patch/capp/patch_capp_onexecute.c
     patch/capp/patch_capp_onkeydown.c
@@ -64,7 +70,9 @@ add_executable(subspacegame
     patch/cfps/patch_cfps_targetticktime.c
     patch/combatcontrol/patch_combatcontrol_rendertarget.c
     patch/commandgui/patch_commandgui_keydown.c
+    patch/commandgui/patch_commandgui_onloop.c
     patch/mousecontrol/patch_mousecontrol_onrender.c
+    patch/seq/seq_frameadv.c
     patch/seq/seq_numerichull.c
     patch/seq/seq_required.c
     patch/seq/seq_timewarp.c
@@ -72,7 +80,6 @@ add_executable(subspacegame
     patch/shipstatus/patch_shipstatus_renderhealth.c
     patch/shipstatus/validate_shipstatus.c
     patch/textlibrary/patch_textlibrary_gettext.c
-    timewarp/timewarp.c
     subspacegame.c
     ${GAME_OSDEP})
 target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
@@ -80,4 +87,6 @@ target_link_libraries(subspacegame disasm minicrt)
 if (WIN32)
     target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/win32)
     target_link_libraries(subspacegame ${CMAKE_CURRENT_SOURCE_DIR}/tlsarray.lib)
+    target_compile_options(subspacegame PRIVATE "$<$<CONFIG:Release>:/Zi>")
+    target_link_options(subspacegame PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
 endif()

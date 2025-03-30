@@ -350,15 +350,24 @@ DisasmTrace CApp_OnLoop_trace = {
               { DT_OP(SKIP), .imin = 2, .imax = 10 },
              { I_CMP },
              { DT_OP(JMP) },   // follow the JNE
-              { I_MOV },
-             { I_CALL,
+              { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, CT_CAPTURE3 } },   // store CommandGui offset
+              { I_CALL,
                 .argcap = { CT_CAPTURE1 },
                 .argout = { DT_OUT_SYM1 } },   // CALL CommandGui::IsPaused
               { DT_OP(SKIP), .imin = 7, .imax = 16 },
              { I_CALL,
                 .argf   = { ARG_MATCH },
                 .argcap = { CT_MATCH1 } },   // CALL CommandGui::IsPaused
-              { DT_OP(SKIP), .imin = 7, .imax = 16 },
+              { DT_OP(SKIP), .imin = 3, .imax = 10 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, CT_MATCH3 } },          // verify CommandGui object
+              { I_CALL, .argout = { DT_OUT_SYM6 } },   // CALL CommandGui::OnLoop
+              { DT_OP(SKIP), .imin = 0, .imax = 6 },
              { I_CMP },
              { I_JA },
              { DT_OP(JMPTBL), .val = 0 },   // switch(), case 0
@@ -375,9 +384,10 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argsym = { 0, &SYM(CApp_gui_offset) } },
              { I_CALL, .argout = { DT_OUT_SYM3 } },   // CommandGui_Restart
               { DT_OP(FINISH) } },
-    .out  = { &SYM(CommandGui_IsPaused),
-             &SYM(CommandGui_IsGameOver),
-             &SYM(CommandGui_Restart),
-             &SYM(CFPS_OnLoop),
-             &SYM(MouseControl_OnLoop) }
+    .out  = { &SYM(CommandGui_IsPaused),               // DT_OUT_SYM1
+              &SYM(CommandGui_IsGameOver),             // DT_OUT_SYM2
+              &SYM(CommandGui_Restart),                // DT_OUT_SYM3
+              &SYM(CFPS_OnLoop),                       // DT_OUT_SYM4
+              &SYM(MouseControl_OnLoop),               // DT_OUT_SYM5
+              &SYM(CommandGui_OnLoop) }
 };
