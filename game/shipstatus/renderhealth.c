@@ -8,14 +8,14 @@ int subspace_ShipStatus_RenderHealth_pre(ShipStatus* self, bool renderText)
     Ship* ship      = sm ? ShipManager_ship(sm) : NULL;
 
     if (ship) {
-        tgd.overrideHullText = true;
-        tgd.hull             = MEMBER(ftlbase, Ship, ship, int, hullIntegrity);
+        gs.overrideHullText = true;
+        gs.hull             = MEMBER(ftlbase, Ship, ship, int, hullIntegrity);
     }
     return 1;
 }
 
 int subspace_ShipStatus_RenderHealth_post(int ret, ShipStatus* self, bool renderText)
 {
-    tgd.overrideHullText = false;
+    gs.overrideHullText = false;
     return ret;
 }

@@ -1,4 +1,5 @@
 #include "ftl/ftl.h"
+#include "ftl/struct.h"
 #include "hook/function.h"
 
 typedef struct CApp CApp;

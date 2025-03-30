@@ -2,7 +2,6 @@
 
 #include "ftl/ftl.h"
 #include "ftl/functions_capp.h"
-#include "ftl/struct.h"
 
 typedef struct CApp CApp;
 extern CApp* theApp;

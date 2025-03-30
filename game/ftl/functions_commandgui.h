@@ -19,9 +19,11 @@ DECLFUNC(CommandGui_SetPaused);
 
 typedef bool (*FUNCTYPE(CommandGui_IsPaused))(CommandGui* self);
 DECLFUNC(CommandGui_IsPaused);
+#define CommandGui_IsPaused(self) FCALL(ftlbase, CommandGui_IsPaused, self)
 
 typedef bool (*FUNCTYPE(CommandGui_IsGameOver))(CommandGui* self);
 DECLFUNC(CommandGui_IsGameOver);
+#define CommandGui_IsGameOver(self) FCALL(ftlbase, CommandGui_IsGameOver, self)
 
 typedef void (*FUNCTYPE(CommandGui_RenderStatic))(CommandGui* self);
 DECLFUNC(CommandGui_RenderStatic);

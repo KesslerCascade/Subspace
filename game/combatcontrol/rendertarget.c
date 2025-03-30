@@ -8,13 +8,13 @@ int subspace_CombatControl_RenderTarget_pre(CombatControl* self)
     Ship* ship      = sm ? ShipManager_ship(sm) : NULL;
 
     if (ship) {
-        tgd.overrideHullText = true;
-        tgd.hull             = MEMBER(ftlbase, Ship, ship, int, hullIntegrity);
+        gs.overrideHullText = true;
+        gs.hull             = MEMBER(ftlbase, Ship, ship, int, hullIntegrity);
     }
     return 1;
 }
 
 void subspace_CombatControl_RenderTarget_post(CombatControl* self)
 {
-    tgd.overrideHullText = false;
+    gs.overrideHullText = false;
 }
