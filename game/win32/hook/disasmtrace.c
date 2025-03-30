@@ -5,7 +5,7 @@
 #include "hook/symbol.h"
 #include "disasm.h"
 
-#define MAX_UNWIND 5
+#define MAX_UNWIND 8
 
 typedef struct DisasmTraceState {
     DisasmOp* op;
@@ -54,7 +54,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
     DisasmTraceState dts = { 0 };
 
     // unwind info for backtracking
-    DisasmTraceState unwind[MAX_UNWIND];
+    DisasmTraceState* unwind;
     int nunwind = 0;
 
     dts.op = trace->ops;
@@ -69,6 +69,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
 
     dts.p     = start;
     bool fail = false;
+    unwind    = smalloc(sizeof(DisasmTraceState) * MAX_UNWIND);
 
     while (dts.p >= code.start && dts.p < code.end && dts.op->op != DT_FINISH) {
         if (dts.op->op == DT_SKIP) {
@@ -233,6 +234,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
         dts.skipmax = MAX(dts.skipmax - 1, 0);
         dts.p += isize;
     }
+
+    sfree(unwind);
 
     // check if we made it all the way to the end of the sequence
     if (dts.op->op != DT_FINISH)
