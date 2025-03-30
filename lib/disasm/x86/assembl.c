@@ -369,6 +369,10 @@ retrylongjump:
                 if (op->type != MRG && op->type != RXM) match |= MA_TYP;
                 if (op->size != 0 && op->size != 4) match |= MA_SIZ;
                 break;
+            case MX8:
+                if (op->type != MRG && op->type != RXM) match |= MA_TYP;
+                if (op->size != 0 && op->size != 8) match |= MA_SIZ;
+                break;
             case RR4:                      // 4-byte memory/register (register only)
                 if (op->type != REG) match |= MA_TYP;
                 if (op->size != 0 && op->size != 4) match |= MA_SIZ;
@@ -383,7 +387,7 @@ retrylongjump:
                 if (op->type != MRG && op->type != RMX) match |= MA_TYP;
                 if (op->size != 0 && op->size != 8) match |= MA_SIZ;
                 break;
-            case MR0:                      // 16-byte memory/SSE register in ModRM byte
+            case MX0:                      // 16-byte memory/SSE register in ModRM byte
                 if (op->type != MRG && op->type != RXM) match |= MA_TYP;
                 if (op->size != 0 && op->size != 16) match |= MA_SIZ;
                 break;
@@ -647,10 +651,11 @@ retrylongjump:
         case MX4:                        // 4-byte memory/SSE register in ModRM byte
         case RR4:                        // 4-byte memory/register (register only)
         case MR8:                        // 8-byte memory/MMX register in ModRM
+        case MX8:                        // 8-byte memory/SSE register in ModRM byte
         case RR8:                        // 8-byte MMX register only in ModRM
         case MRD:                        // 8-byte memory/3DNow! register in ModRM
         case RRD:                        // 8-byte memory/3DNow! (register only)
-        case MR0:                        // 16-byte memory/SSE register in ModRM
+        case MX0:                        // 16-byte memory/SSE register in ModRM
             hasrm = 1;
             if (op->type != MRG) {           // Register in ModRM byte
                 tcode[i + 1] |= 0xC0; tmask[i + 1] |= 0xC0;

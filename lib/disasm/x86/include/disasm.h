@@ -100,7 +100,8 @@
 #define DRX            56              // Debug register DRx
 #define RXM            57              // SSE register XMMx
 #define MX4            58              // 4-byte memory/SSE register in ModRM byte
-#define MR0            59              // 16-byte memory/SSE register in ModRM
+#define MX8            59              // 8-byte memory/SSE register in ModRM byte
+#define MX0            60              // 16-byte memory/SSE register in ModRM
 
 // Pseudooperands (implicit operands, never appear in assembler commands). Must
 // have index equal to or exceeding PSEUDOOP.
@@ -625,7 +626,21 @@ typedef enum e_inst
 
     // SSE
     I_CVTSI2SS,
-    I_MOVSS
+    I_CVTSI2SD,
+    I_CVTSS2SD,
+    I_CVTSD2SS,
+    I_MOVSS,
+    I_MOVSD,
+    I_ADDSS,
+    I_ADDSD,
+    I_SUBSS,
+    I_SUBSD,
+    I_MULSS,
+    I_MULSD,
+    I_DIVSS,
+    I_DIVSD,
+    I_UCOMISS,
+    I_UCOMISD,
 } e_inst;
 
 #define C_TYPEMASK     0x1F0            // Mask for command type

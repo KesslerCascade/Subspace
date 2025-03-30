@@ -179,14 +179,15 @@ static void DecodeMR(int type)
             if (inmemory) da->memtype = DEC_WORD; break;
         case MR4:                        // 4-byte memory/register in ModRM byte
         case RR4:                        // 4-byte memory/register (register only)
-        case MX4:
+        case MX4:                        // 4-byte memory/SSE register
             dsize = regsize = 4;
             if (inmemory) da->memtype = DEC_DWORD; break;
         case MR8:                        // 8-byte memory/MMX register in ModRM
         case RR8:                        // 8-byte MMX register only in ModRM
+        case MX8:                        // 8-byte SSE register only in ModRM
             dsize = 8;
             if (inmemory) da->memtype = DEC_QWORD; break;
-        case MR0:
+        case MX0:
             dsize = 16;
             if (inmemory) da->memtype = DEC_DQWORD; break;
         case MRD:                        // 8-byte memory/3DNow! register in ModRM
@@ -253,7 +254,7 @@ static void DecodeMR(int type)
     if ((c & 0xC0) == 0xC0) {                  // Decode register operand
         if (type == MR8 || type == RR8)
             DecodeMX(c);                       // MMX register
-        else if (type == MR0 || type == MX4)
+        else if (type == MX0 || type == MX4 || type == MX8)
             DecodeXMM(c);                      // SSE register
         else if (type == MRD || type == RRD)
             DecodeNR(c);                       // 3DNow! register
@@ -980,7 +981,6 @@ ulong Disasm(uchar *src, ulong srcsize, ulong srcip,
             case MR4:                      // 4-byte memory/register in ModRM byte
             case MR8:                      // 8-byte memory/MMX register in ModRM
             case MRD:                      // 8-byte memory/3DNow! register in ModRM
-            case MR0:                      // 16-byte memory/SSE register in ModRM
             case MMA:                      // Memory address in ModRM byte for LEA
             case MML:                      // Memory in ModRM byte (for LES)
             case MM6:                      // Memory in ModRm (6-byte descriptor)
@@ -997,6 +997,8 @@ ulong Disasm(uchar *src, ulong srcsize, ulong srcip,
             case MFS:                      // Memory in ModRM byte (FPU state)
             case MFX:                      // Memory in ModRM byte (ext. FPU state)
             case MX4:                      // 4-byte memory/SSE register in ModRM
+            case MX8:                      // 8-byte memory/SSE register in ModRM
+            case MX0:                      // 16-byte memory/SSE register in ModRM
                 DecodeMR(arg); break;
             case MMS:                      // Memory in ModRM byte (as SEG:OFFS)
                 DecodeMR(arg);
