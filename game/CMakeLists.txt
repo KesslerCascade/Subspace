@@ -13,7 +13,6 @@ if(WIN32)
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
         win32/ftl/ftl_globals.c
-        win32/ftl/ftl_mem.c
         win32/ftl/ftl_misc.c
         win32/ftl/ftl_mousecontrol.c
         win32/ftl/ftl_osdep.c
@@ -23,6 +22,7 @@ if(WIN32)
         win32/ftl/ftl_shipstatus.c
         win32/ftl/ftl_starmap.c
         win32/ftl/ftl_startup.c
+        win32/ftl/ftl_stdlib.c
         win32/ftl/ftl_textlibrary.c
         win32/ftl/ftl_worldmanager.c
         win32/hook/analysis.c

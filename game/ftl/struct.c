@@ -1,5 +1,5 @@
 #include "struct.h"
-#include "ftl/mem.h"
+#include "ftl/stdlib.h"
 
 void basic_string_set(basic_string* str, const char* src)
 {

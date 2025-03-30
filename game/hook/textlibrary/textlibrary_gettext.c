@@ -1,3 +1,4 @@
+#include "ftl/stdlib.h"
 #include "ftl/textlibrary.h"
 #include "subspacegame.h"
 

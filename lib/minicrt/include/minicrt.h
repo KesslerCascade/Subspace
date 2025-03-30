@@ -69,22 +69,16 @@ char* _minicrt_strupr(char* str);
 int _minicrt_sprintf(char* buff, const char* fmt, ...);
 int _minicrt_snprintf(char* buff, unsigned int len, const char* fmt, ...);
 int _minicrt_vsnprintf(char* buff, unsigned int len, const char* fmt, va_list arp);
-#define sprintf  _minicrt_sprintf
-#define snprintf _minicrt_snprintf
-#ifdef vsnprintf
-#undef vsnprintf
-#endif
-#define vsnprintf _minicrt_vsnprintf
+#define xsprintf  _minicrt_sprintf
+#define xsnprintf _minicrt_snprintf
+#define xvsnprintf _minicrt_vsnprintf
 
 int _minicrt_wsprintf(wchar_t* buff, const wchar_t* fmt, ...);
 int _minicrt_wsnprintf(wchar_t* buff, unsigned int len, const wchar_t* fmt, ...);
 int _minicrt_wvsnprintf(wchar_t* buff, unsigned int len, const wchar_t* fmt, va_list arp);
-#ifdef wsprintf
-#undef wsprintf
-#endif
-#define wsprintf   _minicrt_wsprintf
-#define wsnprintf  _minicrt_wsnprintf
-#define wvsnprintf _minicrt_wvsnprintf
+#define xwsprintf   _minicrt_wsprintf
+#define xwsnprintf  _minicrt_wsnprintf
+#define xwvsnprintf _minicrt_wvsnprintf
 #endif
 
 long double pow10l(int p);
