@@ -2,7 +2,7 @@
 #include "hook/hook.h"
 #include "patch/patch.h"
 
-#include "textlibrary/textlibrary.h"
+#include "ftl/textlibrary.h"
 
 static bool validate(addr_t base, Patch* p, PatchState* ps)
 {

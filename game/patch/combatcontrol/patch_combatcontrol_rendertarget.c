@@ -2,8 +2,8 @@
 #include "hook/hook.h"
 #include "patch/patch.h"
 
-#include "combatcontrol/combatcontrol.h"
-#include "shipmanager/shipmanager.h"
+#include "ftl/combatcontrol.h"
+#include "ftl/shipmanager.h"
 
 static bool validate(addr_t base, Patch* p, PatchState* ps)
 {

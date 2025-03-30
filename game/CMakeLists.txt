@@ -5,26 +5,26 @@ if(WIN32)
         win32/codegen/codegen.c
         win32/codegen/hookgen.c
         win32/codegen/wrapgen.c
-        win32/ftl/graphics/functions_freetype.c
-        win32/ftl/functions_capp.c
-        win32/ftl/functions_cevent.c
-        win32/ftl/functions_cfps.c
-        win32/ftl/functions_combatcontrol.c
-        win32/ftl/functions_commandgui.c
-        win32/ftl/functions_completeship.c
-        win32/ftl/functions_mem.c
-        win32/ftl/functions_misc.c
-        win32/ftl/functions_mousecontrol.c
-        win32/ftl/functions_osdep.c
-        win32/ftl/functions_shipmanager.c
-        win32/ftl/functions_ship.c
-        win32/ftl/functions_shipmanager.c
-        win32/ftl/functions_shipstatus.c
-        win32/ftl/functions_starmap.c
-        win32/ftl/functions_startup.c
-        win32/ftl/functions_textlibrary.c
-        win32/ftl/functions_worldmanager.c
-        win32/ftl/globals.c
+        win32/ftl/graphics/ftl_freetype.c
+        win32/ftl/ftl_capp.c
+        win32/ftl/ftl_cevent.c
+        win32/ftl/ftl_cfps.c
+        win32/ftl/ftl_combatcontrol.c
+        win32/ftl/ftl_commandgui.c
+        win32/ftl/ftl_completeship.c
+        win32/ftl/ftl_globals.c
+        win32/ftl/ftl_mem.c
+        win32/ftl/ftl_misc.c
+        win32/ftl/ftl_mousecontrol.c
+        win32/ftl/ftl_osdep.c
+        win32/ftl/ftl_shipmanager.c
+        win32/ftl/ftl_ship.c
+        win32/ftl/ftl_shipmanager.c
+        win32/ftl/ftl_shipstatus.c
+        win32/ftl/ftl_starmap.c
+        win32/ftl/ftl_startup.c
+        win32/ftl/ftl_textlibrary.c
+        win32/ftl/ftl_worldmanager.c
         win32/hook/analysis.c
         win32/hook/disasmtrace.c
         win32/hook/export.c
@@ -43,16 +43,18 @@ if(WIN32)
 endif()
 
 add_executable(subspacegame
-    capp/onexecute.c
-    capp/onkeydown.c
-    capp/onloop.c
-    combatcontrol/rendertarget.c
-    commandgui/keydown.c
     ftl/ftl.c
     ftl/struct.c
     hook/module.c
     hook/symbol.c
-    mousecontrol/onrender.c
+    hook/capp/capp_onexecute.c
+    hook/capp/capp_onkeydown.c
+    hook/capp/capp_onloop.c
+    hook/combatcontrol/combatcontrol_rendertarget.c
+    hook/commandgui/commandgui_keydown.c
+    hook/mousecontrol/mousecontrol_onrender.c
+    hook/shipstatus/shipstatus_renderhealth.c
+    hook/textlibrary/textlibrary_gettext.c
     patch/patch.c
     patch/capp/patch_capp_onexecute.c
     patch/capp/patch_capp_onkeydown.c
@@ -66,8 +68,6 @@ add_executable(subspacegame
     patch/shipstatus/patch_shipstatus_renderhealth.c
     patch/shipstatus/validate_shipstatus.c
     patch/textlibrary/patch_textlibrary_gettext.c
-    shipstatus/renderhealth.c
-    textlibrary/gettext.c
     subspacegame.c
     ${GAME_OSDEP})
 target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

@@ -1,6 +1,6 @@
 #include "winmain.h"
 
-#include "ftl/functions_osdep.h"
+#include "ftl/osdep.h"
 
 // Wrap WinMain to call it with the correct module handle
 int subspace_WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)

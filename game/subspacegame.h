@@ -8,8 +8,6 @@ typedef struct SubspaceGameSettings {
     char* gameDir;       // root directory where the game is located
     char* gameProgram;   // name of the game executable
     char* gamePath;      // fill path to game executable
-
-    bool timeWarp
 } SubspaceGameSettings;
 
 typedef struct GameState {

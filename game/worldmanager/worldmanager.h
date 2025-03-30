@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ftl/ftl.h"
-#include "ftl/functions_worldmanager.h"
+#include "ftl/worldmanager.h"
 
 typedef struct WorldManager WorldManager;
 

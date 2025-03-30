@@ -2,7 +2,7 @@
 #include "hook/hook.h"
 #include "patch/patch.h"
 
-#include "shipstatus/shipstatus.h"
+#include "ftl/shipstatus.h"
 
 // Not actually a patch, just a validator to insert into patch sequences and make sure the Ship
 // structure is known

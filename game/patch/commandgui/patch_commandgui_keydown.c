@@ -1,8 +1,7 @@
+#include "ftl/commandgui.h"
 #include "ftl/ftl.h"
-#include "ftl/functions_commandgui.h"
 #include "hook/hook.h"
 #include "patch/patch.h"
-#include "commandgui/commandgui.h"
 
 static bool validate(addr_t base, Patch* p, PatchState* ps)
 {
