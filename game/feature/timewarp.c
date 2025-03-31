@@ -6,18 +6,14 @@
 #include "subspacegame.h"
 
 static double baseFrameTime;
-static double warpBegan;
-static double lastFrame;
+static double lastTime;
 static int warpFrames;
 
 static double warpTime;
 static double realTime;
 
-// #define NUM_TIME_AVG 32
-// static double lastFrameTimes[NUM_TIME_AVG];
-// static int nLastFrameTime;
-
-double g_LastFrameTimeMS;
+#define MAX_WARP_FACTOR 16
+#define MIN_WARP_FACTOR 0.125
 
 // ---- Control interface ----------------
 
@@ -28,13 +24,10 @@ static void doTheTimeWarpAgain()
     // We cap the tick time at the original to ensure we don't go below 60 FPS when in slow motion
     // mode.
     g_TargetFrameTimeMS = MIN(baseFrameTime / gs.warpFactor, baseFrameTime);
-    warpBegan           = CFPS_GetTime(FPSControl);
-    lastFrame           = warpBegan;
+    lastTime            = CFPS_GetTime(FPSControl);
     warpFrames          = 0;
     warpTime            = 0;
     realTime            = 0;
-    // nLastFrameTime      = 0;
-    // memset(lastFrameTimes, 0, sizeof(lastFrameTimes));
 }
 
 bool timeWarpBegin()
@@ -56,7 +49,7 @@ bool timeWarpIncrease()
         return false;
 
     float oldfactor = gs.warpFactor;
-    gs.warpFactor   = MIN(gs.warpFactor * 2, 32);
+    gs.warpFactor   = MIN(gs.warpFactor * 2, MAX_WARP_FACTOR);
     doTheTimeWarpAgain();
 
     return (gs.warpFactor > oldfactor);
@@ -68,7 +61,7 @@ bool timeWarpDecrease()
         return false;
 
     float oldfactor = gs.warpFactor;
-    gs.warpFactor   = MAX(gs.warpFactor / 2, 0.125);
+    gs.warpFactor   = MAX(gs.warpFactor / 2, MIN_WARP_FACTOR);
     doTheTimeWarpAgain();
 
     return (gs.warpFactor < oldfactor);
@@ -99,23 +92,25 @@ float timeWarpAdjustSpeedFactor(float orig)
     // but don't do it every frame because GetTime calls QueryPerformanceCounter a couple times
     if (warpFrames % warpFrameCheck == warpFrameCheck - 1) {
         double now       = CFPS_GetTime(FPSControl);
-        double frameTime = (now - lastFrame);
+        double frameTime = (now - lastTime);
+        lastTime         = now;
+
         warpTime += frameTime * speedFactor;
         realTime += frameTime * orig;
         gs.warpFactorActual = (realTime > 0) ? warpTime / realTime : 0;
-        lastFrame           = now;
 
-        // fine-tine the frame time to try to reach our target FPS, but only for faster than normal
+        // fine-tune the frame time to try to reach our target FPS, but only for faster than normal
         // warps
         if (gs.warpFactor > 1) {
             double frameTimeAdj   = 0;
             double idealFrameTime = MIN(baseFrameTime / gs.warpFactor, baseFrameTime);
 
-            g_LastFrameTimeMS = frameTime / (double)warpFrameCheck; // actually the average over the last few frames
-            if (g_LastFrameTimeMS > idealFrameTime * 1.02)
-                frameTimeAdj = -g_LastFrameTimeMS / 1000;
-            else if (g_LastFrameTimeMS < idealFrameTime * 0.98)
-                frameTimeAdj = g_LastFrameTimeMS / 1000;
+            gs.avgFrameMS = frameTime /
+                (double)warpFrameCheck;   // actually the average over the last few frames
+            if (gs.avgFrameMS > idealFrameTime * 1.02)
+                frameTimeAdj = -gs.avgFrameMS / 1000;
+            else if (gs.avgFrameMS < idealFrameTime * 0.98)
+                frameTimeAdj = gs.avgFrameMS / 1000;
 
             g_TargetFrameTimeMS = MAX(MIN(g_TargetFrameTimeMS + frameTimeAdj, baseFrameTime), 0);
         }

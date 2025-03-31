@@ -8,8 +8,6 @@
 
 // This is just a convenient spot to render random stuff on the screen; since the mouse cursor is
 // one of the last things that's drawn
-extern double g_LastFrameTimeMS;
-
 int subspace_MouseControl_OnRender_pre(MouseControl* self)
 {
     char buf[64];
@@ -30,7 +28,7 @@ int subspace_MouseControl_OnRender_pre(MouseControl* self)
     basic_string_destroy(&tmp);
 
     if (gs.timeWarpActive) {
-        snprintf(buf, sizeof(buf), "Last frame time: %lfms", g_LastFrameTimeMS);
+        snprintf(buf, sizeof(buf), "Avg frame time: %lfms", gs.avgFrameMS);
         basic_string_set(&tmp, buf);
         easy_print(1, 100, 145, &tmp);
         basic_string_destroy(&tmp);

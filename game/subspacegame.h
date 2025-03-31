@@ -54,6 +54,7 @@ typedef struct GameState {
     bool timeWarpActive;
     float warpFactor;
     float warpFactorActual;   // set by CFPS if we're capped due to framerate
+    double avgFrameMS;        // milliseconds per frame, averaged over the last several frames
 } GameState;
 
 extern SubspaceGameSettings settings;
