@@ -1,20 +1,21 @@
-#include "ftl/shipmanager.h"
+#include "feature/numerichull.h"
 #include "ftl/combatcontrol.h"
+#include "ftl/shipmanager.h"
 #include "subspacegame.h"
 
 int subspace_CombatControl_RenderTarget_pre(CombatControl* self)
 {
-    ShipManager* sm = CombatControl_GetCurrentTarget(self);
-    Ship* ship      = sm ? ShipManager_ship(sm) : NULL;
-
-    if (ship) {
-        gs.overrideHullText = true;
-        gs.hull             = MEMBER(ftlbase, Ship, ship, int, hullIntegrity);
+    if (NumericHull_feature.enabled) {
+        ShipManager* sm = CombatControl_GetCurrentTarget(self);
+        if (sm)
+            numericHullBeforeRenderTarget(sm);
     }
+
     return 1;
 }
 
 void subspace_CombatControl_RenderTarget_post(CombatControl* self)
 {
-    gs.overrideHullText = false;
+    if (NumericHull_feature.enabled)
+        numericHullAfterRenderTarget();
 }

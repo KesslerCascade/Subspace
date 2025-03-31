@@ -4,7 +4,7 @@
 
 void subspace_CFPS_OnLoop_post(CFPS* self)
 {
-    if (gs.timeWarpActive) {
+    if (TimeWarp_feature.enabled && gs.timeWarpActive) {
         CFPS_SpeedFactor(self) = timeWarpAdjustSpeedFactor(CFPS_SpeedFactor(self));
     }
 }

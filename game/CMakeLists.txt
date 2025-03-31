@@ -76,9 +76,7 @@ add_executable(subspacegame
     patch/seq/seq_numerichull.c
     patch/seq/seq_required.c
     patch/seq/seq_timewarp.c
-    patch/ship/validate_ship.c
     patch/shipstatus/patch_shipstatus_renderhealth.c
-    patch/shipstatus/validate_shipstatus.c
     patch/textlibrary/patch_textlibrary_gettext.c
     subspacegame.c
     ${GAME_OSDEP})

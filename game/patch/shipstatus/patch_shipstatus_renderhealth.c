@@ -6,7 +6,7 @@
 
 static bool validate(addr_t base, Patch* p, PatchState* ps)
 {
-    return symResolve(base, ShipStatus_RenderHealth);
+    return symResolve(base, ShipStatus_RenderHealth) && symResolve(base, ShipStatus_ship_offset);
 }
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)
