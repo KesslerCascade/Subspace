@@ -9,10 +9,10 @@ void frameAdvStep(CommandGui* gui)
     gs.frameAdvStep = true;
 }
 
-void frameAdvEndFrame(CApp* app)
+void frameAdvEndFrame(CommandGui* gui)
 {
     if (gs.frameAdvStep) {
-        CommandGui_SetPaused(MEMBER(ftlbase, CApp, app, CommandGui*, gui), true, false);
+        CommandGui_SetPaused(gui, true, false);
         gs.frameAdvStep = false;
     }
 }

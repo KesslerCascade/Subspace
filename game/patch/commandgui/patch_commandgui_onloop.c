@@ -10,7 +10,10 @@ static bool validate(addr_t base, Patch* p, PatchState* ps)
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
-    return hookFunction(base, CommandGui_OnLoop, subspace_CommandGui_OnLoop_pre, NULL);
+    return hookFunction(base,
+                        CommandGui_OnLoop,
+                        subspace_CommandGui_OnLoop_pre,
+                        subspace_CommandGui_OnLoop_post);
 }
 
 Patch patch_CommandGui_OnLoop = { .Relevant = AlwaysRequired, .Validate = validate, .Apply = apply };

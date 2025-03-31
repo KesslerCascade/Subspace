@@ -6,4 +6,4 @@
 extern SubspaceFeature FrameAdv_feature;
 
 void frameAdvStep(CommandGui *gui);
-void frameAdvEndFrame(CApp *app); // to be called at the end of each frame
+void frameAdvEndFrame(CommandGui* gui);   // to be called at the end of each frame

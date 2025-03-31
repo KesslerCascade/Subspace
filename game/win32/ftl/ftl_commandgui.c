@@ -200,4 +200,5 @@ Symbol SYM(CommandGui_OnLoop) = {
 };
 FuncInfo FUNCINFO(CommandGui_OnLoop) = { .nargs   = 1,
                                          .stdcall = true,
-                                         .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+                                         .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                         .rettype = RET_VOID };

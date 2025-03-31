@@ -32,8 +32,8 @@ int sscmain(void)
         return 1;
     }
 
-    if (initFeature(&TimeWarp_feature, &ps))
-        enableFeature(&TimeWarp_feature, true);
+    if (initFeature(&FrameAdv_feature, &ps))
+        enableFeature(&FrameAdv_feature, true);
 
     if (!patchEnd(&ps)) {
         // log

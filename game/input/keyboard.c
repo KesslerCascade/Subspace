@@ -14,12 +14,12 @@ bool keyDownGlobal(CApp* app, int key)
 bool keyDownInGame(CommandGui* gui, int key, bool shiftHeld, bool isPaused, bool isJumping)
 {
     if (!isJumping) {
-        if (settings.frameAdv->enabled && key == '`') {
+        if (FrameAdv_feature.enabled && key == '`') {
             frameAdvStep(gui);
             return true;
         }
 
-        if (settings.timeWarp->enabled) {
+        if (TimeWarp_feature.enabled) {
             if (key == '[') {
                 timeWarpDecrease();
                 return true;
