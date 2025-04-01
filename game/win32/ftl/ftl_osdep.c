@@ -47,3 +47,21 @@ DisasmTrace WinMain_trace = {
               { DT_OP(FINISH) } },
     .out  = { &SYM(sil_main) }
 };
+
+// Alternate trace for builds that have extra debugging code in sil__main
+DisasmTrace WinMain_fallback_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "SIL",
+    .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 5 },
+             { DT_OP(CALL) },   // follow sil__main call
+              { DT_OP(SKIP), .imin = 30, .imax = 50 },
+             { I_MOV, .argf = { ARG_MATCH }, .args = { { REG_ESP, .idx = REG_UNDEF, .addr = 0 } } },
+             { DT_OP(CALL) },   // follow sil_main call
+              { DT_OP(SKIP), .imin = 10, .imax = 40, .outip = DT_OUT_SYM1 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ESP } },
+                .argstr = { 0, "FTL.log" } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(sil_main) }
+};

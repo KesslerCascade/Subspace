@@ -9,7 +9,9 @@ INITWRAP(sil_main);
 Symbol SYM(sil_main) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WinMain_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "sil_main" },
-             { 0 } }
+             { .type   = SYMBOL_FIND_DISASM,
+                .disasm = &WinMain_fallback_trace },   // more expensive but robust method
+              { 0 } }
 };
 FuncInfo FUNCINFO(sil_main) = { .nargs = 2, .purecdecl = true };
 
@@ -36,6 +38,7 @@ DisasmTrace sil_main_CApp_trace = {
     .c    = DTRACE_STRREFS,
     .cstr = "Starting up\n",
     .ops  = { { I_MOV },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CALL },
              { I_LEA, .argf = { ARG_REG }, .args = { { REG_ECX } } },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // result is arg1 of the CALL

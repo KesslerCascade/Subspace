@@ -46,6 +46,7 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
     .c    = DTRACE_STRREFS,
     .cstr = "Generating world...\n",
     .ops  = { { I_MOV },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ftl_log
               { DT_OP(SKIP), .imin = 1, .imax = 6 },
              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL operator new
@@ -83,6 +84,7 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
                 .argout = { DT_OUT_SYM5 } },
              { DT_OP(SKIP), .imin = 3, .imax = 7 },
              { I_MOV, .argf = { ARG_IGNORE, ARG_MATCH }, .argstr = { 0, "Running Game!\n" } },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
              { I_CALL },   // CALL ftl_log
               { I_MOV,
                 .argf   = { ARG_REG },
@@ -275,7 +277,7 @@ DisasmTrace CApp_OnRender_trace = {
 DisasmTrace CApp_OnInit_v1_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(CApp_OnInit),
-    .ops  = { { DT_OP(SKIP), .imin = 30, .imax = 40 },
+    .ops  = { { DT_OP(SKIP), .imin = 30, .imax = 50 },
              { I_MOV, .argf = { 0, ARG_MATCH }, .argstr = { 0, "vsync" } },
              { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CALL },   // CALL graphics_set_display_attr

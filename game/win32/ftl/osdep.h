@@ -11,3 +11,4 @@ DECLFUNC(WinMain);
     FCALL(ftlbase, WinMain, hInstance, hPrevInstance, lpCmdLine, nShowCmd)
 
 extern DisasmTrace WinMain_trace;
+extern DisasmTrace WinMain_fallback_trace;
