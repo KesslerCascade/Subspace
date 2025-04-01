@@ -629,6 +629,8 @@ typedef enum e_inst
     I_CVTSI2SD,
     I_CVTSS2SD,
     I_CVTSD2SS,
+    I_CVTTSS2SI,
+    I_CVTTSD2SI,
     I_MOVSS,
     I_MOVSD,
     I_ADDSS,
@@ -641,6 +643,8 @@ typedef enum e_inst
     I_DIVSD,
     I_UCOMISS,
     I_UCOMISD,
+    I_MOVAPS,
+    I_MOVAPD
 } e_inst;
 
 #define C_TYPEMASK     0x1F0            // Mask for command type

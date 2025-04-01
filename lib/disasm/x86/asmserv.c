@@ -594,6 +594,8 @@ const t_cmddata cmddata[] = {
     { 0xFFFFFF, 0x2A0FF2, 2,00,  RXM,MR4,NNN, C_SSE + 8,          I_CVTSI2SD },
     { 0xFFFFFF, 0x5A0FF3, 2,00,  RXM,MX4,NNN, C_SSE + 4,          I_CVTSS2SD },
     { 0xFFFFFF, 0x5A0FF2, 2,00,  RXM,MX8,NNN, C_SSE + 8,          I_CVTSD2SS },
+    { 0xFFFFFF, 0x2C0FF3, 2,00,  REG,MX4,NNN, C_SSE + 4,          I_CVTTSS2SI },
+    { 0xFFFFFF, 0x2C0FF2, 2,00,  REG,MX8,NNN, C_SSE + 4,          I_CVTTSD2SI },
     { 0xFFFFFF, 0x580FF3, 2,00,  RXM,MX4,NNN, C_SSE + 4,          I_ADDSS },
     { 0xFFFFFF, 0x580FF2, 2,00,  RXM,MX8,NNN, C_SSE + 8,          I_ADDSD },
     { 0xFFFFFF, 0x5C0FF3, 2,00,  RXM,MX4,NNN, C_SSE + 4,          I_SUBSS },
@@ -604,7 +606,11 @@ const t_cmddata cmddata[] = {
     { 0xFFFFFF, 0x5E0FF2, 2,00,  RXM,MX8,NNN, C_SSE + 8,          I_DIVSD },
     { 0x00FFFF, 0x002E0F, 2,00,  RXM,MX4,NNN, C_SSE + 4,          I_UCOMISS },
     { 0xFFFFFF, 0x2E0F66, 2,00,  RXM,MX8,NNN, C_SSE + 8,          I_UCOMISD },
-    { 0xFFFFFF, 0x2E0F66, 2,00,  RXM,MX0,NNN, C_SSE + 0,          I_PXOR },    
+    { 0xFFFFFF, 0x2E0F66, 2,00,  RXM,MX0,NNN, C_SSE + 0,          I_PXOR },
+    { 0x00FFFF, 0x00280F, 2,00,  RXM,MX0,NNN, C_SSE + 0,          I_MOVAPS },
+    { 0x00FFFF, 0x00290F, 2,00,  MX0,RXM,NNN, C_SSE + 0,          I_MOVAPS },
+    { 0xFFFFFF, 0x280F66, 2,00,  RXM,MX0,NNN, C_SSE + 0,          I_MOVAPD },
+    { 0xFFFFFF, 0x290F66, 2,00,  MX0,RXM,NNN, C_SSE + 0,          I_MOVAPD },
     // End of command table.
     { 0x000000, 0x000000, 0,00,  NNN,NNN,NNN, C_CMD + 0,          I_NONE }
 };
