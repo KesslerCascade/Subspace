@@ -5,7 +5,7 @@
 #include "hook/symbol.h"
 #include "disasm.h"
 
-#define MAX_UNWIND 8
+#define MAX_UNWIND 10
 
 typedef struct DisasmTraceState {
     DisasmOp* op;
@@ -13,6 +13,7 @@ typedef struct DisasmTraceState {
     // current skip
     int skipmin;
     int skipmax;
+    int flow;
     t_arg cap[16];        // captured arguments
     bool outset[16];      // is outaddr set for this slot (it may still be zero value)
     addr_t outaddr[16];   // potential outputs
@@ -26,12 +27,14 @@ static void pushUnwind(DisasmTraceState* dts, DisasmTraceState* unwind, int* nun
     DisasmTraceState ndts = *dts;
 
     // if we can't skip anymore or are already maxed out on unwind points, just do nothing.
-    // we should never get here if skipmin > 0, but check it anyway.
-    if (dts->skipmin > 0 || dts->skipmax < 1 || *nunwind >= MAX_UNWIND)
+    if (dts->skipmax < 1 || *nunwind >= MAX_UNWIND)
         return;
 
-    // we want the unwound state to start on the instruction *after* the one we saved it on
+    // we want the unwound state to start on the instruction *after* the one we saved it on,
+    // simulating a skip
     ndts.p += isize;
+    // ndts.skipmin = MAX(ndts.skipmin - 1, 0);
+    // ndts.skipmax = MAX(ndts.skipmax - 1, 0);
 
     unwind[*nunwind] = ndts;
     (*nunwind)++;
@@ -72,6 +75,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
     unwind    = smalloc(sizeof(DisasmTraceState) * MAX_UNWIND);
 
     while (dts.p >= code.start && dts.p < code.end && dts.op->op != DT_FINISH) {
+        bool skip = false;
+
         // at any time we can save the current IP to an output
         if (dts.op->outip > 0) {
             dts.outaddr[dts.op->outip - 1] = dts.p;
@@ -81,6 +86,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
         if (dts.op->op == DT_SKIP) {
             dts.skipmin = dts.op->imin;
             dts.skipmax = dts.op->imax;
+            dts.flow    = dts.op->flow;
             ++dts.op;
             continue;
         } else if (dts.op->op == DT_LABEL) {
@@ -181,6 +187,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     // can't skip; so we backtrack or fail
                     if (!popUnwind(&dts, unwind, &nunwind, &isize))
                         break;
+                } else {
+                    skip = true;
                 }
             } else if (dts.op->op == DT_CALL || dts.op->op == DT_JMP) {
                 bool instmatch = false;
@@ -214,6 +222,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     // it wasn't a call and we're can't skip it so... just fail
                     if (!popUnwind(&dts, unwind, &nunwind, &isize))
                         break;
+                } else {
+                    skip = true;
                 }
             } else if (dts.op->op == DT_JMPTBL) {
                 uchar cmdtype  = disasm.command->type & C_TYPEMASK;
@@ -234,7 +244,37 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     // it wasn't a valid jump table and we're can't skip it so... just fail
                     if (!popUnwind(&dts, unwind, &nunwind, &isize))
                         break;
+                } else {
+                    skip = true;
                 }
+            }
+        } else {
+            skip = true;
+        }
+
+        if (skip) {
+            // if we're skipping, try to follow control flow if requested
+            uchar cmdtype  = disasm.command->type & C_TYPEMASK;
+            bool instmatch = false;
+
+            if (dts.flow == DT_FLOW_JMP_ALL || dts.flow == DT_FLOW_JMP_BOTH)
+                instmatch = (cmdtype == C_JMP || cmdtype == C_JMC);
+            else if (dts.flow == DT_FLOW_JMP_UNCOND)
+                instmatch = (cmdtype == C_JMP);
+
+            if (instmatch && disasm.arg[0].addr >= code.start && disasm.arg[0].addr < code.end) {
+                // follow the first argument, which we've verified is a destination within the
+                // same module.
+                // Do NOT reset skip, because we're following along during a skip.
+
+                if (dts.flow == DT_FLOW_JMP_BOTH) {
+                    // if we're following both branches, create an unwind point which will resume
+                    // right after this jump
+                    pushUnwind(&dts, unwind, &nunwind, isize);
+                }
+
+                dts.p = disasm.arg[0].addr;
+                isize = 0;   // don't advance pointer
             }
         }
 

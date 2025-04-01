@@ -45,7 +45,7 @@ typedef enum DisasmOutput {
     DT_OUT_SYM16 = 16
 } DisasmOutput;
 
-typedef enum DisarpArgCaptureType {
+typedef enum DisarmArgCaptureType {
     CT_CAPTURE   = 0x10,   // capture the the argument from disassembly to use later - OR with the
                            // capture number
     CT_CAPTURE1  = CT_CAPTURE | 0,
@@ -84,12 +84,20 @@ typedef enum DisarpArgCaptureType {
     CT_ARG_MASK  = 0xf,
 } DisasmArgCaptureType;
 
+typedef enum DisasmFlowType {
+    DT_FLOW_NONE = 0,     // ignore program flow entirely
+    DT_FLOW_JMP_ALL,      // follow all jumps
+    DT_FLOW_JMP_UNCOND,   // follow only unconditional jumps
+    DT_FLOW_JMP_BOTH,     // follow flow; branch on conditional jumps and follow both
+} DisasmFlowType;
+
 typedef struct DisasmOp {
     e_inst inst;           // instruction to match for DISASM_INST
     DisasmOpType op;       // dissembly operation
 
     int imin, imax;        // min and max number of instructions to skip (before the next match) for
                            // DISASM_SKIP
+    int flow;              // the type of program flow following to do during skips
 
     uint32_t val;          // misc value used for certain ops
     DisasmArgOp argf[3];   // argument filter
