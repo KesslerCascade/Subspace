@@ -270,6 +270,16 @@ unsigned int _minicrt_strlen(const char* str)
     }
 }
 
+char* _minicrt_strchr(const char* p, int ch)
+{
+    for (;; ++p) {
+        if (*p == ch)
+            return (char*)p;
+    }
+    return NULL;
+}
+
+
 char* _minicrt_strrchr(const char* p, int ch)
 {
     char* save;

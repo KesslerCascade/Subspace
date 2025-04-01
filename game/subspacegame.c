@@ -31,24 +31,43 @@ int sscmain(void)
     }
     if (!patchApplySeq(&ps, OSDepPatches) || !patchApplySeq(&ps, RequiredPatches)) {
         // log
+        WriteDbg("Required patches failed.\n");
         return 1;
     }
 
-    if (initFeature(&InfoBlock_feature, &ps))
+    if (initFeature(&InfoBlock_feature, &ps)) {
         enableFeature(&InfoBlock_feature, true);
-    if (initFeature(&TimeWarp_feature, &ps))
+        WriteDbg("InfoBlock: PASSED\n");
+    } else {
+        WriteDbg("InfoBlock: FAILED\n");
+    }
+    if (initFeature(&TimeWarp_feature, &ps)) {
         enableFeature(&TimeWarp_feature, true);
-    if (initFeature(&FrameAdv_feature, &ps))
+        WriteDbg("TimeWarp: PASSED\n");
+    } else {
+        WriteDbg("TimeWarp: FAILED\n");
+    }
+    if (initFeature(&FrameAdv_feature, &ps)) {
         enableFeature(&FrameAdv_feature, true);
-    if (initFeature(&NumericHull_feature, &ps))
+        WriteDbg("FrameAdv: PASSED\n");
+    } else {
+        WriteDbg("FrameAdv: FAILED\n");
+    }
+    if (initFeature(&NumericHull_feature, &ps)) {
         enableFeature(&NumericHull_feature, true);
+        WriteDbg("NumericHull: PASSED\n");
+    } else {
+        WriteDbg("NumericHull: FAILED\n");
+    }
 
     if (!patchEnd(&ps)) {
         // log
         return 1;
     }
 
-    ftlentry = getProgramEntry(ftlbase);
-    ftlentry();
+    if (!settings.testMode) {
+        ftlentry = getProgramEntry(ftlbase);
+        ftlentry();
+    }
     return 0;
 }

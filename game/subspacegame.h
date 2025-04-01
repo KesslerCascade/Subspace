@@ -16,6 +16,12 @@ typedef bool (*featurePatch_t)(SubspaceFeature* feat, void* settings, PatchState
 // Enable or disable the feature at runtime
 typedef bool (*featureEnable_t)(SubspaceFeature* feat, void* settings, bool enabled);
 
+#ifdef _DEBUG
+extern void WriteDbg(const char* str);
+#else
+#define WriteDbg(x)
+#endif
+
 extern const int subspace_version_maj;
 extern const int subspace_version_min;
 extern const char* subspace_version_series;
@@ -41,6 +47,8 @@ typedef struct SubspaceGameSettings {
     char* gameDir;       // root directory where the game is located
     char* gameProgram;   // name of the game executable
     char* gamePath;      // fill path to game executable
+
+    bool testMode;
 
     SubspaceFeature* numericHull;
     SubspaceFeature* frameAdv;

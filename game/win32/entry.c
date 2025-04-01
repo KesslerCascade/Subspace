@@ -4,6 +4,8 @@
 
 #include "minicrt.h"
 
+HANDLE dbgconsole;
+
 // IMPORTANT: This program is bare and jumps directly into its entry point. It does
 // not have the C runtime library available at startup. It does not perform CRT0
 // initialization. It does not pass go.
@@ -25,10 +27,36 @@ int __stdcall entry()
     settings.gameProgram = smalloc(MAX_PATH);
     settings.gamePath    = smalloc(MAX_PATH);
 
+    const char* wincmdline = GetCommandLineA();
+    char cmdline[MAX_PATH];
+    strcpy(cmdline, wincmdline);
+    char* last = NULL;
+    char* self = strtok_r(cmdline, " ", &last);
+    char* cmd  = strtok_r(NULL, " ", &last);
+    if (cmd && !stricmp(cmd, "-test")) {
+        settings.testMode = true;
+
+        char* program = strtok_r(NULL, " ", &last);
+
+        strcpy(settings.gameProgram, "FTLGame.exe");
+        strcpy(settings.gamePath, program);
+        strcpy(settings.gameDir, program);
+        char* p = strrchr(settings.gameDir, '\\');
+        if (p)
+            *p = '\0';
+    } else {
 #if 0
-    strcpy(settings.gameDir, "M:\\Dev\\FTLCopy");
+    strcpy(settings.gameDir, "M:\\Dev\\FTL1.6.3");
     strcpy(settings.gameProgram, "FTLGame.exe");
-    strcpy(settings.gamePath, "M:\\Dev\\FTLCopy\\FTLGame.exe");
+    strcpy(settings.gamePath, "M:\\Dev\\FTL1.6.3\\FTLGame.exe");
+#elif 0
+        strcpy(settings.gameDir, "M:\\Dev\\FTLGoG1.6.13b");
+        strcpy(settings.gameProgram, "FTLGame.exe");
+        strcpy(settings.gamePath, "M:\\Dev\\FTLGoG1.6.13b\\FTLGame.exe");
+#elif 1
+        strcpy(settings.gameDir, "M:\\Dev\\FTLSteam1.6.12");
+        strcpy(settings.gameProgram, "FTLGame.exe");
+        strcpy(settings.gamePath, "M:\\Dev\\FTLSteam1.6.12\\FTLGame.exe");
 #elif 0
     strcpy(settings.gameDir, "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light");
     strcpy(settings.gameProgram, "FTLGame.exe");
@@ -39,10 +67,14 @@ int __stdcall entry()
     strcpy(settings.gameProgram, "FTLGame.exe");
     strcpy(settings.gamePath, "M:\\Games\\Sync\\FTL\\FTLGame.exe");
 #endif
+    }
 
     SetCurrentDirectoryA(settings.gameDir);
     SetEnvironmentVariableA("USERPROFILE", settings.gameDir);
 
+#ifdef _DEBUG
+    AllocConsole();
+#endif
     // if (AllocConsole()) {
     //  FILE* temp;
     //  freopen_s(&temp, "CONIN$", "r", stdin);
@@ -55,6 +87,17 @@ int __stdcall entry()
 
     int ret = sscmain();
 
+    if (settings.testMode) {
+        Sleep(3000);
+    }
+
     // probably will never reach this, but just in case
     ExitProcess(ret);
+}
+
+void WriteDbg(const char* str)
+{
+    HANDLE hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
+    DWORD written  = 0;
+    WriteConsoleA(hstdout, (void*)str, strlen(str), &written, NULL);
 }

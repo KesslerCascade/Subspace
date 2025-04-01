@@ -26,6 +26,8 @@ int _minicrt_strncmp(const char* str1, const char* str2, unsigned int count);
 #define strncmp _minicrt_strncmp
 int _minicrt_stricmp(const char* str1, const char* str2);
 #define stricmp _minicrt_stricmp
+char* _minicrt_strchr(const char* p, int ch);
+#define strchr _minicrt_strchr
 char* _minicrt_strrchr(const char* p, int ch);
 #define strrchr _minicrt_strrchr
 
