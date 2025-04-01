@@ -135,6 +135,9 @@ static int loadSection(addr_t imagebase, IMAGE_SECTION_HEADER* sh, void* userdat
     void* sptr     = prva(imagebase, sh->VirtualAddress);
     DWORD didread;
 
+    if (sh->Name[0] == '/')
+        return 1;   // debug section, pretend we loaded it but actually ignore
+
     if (SetFilePointer(hFile, sh->PointerToRawData, 0, FILE_BEGIN) == INVALID_SET_FILE_POINTER)
         return 0;
 
