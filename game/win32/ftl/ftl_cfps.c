@@ -9,14 +9,16 @@
 // WorldManager construction is a convenient place to find the address of 'operator new' because
 // it's called immediately after a specific log message.
 Symbol SYM(CFPS_FPSControl) = {
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_worldgen_trace },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_2 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CFPS10FPSControlE" },
              { 0 } }
 };
 
 INITWRAP(CFPS_GetTime);
 Symbol SYM(CFPS_GetTime) = {
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_worldgen_trace },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_2 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CFPS7GetTimeEv" },
              { 0 } }
 };

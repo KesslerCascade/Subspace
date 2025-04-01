@@ -3,7 +3,9 @@
 #include "hook/disasmtrace.h"
 
 Symbol SYM(CEvent_callback) = {
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_worldgen_trace }, { 0 } }
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_2 },
+             { 0 } }
 };
 
 DisasmTrace CEvent_callback_trace = {

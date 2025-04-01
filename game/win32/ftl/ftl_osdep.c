@@ -57,11 +57,11 @@ DisasmTrace WinMain_fallback_trace = {
               { DT_OP(SKIP), .imin = 30, .imax = 50 },
              { I_MOV, .argf = { ARG_MATCH }, .args = { { REG_ESP, .idx = REG_UNDEF, .addr = 0 } } },
              { DT_OP(CALL) },   // follow sil_main call
-              { DT_OP(SKIP), .imin = 10, .imax = 40, .outip = DT_OUT_SYM1 },
+              { DT_OP(SKIP), .imin = 40, .imax = 90, .outip = DT_OUT_SYM1 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ESP } },
-                .argstr = { 0, "FTL.log" } },
+                .argstr = { 0, "FasterThanLight" } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(sil_main) }
 };

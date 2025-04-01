@@ -58,5 +58,7 @@ SubspaceFeature InfoBlock_feature = {
                         &SYM(version_major),
                         &SYM(version_minor),
                         &SYM(version_rev),
+                        &SYM(CFPS_FPSControl),
+                        &SYM(CFPS_fps_offset),
                         0 }
 };

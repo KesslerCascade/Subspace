@@ -51,7 +51,7 @@ FuncInfo FUNCINFO(CombatControl_GetCurrentTarget) = { .nargs   = 1,
 DisasmTrace CombatControl_RenderTarget_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(CombatControl_RenderTarget),
-    .ops  = { { DT_OP(SKIP), .imin = 250, .imax = 350 },
+    .ops  = { { DT_OP(SKIP), .imin = 250, .imax = 1500 },
              { I_MOV,
                 .argf = { 0, ARG_ADDR },
                 .args = { { 0 }, { .addr = 0x69676e65 } } },   // engi
@@ -63,11 +63,11 @@ DisasmTrace CombatControl_RenderTarget_trace = {
              { I_MOV,
                 .argf = { 0, ARG_ADDR },
                 .args = { { 0 }, { .addr = 0x6b636168 } } },   // hack
-              { DT_OP(SKIP), .imin = 25, .imax = 40 },
+              { DT_OP(SKIP), .imin = 10, .imax = 40 },
              { I_CALL, .argf = { ARG_MATCH }, .argsym = { &SYM(operator_delete) } },
              { DT_OP(SKIP), .imin = 2, .imax = 7 },
              { I_CALL, .argf = { ARG_MATCH }, .argsym = { &SYM(operator_delete) } },
-             { DT_OP(SKIP), .imin = 0, .imax = 10 },
+             { DT_OP(SKIP), .imin = 0, .imax = 10, .flow = DT_FLOW_JMP_UNCOND },
              { I_MOV,
                 .argf = { ARG_REG, ARG_ADDR },
                 .args = { { REG_ESP }, { .addr = 7 } } },   // selecting font 7
