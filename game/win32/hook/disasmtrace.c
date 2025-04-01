@@ -72,6 +72,12 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
     unwind    = smalloc(sizeof(DisasmTraceState) * MAX_UNWIND);
 
     while (dts.p >= code.start && dts.p < code.end && dts.op->op != DT_FINISH) {
+        // at any time we can save the current IP to an output
+        if (dts.op->outip > 0) {
+            dts.outaddr[dts.op->outip - 1] = dts.p;
+            dts.outset[dts.op->outip - 1]  = true;
+        }
+
         if (dts.op->op == DT_SKIP) {
             dts.skipmin = dts.op->imin;
             dts.skipmax = dts.op->imax;
@@ -91,6 +97,9 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     dts.p = addr;
             }
             ++dts.op;
+        } else if (dts.op->op == DT_NOOP) {
+            ++dts.op;
+            continue;
         }
 
         // pseudo-ops are done, we're disassembling something!
@@ -151,12 +160,6 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                 }
 
                 if (match) {
-                    // is this the instruction we're looking for?
-                    if (dts.op->outip > 0) {
-                        dts.outaddr[dts.op->outip - 1] = dts.p;
-                        dts.outset[dts.op->outip - 1]  = true;
-                    }
-
                     for (int i = 0; i < 3; i++) {
                         // capture any args from this match
                         if (dts.op->argcap[i] & CT_CAPTURE)
@@ -185,10 +188,15 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                 if (dts.op->op == DT_CALL) {
                     instmatch = (disasm.inst == I_CALL);
                 } else {
-                    // use command type to avoid having to check every jump instruction -- we want
-                    // both regular and conditional jumps
-                    uchar cmdtype = disasm.command->type & C_TYPEMASK;
-                    instmatch     = (cmdtype == C_JMP || cmdtype == C_JMC);
+                    // op may want to check for a specific jump instruction
+                    if (dts.op->inst != I_NONE) {
+                        instmatch = (dts.op->inst == disasm.inst);
+                    } else {
+                        // use command type to avoid having to check every jump instruction -- we
+                        // want both regular and conditional jumps
+                        uchar cmdtype = disasm.command->type & C_TYPEMASK;
+                        instmatch     = (cmdtype == C_JMP || cmdtype == C_JMC);
+                    }
                 }
 
                 if (instmatch && disasm.arg[0].addr >= code.start &&

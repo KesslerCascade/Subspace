@@ -7,6 +7,7 @@ typedef struct Symbol Symbol;
 
 typedef enum DisasmOpType {
     DT_INST = 0,   // Instruction to match
+    DT_NOOP,       // Do nothing (but maybe save EIP)
     DT_SKIP,       // Instructions to skip
     DT_JMP,        // follow a jump or conditional jump instead of disassembling it
     DT_CALL,       // follow a call instead of disassembling it (there is no return logic, it's
