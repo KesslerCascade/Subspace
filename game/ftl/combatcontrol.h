@@ -4,6 +4,8 @@
 
 typedef struct CombatControl CombatControl;
 
+extern DisasmTrace CombatControl_RenderTarget_trace;
+
 int subspace_CombatControl_RenderTarget_pre(CombatControl* self);
 void subspace_CombatControl_RenderTarget_post(CombatControl* self);
 

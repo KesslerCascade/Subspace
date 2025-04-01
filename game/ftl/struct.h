@@ -7,6 +7,13 @@
 #define MEMBER(base, ParentType, parent, MemberType, member) \
     (*(MemberType*)((((uintptr_t)(parent)) + (symAddr(base, ParentType##_##member##_offset)))))
 
+typedef struct GL_Color {
+    float r;
+    float g;
+    float b;
+    float a;
+} GL_Color;
+
 typedef struct Pointf {
     float x, y;
 } Pointf;

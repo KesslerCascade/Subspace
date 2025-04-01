@@ -3,6 +3,7 @@
 // one of the playform-specific subdirectories
 
 #include "feature/frameadv.h"
+#include "feature/infoblock.h"
 #include "feature/numerichull.h"
 #include "feature/timewarp.h"
 #include "ftl/ftl.h"
@@ -33,6 +34,8 @@ int sscmain(void)
         return 1;
     }
 
+    if (initFeature(&InfoBlock_feature, &ps))
+        enableFeature(&InfoBlock_feature, true);
     if (initFeature(&TimeWarp_feature, &ps))
         enableFeature(&TimeWarp_feature, true);
     if (initFeature(&FrameAdv_feature, &ps))

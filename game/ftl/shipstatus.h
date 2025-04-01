@@ -5,6 +5,8 @@
 typedef struct ShipStatus ShipStatus;
 typedef struct ShipManager ShipManager;
 
+extern DisasmTrace ShipStatus_RenderEvadeOxygen_trace;
+
 int subspace_ShipStatus_RenderHealth_pre(ShipStatus* self, bool renderText);
 int subspace_ShipStatus_RenderHealth_post(int ret, ShipStatus* self, bool renderText);
 
@@ -15,6 +17,7 @@ DECLFUNC(ShipStatus_RenderHealth);
 
 DECLSYM(ShipStatus_OnRender);
 DECLSYM(ShipStatus_LinkShip);
+DECLSYM(ShipStatus_RenderEvadeOxygen);
 
 DECLSYM(ShipStatus_ship_offset);
 DECLSYM(ShipStatus_hullBox_offset);

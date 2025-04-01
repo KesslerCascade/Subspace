@@ -22,5 +22,4 @@ DECLINFO(TextLibrary_GetText_3arg);
 DECLFUNCP(TextLibrary_GetText);
 #define TextLibrary_GetText(self, text, out, lang) \
     FCALLP(ftlbase, TextLibrary_GetText, self, text, out, lang)
-#define GetText(text, out) \
-    TextLibrary_GetText(g_Library, text, out, Globals_Library_currentLanguage)
+#define GetText(text, out) TextLibrary_GetText(g_Library, text, out, g_Library_currentLanguage)

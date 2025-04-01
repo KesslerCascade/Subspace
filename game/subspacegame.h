@@ -16,6 +16,11 @@ typedef bool (*featurePatch_t)(SubspaceFeature* feat, void* settings, PatchState
 // Enable or disable the feature at runtime
 typedef bool (*featureEnable_t)(SubspaceFeature* feat, void* settings, bool enabled);
 
+extern const int subspace_version_maj;
+extern const int subspace_version_min;
+extern const char* subspace_version_series;
+extern const char* subspace_version_str;
+
 typedef struct SubspaceFeature {
     bool available;   // is this feature available -- i.e. did all the necessary patches apply?
     bool enabled;   // is the feature enabled? Doesn't mean that it's active right now, just enabled

@@ -9,6 +9,7 @@ typedef struct CommandGui CommandGui;
 int subspace_CommandGui_KeyDown_pre(CommandGui* self, int key, bool shiftHeld);
 int subspace_CommandGui_OnLoop_pre(CommandGui* self);
 void subspace_CommandGui_OnLoop_post(CommandGui* self);
+void subspace_CommandGui_RenderStatic_post(CommandGui* self);
 
 // FTL functions & wrappers below
 

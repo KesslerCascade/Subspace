@@ -3,6 +3,7 @@
 #include "ftl/cfps.h"
 #include "ftl/commandgui.h"
 #include "ftl/globals.h"
+#include "ftl/mainmenu.h"
 #include "ftl/misc.h"
 #include "ftl/mousecontrol.h"
 #include "ftl/startup.h"
@@ -261,16 +262,19 @@ DisasmTrace CApp_OnRender_trace = {
               { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
              { I_CALL, .argout = { DT_OUT_SYM1 } },
              { DT_OP(GOTO), .val = 1 },   // Go back to the JE
-              { DT_OP(SKIP), .imin = 7, .imax = 20 },
+              { I_JZ },
+             { I_LEA },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MainMenu::OnRender
+              { DT_OP(SKIP), .imin = 4, .imax = 17 },
              { I_CALL },
              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
-             { I_CALL, .argout = { DT_OUT_SYM2 } },
-             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL MouseControl::OnRender
+              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
              { I_CALL },
              { I_CMP },
              { I_JNZ },
              { DT_OP(FINISH) } },
-    .out  = { &SYM(CommandGui_RenderStatic), &SYM(MouseControl_OnRender) }
+    .out  = { &SYM(CommandGui_RenderStatic), &SYM(MainMenu_OnRender), &SYM(MouseControl_OnRender) }
 };
 
 // Trace for version of the code with 2-argument TextLibrary::GetText

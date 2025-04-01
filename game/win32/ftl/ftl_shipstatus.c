@@ -1,4 +1,5 @@
 #include "ftl/commandgui.h"
+#include "ftl/graphics/csurface.h"
 #include "ftl/shipstatus.h"
 #include "hook/disasmtrace.h"
 
@@ -24,6 +25,46 @@ Symbol SYM(ShipStatus_LinkShip) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_Restart_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10ShipStatus8LinkShipEP11ShipManager" },
              { 0 } }
+};
+
+DisasmTrace ShipStatus_OnRender_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipStatus_OnRender),
+    .ops  = { { DT_OP(SKIP), .imin = 16, .imax = 26 },
+             { I_CALL, .argf = { ARG_MATCH }, .argsym = { &SYM(ShipStatus_RenderHealth) } },
+             { DT_OP(SKIP), .imin = 2, .imax = 8 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_MATCH },
+                .args = { { REG_ESP },
+                          { REG_UNDEF, .idx = REG_UNDEF, .addr = 0 } } },   // MOV DWORD PTR [ESP], 0
+              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CAL ShipStatus::RenderEvadeOxygen
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipStatus_RenderEvadeOxygen) }
+};
+
+Symbol SYM(ShipStatus_RenderEvadeOxygen) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_OnRender_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10ShipStatus17RenderEvadeOxygenEb" },
+             { 0 } }
+};
+
+DisasmTrace ShipStatus_RenderEvadeOxygen_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipStatus_RenderEvadeOxygen),
+    // normally a skip this big would be bad, but these are literally the only 2 places in the
+    // entire codebase that these two constants appear
+    .ops  = { { DT_OP(SKIP), .imin = 200, .imax = 1000 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x42c60000 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x42a40000 } } },
+             { DT_OP(SKIP), .imin = 4, .imax = 12 },
+             { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x42c60000 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x42a40000 } } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(CSurface_GL_SetColor) }
 };
 
 DisasmTrace ShipStatus_LinkShip_trace = {

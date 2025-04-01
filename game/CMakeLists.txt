@@ -5,6 +5,7 @@ if(WIN32)
         win32/codegen/codegen.c
         win32/codegen/hookgen.c
         win32/codegen/wrapgen.c
+        win32/ftl/graphics/ftl_csurface.c
         win32/ftl/graphics/ftl_freetype.c
         win32/ftl/ftl_capp.c
         win32/ftl/ftl_cevent.c
@@ -13,6 +14,7 @@ if(WIN32)
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
         win32/ftl/ftl_globals.c
+        win32/ftl/ftl_mainmenu.c
         win32/ftl/ftl_misc.c
         win32/ftl/ftl_mousecontrol.c
         win32/ftl/ftl_osdep.c
@@ -45,8 +47,10 @@ endif()
 add_executable(subspacegame
     feature/feature.c
     feature/frameadv.c
+    feature/infoblock.c
     feature/numerichull.c
     feature/timewarp.c
+    ftl/graphics/colors.c
     ftl/ftl.c
     ftl/struct.c
     hook/module.c
@@ -58,6 +62,7 @@ add_executable(subspacegame
     hook/combatcontrol/combatcontrol_rendertarget.c
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
+    hook/commandgui/commandgui_renderstatic.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/shipstatus/shipstatus_renderhealth.c
     hook/textlibrary/textlibrary_gettext.c
@@ -71,14 +76,17 @@ add_executable(subspacegame
     patch/combatcontrol/patch_combatcontrol_rendertarget.c
     patch/commandgui/patch_commandgui_keydown.c
     patch/commandgui/patch_commandgui_onloop.c
+    patch/commandgui/patch_commandgui_renderstatic.c
     patch/mousecontrol/patch_mousecontrol_onrender.c
     patch/seq/seq_frameadv.c
+    patch/seq/seq_infoblock.c
     patch/seq/seq_numerichull.c
     patch/seq/seq_required.c
     patch/seq/seq_timewarp.c
     patch/shipstatus/patch_shipstatus_renderhealth.c
     patch/textlibrary/patch_textlibrary_gettext.c
     subspacegame.c
+    version.c
     ${GAME_OSDEP})
 target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 target_link_libraries(subspacegame disasm minicrt)
