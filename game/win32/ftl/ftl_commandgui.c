@@ -2,6 +2,8 @@
 #include "ftl/combatcontrol.h"
 #include "ftl/commandgui.h"
 #include "ftl/completeship.h"
+#include "ftl/ftlbutton.h"
+#include "ftl/graphics/freetype.h"
 #include "ftl/misc.h"
 #include "ftl/shipmanager.h"
 #include "ftl/shipstatus.h"
@@ -83,23 +85,41 @@ DisasmTrace CommandGui_RenderStatic_trace = {
     // For now, just check every CALL. This trace is very much a brute force and a big TODO is to
     // replace it with something better.
     .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 500 },
+             { I_LEA, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { DT_OP(LABEL), .val = 1 },
+             { DT_OP(CALL) },
+             { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 0, .imax = 200 },
+             { I_MOV,
+                .argf = { 0, ARG_ADDR },
+                .args = { { 0 }, { .addr = 0x5f6c7466 } } },   // "ftl_"
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_MOV,
+                .argf = { 0, ARG_ADDR },
+                .args = { { 0 }, { .addr = 0x76697264 } } },   // "driv"
+              { DT_OP(SKIP), .imin = 15, .imax = 30 },
+             { I_CVTSI2SS },
+             { I_MOVSS },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },
+             { DT_OP(GOTO), .val = 1 },   // go back to RenderStatic
+              { DT_OP(SKIP), .imin = 0, .imax = 500 },
              { I_MOVZX,
                 .argf   = { 0, ARG_ADDR },
                 .argsym = { 0, &SYM(ShipManager_current_target_offset) } },
              { I_TEST },
              { DT_OP(SKIP), .imin = 0, .imax = 3 },
-             { DT_OP(LABEL), .val = 1 },
+             { DT_OP(LABEL), .val = 2 },
              { DT_OP(JMP) },   // first follow part where current target is set
               { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
              { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL CombatControl::OnRenderCombat
-              { DT_OP(GOTO), .val = 1 },               // go back to first part
+              { DT_OP(GOTO), .val = 2 },               // go back to first part
               { DT_OP(SKIP), .imin = 0, .imax = 500 },
              { DT_OP(CALL) },
-             { I_PUSH, .outip = DT_OUT_SYM1 },
-             { DT_OP(SKIP), .imin = 0, .imax = 30 },
+             { I_PUSH, .outip = DT_OUT_SYM4 },   // CALL ShipStatus::OnRender
+              { DT_OP(SKIP), .imin = 0, .imax = 30 },
              { DT_OP(CALL) },
-             { I_PUSH, .outip = DT_OUT_SYM2 },
-             { DT_OP(SKIP), .imin = 0, .imax = 50 },
+             { I_PUSH, .outip = DT_OUT_SYM5 },   // CALL ShipStatus::RenderHealth
+              { DT_OP(SKIP), .imin = 0, .imax = 50 },
              { I_MOV,
                 .argf = { 0, ARG_ADDR },
                 .args = { { 0 }, { .addr = 0x74617473 } } },   // "stat"
@@ -107,9 +127,11 @@ DisasmTrace CommandGui_RenderStatic_trace = {
                 .argf = { 0, ARG_ADDR },
                 .args = { { 0 }, { .addr = 0x685f7375 } } },   // "us_h" (ull)
               { DT_OP(FINISH) } },
-    .out  = { &SYM(ShipStatus_OnRender),
-             &SYM(ShipStatus_RenderHealth),
-             &SYM(CombatControl_OnRenderCombat) }
+    .out  = { &SYM(FTLButton_OnRender),
+             &SYM(freetype_easy_printCenter),
+             &SYM(CombatControl_OnRenderCombat),
+             &SYM(ShipStatus_OnRender),
+             &SYM(ShipStatus_RenderHealth) }
 };
 
 DisasmTrace CommandGui_RunCommand_HULL_trace = {

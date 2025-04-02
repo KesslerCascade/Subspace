@@ -12,14 +12,20 @@ Symbol SYM(ShipStatus_RenderHealth) = {
 FuncInfo FUNCINFO(ShipStatus_RenderHealth) = {
     .nargs   = 2,
     .stdcall = true,
-    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } }
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_VOID
 };
 
+INITWRAP(ShipStatus_OnRender);
 Symbol SYM(ShipStatus_OnRender) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RenderStatic_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10ShipStatus8OnRenderEv" },
              { 0 } }
 };
+FuncInfo FUNCINFO(ShipStatus_OnRender) = { .nargs   = 1,
+                                           .stdcall = true,
+                                           .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                           .rettype = RET_VOID };
 
 Symbol SYM(ShipStatus_LinkShip) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_Restart_trace },

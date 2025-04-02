@@ -8,14 +8,17 @@ typedef struct ShipManager ShipManager;
 extern DisasmTrace ShipStatus_RenderEvadeOxygen_trace;
 
 int subspace_ShipStatus_RenderHealth_pre(ShipStatus* self, bool renderText);
-int subspace_ShipStatus_RenderHealth_post(int ret, ShipStatus* self, bool renderText);
+void subspace_ShipStatus_RenderHealth_post(ShipStatus* self, bool renderText);
+void subspace_ShipStatus_OnRender_post(ShipStatus* self);
 
 // FTL functions & wrappers below
 
 typedef void (*FUNCTYPE(ShipStatus_RenderHealth))(ShipStatus* self, bool renderText);
 DECLFUNC(ShipStatus_RenderHealth);
 
-DECLSYM(ShipStatus_OnRender);
+typedef void (*FUNCTYPE(ShipStatus_OnRender))(ShipStatus* self);
+DECLFUNC(ShipStatus_OnRender);
+
 DECLSYM(ShipStatus_LinkShip);
 DECLSYM(ShipStatus_RenderEvadeOxygen);
 

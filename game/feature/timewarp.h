@@ -9,5 +9,7 @@ bool timeWarpIncrease();
 bool timeWarpDecrease();
 void timeWarpEnd();
 
+void timeWarpRender();
+
 float timeWarpAdjustSpeedFactor(float orig);
 void timeWarpBeginFrame(CommandGui* gui);

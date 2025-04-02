@@ -13,6 +13,7 @@ if(WIN32)
         win32/ftl/ftl_combatcontrol.c
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
+        win32/ftl/ftl_ftlbutton.c
         win32/ftl/ftl_globals.c
         win32/ftl/ftl_mainmenu.c
         win32/ftl/ftl_misc.c
@@ -65,6 +66,7 @@ add_executable(subspacegame
     hook/commandgui/commandgui_renderstatic.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/shipstatus/shipstatus_renderhealth.c
+    hook/shipstatus/shipstatus_onrender.c
     hook/textlibrary/textlibrary_gettext.c
     input/keyboard.c
     patch/patch.c
@@ -84,6 +86,7 @@ add_executable(subspacegame
     patch/seq/seq_required.c
     patch/seq/seq_timewarp.c
     patch/shipstatus/patch_shipstatus_renderhealth.c
+    patch/shipstatus/patch_shipstatus_onrender.c
     patch/textlibrary/patch_textlibrary_gettext.c
     subspacegame.c
     version.c

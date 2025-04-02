@@ -1,4 +1,5 @@
 #include "ftl/capp.h"
+#include "ftl/graphics/freetype.h"
 #include "ftl/mainmenu.h"
 #include "ftl/misc.h"
 #include "hook/disasmtrace.h"
@@ -23,6 +24,13 @@ DisasmTrace MainMenu_OnRender_trace = {
              { DT_OP(SKIP), .imin = 50, .imax = 300 },
              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ESP } }, .argout = { 0, DT_OUT_SYM3 } },
              { I_CALL, .argf = { ARG_MATCH }, .argsym = &SYM(basicstring_from_int) },
+             { DT_OP(SKIP), .imin = 0, .imax = 1000 },
+             { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x44278000 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 10 },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },
              { DT_OP(FINISH) } },
-    .out  = { &SYM(version_rev), &SYM(version_minor), &SYM(version_major) }
+    .out  = { &SYM(version_rev),
+             &SYM(version_minor),
+             &SYM(version_major),
+             &SYM(freetype_easy_measurePrintLines) }
 };

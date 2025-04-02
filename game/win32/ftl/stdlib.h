@@ -8,16 +8,20 @@
 
 typedef void * (*FUNCTYPE(msvcrt_malloc))(size_t size);
 DECLFUNC(msvcrt_malloc);
-#define malloc(sz) FCALL(ftlbase, msvcrt_malloc, sz);
+#define malloc(sz) FCALL(ftlbase, msvcrt_malloc, sz)
 
 typedef void (*FUNCTYPE(msvcrt_free))(void *ptr);
 DECLFUNC(msvcrt_free);
-#define free(p) FCALL(ftlbase, msvcrt_free, p);
+#define free(p) FCALL(ftlbase, msvcrt_free, p)
 
 typedef void* (*FUNCTYPE(msvcrt_malloc))(size_t size);
 DECLFUNC(msvcrt_malloc);
-#define malloc(sz) FCALL(ftlbase, msvcrt_malloc, sz);
+#define malloc(sz) FCALL(ftlbase, msvcrt_malloc, sz)
 
 typedef int (*FUNCTYPE(msvcrt_snprintf))(char* s, size_t n, const char* format, ...);
 DECLFUNC(msvcrt_snprintf);
-#define snprintf(s, n, format, ...) FCALL(ftlbase, msvcrt_snprintf, s, n, format, __VA_ARGS__);
+#define snprintf(s, n, format, ...) FCALL(ftlbase, msvcrt_snprintf, s, n, format, __VA_ARGS__)
+
+typedef double (*FUNCTYPE(msvcrt_sin))(double x);
+DECLFUNC(msvcrt_sin);
+#define sin(x) FCALL(ftlbase, msvcrt_sin, x)

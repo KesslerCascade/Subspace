@@ -13,9 +13,8 @@ int subspace_ShipStatus_RenderHealth_pre(ShipStatus* self, bool renderText)
     return 1;
 }
 
-int subspace_ShipStatus_RenderHealth_post(int ret, ShipStatus* self, bool renderText)
+void subspace_ShipStatus_RenderHealth_post(ShipStatus* self, bool renderText)
 {
     if (NumericHull_feature.enabled)
         numericHullAfterRenderHealth(renderText);
-    return ret;
 }
