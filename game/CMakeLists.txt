@@ -64,6 +64,7 @@ add_executable(subspacegame
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
     hook/commandgui/commandgui_renderstatic.c
+    hook/ftlbutton/ftlbutton_onrender.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
@@ -79,6 +80,7 @@ add_executable(subspacegame
     patch/commandgui/patch_commandgui_keydown.c
     patch/commandgui/patch_commandgui_onloop.c
     patch/commandgui/patch_commandgui_renderstatic.c
+    patch/ftlbutton/patch_ftlbutton_onrender.c
     patch/mousecontrol/patch_mousecontrol_onrender.c
     patch/seq/seq_frameadv.c
     patch/seq/seq_infoblock.c
