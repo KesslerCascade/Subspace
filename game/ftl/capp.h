@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ftl/ftl.h"
+#include "ftl/struct.h"
 #include "hook/function.h"
 
 typedef struct CApp CApp;
@@ -44,3 +45,5 @@ DECLSYM(CApp_gui_offset);
 
 DECLSYM(CApp_vtable);
 DECLSYM(CApp_vtable_OnKeyDown_offset);
+
+#define CApp_gui(capp) MEMBER(ftlbase, CApp, capp, CommandGui*, gui)
