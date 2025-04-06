@@ -9,8 +9,6 @@
 #include "ftl/ftl.h"
 #include "loader/loader.h"
 #include "patch/patch.h"
-#include "patch/seq/seq_osdep.h"
-#include "patch/seq/seq_required.h"
 
 SubspaceGameSettings settings = {
     .frameAdv = &FrameAdv_feature,

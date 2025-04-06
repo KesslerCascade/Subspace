@@ -1,6 +1,6 @@
 #include "ftl/stdlib.h"
 
-#include "patch/seq/seq_numerichull.h"
+#include "patch/patchlist.h"
 #include "numerichull.h"
 
 void numericHullBeforeRenderHealth(ShipManager* sm, bool renderText)
@@ -46,12 +46,12 @@ bool numericHullCheckText(TextLibrary* tlib, basic_string* text, basic_string* o
 
 // ---- Patching ----------------
 
-static bool numericHull_Patch(SubspaceFeature* feat, void* settings, PatchState* ps)
-{
-    return patchApplySeq(ps, NumericHullPatches);
-}
+Patch* NumericHull_patches[] = { &patch_TextLibrary_GetText,
+                                 &patch_ShipStatus_RenderHealth,
+                                 &patch_CombatControl_RenderTarget,
+                                 0 };
 
 SubspaceFeature NumericHull_feature = {
-    .patch           = numericHull_Patch,
+    .requiredPatches = NumericHull_patches,
     .requiredSymbols = { &SYM(ShipManager_ship_offset), &SYM(Ship_hullIntegrity_offset), 0 }
 };

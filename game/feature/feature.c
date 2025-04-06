@@ -24,6 +24,10 @@ bool initFeature(SubspaceFeature* feat, PatchState* ps)
     }
 
     // try to patch
+    if (feat->requiredPatches) {
+        if (!patchApplySeq(ps, feat->requiredPatches))
+            return false;
+    }
     if (feat->patch) {
         if (!feat->patch(feat, feat->settings, ps))
             return false;

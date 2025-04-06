@@ -1,6 +1,6 @@
 #include "frameadv.h"
 #include "ftl/commandgui.h"
-#include "patch/seq/seq_frameadv.h"
+#include "patch/patchlist.h"
 
 void frameAdvStep(CommandGui* gui)
 {
@@ -19,11 +19,6 @@ void frameAdvEndFrame(CommandGui* gui)
 
 // ---- Patching ----------------
 
-static bool frameAdv_Patch(SubspaceFeature* feat, void* settings, PatchState* ps)
-{
-    return patchApplySeq(ps, FrameAdvPatches);
-}
-
 static bool frameAdv_Enable(SubspaceFeature* feat, void* settings, bool enabled)
 {
     if (!enabled)
@@ -32,8 +27,10 @@ static bool frameAdv_Enable(SubspaceFeature* feat, void* settings, bool enabled)
     return enabled;
 }
 
+Patch* FrameAdv_patches[] = { &patch_CommandGui_KeyDown, &patch_CommandGui_OnLoop, 0 };
+
 SubspaceFeature FrameAdv_feature = {
-    .patch           = frameAdv_Patch,
     .enable          = frameAdv_Enable,
+    .requiredPatches = FrameAdv_patches,
     .requiredSymbols = { &SYM(CommandGui_SetPaused), 0 }
 };

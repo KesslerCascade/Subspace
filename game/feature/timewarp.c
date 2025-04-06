@@ -7,7 +7,7 @@
 #include "ftl/globals.h"
 #include "ftl/graphics/csurface.h"
 #include "ftl/graphics/freetype.h"
-#include "patch/seq/seq_timewarp.h"
+#include "patch/patchlist.h"
 #include "subspacegame.h"
 
 static double baseFrameTime;
@@ -257,10 +257,8 @@ void timeWarpRender()
 
 static bool timeWarp_Patch(SubspaceFeature* feat, void* settings, PatchState* ps)
 {
-    bool ret = patchApplySeq(ps, TimeWarpPatches);
-    if (ret)
-        baseFrameTime = g_TargetFrameTimeMS;
-    return ret;
+    baseFrameTime = g_TargetFrameTimeMS;
+    return true;
 }
 
 static bool timeWarp_Enable(SubspaceFeature* feat, void* settings, bool enabled)
@@ -271,9 +269,20 @@ static bool timeWarp_Enable(SubspaceFeature* feat, void* settings, bool enabled)
     return enabled;
 }
 
+Patch* TimeWarp_patches[] = {
+    &patch_CFPS_OnLoop,
+    &patch_CFPS_TargetFrameTime,
+    &patch_MouseControl_OnRender,
+    &patch_CommandGui_KeyDown,
+    &patch_CommandGui_OnLoop,
+    &patch_ShipStatus_OnRender,
+    0
+};
+
 SubspaceFeature TimeWarp_feature = {
     .patch           = timeWarp_Patch,
     .enable          = timeWarp_Enable,
+    .requiredPatches = TimeWarp_patches,
     .requiredSymbols = { &SYM(CFPS_FPSControl),
                         &SYM(CFPS_GetTime),
                         &SYM(CFPS_fps_offset),

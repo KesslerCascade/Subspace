@@ -6,6 +6,8 @@ typedef uintptr_t addr_t;
 
 typedef struct SubspaceFeature SubspaceFeature;
 typedef struct PatchState PatchState;
+typedef struct Patch Patch;
+typedef Patch* PatchSequence[];
 typedef struct Symbol Symbol;
 // Return how much space is needed for any feature-specific settings
 typedef size_t (*featureSettingsSize_t)(SubspaceFeature* feat);
@@ -36,10 +38,11 @@ typedef struct SubspaceFeature {
     featurePatch_t patch;
     featureEnable_t enable;
 
-    void* settings;              // memory allocated for a feature-specific struct
+    void* settings;            // memory allocated for a feature-specific struct
 
-    Symbol* requiredSymbols[];   // other required symbols that aren't checked for during patch
-                                 // sequence validation
+    Patch** requiredPatches;          // patches needed for this feature to function
+    Symbol* requiredSymbols[];        // other required symbols that aren't checked for during patch
+                                      // sequence validation
 } SubspaceFeature;
 
 // client settings that are semt by the main process

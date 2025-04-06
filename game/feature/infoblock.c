@@ -5,9 +5,9 @@
 #include "ftl/graphics/colors.h"
 #include "ftl/graphics/csurface.h"
 #include "ftl/graphics/freetype.h"
-#include "ftl/struct.h"
 #include "ftl/misc.h"
-#include "patch/seq/seq_infoblock.h"
+#include "ftl/struct.h"
+#include "patch/patchlist.h"
 #include "infoblock.h"
 
 #define INFOBLOCK_FONT 6
@@ -46,13 +46,10 @@ void infoBlockRender(void)
 
 // ---- Patching ----------------
 
-static bool infoBlock_Patch(SubspaceFeature* feat, void* settings, PatchState* ps)
-{
-    return patchApplySeq(ps, InfoBlockPatches);
-}
+Patch* InfoBlock_patches[] = { &patch_FTLButton_OnRender, &patch_TextLibrary_GetText, 0 };
 
 SubspaceFeature InfoBlock_feature = {
-    .patch           = infoBlock_Patch,
+    .requiredPatches = InfoBlock_patches,
     .requiredSymbols = { &SYM(freetype_easy_printRightAlign),
                         &SYM(CSurface_GL_SetColor),
                         &SYM(version_major),

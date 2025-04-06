@@ -17,4 +17,4 @@ static bool apply(addr_t base, Patch* p, PatchState* ps)
     return replaceVariable(base, symAddr(base, TargetFrameTimeMS), &g_TargetFrameTimeMS);
 }
 
-Patch patch_CFPS_TargetTickTime = { .Relevant = AlwaysRequired, .Validate = validate, .Apply = apply };
+Patch patch_CFPS_TargetFrameTime = { .Relevant = AlwaysRequired, .Validate = validate, .Apply = apply };

@@ -37,8 +37,7 @@ if(WIN32)
         win32/loader/loader.c
         win32/loader/rtld.c
         win32/loader/rtldoverrides.c
-        win32/patch/osdep/patch_main.c
-        win32/patch/seq/seq_osdep.c
+        win32/patch/patch_osdep.c
         win32/entry.c
         win32/kernel32_overrides.c
         win32/winmain.c)
@@ -60,6 +59,7 @@ add_executable(subspacegame
     hook/capp/capp_onkeydown.c
     hook/capp/capp_onloop.c
     hook/cfps/cfps_onloop.c
+    hook/cfps/cfps_targetframetime.c
     hook/combatcontrol/combatcontrol_rendertarget.c
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
@@ -71,25 +71,7 @@ add_executable(subspacegame
     hook/textlibrary/textlibrary_gettext.c
     input/keyboard.c
     patch/patch.c
-    patch/capp/patch_capp_onexecute.c
-    patch/capp/patch_capp_onkeydown.c
-    patch/capp/patch_capp_onloop.c
-    patch/cfps/patch_cfps_onloop.c
-    patch/cfps/patch_cfps_targetticktime.c
-    patch/combatcontrol/patch_combatcontrol_rendertarget.c
-    patch/commandgui/patch_commandgui_keydown.c
-    patch/commandgui/patch_commandgui_onloop.c
-    patch/commandgui/patch_commandgui_renderstatic.c
-    patch/ftlbutton/patch_ftlbutton_onrender.c
-    patch/mousecontrol/patch_mousecontrol_onrender.c
-    patch/seq/seq_frameadv.c
-    patch/seq/seq_infoblock.c
-    patch/seq/seq_numerichull.c
-    patch/seq/seq_required.c
-    patch/seq/seq_timewarp.c
-    patch/shipstatus/patch_shipstatus_renderhealth.c
-    patch/shipstatus/patch_shipstatus_onrender.c
-    patch/textlibrary/patch_textlibrary_gettext.c
+    patch/required.c
     subspacegame.c
     version.c
     ${GAME_OSDEP})

@@ -16,3 +16,5 @@ static bool apply(addr_t base, Patch* p, PatchState* ps)
 }
 
 Patch patch_OSDepWinMain = { .Relevant = AlwaysRequired, .Validate = validate, .Apply = apply };
+
+PatchSequence OSDepPatches = { &patch_OSDepWinMain, 0 };
