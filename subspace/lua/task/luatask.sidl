@@ -1,0 +1,13 @@
+#include <cx/taskqueue.sidl>
+#include <lua.h>
+
+struct LuaThread;
+
+bool luaPushTask(lua_State *L, Task *task);
+bool luaParseTaskParams(LuaThread *lt, Task *task, int nparam);
+
+bool registerTaskMetatable(lua_State *L);
+
+abstract class LuaTask extends Task {
+    LuaThread *lt;
+}
