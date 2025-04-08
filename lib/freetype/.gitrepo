@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://gitlab.freedesktop.org/freetype/freetype.git
+	branch = VER-2-13-3
+	commit = 42608f77f20749dd6ddc9e0536788eaad70ea4b5
+	parent = 2c51843a1ee3ba5e1017c99217182c2431d5a6b7
+	method = merge
+	cmdver = 0.4.7
