@@ -166,6 +166,8 @@ set(VERSION_MAJOR "2")
 set(VERSION_MINOR "13")
 set(VERSION_PATCH "3")
 
+if(PROJECT_IS_TOP_LEVEL)
+
 # Generate LIBRARY_VERSION and LIBRARY_SOVERSION.
 set(LIBTOOL_REGEX "version_info='([0-9]+):([0-9]+):([0-9]+)'")
 file(STRINGS "${PROJECT_SOURCE_DIR}/builds/unix/configure.raw"
@@ -184,6 +186,8 @@ string(REGEX REPLACE
 # This is what libtool does internally on Unix platforms.
 math(EXPR LIBRARY_SOVERSION "${LIBTOOL_CURRENT} - ${LIBTOOL_AGE}")
 set(LIBRARY_VERSION "${LIBRARY_SOVERSION}.${LIBTOOL_AGE}.${LIBTOOL_REVISION}")
+
+endif()
 
 # External dependency library detection is automatic.  See the notes at the
 # top of this file, for how to force or disable dependencies completely.
@@ -248,6 +252,8 @@ endif ()
 
 
 # Find dependencies
+if(PROJECT_IS_TOP_LEVEL)
+
 include(FindPkgConfig)
 
 if (NOT FT_DISABLE_HARFBUZZ)
@@ -297,6 +303,8 @@ if (NOT FT_DISABLE_BROTLI)
     find_package(BrotliDec)
   endif ()
 endif ()
+
+endif()
 
 # Create the configuration file
 if (UNIX AND NOT WIN32)

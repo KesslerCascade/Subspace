@@ -58,6 +58,7 @@ static int cdlua5_sizecb(cdCanvas *canvas, int w, int h, double mm_w, double mm_
   return (int)luaL_checkinteger(L,-1);
 }
 
+#if 0
 
 /***************************************************************************\
 * CD_CGM.                                                                   *
@@ -311,6 +312,8 @@ static int cgm_vdcextcb(cdCanvas *canvas, short type, void *xmn, void *ymn, void
   return result_i;
 }
 
+#endif
+
 /***************************************************************************\
 * CD_DBUFFER.                                                                 *
 \***************************************************************************/
@@ -509,6 +512,7 @@ static cdluaContext cdluaimagergbctx =
   0
 };
 
+#if 0
 /***************************************************************************\
 * CD_DXF.                                                                   *
 \***************************************************************************/
@@ -805,6 +809,8 @@ static int clipboard_sizecb(cdCanvas *canvas, int w, int h, double mm_w, double 
   return cdlua5_sizecb(canvas, w, h, mm_w, mm_h, cdluaclipboardcb[CD_SIZECB].lock);
 }
 
+#endif
+
 /***************************************************************************\
 * CD_NATIVEWINDOW.                                                          *
 \***************************************************************************/
@@ -839,20 +845,20 @@ void cdlua_initdrivers(lua_State * L, cdluaLuaState* cdL)
 {
   cdlua_addcontext(L, cdL, &cdluaimagectx);
   cdlua_addcontext(L, cdL, &cdluaimagergbctx);
-  cdlua_addcontext(L, cdL, &cdluadxfctx);
-  cdlua_addcontext(L, cdL, &cdluadgnctx);
-  cdlua_addcontext(L, cdL, &cdluacgmctx);
-  cdlua_addcontext(L, cdL, &cdluamfctx);
-  cdlua_addcontext(L, cdL, &cdluadebugctx);
-  cdlua_addcontext(L, cdL, &cdluapicturectx);
-  cdlua_addcontext(L, cdL, &cdluapsctx);
-  cdlua_addcontext(L, cdL, &cdluasvgctx);
-  cdlua_addcontext(L, cdL, &cdluapptxctx);
-  cdlua_addcontext(L, cdL, &cdluaclipboardctx);
+  //cdlua_addcontext(L, cdL, &cdluadxfctx);
+  //cdlua_addcontext(L, cdL, &cdluadgnctx);
+  //cdlua_addcontext(L, cdL, &cdluacgmctx);
+  //cdlua_addcontext(L, cdL, &cdluamfctx);
+  //cdlua_addcontext(L, cdL, &cdluadebugctx);
+  //cdlua_addcontext(L, cdL, &cdluapicturectx);
+  //cdlua_addcontext(L, cdL, &cdluapsctx);
+  //cdlua_addcontext(L, cdL, &cdluasvgctx);
+  //cdlua_addcontext(L, cdL, &cdluapptxctx);
+  //cdlua_addcontext(L, cdL, &cdluaclipboardctx);
   cdlua_addcontext(L, cdL, &cdluanativewindowctx);
-  cdlua_addcontext(L, cdL, &cdluaprinterctx);
-  cdlua_addcontext(L, cdL, &cdluawmfctx);
-  cdlua_addcontext(L, cdL, &cdluaemfctx);
+  //cdlua_addcontext(L, cdL, &cdluaprinterctx);
+  //cdlua_addcontext(L, cdL, &cdluawmfctx);
+  //cdlua_addcontext(L, cdL, &cdluaemfctx);
   cdlua_addcontext(L, cdL, &cdluadbufctx);
   cdlua_addcontext(L, cdL, &cdluadbufrgbctx);
 }

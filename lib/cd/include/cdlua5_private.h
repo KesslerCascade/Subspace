@@ -7,6 +7,8 @@
 #ifndef __CDLUA5_PRIVATE_H
 #define __CDLUA5_PRIVATE_H
 
+#include <cx/xalloc.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif

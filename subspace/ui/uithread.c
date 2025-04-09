@@ -4,8 +4,17 @@
 #include "lua/task/luaexec.h"
 #include "subspace.h"
 
+#include <cd.h>
+#include <cdlua.h>
+#include <cdluaiup.h>
 #include <iup.h>
+#include <iup_plot.h>
+#include <iupcontrols.h>
 #include <iuplua.h>
+#include <iuplua_plot.h>
+#include <iupluacontrols.h>
+
+#include <lauxlib.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -39,21 +48,33 @@ static bool uiThreadInit(TaskQueue* tq, void* data)
     IupSetGlobal("UTF8MODE_FILE", "YES");
 
     UIThread* uithr = (UIThread*)data;
-    iuplua_open(uithr->lua.L);
+    luaL_requiref(uithr->lua.L, "iuplua", iuplua_open, 1);
+    luaL_requiref(uithr->lua.L, "cdlua", cdlua_open, 1);
+    luaL_requiref(uithr->lua.L, "cdluaiup", cdluaiup_open, 1);
+    IupControlsOpen();
+    luaL_requiref(uithr->lua.L, "iupcontrols", iupcontrolslua_open, 1);
+    IupPlotOpen();
+    luaL_requiref(uithr->lua.L, "iupplot", iup_plotlua_open, 1);
+
     atomicStore(bool, &uirunning, true, Release);
     return true;
 }
 
+typedef struct UIThreadShutdownData {
+    UIThread* uithr;
+    SharedEvent* e;
+} UIThreadShutdownData;
 static bool uiThreadShutdown(TaskQueue* tq, void* data)
 {
+    UIThreadShutdownData* d = (UIThreadShutdownData*)data;
     atomicStore(bool, &uirunning, false, Release);
-#ifdef WITH_GUI
-    IupClose();
-#endif
+    cdlua_close(d->uithr->lua.L);
+    iuplua_close(d->uithr->lua.L);
 
-    SharedEvent* e = (SharedEvent*)data;
-    eventSignal(&e->ev);
-    sheventRelease(&e);
+    eventSignal(&d->e->ev);
+    sheventRelease(&d->e);
+
+    xaFree(d);
     return true;
 }
 
@@ -148,10 +169,13 @@ bool uiShutdown(UIThread* uithr)
         return false;
     uiStop(uithr);
 
+    UIThreadShutdownData* sd = xaAllocStruct(UIThreadShutdownData, XA_Zero);
     SharedEvent *callEvent = sheventCreate(0);
 
     // Tear down UI from inside the UI thread itself
-    tqCall(uithr->uiq, uiThreadShutdown, sheventAcquire(callEvent));
+    sd->e     = sheventAcquire(callEvent);
+    sd->uithr = uithr;
+    tqCall(uithr->uiq, uiThreadShutdown, sd);
     eventWaitTimeout(&callEvent->ev, timeS(10));
 
     tqShutdown(uithr->uiworkers, true);

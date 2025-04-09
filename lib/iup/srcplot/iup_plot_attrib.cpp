@@ -1331,12 +1331,13 @@ static int iPlotSetGraphicsModeAttrib(Ihandle* ih, const char* value)
   if (ih->handle)  // Can be set only before map
     return 0;
 
-  if (iupStrEqualNoCase(value, "OPENGL"))
+/*  if (iupStrEqualNoCase(value, "OPENGL"))
   {
     ih->data->graphics_mode = IUP_PLOT_OPENGL;
     IupSetAttribute(ih, "BUFFER", "DOUBLE");
   }
-  else if (iupStrEqualNoCase(value, "IMAGERGB"))
+  else */
+  if (iupStrEqualNoCase(value, "IMAGERGB"))
     ih->data->graphics_mode = IUP_PLOT_IMAGERGB;
   else if (iupStrEqualNoCase(value, "NATIVEPLUS"))
     ih->data->graphics_mode = IUP_PLOT_NATIVEPLUS;
@@ -1348,7 +1349,7 @@ static int iPlotSetGraphicsModeAttrib(Ihandle* ih, const char* value)
 
 static char* iPlotGetGraphicsModeAttrib(Ihandle* ih)
 {
-  char* graphics_mode_str[] = { "NATIVE", "NATIVEPLUS", "IMAGERGB", "OPENGL" };
+  char* graphics_mode_str[] = { "NATIVE", "NATIVEPLUS", "IMAGERGB" }; // , "OPENGL" };
   return graphics_mode_str[ih->data->graphics_mode];
 }
 

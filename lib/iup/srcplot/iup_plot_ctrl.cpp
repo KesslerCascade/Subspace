@@ -66,6 +66,7 @@ static int iPlotSelectFile(Ihandle* parent, char* filename, const char* title, c
   return 0;
 }
 
+#if 0
 static int iPlotCopyAsMetafile_CB(Ihandle* self)
 {
   Ihandle* ih = (Ihandle*)IupGetAttribute(self, "PLOT");
@@ -86,6 +87,7 @@ static int iPlotCopyAsMetafile_CB(Ihandle* self)
   cdKillCanvas(cd_canvas);
   return IUP_DEFAULT;
 }
+#endif
 
 static int iPlotCopyAsImage_CB(Ihandle* self)
 {
@@ -113,6 +115,7 @@ static int iPlotCopyAsImage_CB(Ihandle* self)
   return IUP_DEFAULT;
 }
 
+#if 0
 static int iPlotExportEPS_CB(Ihandle* self)
 {
   Ihandle* ih = (Ihandle*)IupGetAttribute(self, "PLOT");
@@ -256,6 +259,7 @@ static int iPlotPrint_CB(Ihandle* self)
   cdKillCanvas(cd_canvas);
   return IUP_DEFAULT;
 }
+#endif
 
 static double iPlotDataSetValuesMatrixNumericGetValue_CB(Ihandle *ih_matrix, int lin, int col)
 {
@@ -1342,21 +1346,21 @@ static Ihandle* iPlotCreateMenuContext(Ihandle* ih, int x, int y)
     IupSeparator(),
     IupSubmenu("_@IUP_COPY",
     IupMenu(
-    IupSetCallbacks(IupItem("Metafile", NULL), "ACTION", iPlotCopyAsMetafile_CB, NULL),
+    //IupSetCallbacks(IupItem("Metafile", NULL), "ACTION", iPlotCopyAsMetafile_CB, NULL),
     IupSetCallbacks(IupItem("Image", NULL), "ACTION", iPlotCopyAsImage_CB, NULL),
     NULL)),
-    IupSubmenu("_@IUP_EXPORT",
-    IupMenu(
-    IupSetCallbacks(IupItem("SVG...", NULL), "ACTION", iPlotExportSVG_CB, NULL),
-    IupSetCallbacks(IupItem("EPS...", NULL), "ACTION", iPlotExportEPS_CB, NULL),
-    IupSetCallbacks(IupItem("CGM...", NULL), "ACTION", iPlotExportCGM_CB, NULL),
+    //IupSubmenu("_@IUP_EXPORT",
+    //IupMenu(
+    //IupSetCallbacks(IupItem("SVG...", NULL), "ACTION", iPlotExportSVG_CB, NULL),
+    //IupSetCallbacks(IupItem("EPS...", NULL), "ACTION", iPlotExportEPS_CB, NULL),
+    //IupSetCallbacks(IupItem("CGM...", NULL), "ACTION", iPlotExportCGM_CB, NULL),
 #ifdef WIN32
-    IupSetCallbacks(IupItem("EMF...", NULL), "ACTION", iPlotExportEMF_CB, NULL),
-    IupSetCallbacks(IupItem("WMF...", NULL), "ACTION", iPlotExportWMF_CB, NULL),
+    //IupSetCallbacks(IupItem("EMF...", NULL), "ACTION", iPlotExportEMF_CB, NULL),
+    //IupSetCallbacks(IupItem("WMF...", NULL), "ACTION", iPlotExportWMF_CB, NULL),
 #endif
-    NULL)),
-    IupSeparator(),
-    IupSetCallbacks(IupItem("_@IUP_PRINTDLG", NULL), "ACTION", iPlotPrint_CB, NULL),
+    //NULL)),
+    //IupSeparator(),
+    //IupSetCallbacks(IupItem("_@IUP_PRINTDLG", NULL), "ACTION", iPlotPrint_CB, NULL),
     NULL);
 
   if (IupGetInt(ih, "MENUITEMPROPERTIES") || IupGetInt(ih, "MENUITEMVALUES"))
@@ -1426,7 +1430,7 @@ void iupPlotSetPlotCurrent(Ihandle* ih, int p)
 
 void iupPlotRedraw(Ihandle* ih, int flush, int only_current, int reset_redraw)
 {
-  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
+/*  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
   {
     IupGLMakeCurrent(ih);
 
@@ -1434,7 +1438,7 @@ void iupPlotRedraw(Ihandle* ih, int flush, int only_current, int reset_redraw)
     flush = 1;  // always flush
     only_current = 0;  // redraw all plots
     reset_redraw = 1;  // always render
-  }
+  } */
 
   if (ih->data->sync_view || ih->data->merge_view)
     only_current = 0;  // draw all plots
@@ -1520,8 +1524,8 @@ void iupPlotRedraw(Ihandle* ih, int flush, int only_current, int reset_redraw)
   if (flush)
     cdCanvasFlush(ih->data->cd_canvas);
 
-  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
-    IupGLSwapBuffers(ih);
+/*  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
+    IupGLSwapBuffers(ih); */
 }
 
 static int iPlotAction_CB(Ihandle* ih)
@@ -1571,13 +1575,13 @@ void iupPlotUpdateViewports(Ihandle* ih)
 
 static int iPlotResize_CB(Ihandle* ih, int width, int height)
 {
-  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
+/*  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
   {
     IupGLMakeCurrent(ih);
 
     double res = IupGetDouble(NULL, "SCREENDPI") / 25.4;
     cdCanvasSetfAttribute(ih->data->cd_canvas, "SIZE", "%dx%d %g", width, height, res);
-  }
+  } */
 
   iupPlotUpdateViewports(ih);
   return IUP_DEFAULT;
@@ -1772,8 +1776,8 @@ static int iPlotFindPlot(Ihandle* ih, int x, int &y, char* status)
 {
   int w, h;
 
-  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
-    IupGLMakeCurrent(ih);
+/*  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
+    IupGLMakeCurrent(ih); */
 
   cdCanvasActivate(ih->data->cd_canvas);
   cdCanvasGetSize(ih->data->cd_canvas, &w, &h, NULL, NULL);
@@ -2196,8 +2200,8 @@ static int iPlotKeyPress_CB(Ihandle* ih, int c, int press)
   if (!press)
     return IUP_DEFAULT;
 
-  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
-    IupGLMakeCurrent(ih);
+/*  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
+    IupGLMakeCurrent(ih); */
 
   if (c == K_cH || c == K_cV)
   {
@@ -2941,13 +2945,13 @@ int  IupPlotFindSegment(Ihandle* ih, double cnv_x, double cnv_y, int *ds_index, 
 
 static int iPlotMapMethod(Ihandle* ih)
 {
-  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
+/*  if (ih->data->graphics_mode == IUP_PLOT_OPENGL)
   {
     IupGLMakeCurrent(ih);
     double res = IupGetDouble(NULL, "SCREENDPI") / 25.4;
     ih->data->cd_canvas = cdCreateCanvasf(CD_GL, "10x10 %g", res);
   }
-  else if (ih->data->graphics_mode == IUP_PLOT_IMAGERGB)
+  else */ if (ih->data->graphics_mode == IUP_PLOT_IMAGERGB)
     ih->data->cd_canvas = cdCreateCanvas(CD_IUPDBUFFERRGB, ih);
   else if (ih->data->graphics_mode == IUP_PLOT_NATIVEPLUS)
   {
@@ -3058,7 +3062,7 @@ static void iPlotSetClassUpdate(Iclass* ic)
 
 static Iclass* iPlotNewClass(void)
 {
-  Iclass* ic = iupClassNew(iupRegisterFindClass("glcanvas"));
+  Iclass* ic = iupClassNew(iupRegisterFindClass("canvas"));
 
   ic->name = (char*)"plot";
   ic->format = NULL;  /* none */
@@ -3116,7 +3120,7 @@ void IupPlotOpen(void)
   if (!IupIsOpened())
     return;
 
-  IupGLCanvasOpen();
+  //IupGLCanvasOpen();
 
 #ifdef USE_CONTEXTPLUS
   cdInitContextPlus();

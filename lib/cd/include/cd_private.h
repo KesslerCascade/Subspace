@@ -7,6 +7,8 @@
 #ifndef __CD_PRIVATE_H
 #define __CD_PRIVATE_H
 
+#include <cx/xalloc.h>
+
 #include <stdarg.h>
 
 #ifdef __cplusplus

@@ -30,7 +30,7 @@ add_executable(subspace
     version.c
     ../lib/cx/cx/cx.natvis
     ${SUBSPACE_SIDL})
-target_link_libraries(subspace cxlua iup iuplua sqlite)
+target_link_libraries(subspace cxlua iupluacontrols sqlite)
 target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(WIN32)

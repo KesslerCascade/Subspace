@@ -22,9 +22,19 @@ else()
     target_link_libraries(png_static PUBLIC zlib cx)
     add_library(png ALIAS png_static)
 
+    set(BUILD_SHARED_LIBS   OFF CACHE INTERNAL "Build shared libraries" FORCE)
+    set(FT_DISABLE_BZIP2    ON  CACHE INTERNAL "Disable support of bzip2 compressed fonts." FORCE)
+    set(FT_DISABLE_HARFBUZZ ON  CACHE INTERNAL "Disable HarfBuzz (used for improving auto-hinting of OpenType fonts)." FORCE)
+    set(FT_DISABLE_BROTLI   ON  CACHE INTERNAL "Disable support of compressed WOFF2 fonts." FORCE)
+    add_subdirectory(freetype)
+    target_link_libraries(freetype cx zlib png_static)
+
     add_subdirectory(iup)
     target_compile_definitions(iup PRIVATE XALLOC_REMAP_MALLOC)
     target_compile_definitions(iuplua PRIVATE XALLOC_REMAP_MALLOC)
+
+    add_subdirectory(cd)
+    target_compile_definitions(cd PRIVATE XALLOC_REMAP_MALLOC)
 
     add_subdirectory(sqlite)
 endif()

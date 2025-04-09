@@ -214,6 +214,70 @@ target_include_directories(iup
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include)
 
+add_library (iupcd STATIC
+    srccd/iup_cd.c
+    srccd/iup_cdutil.c
+    srccd/iup_draw_cd.c
+)
+target_link_libraries(iupcd iup cd)
+target_compile_definitions(iupcd PRIVATE XALLOC_REMAP_MALLOC COBJMACROS USE_NEW_DRAW  _UNICODE UNICODE)
+target_include_directories(iupcd
+    PRIVATE
+        src)
+
+add_library (iupcontrols
+    srccontrols/matrix/iupmat_aux.c
+    srccontrols/matrix/iupmat_colres.c
+    srccontrols/matrix/iupmat_draw.c
+    srccontrols/matrix/iupmat_edit.c
+    srccontrols/matrix/iupmat_ex.c
+    srccontrols/matrix/iupmat_getset.c
+    srccontrols/matrix/iupmat_key.c
+    srccontrols/matrix/iupmat_mark.c
+    srccontrols/matrix/iupmat_mem.c
+    srccontrols/matrix/iupmat_mouse.c
+    srccontrols/matrix/iupmat_numlc.c
+    srccontrols/matrix/iupmat_scroll.c
+    srccontrols/matrix/iupmatrix.c
+    srccontrols/matrixex/iup_matrixex.c
+    srccontrols/matrixex/iupmatex_busy.c
+    srccontrols/matrixex/iupmatex_clipboard.c
+    srccontrols/matrixex/iupmatex_copy.c
+    srccontrols/matrixex/iupmatex_export.c
+    srccontrols/matrixex/iupmatex_find.c
+    srccontrols/matrixex/iupmatex_sort.c
+    srccontrols/matrixex/iupmatex_undo.c
+    srccontrols/matrixex/iupmatex_units.c
+    srccontrols/matrixex/iupmatex_visible.c
+    srccontrols/iup_cells.c
+    srccontrols/iup_controls.c
+    srccontrols/iup_matrixlist.c
+    )
+target_link_libraries(iupcontrols iupcd)
+target_compile_definitions(iupcontrols PRIVATE XALLOC_REMAP_MALLOC COBJMACROS USE_NEW_DRAW  _UNICODE UNICODE)
+target_include_directories(iupcontrols
+    PRIVATE
+        src
+        srccd
+        srccontrols)
+
+add_library (iupplot
+    srcplot/iup_plot_attrib.cpp
+    srcplot/iup_plot_ctrl.cpp
+    srcplot/iupPlot.cpp
+    srcplot/iupPlotAxis.cpp
+    srcplot/iupPlotCalc.cpp
+    srcplot/iupPlotData.cpp
+    srcplot/iupPlotDraw.cpp
+    srcplot/iupPlotTick.cpp
+)
+target_link_libraries(iupplot iupcd)
+target_compile_definitions(iupplot PRIVATE XALLOC_REMAP_MALLOC COBJMACROS USE_NEW_DRAW  _UNICODE UNICODE)
+target_include_directories(iupplot
+    PRIVATE
+        src
+        srccd)
+
 set(IUPLUA_C_SOURCES
     srclua5/elem/il_animatedlabel.c
     srclua5/elem/il_backgroundbox.c
@@ -386,3 +450,48 @@ target_link_libraries(iuplua PUBLIC iup lua)
 target_compile_definitions(iuplua PRIVATE IUPLUA_USELOH XALLOC_REMAP_MALLOC _UNICODE UNICODE)
 target_include_directories(iuplua PRIVATE src srclua5 ${CMAKE_CURRENT_BINARY_DIR}/srclua5 ${CMAKE_CURRENT_BINARY_DIR}/srclua5/elem)
 add_dependencies(iuplua iuplua_loh)
+
+add_library(iupluacd STATIC
+    srclua5/iuplua_cd.c
+)
+target_link_libraries(iupluacd iuplua iupcd cdlua)
+target_compile_definitions(iupluacd PRIVATE XALLOC_REMAP_MALLOC _UNICODE UNICODE)
+
+set(IUPLUACONTROLS_C_SOURCES
+    srclua5/ctrl/il_cells.c
+    srclua5/ctrl/il_matrix.c
+    srclua5/ctrl/il_matrixex.c
+    srclua5/ctrl/il_matrixlist.c
+    srclua5/ctrl/il_plot.c
+    srclua5/ctrl/iuplua_controls.c
+    srclua5/ctrl/iuplua_matrix_aux.c
+    srclua5/ctrl/iuplua_plot.c
+)
+
+function(add_luacontrols_loh)
+    foreach(arg ${ARGN})
+        string(REGEX REPLACE "\\.[^.]*$" "" argbase ${arg})
+        add_custom_command(OUTPUT ${CMAKE_CURRENT_BINARY_DIR}/${argbase}.loh
+            COMMAND luacmd ${CMAKE_CURRENT_SOURCE_DIR}/srclua5/bin2c.lua +${CMAKE_CURRENT_SOURCE_DIR}/${arg} > ${CMAKE_CURRENT_BINARY_DIR}/${argbase}.loh
+            MAIN_DEPENDENCY ${CMAKE_CURRENT_SOURCE_DIR}/${arg}
+            )
+        list(APPEND IUPLUACONTROLS_LOH_FILES ${CMAKE_CURRENT_BINARY_DIR}/${argbase}.loh)
+        set(IUPLUACONTROLS_LOH_FILES ${IUPLUACONTROLS_LOH_FILES} PARENT_SCOPE)
+    endforeach()
+endfunction()
+
+add_luacontrols_loh(
+    srclua5/ctrl/cells.lua
+    srclua5/ctrl/matrix.lua
+    srclua5/ctrl/matrixex.lua
+    srclua5/ctrl/matrixlist.lua
+    srclua5/ctrl/plot.lua
+)
+
+add_custom_target(iupluacontrols_loh DEPENDS ${IUPLUACONTROLS_LOH_FILES})
+
+add_library(iupluacontrols STATIC ${IUPLUACONTROLS_C_SOURCES})
+target_link_libraries(iupluacontrols iupluacd iupcontrols iupplot)
+target_compile_definitions(iupluacontrols PRIVATE IUPLUA_USELOH XALLOC_REMAP_MALLOC _UNICODE UNICODE)
+target_include_directories(iupluacontrols PRIVATE src srclua5 ${CMAKE_CURRENT_BINARY_DIR}/srclua5 ${CMAKE_CURRENT_BINARY_DIR}/srclua5/ctrl)
+add_dependencies(iupluacontrols iupluacontrols_loh)

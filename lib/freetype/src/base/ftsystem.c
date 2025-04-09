@@ -32,6 +32,7 @@
 #include <freetype/ftsystem.h>
 #include <freetype/fterrors.h>
 #include <freetype/fttypes.h>
+#include <cx/xalloc.h>
 
 
   /**************************************************************************

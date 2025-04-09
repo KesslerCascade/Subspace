@@ -30,6 +30,7 @@
 
 #ifndef FTSTDLIB_H_
 #define FTSTDLIB_H_
+#include <cx/xalloc.h>
 
 
 #include <stddef.h>
@@ -139,10 +140,10 @@
    */
 
 
-#define ft_scalloc   calloc
-#define ft_sfree     free
-#define ft_smalloc   malloc
-#define ft_srealloc  realloc
+#define ft_scalloc   xa_calloc
+#define ft_sfree     xa_free
+#define ft_smalloc   xa_malloc
+#define ft_srealloc  xa_realloc
 
 
   /**************************************************************************
