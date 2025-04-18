@@ -4,6 +4,7 @@ add_library(minicrt STATIC
     lock.c
     mem.c
     minicrt.c
+    sbuflite.c
     smalloc.c
     string.c
     xprintf.c)

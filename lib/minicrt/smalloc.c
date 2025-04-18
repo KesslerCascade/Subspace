@@ -67,6 +67,9 @@ static void _sm_os_init(void* unused)
 {
     sm_init_heap(&default_heap, sm_win32_chunk_alloc, sm_win32_chunk_free);
 }
+
+sm_chunk_alloc_t chunkalloc_default = sm_win32_chunk_alloc;
+sm_chunk_free_t chunkfree_default = sm_win32_chunk_free;
 #endif
 /* OS DEPENDENT SECTION ENDS */
 

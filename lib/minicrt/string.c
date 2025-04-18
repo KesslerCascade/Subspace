@@ -272,7 +272,7 @@ unsigned int _minicrt_strlen(const char* str)
 
 char* _minicrt_strchr(const char* p, int ch)
 {
-    for (;; ++p) {
+    for (; *p; ++p) {
         if (*p == ch)
             return (char*)p;
     }

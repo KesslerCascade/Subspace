@@ -37,7 +37,7 @@ char* _minicrt_strtok(char* s, const char* delim);
 #define strtok _minicrt_strtok
 
 int _minicrt_atoi(const char* str);
-#define atoi _minicrt_
+#define atoi _minicrt_atoi
 long _minicrt_strtol(const char* nptr, char** endptr, int base);
 #define strtol _minicrt_strtol
 
@@ -104,6 +104,8 @@ typedef struct sm_heap_t {
     lock_t lock;
 } sm_heap_t;
 extern sm_heap_t default_heap;
+extern sm_chunk_alloc_t chunkalloc_default;
+extern sm_chunk_free_t chunkfree_default;
 
 void sm_init_heap(sm_heap_t* heap, sm_chunk_alloc_t chunkalloc, sm_chunk_free_t chunkfree);
 void* smalloc_heap(sm_heap_t* heap, unsigned int sz);
