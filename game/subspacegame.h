@@ -4,6 +4,7 @@
 
 typedef uintptr_t addr_t;
 
+typedef struct ControlState ControlState;
 typedef struct SubspaceFeature SubspaceFeature;
 typedef struct PatchState PatchState;
 typedef struct Patch Patch;
@@ -23,6 +24,8 @@ extern void WriteDbg(const char* str);
 #else
 #define WriteDbg(x)
 #endif
+
+void OSShowError(const char* str);
 
 extern const int subspace_version_maj;
 extern const int subspace_version_min;
@@ -47,6 +50,9 @@ typedef struct SubspaceFeature {
 
 // client settings that are semt by the main process
 typedef struct SubspaceGameSettings {
+    uint32_t addr;
+    int port;
+
     char* gameDir;       // root directory where the game is located
     char* gameProgram;   // name of the game executable
     char* gamePath;      // fill path to game executable
@@ -75,7 +81,9 @@ typedef struct GameState {
 
 extern SubspaceGameSettings settings;
 extern GameState gs;
+extern ControlState control;
 
-int sscmain(void);
+int sscmain(int argc, char* argv[]);
+void sscmain2(void);   // main function that runs after the game has initialized CRT
 bool initFeature(SubspaceFeature* feat, PatchState* ps);
 bool enableFeature(SubspaceFeature* feat, bool enabled);

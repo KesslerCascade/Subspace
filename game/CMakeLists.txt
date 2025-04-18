@@ -40,11 +40,14 @@ if(WIN32)
         win32/patch/patch_osdep.c
         win32/entry.c
         win32/kernel32_overrides.c
+        win32/winerror.c
         win32/winmain.c)
     set(CMAKE_WIN32_EXECUTABLE true)
 endif()
 
 add_executable(subspacegame
+    control/controlclient.c
+    control/controlconnect.c
     feature/feature.c
     feature/frameadv.c
     feature/infoblock.c
@@ -74,8 +77,11 @@ add_executable(subspacegame
     patch/required.c
     subspacegame.c
     version.c
+    ${SHARED_SOURCE_DIR}/control.c
+    ${SHARED_SOURCE_DIR}/net.c
     ${GAME_OSDEP})
 target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_compile_definitions(subspacegame PRIVATE SUBSPACE_GAME)
 target_link_libraries(subspacegame disasm minicrt)
 if (WIN32)
     target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/win32)

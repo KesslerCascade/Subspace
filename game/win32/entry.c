@@ -21,6 +21,20 @@ HANDLE dbgconsole;
 typedef int(WINAPI* WinMain_t)(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
                                int nShowCmd);
 
+static char* nextp(char* p)
+{
+    char* p1 = strchr(p, ' ');
+    char* p2 = strchr(p, '"');
+    if (!p1)
+        return p2;
+    if (!p2)
+        return p1;
+
+    if (p1 < p2)
+        return p1;
+    return p2;
+}
+
 int __stdcall entry()
 {
     settings.gameDir     = smalloc(MAX_PATH);
@@ -28,52 +42,82 @@ int __stdcall entry()
     settings.gamePath    = smalloc(MAX_PATH);
 
     const char* wincmdline = GetCommandLineA();
-    char cmdline[MAX_PATH];
-    strcpy(cmdline, wincmdline);
-    char* last = NULL;
-    char* self = strtok_r(cmdline, " ", &last);
-    char* cmd  = strtok_r(NULL, " ", &last);
-    if (cmd && !stricmp(cmd, "-test")) {
-        settings.testMode = true;
+    char* cmdline          = sstrdup(wincmdline);
+    bool q                 = false;
+    char* p                = cmdline;
 
-        char* program = strtok_r(NULL, " ", &last);
+    int nargs = 1;
 
-        strcpy(settings.gameProgram, "FTLGame.exe");
-        strcpy(settings.gamePath, program);
-        strcpy(settings.gameDir, program);
-        char* p = strrchr(settings.gameDir, '\\');
-        if (p)
-            *p = '\0';
-    } else {
-#if 0
+    if (!*p)
+        nargs = 0;
+
+    // scan to count args
+    while (p && *p) {
+        p = nextp(p);
+        if (p) {
+            if (*p == '"')
+                q = !q;
+            if (*p == ' ' && !q) {
+                if (*(p + 1) != ' ' && *(p + 1) != '\0')
+                    ++nargs;
+            }
+            ++p;
+        }
+    }
+
+    char** argv = scalloc(nargs, sizeof(char*));
+    if (nargs > 0)
+        argv[0] = cmdline;
+
+    // tokenize
+    int carg = 1;
+    p        = cmdline;
+    while (p && *p) {
+        p = nextp(p);
+        if (p) {
+            if (*p == '"') {
+                if (!q && argv[carg - 1] == p)
+                    argv[carg - 1] = p + 1;
+                q  = !q;
+                *p = '\0';
+            }
+            if (*p == ' ' && !q) {
+                *p = '\0';
+                if (*(p + 1) != ' ' && *(p + 1) != '\0')
+                    argv[carg++] = p + 1;
+            }
+            ++p;
+        }
+    }
+
+#if 1
     strcpy(settings.gameDir, "M:\\Dev\\FTL1.6.3");
     strcpy(settings.gameProgram, "FTLGame.exe");
     strcpy(settings.gamePath, "M:\\Dev\\FTL1.6.3\\FTLGame.exe");
 #elif 0
-        strcpy(settings.gameDir, "M:\\Dev\\FTLGoG1.6.13b");
-        strcpy(settings.gameProgram, "FTLGame.exe");
-        strcpy(settings.gamePath, "M:\\Dev\\FTLGoG1.6.13b\\FTLGame.exe");
-#elif 1
-        strcpy(settings.gameDir, "M:\\Dev\\FTLSteam1.6.12");
-        strcpy(settings.gameProgram, "FTLGame.exe");
-        strcpy(settings.gamePath, "M:\\Dev\\FTLSteam1.6.12\\FTLGame.exe");
+    strcpy(settings.gameDir, "M:\\Dev\\FTLGoG1.6.13b");
+    strcpy(settings.gameProgram, "FTLGame.exe");
+    strcpy(settings.gamePath, "M:\\Dev\\FTLGoG1.6.13b\\FTLGame.exe");
+#elif 0
+    strcpy(settings.gameDir, "M:\\Dev\\FTLSteam1.6.8");
+    strcpy(settings.gameProgram, "FTLGame.exe");
+    strcpy(settings.gamePath, "M:\\Dev\\FTLSteam1.6.8\\FTLGame.exe");
 #elif 0
     strcpy(settings.gameDir, "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light");
     strcpy(settings.gameProgram, "FTLGame.exe");
     strcpy(settings.gamePath,
            "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light\\FTLGame.exe");
 #elif 1
-    strcpy(settings.gameDir, "M:\\Games\\Sync\\FTL");
+    strcpy(settings.gameDir, "M:\\Games\\FTL");
     strcpy(settings.gameProgram, "FTLGame.exe");
-    strcpy(settings.gamePath, "M:\\Games\\Sync\\FTL\\FTLGame.exe");
+    strcpy(settings.gamePath, "M:\\Games\\FTL\\FTLGame.exe");
 #endif
-    }
 
     SetCurrentDirectoryA(settings.gameDir);
     SetEnvironmentVariableA("USERPROFILE", settings.gameDir);
 
 #ifdef _DEBUG
-    AllocConsole();
+    // AllocConsole();
 #endif
     // if (AllocConsole()) {
     //  FILE* temp;
@@ -85,11 +129,11 @@ int __stdcall entry()
     //    setvbuf(stdout, NULL, _IONBF, 0);
     // setvbuf(stderr, NULL, _IONBF, 0);
 
-    int ret = sscmain();
+    int ret = sscmain(nargs, argv);
 
-    if (settings.testMode) {
-        Sleep(3000);
-    }
+    // if (settings.testMode) {
+    // Sleep(3000);
+    //}
 
     // probably will never reach this, but just in case
     ExitProcess(ret);

@@ -14,6 +14,7 @@ set(SUBSPACE_SIDL
 add_sidl(${SUBSPACE_SIDL})
 
 add_executable(subspace
+    control/controlserver.c
     lua/log/lualog.c
     lua/lua/lualua.c
     lua/task/luacall.c
@@ -29,6 +30,8 @@ add_executable(subspace
     subspace.c
     version.c
     ../lib/cx/cx/cx.natvis
+    ${SHARED_SOURCE_DIR}/control.c
+    ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_SIDL})
 target_link_libraries(subspace cxlua iupluacontrols sqlite)
 target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

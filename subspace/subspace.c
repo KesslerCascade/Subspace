@@ -1,6 +1,8 @@
 #include "subspace.h"
 #include "version.h"
 
+#include "control/controlserver.h"
+
 #include <cx/debug.h>
 #include <cx/log.h>
 #include <cx/sys.h>
@@ -45,12 +47,18 @@ int entryPoint()
     if (!filesys)
         fatalError(_S"Could not open filesystem", false);
 
+    if (!netInit())
+        fatalError(_S"Could not initialize networking", true);
+
     parseArgs(&subspace);
 
     // try to find basedir
     if (strEmpty(subspace.basedir)) {
         if (!subspaceFindBaseDir(&subspace.basedir, filesys)) {
-            fatalError(_S"Could not find Subspace installation folder. Please ensure that the required files are present.", false);
+            fatalError(
+                _S
+                "Could not find Subspace installation folder. Please ensure that the required files are present.",
+                false);
         }
     }
 
@@ -62,7 +70,10 @@ int entryPoint()
 
     // mount subspace:/ namespace
     if (!subspaceMount(&subspace)) {
-        fatalError(_S"Required data files are missing. Please ensure the Subspace installation is complete.", false);
+        fatalError(
+            _S
+            "Required data files are missing. Please ensure the Subspace installation is complete.",
+            false);
     }
     vfsSetCurDir(subspace.fs, SSNS);
 
@@ -95,6 +106,10 @@ int entryPoint()
         fatalError(_S"Failed to load UI.", false);
     }
 
+    if (!controlServerStart()) {
+        fatalError(_S"Failed to start control server.", false);
+    }
+
     uiStart(&subspace.ui);
 
     do {
@@ -104,6 +119,8 @@ int entryPoint()
 
     uiStop(&subspace.ui);
     uiShutdown(&subspace.ui);
+
+    controlServerStop();
 
     // unmount the subspace:/ namespace
     vfsSetCurDir(subspace.fs, _S"/");

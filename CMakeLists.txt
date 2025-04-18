@@ -4,6 +4,7 @@ include (lib/cx/cmake/organize_targets.cmake)
 
 set(TOP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set(TOP_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(SHARED_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/shared)
 
 project (subspace)
 
