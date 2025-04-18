@@ -291,7 +291,7 @@ static int importDeps(addr_t imagebase, IMAGE_DATA_DIRECTORY* data)
             hModule = getLib(name);
             /* } */
             if (!hModule)
-                continue;
+                return 0;
         }
 
         while (*lookup) {
@@ -447,7 +447,8 @@ addr_t loadExe(const char* filename)
     if (!enumSections(imagebase, unprotectSection, NULL))
         goto fail;
 
-    importDeps(imagebase, &nthdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT]);
+    if (!importDeps(imagebase, &nthdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT]))
+        goto fail;
 
     // Restore memory protection on all sections
     if (!enumSections(imagebase, protectSection, NULL))
@@ -529,7 +530,8 @@ addr_t loadExe(const char* filename)
             goto fail;
     }
 
-    importDeps(imagebase, &nthdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT]);
+    if (!importDeps(imagebase, &nthdr->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_IMPORT]))
+        goto fail;
 
     // Fix memory protection on all sections
     if (!enumSections(imagebase, protectSection, NULL))
