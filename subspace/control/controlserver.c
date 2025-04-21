@@ -63,9 +63,8 @@ static int controlThread(Thread* self)
             socket_t newsock        = accept(svr.svrsock, (struct sockaddr*)&addr, &addrlen);
 
             if (newsock) {
-                ControlState* nctl = xaAlloc(sizeof(ControlState), XA_Zero);
-                controlInit(nctl, newsock);
-                saPush(&svr.clients, ptr, nctl);
+                ControlClient* ncli = cclientCreate(newsock);
+                saPushC(&svr.clients, object, &ncli);
             }
         }
 
@@ -104,7 +103,7 @@ static int controlThread(Thread* self)
 bool controlServerStart(void)
 {
     memset(&svr, 0, sizeof(ControlServer));
-    saInit(&svr.clients, ptr, 4);
+    saInit(&svr.clients, object, 4);
     srand(time(NULL));
 
     // try to bind to a random port
