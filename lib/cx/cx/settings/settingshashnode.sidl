@@ -1,0 +1,28 @@
+#include <cx/ssdtree/node/ssdhashnode.sidl>
+
+typedef struct SettingsBind {
+    stype type;                 // type of bound variable
+    stgeneric *var;             // pointer to bound variable
+    stgeneric cache;            // cached copy for change detection
+    stgeneric def;              // default value
+
+    bool userset;               // explicitly overridden, even if it's the default value
+} SettingsBind;
+
+class SettingsHashNode extends SSDHashNode
+{
+    hashtable binds;
+
+    override get;
+    override set;
+    override setC;
+    override remove;
+
+    bool bind(strref name, stype btyp, void *bvar, stgeneric bdef, SSDLockState *_ssdCurrentLockState);
+    void checkBound(strref name, SSDLockState *_ssdCurrentLockState);        // check a single bound variable for changes
+    void checkAll(SSDLockState *_ssdCurrentLockState);               // check for bound variables that have changed
+    void unbindAll(SSDLockState *_ssdCurrentLockState);
+
+    factory _create(SSDTree *tree);
+    init();
+}

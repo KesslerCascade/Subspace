@@ -1,0 +1,24 @@
+#include <cx/thread.h>
+#include <cx/fs/vfsobj.sidl>
+#include <cx/ssdtree/ssdtreeobj.sidl>
+
+class SettingsTree extends SSDTree
+{
+    object:VFS vfs;
+    string filename;
+
+    // interval to flush to disk
+    int64 interval;
+
+    // timestamp of last background check
+    int64 check;
+
+    // timestamp the settings were last saved to disk
+    int64 saved;
+
+    // re-check all bound variables at next flush
+    bool checkbound;
+
+    factory create();
+    init();
+}
