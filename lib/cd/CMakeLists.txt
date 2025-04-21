@@ -38,21 +38,3 @@ target_include_directories(cd
         src src/sim
     PUBLIC
         ${CMAKE_CURRENT_SOURCE_DIR}/include)
-
-set(CDLUA_SOURCES
-    src/lua5/cdlua5.c
-    src/lua5/cdvoid5.c
-    src/lua5/cdlua5ctx.c
-    src/lua5/cdlua5_active.c
-    src/lua5/cdlua5_canvas.c)
-
-add_library(cdlua STATIC
-    ${CDLUA_SOURCES}
-)
-target_link_libraries(cdlua cd lua)
-target_compile_definitions(cdlua PRIVATE XALLOC_REMAP_MALLOC COBJMACROS _UNICODE UNICODE)
-target_include_directories(cdlua
-    PRIVATE
-        src/lua5
-    PUBLIC
-        ${CMAKE_CURRENT_SOURCE_DIR}/include)

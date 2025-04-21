@@ -102,10 +102,6 @@ int entryPoint()
         fatalError(_S"Failed to initialize UI.", false);
     }
 
-    if (!uiLoadLua(&subspace.ui, LUA_MAIN_FILENAME)) {
-        fatalError(_S"Failed to load UI.", false);
-    }
-
     if (!controlServerStart()) {
         fatalError(_S"Failed to start control server.", false);
     }

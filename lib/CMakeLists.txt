@@ -6,7 +6,6 @@ if (BUILD_GAME)
 else()
     set(as_subproject ZLIB)
 
-    set(CX_LUA ON CACHE INTERNAL "Build Lua scripting engine and cxlua library" FORCE)
     add_subdirectory(cx)
 
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries" FORCE)
@@ -31,7 +30,6 @@ else()
 
     add_subdirectory(iup)
     target_compile_definitions(iup PRIVATE XALLOC_REMAP_MALLOC)
-    target_compile_definitions(iuplua PRIVATE XALLOC_REMAP_MALLOC)
 
     add_subdirectory(cd)
     target_compile_definitions(cd PRIVATE XALLOC_REMAP_MALLOC)

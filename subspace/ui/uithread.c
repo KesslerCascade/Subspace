@@ -1,33 +1,18 @@
 #include "uithread.h"
 
-#include "lua/task/luacall.h"
-#include "lua/task/luaexec.h"
 #include "subspace.h"
 
 #include <cd.h>
-#include <cdlua.h>
-#include <cdluaiup.h>
 #include <iup.h>
 #include <iup_plot.h>
 #include <iupcontrols.h>
-#include <iuplua.h>
-#include <iuplua_plot.h>
-#include <iupluacontrols.h>
-
-#include <lauxlib.h>
 
 #ifdef WIN32
 #include <windows.h>
 #endif
 
-static atomic(bool) uirunning;
-
 static bool uicb(TaskQueue *tq)
 {
-        // failsafe as lua still has some tasks to process even after the UI is shut down
-    if (!atomicLoad(bool, &uirunning, Acquire))
-        return true;
-
     IupLoopStep();
 
     #ifdef WIN32
@@ -37,7 +22,6 @@ static bool uicb(TaskQueue *tq)
     #endif
 
     return true;
-
 }
 
 static bool uiThreadInit(TaskQueue* tq, void* data)
@@ -47,50 +31,10 @@ static bool uiThreadInit(TaskQueue* tq, void* data)
     IupSetGlobal("UTF8MODE", "YES");
     IupSetGlobal("UTF8MODE_FILE", "YES");
 
-    UIThread* uithr = (UIThread*)data;
-    luaL_requiref(uithr->lua.L, "iuplua", iuplua_open, 1);
-    luaL_requiref(uithr->lua.L, "cdlua", cdlua_open, 1);
-    luaL_requiref(uithr->lua.L, "cdluaiup", cdluaiup_open, 1);
     IupControlsOpen();
-    luaL_requiref(uithr->lua.L, "iupcontrols", iupcontrolslua_open, 1);
     IupPlotOpen();
-    luaL_requiref(uithr->lua.L, "iupplot", iup_plotlua_open, 1);
 
-    atomicStore(bool, &uirunning, true, Release);
     return true;
-}
-
-typedef struct UIThreadShutdownData {
-    UIThread* uithr;
-    SharedEvent* e;
-} UIThreadShutdownData;
-static bool uiThreadShutdown(TaskQueue* tq, void* data)
-{
-    UIThreadShutdownData* d = (UIThreadShutdownData*)data;
-    atomicStore(bool, &uirunning, false, Release);
-    cdlua_close(d->uithr->lua.L);
-    iuplua_close(d->uithr->lua.L);
-
-    eventSignal(&d->e->ev);
-    sheventRelease(&d->e);
-
-    xaFree(d);
-    return true;
-}
-
-bool uiLoadLua(UIThread *uithr, strref filename)
-{
-    bool ret         = false;
-
-    logFmt(Verbose, _S"ui: Loading lua script ${string}", stvar(strref, filename));
-    LuaExecFile* task = luaexecfileCreate(&uithr->lua, filename);
-    luaAddTask(&uithr->lua, task);
-
-    taskWait(task, timeForever);
-
-    ret = taskSucceeded(task);
-    objRelease(&task);
-    return ret;
 }
 
 bool uiInit(UIThread* uithr, Subspace *ss)
@@ -101,7 +45,7 @@ bool uiInit(UIThread* uithr, Subspace *ss)
     TaskQueueConfig conf;
     tqPresetSingle(&conf);
     conf.pool.ui = uicb;
-    uithr->uiq  = tqCreate(_S"LuaUI", &conf);
+    uithr->uiq   = tqCreate(_S"UI", &conf);
     if (!uithr->uiq || !tqStart(uithr->uiq))
         return false;
 
@@ -111,38 +55,39 @@ bool uiInit(UIThread* uithr, Subspace *ss)
     if (!uithr->uiworkers || !tqStart(uithr->uiworkers))
         return false;
 
-    // lua needs a reference to our queues and structure
-    luaInit(&uithr->lua, ss, uithr->uiq, uithr->uiworkers);
-
     // Some initialization must be performed in the UI thread itself
     tqCall(uithr->uiq, uiThreadInit, (void*)uithr);
 
     return true;
 }
 
-static bool startupCb(stvlist *cvars, stvlist *args)
+static bool uiStartFunc(TaskQueue* tq, void* data)
 {
-    Task* task = stvlNextObj(args, Task);
-    UIThread* uithr = stvlNextPtr(cvars);
+    UIThread* uithr = (UIThread*)data;
+    IupMessage("Hello World 1", "Hello world from IUP.");
+    uithr->ss->exit = true;
+    eventSignal(&uithr->ss->notify);
 
-    if (!(task && uithr))
-        return false;
-
-    if (!taskSucceeded(task)) {
-        logStr(Error, _S"uithread: startup failed!");
-        uithr->ss->exit = true;
-        eventSignal(&uithr->ss->notify);
-    }
     return true;
 }
 
 void uiStart(UIThread* uithr)
 {
-    // Notify LUA to start up the UI
-    LuaCall* task = luacallCreate(&uithr->lua, _S"startup", true, 0, stvNone);
-    cchainAttach(&task->oncomplete, startupCb, stvar(ptr, uithr));
-    luaRun(&uithr->lua, task);
+    if (uithr->started)
+        return;
+
+    // Need to run the function to create the UI from the UI thread itself
+    tqCall(uithr->uiq, uiStartFunc, uithr);
     uithr->started = true;
+}
+
+static bool uiStopFunc(TaskQueue* tq, void* data)
+{
+    UIThread* uithr = (UIThread*)data;
+    uithr->ss->exit = true;
+    eventSignal(&uithr->ss->notify);
+
+    return true;
 }
 
 bool uiStop(UIThread* uithr)
@@ -150,16 +95,26 @@ bool uiStop(UIThread* uithr)
     if (!uithr->started)
         return false;
 
-    // notify LUA environment of the shutdown
-    LuaCall* task = luacallCreate(&uithr->lua, _S"shutdown", false, 0, stvNone);
-    luaAddTask(&uithr->lua, task);
-
-    // wait for call to finish
-    taskWait(task, timeS(10));
-    objRelease(&task);
-
+    // Notify the UI thread that it should start shutting things down
+    tqCall(uithr->uiq, uiStopFunc, uithr);
     uithr->started = false;
 
+    return true;
+}
+
+typedef struct UIThreadShutdownData {
+    UIThread* uithr;
+    SharedEvent* e;
+} UIThreadShutdownData;
+static bool uiThreadShutdown(TaskQueue* tq, void* data)
+{
+    UIThreadShutdownData* d = (UIThreadShutdownData*)data;
+    IupClose();
+
+    eventSignal(&d->e->ev);
+    sheventRelease(&d->e);
+
+    xaFree(d);
     return true;
 }
 
@@ -184,6 +139,5 @@ bool uiShutdown(UIThread* uithr)
     objRelease(&uithr->uiq);
     sheventRelease(&callEvent);
 
-    luaShutdown(&uithr->lua);
     return true;
 }

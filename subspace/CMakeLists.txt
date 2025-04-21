@@ -8,10 +8,7 @@ endif()
 
 set(SUBSPACE_SIDL
     control/controlclient.sidl
-    control/controltask.sidl
-    lua/task/luacall.sidl
-    lua/task/luaexec.sidl
-    lua/task/luatask.sidl)
+    control/controltask.sidl)
 
 add_sidl(${SUBSPACE_SIDL})
 
@@ -19,14 +16,6 @@ add_executable(subspace
     control/controlclient.c
     control/controlserver.c
     control/controltask.c
-    lua/log/lualog.c
-    lua/lua/lualua.c
-    lua/task/luacall.c
-    lua/task/luaexec.c
-    lua/task/luatask.c
-    lua/subspace/luasubspace.c
-    lua/luamodules.c
-    lua/luathread.c
     ui/uithread.c
     win32/win32.c
     filesys.c
@@ -37,7 +26,7 @@ add_executable(subspace
     ${SHARED_SOURCE_DIR}/control.c
     ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_SIDL})
-target_link_libraries(subspace cxlua iupluacontrols sqlite)
+target_link_libraries(subspace cx iupcontrols iupplot sqlite)
 target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(WIN32)
