@@ -1,0 +1,18 @@
+#include "control.h"
+#include <cx/thread/prqueue.h>
+
+[methodprefix cclient] class ControlClient
+{
+    ControlState state;
+    PrQueue outbound;
+
+    void send();
+    void recv();
+    unbound socket_t sock();
+    unbound bool closed();
+    unbound bool sendPending();
+
+    init();
+    destroy();
+    factory create(socket_t sock);
+}

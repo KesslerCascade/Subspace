@@ -25,3 +25,21 @@ DECLFUNC(msvcrt_snprintf);
 typedef double (*FUNCTYPE(msvcrt_sin))(double x);
 DECLFUNC(msvcrt_sin);
 #define sin(x) FCALL(ftlbase, msvcrt_sin, x)
+
+typedef uintptr_t (*FUNCTYPE(msvcrt_beginthread))(void (*start_address)(void*), unsigned stack_size,
+                                                  void* arglist);
+DECLFUNC(msvcrt_beginthread);
+#define _beginthread(start_address, stack_size, arglist) \
+    FCALL(ftlbase, msvcrt_beginthread, start_address, stack_size, arglist)
+
+typedef int (*FUNCTYPE(msvcrt_rand))(void);
+DECLFUNC(msvcrt_rand);
+#define rand() FCALL(ftlbase, msvcrt_rand)
+
+typedef void (*FUNCTYPE(msvcrt_srand))(unsigned seed);
+DECLFUNC(msvcrt_srand);
+#define srand(seed) FCALL(ftlbase, msvcrt_srand, seed)
+
+typedef time_t (*FUNCTYPE(msvcrt_time))(time_t* tm);
+DECLFUNC(msvcrt_time);
+#define time(tm) FCALL(ftlbase, msvcrt_time, tm)

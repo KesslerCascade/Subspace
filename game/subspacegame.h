@@ -19,14 +19,6 @@ typedef bool (*featurePatch_t)(SubspaceFeature* feat, void* settings, PatchState
 // Enable or disable the feature at runtime
 typedef bool (*featureEnable_t)(SubspaceFeature* feat, void* settings, bool enabled);
 
-#ifdef _DEBUG
-extern void WriteDbg(const char* str);
-#else
-#define WriteDbg(x)
-#endif
-
-void OSShowError(const char* str);
-
 extern const int subspace_version_maj;
 extern const int subspace_version_min;
 extern const char* subspace_version_series;

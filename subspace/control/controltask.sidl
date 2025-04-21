@@ -1,0 +1,6 @@
+#include <cx/taskqueue.sidl>
+#include "controlclient.sidl"
+
+abstract class ControlTask extends ComplexTask {
+    object:ControlClient client;
+}

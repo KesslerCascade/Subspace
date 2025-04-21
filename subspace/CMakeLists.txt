@@ -7,6 +7,8 @@ if(WIN32)
 endif()
 
 set(SUBSPACE_SIDL
+    control/controlclient.sidl
+    control/controltask.sidl
     lua/task/luacall.sidl
     lua/task/luaexec.sidl
     lua/task/luatask.sidl)
@@ -14,7 +16,9 @@ set(SUBSPACE_SIDL
 add_sidl(${SUBSPACE_SIDL})
 
 add_executable(subspace
+    control/controlclient.c
     control/controlserver.c
+    control/controltask.c
     lua/log/lualog.c
     lua/lua/lualua.c
     lua/task/luacall.c

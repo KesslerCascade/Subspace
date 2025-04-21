@@ -14,6 +14,7 @@
 #include "loader/loader.h"
 #include "patch/patch.h"
 #include "control.h"
+#include "osdep.h"
 #include "version.h"
 
 SubspaceGameSettings settings = {
@@ -43,54 +44,54 @@ int sscmain(int argc, char* argv[])
     netInit();
 
     if (settings.port == 0) {
-        OSShowError("This executible is not intended to be run directly. "
+        osShowError("This executible is not intended to be run directly. "
                     "Please launch the main Subspace program to run the game.");
         return 1;
     }
 
     // First order of business: open the control connection
-    socket_t sock;
-    if (!controlConnect(&sock))
-        return 1;
-    controlInit(&control, sock);
-    controlSendHello(&control);
+        socket_t sock;
+        if (!controlConnect(&sock))
+            return 1;
+        controlInit(&control, sock);
+        controlSendStartup(&control);
 
-    ftlbase = loadProgram(settings.gameProgram);
+        ftlbase = loadProgram(settings.gameProgram);
 
-    PatchState ps;
-    if (!patchBegin(&ps, ftlbase)) {
-        // log
-        return 1;
-    }
+        PatchState ps;
+        if (!patchBegin(&ps, ftlbase)) {
+            // log
+            return 1;
+        }
     if (!patchApplySeq(&ps, OSDepPatches) || !patchApplySeq(&ps, RequiredPatches)) {
         // log
-        WriteDbg("Required patches failed.\n");
+        osWriteDbg("Required patches failed.\n");
         return 1;
     }
 
     if (initFeature(&InfoBlock_feature, &ps)) {
         enableFeature(&InfoBlock_feature, true);
-        WriteDbg("InfoBlock: PASSED\n");
+        osWriteDbg("InfoBlock: PASSED\n");
     } else {
-        WriteDbg("InfoBlock: FAILED\n");
+        osWriteDbg("InfoBlock: FAILED\n");
     }
     if (initFeature(&TimeWarp_feature, &ps)) {
         enableFeature(&TimeWarp_feature, true);
-        WriteDbg("TimeWarp: PASSED\n");
+        osWriteDbg("TimeWarp: PASSED\n");
     } else {
-        WriteDbg("TimeWarp: FAILED\n");
+        osWriteDbg("TimeWarp: FAILED\n");
     }
     if (initFeature(&FrameAdv_feature, &ps)) {
         enableFeature(&FrameAdv_feature, true);
-        WriteDbg("FrameAdv: PASSED\n");
+        osWriteDbg("FrameAdv: PASSED\n");
     } else {
-        WriteDbg("FrameAdv: FAILED\n");
+        osWriteDbg("FrameAdv: FAILED\n");
     }
     if (initFeature(&NumericHull_feature, &ps)) {
         enableFeature(&NumericHull_feature, true);
-        WriteDbg("NumericHull: PASSED\n");
+        osWriteDbg("NumericHull: PASSED\n");
     } else {
-        WriteDbg("NumericHull: FAILED\n");
+        osWriteDbg("NumericHull: FAILED\n");
     }
 
     if (!patchEnd(&ps)) {
@@ -107,5 +108,6 @@ int sscmain(int argc, char* argv[])
 
 void sscmain2(void)
 {
+    controlClientStart();
     return;
 }

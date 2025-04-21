@@ -9,12 +9,12 @@ bool controlConnect(socket_t *sock) {
 
     socket_t csock = socket(PF_INET, SOCK_STREAM, 0);
     if (!csock) {
-        OSShowError("An unexpected network error occurred.");
+        osShowError("An unexpected network error occurred.");
         return false;
     }
 
     if (connect(csock, (struct sockaddr*)&addr, sizeof(addr)) != 0) {
-        OSShowError("Failed to connect to main Subspace program.");
+        osShowError("Failed to connect to main Subspace program.");
         return false;
     }
 

@@ -139,7 +139,7 @@ int __stdcall entry()
     ExitProcess(ret);
 }
 
-void WriteDbg(const char* str)
+void osWriteDbg(const char* str)
 {
     HANDLE hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
     DWORD written  = 0;

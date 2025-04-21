@@ -1,10 +1,31 @@
 #include "controlserver.h"
 #include <cx/thread.h>
 #include <stdlib.h>
+#include "controlclient.h"
+
+#include <cx/container.h>
+#include <cx/thread.h>
+#include <cx/thread/prqueue.h>
+#include "net.h"
+
+saDeclare(socket_t);
+saDeclarePtr(ControlState);
+
+typedef struct ControlServer {
+    Thread* thread;
+    sa_ControlClient clients;
+    atomic(ptr) active;   // currently active client to send messages to
+
+    socket_t svrsock;
+    int port;
+
+    socket_t notifysock;   // dummy socket to wake up the thread
+    int notifyport;
+} ControlServer;
 
 ControlServer svr;
 
-int controlThread(Thread* self)
+static int controlThread(Thread* self)
 {
     fd_set rset;
     fd_set wset;
@@ -24,12 +45,13 @@ int controlThread(Thread* self)
         maxfd = max(maxfd, svr.notifysock + 1);
 
         FD_ZERO(&wset);
-        foreach(sarray, idx, ControlState *, cs, svr.clients) {
-            FD_SET(cs->sock, &rset);
-            if (sbufCAvail(cs->sendbuf) > 0) {
-                FD_SET(cs->sock, &wset);
+        foreach (sarray, idx, ControlClient*, cc, svr.clients) {
+            socket_t sock = cclientSock(cc);
+            FD_SET(sock, &rset);
+            if (cclientSendPending(cc)) {
+                FD_SET(sock, &wset);
             }
-            maxfd = max(maxfd, cs->sock + 1);
+            maxfd = max(maxfd, sock + 1);
         }
 
         select(maxfd, &rset, &wset, NULL, &sto);
@@ -53,28 +75,21 @@ int controlThread(Thread* self)
             recv(svr.notifysock, &tmp, 1, 0);
         }
 
-        foreach(sarray, idx, ControlState *, cs, svr.clients) {
-            controlSend(cs);    // send any outbound data
+        foreach (sarray, idx, ControlClient*, cc, svr.clients) {
+            // send any outbound data
+            cclientSend(cc);
 
-            if (FD_ISSET(cs->sock, &rset)) {
-                if (controlMsgReady(cs)) {
-                    ControlMsg* temp = controlGetMsg(cs, CF_ALLOC_AUTO);
-                    controlMsgFree(temp, CF_ALLOC_AUTO);
-                };   // celebrate?
-            }
+            if (FD_ISSET(cclientSock(cc), &rset))
+                cclientRecv(cc);
 
-            if (cs->closed) {
+            if (cclientClosed(cc)) {
                 // connection was closed, remove this one from the list
                 saPush(&removedConns, int32, idx);
             }
         }
 
         for (int i = saSize(removedConns) - 1; i >= 0; --i) {
-            int cidx = removedConns.a[i];
-            netClose(svr.clients.a[cidx]->sock);
-            controlStateDestroy(svr.clients.a[cidx]);
-            xaFree(svr.clients.a[cidx]);
-            saRemove(&svr.clients, cidx);
+            saRemove(&svr.clients, removedConns.a[i]);
         }
         saClear(&removedConns);
     }

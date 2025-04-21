@@ -40,6 +40,7 @@ if(WIN32)
         win32/patch/patch_osdep.c
         win32/entry.c
         win32/kernel32_overrides.c
+        win32/thread.c
         win32/winerror.c
         win32/winmain.c)
     set(CMAKE_WIN32_EXECUTABLE true)

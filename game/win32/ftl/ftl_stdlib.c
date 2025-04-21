@@ -23,3 +23,27 @@ Symbol SYM(msvcrt_sin) = {
     .find = { { .type = SYMBOL_FIND_IMPORT, .str = "msvcrt.dll", .name = "sin" }, { 0 } }
 };
 FuncInfo FUNCINFO(msvcrt_sin) = { .nargs = 1, .purecdecl = true };
+
+INITWRAP(msvcrt_beginthread);
+Symbol SYM(msvcrt_beginthread) = {
+    .find = { { .type = SYMBOL_FIND_IMPORT, .str = "msvcrt.dll", .name = "_beginthread" }, { 0 } }
+};
+FuncInfo FUNCINFO(msvcrt_beginthread) = { .nargs = 3, .purecdecl = true };
+
+INITWRAP(msvcrt_rand);
+Symbol SYM(msvcrt_rand) = {
+    .find = { { .type = SYMBOL_FIND_IMPORT, .str = "msvcrt.dll", .name = "rand" }, { 0 } }
+};
+FuncInfo FUNCINFO(msvcrt_rand) = { .nargs = 0, .purecdecl = true };
+
+INITWRAP(msvcrt_srand);
+Symbol SYM(msvcrt_srand) = {
+    .find = { { .type = SYMBOL_FIND_IMPORT, .str = "msvcrt.dll", .name = "srand" }, { 0 } }
+};
+FuncInfo FUNCINFO(msvcrt_srand) = { .nargs = 1, .purecdecl = true };
+
+INITWRAP(msvcrt_time);
+Symbol SYM(msvcrt_time) = {
+    .find = { { .type = SYMBOL_FIND_IMPORT, .str = "msvcrt.dll", .name = "time" }, { 0 } }
+};
+FuncInfo FUNCINFO(msvcrt_time) = { .nargs = 1, .purecdecl = true };
