@@ -5,6 +5,7 @@
 
 #include <cx/debug.h>
 #include <cx/log.h>
+#include <cx/settings.h>
 #include <cx/sys.h>
 
 DEFINE_ENTRY_POINT
@@ -77,6 +78,8 @@ int entryPoint()
     }
     vfsSetCurDir(subspace.fs, SSNS);
 
+    subspace.settings = setsOpen(subspace.fs, SETTINGS_FILENAME, 0);
+
     // Set up log file
     if (!logOpen(subspace.fs, LOG_FILENAME, &deferbuf)) {
         fatalError(
@@ -117,6 +120,8 @@ int entryPoint()
     uiShutdown(&subspace.ui);
 
     controlServerStop();
+
+    setsClose(&subspace.settings);
 
     // unmount the subspace:/ namespace
     vfsSetCurDir(subspace.fs, _S"/");
