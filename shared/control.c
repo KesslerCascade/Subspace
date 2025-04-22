@@ -502,18 +502,20 @@ ControlMsg* controlGetMsg(ControlState* cs, int allocmode)
 
     ControlMsg* ret = allocBytes(sizeof(ControlMsg), NULL, allocmode, 0);
     if (!ret)
-        return NULL;
+        goto out;
 
     if (!controlGetHeader(cs, &ret->hdr) || ret->hdr.nfields > MAX_CONTROL_ARRAY) {
         freeBytes(ret, allocmode);
-        return NULL;
+        ret = NULL;
+        goto out;
     }
 
     if (ret->hdr.nfields > 0) {
         ret->fields = allocBytes(ret->hdr.nfields * sizeof(void*), NULL, allocmode, 0);
         if (!ret->fields) {
             freeBytes(ret, allocmode);
-            return NULL;
+            ret = NULL;
+            goto out;
         }
 
         for (uint32_t i = 0; i < ret->hdr.nfields; i++) {
@@ -529,6 +531,8 @@ ControlMsg* controlGetMsg(ControlState* cs, int allocmode)
         }
     }
 
+out:
+    controlRecvDone(cs);
     return ret;
 }
 
