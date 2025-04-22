@@ -1,8 +1,9 @@
 #pragma once
 
 #include <cx/fs.h>
-#include <cx/taskqueue.h>
+#include <cx/log.h>
 #include <cx/ssdtree.h>
+#include <cx/taskqueue.h>
 
 #include "ui/uithread.h"
 
@@ -21,6 +22,7 @@
 #define FTLNS _S"ftl:/"
 
 extern VFS* filesys;
+extern LogCategory* gamecat;
 
 typedef struct Subspace {
     string basedir;

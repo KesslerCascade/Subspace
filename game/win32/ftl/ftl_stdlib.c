@@ -12,6 +12,12 @@ Symbol SYM(msvcrt_free) = {
 };
 FuncInfo FUNCINFO(msvcrt_free) = { .nargs = 1, .purecdecl = true };
 
+INITWRAP(msvcrt_realloc);
+Symbol SYM(msvcrt_realloc) = {
+    .find = { { .type = SYMBOL_FIND_IMPORT, .str = "msvcrt.dll", .name = "realloc" }, { 0 } }
+};
+FuncInfo FUNCINFO(msvcrt_realloc) = { .nargs = 2, .purecdecl = true };
+
 INITWRAP(msvcrt_snprintf);
 Symbol SYM(msvcrt_snprintf) = {
     .find = { { .type = SYMBOL_FIND_IMPORT, .str = "msvcrt.dll", .name = "_snprintf" }, { 0 } }

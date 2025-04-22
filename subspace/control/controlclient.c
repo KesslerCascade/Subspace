@@ -61,6 +61,9 @@ void ControlClient_recv(_In_ ControlClient* self)
 {
     if (controlMsgReady(&self->state)) {
         ControlMsg* msg         = controlGetMsg(&self->state, CF_ALLOC_AUTO);
+        if (!msg)
+            return;
+
         ctask_factory_t handler = controlServerGetHandler(msg->hdr.cmd);
         if (handler) {
             Task* task = handler(self, msg);

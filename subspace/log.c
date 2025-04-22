@@ -5,6 +5,7 @@
 #define LOG_SEGMENTS 5
 static LogFileData *logdata;
 static LogDest *dest;
+LogCategory* gamecat;
 
 bool logOpen(VFS *vfs, string filename, LogDest **defer)
 {
@@ -13,14 +14,16 @@ bool logOpen(VFS *vfs, string filename, LogDest **defer)
     vfsCreateAll(vfs, pdir);
     strDestroy(&pdir);
 
+    gamecat              = logCreateCat(_S"Game", false);
     LogFileConfig config = {
-        .flags = LOG_LocalTime | LOG_OmitLevel,
-        .dateFormat = LOG_DateISOCompact,
-        .spacing = 4,
-        .rotateMode = LOG_RotateSize,
-        .rotateSize = LOG_SEGMENT_SIZE,
+        .flags = LOG_LocalTime | LOG_ShortLevel | LOG_BracketLevel | LOG_IncludeCategory |
+            LOG_BracketCategory,
+        .dateFormat      = LOG_DateISOCompact,
+        .spacing         = 4,
+        .rotateMode      = LOG_RotateSize,
+        .rotateSize      = LOG_SEGMENT_SIZE,
         .rotateKeepFiles = LOG_SEGMENTS,
-        .rotateKeepTime = timeS(86400 * 14)
+        .rotateKeepTime  = timeS(86400 * 14)
     };
     logdata = logfileCreate(vfs, filename, &config);
     if (!logdata)

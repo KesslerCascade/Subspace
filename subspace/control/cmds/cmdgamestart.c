@@ -6,12 +6,9 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "gamestart.h"
+#include "cmdgamestart.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include <cx/ssdtree.h>
-#include <cx/fs.h>
-#include "control/controlserver.h"
 
 static _objfactory_guaranteed Task* CmdGameStart_factory(ControlClient* client, ControlMsg* msg)
 {
@@ -69,6 +66,7 @@ uint32 CmdGameStart_run(_In_ CmdGameStart* self, _In_ TaskQueue* tq, _In_ TQWork
 
         cclientQueue(self->client, msg);
     } else {
+        // Config isn't complete; game shouldn't have been launched
         ControlMsg* msg = controlAllocMsg(0, CF_ALLOC_AUTO);
         if (!msg)
             return TASK_Result_Failure;
@@ -83,5 +81,5 @@ uint32 CmdGameStart_run(_In_ CmdGameStart* self, _In_ TaskQueue* tq, _In_ TQWork
 }
 
 // Autogen begins -----
-#include "gamestart.auto.inc"
+#include "cmdgamestart.auto.inc"
 // Autogen ends -------

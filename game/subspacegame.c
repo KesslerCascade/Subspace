@@ -12,6 +12,7 @@
 #include "feature/timewarp.h"
 #include "ftl/ftl.h"
 #include "loader/loader.h"
+#include "log/log.h"
 #include "patch/patch.h"
 #include "control.h"
 #include "osdep.h"
@@ -56,59 +57,56 @@ int sscmain(int argc, char* argv[])
     controlInit(&control, sock);
     controlSendGameStart(&control);
 
-    int lcmd = controlRecvLaunchCmd(&control);
-    switch (lcmd) {
-    case RLC_Timeout:
-        osShowError("Main subspace program did not respond");
-        return 1;
-    case RLC_Error:
-        osShowError("An unexpcted communication error occured");
-        return 1;
-    case RLC_Exit:
-        return 0;
-    }
+    int lcmd = controlStartupHandshake(&control);
+    if (lcmd != RLC_Launch)
+        return (lcmd != RLC_Exit);
 
     osSetCurrentDir(settings.gameDir);
+    log_fmt(LOG_Info, "Loading executable:  %s", settings.gamePath);
     ftlbase = loadProgram(settings.gameProgram);
+
+    if (!ftlbase) {
+        log_str(LOG_Error, "Failed to load game executable!");
+        return 1;
+    }
 
     PatchState ps;
     if (!patchBegin(&ps, ftlbase)) {
-        // log
+        log_str(LOG_Error, "Patching failed to initialize");
         return 1;
     }
     if (!patchApplySeq(&ps, OSDepPatches) || !patchApplySeq(&ps, RequiredPatches)) {
-        // log
-        osWriteDbg("Required patches failed.\n");
+        log_str(LOG_Error, "Required patches failed");
         return 1;
     }
 
     if (initFeature(&InfoBlock_feature, &ps)) {
         enableFeature(&InfoBlock_feature, true);
-        osWriteDbg("InfoBlock: PASSED\n");
+        log_str(LOG_Verbose, "InfoBlock: PASSED");
     } else {
-        osWriteDbg("InfoBlock: FAILED\n");
+        log_str(LOG_Warn, "InfoBlock: FAILED");
     }
     if (initFeature(&TimeWarp_feature, &ps)) {
         enableFeature(&TimeWarp_feature, true);
-        osWriteDbg("TimeWarp: PASSED\n");
+        log_str(LOG_Verbose, "TimeWarp: PASSED");
     } else {
-        osWriteDbg("TimeWarp: FAILED\n");
+        log_str(LOG_Warn, "TimeWarp: FAILED");
     }
     if (initFeature(&FrameAdv_feature, &ps)) {
         enableFeature(&FrameAdv_feature, true);
-        osWriteDbg("FrameAdv: PASSED\n");
+        log_str(LOG_Verbose, "FrameAdv: PASSED");
     } else {
-        osWriteDbg("FrameAdv: FAILED\n");
+        log_str(LOG_Warn, "FrameAdv: FAILED");
     }
     if (initFeature(&NumericHull_feature, &ps)) {
         enableFeature(&NumericHull_feature, true);
-        osWriteDbg("NumericHull: PASSED\n");
+        log_str(LOG_Verbose, "NumericHull: PASSED");
     } else {
-        osWriteDbg("NumericHull: FAILED\n");
+        log_str(LOG_Warn, "NumericHull: FAILED");
     }
 
     if (!patchEnd(&ps)) {
-        // log
+        log_str(LOG_Error, "Patching failed to complete");
         return 1;
     }
 
@@ -122,5 +120,7 @@ int sscmain(int argc, char* argv[])
 void sscmain2(void)
 {
     controlClientStart();
+    log_client();
+    log_str(LOG_Info, "Game communication thread started");
     return;
 }

@@ -49,6 +49,7 @@ endif()
 add_executable(subspacegame
     control/controlclient.c
     control/controlconnect.c
+    control/messagequeue.c
     feature/feature.c
     feature/frameadv.c
     feature/infoblock.c
@@ -74,6 +75,7 @@ add_executable(subspacegame
     hook/shipstatus/shipstatus_onrender.c
     hook/textlibrary/textlibrary_gettext.c
     input/keyboard.c
+    log/log.c
     patch/patch.c
     patch/required.c
     subspacegame.c

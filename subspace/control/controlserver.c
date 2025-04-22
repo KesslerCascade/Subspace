@@ -9,7 +9,8 @@
 #include <cx/thread/prqueue.h>
 #include "net.h"
 
-#include "control/cmds/gamestart.h"
+#include "control/cmds/cmdgamestart.h"
+#include "control/cmds/cmdlog.h"
 
 saDeclare(socket_t);
 saDeclarePtr(ControlState);
@@ -71,6 +72,10 @@ static int controlThread(Thread* self)
             socket_t newsock        = accept(svr.svrsock, (struct sockaddr*)&addr, &addrlen);
 
             if (newsock) {
+                logFmt(Verbose,
+                       _S"Accepting connection from ${string}:${int}",
+                       stvar(strref, (strref)inet_ntoa(addr.sin_addr)),
+                       stvar(int32, ntohs(addr.sin_port)));
                 ControlClient* ncli = cclientCreate(svr.subspace, newsock);
                 saPushC(&svr.clients, object, &ncli);
             }
@@ -132,8 +137,13 @@ bool controlServerStart(Subspace* ss)
         addr.sin_port             = htons(svr.port);
 
         if (bind(svr.svrsock, (struct sockaddr*)&addr, sizeof(addr)) == 0 &&
-            listen(svr.svrsock, 5) == 0)
+            listen(svr.svrsock, 5) == 0) {
+            logFmt(Verbose,
+                   _S"Listening on ${string}:${int}",
+                   stvar(strref, (strref)inet_ntoa(addr.sin_addr)),
+                   stvar(int32, svr.port));
             break;
+        }
 
         netClose(svr.svrsock);
         svr.svrsock = 0;
@@ -165,6 +175,7 @@ bool controlServerStart(Subspace* ss)
 
     // register all the command handlers
     CmdGameStart_register();
+    CmdLog_register();
 
     // start up server thread
     svr.thread = thrCreate(controlThread, _S"Control Server", stvNone);

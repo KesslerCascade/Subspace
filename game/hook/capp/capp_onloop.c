@@ -1,3 +1,4 @@
+#include "control/controlclient.h"
 #include "ftl/capp.h"
 #include "hook/hook.h"
 #include "patch/patchlist.h"
@@ -6,6 +7,7 @@
 
 int subspace_CApp_OnLoop_pre(CApp* self)
 {
+    controlClientProcess();
     return 1;   // we do want to execute the original CApp::OnLoop
 }
 

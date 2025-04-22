@@ -11,7 +11,8 @@ set(EXTRA_SIDL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 set(SUBSPACE_SIDL
     control/controlclient.sidl
     control/controltask.sidl
-    control/cmds/gamestart.sidl)
+    control/cmds/cmdgamestart.sidl
+    control/cmds/cmdlog.sidl)
 
 add_sidl(${SUBSPACE_SIDL})
 
@@ -19,7 +20,8 @@ add_executable(subspace
     control/controlclient.c
     control/controlserver.c
     control/controltask.c
-    control/cmds/gamestart.c
+    control/cmds/cmdgamestart.c
+    control/cmds/cmdlog.c
     ui/uithread.c
     win32/win32.c
     filesys.c

@@ -1,4 +1,5 @@
 #include "controlclient.h"
+#include "messagequeue.h"
 #include "osdep.h"
 #include "subspacegame.h"
 #include "version.h"
@@ -14,94 +15,16 @@ typedef struct ControlClient {
     socket_t notifysock;   // dummy socket to wake up the thread
     int notifyport;
 
-    lock_t msgqlock;
+    lock_t lock;
     MessageQueue* inbound;
     MessageQueue* outbound;
     MessageQueue* inbound_secondary;
     MessageQueue* outbound_secondary;
+    hashtbl handlers;
 } ControlClient;
 
 ControlState control;
 ControlClient client;
-
-void controlSendGameStart(ControlState* cs)
-{
-    ControlMsgHeader mh = { 0 };
-    ControlField vf = { 0 }, majvf = { 0 }, minvf = { 0 };
-
-    mh.nfields = 3;
-    strcpy(mh.cmd, "GameStart");
-    strcpy(vf.h.name, "ver");
-    vf.h.ftype   = CF_STRING;
-    vf.d.cfd_str = (char*)subspace_version_str;
-
-    strcpy(majvf.h.name, "major");
-    majvf.h.ftype   = CF_INT;
-    majvf.d.cfd_int = subspace_version_maj;
-
-    strcpy(minvf.h.name, "minor");
-    minvf.h.ftype   = CF_INT;
-    minvf.d.cfd_int = subspace_version_min;
-
-    ControlField* fields[3] = { &vf, &majvf, &minvf };
-    controlPutMsg(cs, &mh, fields);
-    while (controlSend(cs)) {}
-}
-
-// simple handler for getting the startup information packet decoded before we have nicities like
-// the client thread or better memory allocation up and running
-static char strbuf[MAX_PATH];
-int controlRecvLaunchCmd(ControlState* cs)
-{
-    int retries = 5;
-    fd_set rset;
-    struct timeval sto = { 0 };
-    sto.tv_sec         = 10;
-    while (!controlMsgReady(cs)) {
-        if (cs->closed)
-            return RLC_Error;
-
-        FD_ZERO(&rset);
-        FD_SET(cs->sock, &rset);
-        select(cs->sock + 1, &rset, NULL, NULL, &sto);
-
-        if (!FD_ISSET(cs->sock, &rset) && retries-- <= 0)
-            return RLC_Timeout;
-    }
-
-    ControlMsgHeader hdr;
-    if (!controlGetHeader(cs, &hdr))
-        return RLC_Error;
-
-    if (!strcmp(hdr.cmd, "Exit"))
-        return RLC_Exit;
-
-    if (strcmp(hdr.cmd, "Launch") != 0)
-        return RLC_Error;
-
-    for (int i = 0; i < hdr.nfields; i++) {
-        ControlField f;
-        f.d.cfd_str = strbuf;
-        f.count     = MAX_PATH;
-        if (!controlGetField(cs, &f, CF_ALLOC_PRE))
-            return RLC_Error;
-
-        if (!strcmp(f.h.name, "launchmode")) {
-            if (f.d.cfd_int != 0)
-                return RLC_Error;
-        }
-        if (!strcmp(f.h.name, "gamedir")) {
-            settings.gameDir = sstrdup(f.d.cfd_str);
-        }
-        if (!strcmp(f.h.name, "gameprogram")) {
-            settings.gameProgram = sstrdup(f.d.cfd_str);
-        }
-        if (!strcmp(f.h.name, "gamepath")) {
-            settings.gamePath = sstrdup(f.d.cfd_str);
-        }
-    }
-    return RLC_Launch;
-}
 
 static int controlThread(void* data)
 {
@@ -110,18 +33,59 @@ static int controlThread(void* data)
     sto.tv_sec         = 10;
 
     while (!atomicLoad(bool, &client.shouldExit, Relaxed)) {
+        bool isconn = control.sock && !control.closed;
         FD_ZERO(&rset);
         FD_ZERO(&wset);
         FD_SET(client.notifysock, &rset);
-
         int maxfd = client.notifysock + 1;
 
-        select(maxfd, &rset, NULL, NULL, &sto);
+        if (isconn) {
+            FD_SET(control.sock, &rset);
+            if (sbufCAvail(control.sendbuf) > 0)
+                FD_SET(control.sock, &wset);
+            maxfd = max(maxfd, control.sock + 1);
+        }
+
+        select(maxfd, &rset, &wset, NULL, &sto);
 
         // clear out the single byte sent to the notify socket
         if (FD_ISSET(client.notifysock, &rset)) {
             char tmp;
             recv(client.notifysock, &tmp, 1, 0);
+        }
+
+        // swap queues and process any outbound messages
+        lock_acq(&client.lock);
+        // swap queues while locked
+        MessageQueue* oqueue      = client.outbound;
+        client.outbound           = client.outbound_secondary;
+        client.outbound_secondary = oqueue;
+        lock_rel(&client.lock);
+
+        for (int i = 0; i < oqueue->nmsgs; i++) {
+            controlPutMsg(&control, &oqueue->msgs[i]->hdr, oqueue->msgs[i]->fields);
+        }
+        msgqClear(oqueue);
+
+        if (isconn) {
+            controlSend(&control);
+
+            // read any inbound messages and queue them
+            if (FD_ISSET(control.sock, &rset)) {
+                if (controlMsgReady(&control)) {
+                    ControlMsg* msg = controlGetMsg(&control, CF_ALLOC_AUTO);
+
+                    lock_acq(&client.lock);
+                    controlclientcb_t cb = (controlclientcb_t)_hashtbl_get(&client.handlers,
+                                                                           (uintptr_t)msg->hdr.cmd);
+                    if (cb) {
+                        msgqAdd(client.inbound, msg, cb);
+                    } else {
+                        controlMsgFree(msg, CF_ALLOC_AUTO);
+                    }
+                    lock_rel(&client.lock);
+                }
+            }
         }
     }
     return 0;
@@ -152,6 +116,12 @@ bool controlClientStart(void)
     if (client.notifysock == 0)
         return false;
 
+    lock_init(&client.lock);
+    hashtbl_init(&client.handlers, 16, HT_STRING_KEYS);
+    client.inbound            = msgqCreate(16, true);
+    client.inbound_secondary  = msgqCreate(16, true);
+    client.outbound           = msgqCreate(16, false);
+    client.outbound_secondary = msgqCreate(16, false);
     osStartThread(controlThread, NULL);
     return true;
 }
@@ -171,4 +141,35 @@ void controlClientNotify(void)
 
     char nothing = '\0';
     sendto(client.notifysock, &nothing, 1, 0, (struct sockaddr*)&addr, sizeof(addr));
+}
+
+void controlClientQueue(ControlMsg* msg)
+{
+    lock_acq(&client.lock);
+    msgqAdd(client.outbound, msg, NULL);
+    lock_rel(&client.lock);
+    controlClientNotify();
+}
+
+void controlClientProcess(void)
+{
+    lock_acq(&client.lock);
+    // swap queues while locked
+    MessageQueue* queue      = client.inbound;
+    client.inbound           = client.inbound_secondary;
+    client.inbound_secondary = queue;
+    lock_rel(&client.lock);
+
+    for (int i = 0; i < queue->nmsgs; i++) {
+        if (queue->cbs[i])
+            queue->cbs[i](queue->msgs[i]);
+    }
+    msgqClear(queue);
+}
+
+void controlClientRegister(const char* cmd, controlclientcb_t cb)
+{
+    lock_acq(&client.lock);
+    hashtbl_add(&client.handlers, cmd, cb);
+    lock_rel(&client.lock);
 }
