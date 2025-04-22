@@ -11,12 +11,13 @@
 DEFINE_ENTRY_POINT
 
 VFS* filesys;
-Subspace subspace;
+Subspace subspace = { .listenaddr = 0x7f000001 };
 
 static void parseArgs(Subspace* ss)
 {
-    for (int i = 0; i < saSize(cmdArgs); i++) {
-        if (strEqi(cmdArgs.a[i], _S"-basedir") && i < saSize(cmdArgs) - 1) {
+    int nargs = saSize(cmdArgs);
+    for (int i = 0; i < nargs; i++) {
+        if (strEqi(cmdArgs.a[i], _S"-basedir") && i < nargs - 1) {
             i++;
             if (subspaceCheckBaseDir(filesys, cmdArgs.a[i])) {
                 strDup(&ss->basedir, cmdArgs.a[i]);
@@ -29,8 +30,15 @@ static void parseArgs(Subspace* ss)
         if (strEqi(cmdArgs.a[i], _S"-dbg")) {
             ss->devmode = true;
         }
-        if (strEqi(cmdArgs.a[i], _S"-luadebug")) {
-            ss->luadebug = true;
+        if (strEqi(cmdArgs.a[i], _S"-listenaddr") && i < nargs - 1) {
+            i++;
+            ss->listenaddr = ntohl(inet_addr(strC(cmdArgs.a[i])));
+        }
+        if (strEqi(cmdArgs.a[i], _S"-port") && i < nargs - 1) {
+            i++;
+            int nport = 0;
+            if (strToInt32(&nport, cmdArgs.a[i], 10, true))
+                ss->port = nport;
         }
     }
 }
@@ -105,7 +113,7 @@ int entryPoint()
         fatalError(_S"Failed to initialize UI.", false);
     }
 
-    if (!controlServerStart()) {
+    if (!controlServerStart(&subspace)) {
         fatalError(_S"Failed to start control server.", false);
     }
 

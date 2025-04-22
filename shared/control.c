@@ -397,7 +397,8 @@ bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
 
     ControlFieldHeader* hdr = &field->h;
     size_t pad              = hdr->size - sizeof(ControlFieldHeader);
-    memset(&field->d, 0, sizeof(field->d));
+    if (allocmode != CF_ALLOC_PRE)
+        memset(&field->d, 0, sizeof(field->d));
 
     if (hdr->size > MAX_CONTROL_FIELD)
         return false;   // insane
@@ -508,21 +509,23 @@ ControlMsg* controlGetMsg(ControlState* cs, int allocmode)
         return NULL;
     }
 
-    ret->fields = allocBytes(ret->hdr.nfields * sizeof(void*), NULL, allocmode, 0);
-    if (!ret->fields) {
-        freeBytes(ret, allocmode);
-        return NULL;
-    }
-
-    for (uint32_t i = 0; i < ret->hdr.nfields; i++) {
-        ret->fields[i] = allocBytes(sizeof(ControlField), NULL, allocmode, 0);
-        if (!ret->fields[i] || !controlGetField(cs, ret->fields[i], allocmode)) {
-            for (uint32_t j = 0; j < i; j++) {
-                freeBytes(ret->fields[j], allocmode);
-            }
-            freeBytes(ret->fields, allocmode);
+    if (ret->hdr.nfields > 0) {
+        ret->fields = allocBytes(ret->hdr.nfields * sizeof(void*), NULL, allocmode, 0);
+        if (!ret->fields) {
             freeBytes(ret, allocmode);
             return NULL;
+        }
+
+        for (uint32_t i = 0; i < ret->hdr.nfields; i++) {
+            ret->fields[i] = allocBytes(sizeof(ControlField), NULL, allocmode, 0);
+            if (!ret->fields[i] || !controlGetField(cs, ret->fields[i], allocmode)) {
+                for (uint32_t j = 0; j < i; j++) {
+                    freeBytes(ret->fields[j], allocmode);
+                }
+                freeBytes(ret->fields, allocmode);
+                freeBytes(ret, allocmode);
+                return NULL;
+            }
         }
     }
 
@@ -585,7 +588,7 @@ void controlFieldFreeMulti(uint32_t nfields, ControlField** fields, int allocmod
         controlFieldFree(fields[i], allocmode);
         freeBytes(fields[i], allocmode);
     }
-    if (freearr)
+    if (freearr && nfields > 0)
         freeBytes(fields, allocmode);
 }
 
@@ -593,6 +596,28 @@ void controlMsgFree(ControlMsg* msg, int allocmode)
 {
     controlFieldFreeMulti(msg->hdr.nfields, msg->fields, allocmode, true);
     freeBytes(msg, allocmode);
+}
+
+ControlMsg* controlAllocMsg(int nfields, int allocmode)
+{
+    if (allocmode == CF_ALLOC_NEVER || allocmode == CF_ALLOC_PRE)
+        return NULL;
+
+    ControlMsg* ret = allocBytes(sizeof(ControlMsg), NULL, allocmode, 0);
+    if (!ret)
+        return NULL;
+
+    memset(&ret->hdr, 0, sizeof(ControlMsgHeader));
+    ret->hdr.nfields = nfields;
+    if (nfields > 0) {
+        ret->fields = allocBytes(sizeof(void*) * nfields, NULL, allocmode, 0);
+
+        for (int i = 0; i < nfields; i++) {
+            ret->fields[i] = allocBytes(sizeof(ControlField), NULL, allocmode, 0);
+            memset(ret->fields[i], 0, sizeof(ControlField));
+        }
+    }
+    return ret;
 }
 
 void controlStateDestroy(ControlState* cs)

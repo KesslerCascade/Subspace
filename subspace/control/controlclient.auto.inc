@@ -8,6 +8,7 @@ ControlClient_ClassIf ControlClient_ClassIf_tmpl = {
 static ControlClient_ClassIf _impl_ControlClient_ControlClient_ClassIf = {
     ._size = sizeof(ControlClient_ClassIf),
     ._implements = (ObjIface*)&ControlClient_ClassIf_tmpl,
+    .queue = (void (*)(void*, ControlMsg*))ControlClient_queue,
     .send = (void (*)(void*))ControlClient_send,
     .recv = (void (*)(void*))ControlClient_recv,
 };

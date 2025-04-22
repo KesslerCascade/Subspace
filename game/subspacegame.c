@@ -50,19 +50,32 @@ int sscmain(int argc, char* argv[])
     }
 
     // First order of business: open the control connection
-        socket_t sock;
-        if (!controlConnect(&sock))
-            return 1;
-        controlInit(&control, sock);
-        controlSendStartup(&control);
+    socket_t sock;
+    if (!controlConnect(&sock))
+        return 1;
+    controlInit(&control, sock);
+    controlSendGameStart(&control);
 
-        ftlbase = loadProgram(settings.gameProgram);
+    int lcmd = controlRecvLaunchCmd(&control);
+    switch (lcmd) {
+    case RLC_Timeout:
+        osShowError("Main subspace program did not respond");
+        return 1;
+    case RLC_Error:
+        osShowError("An unexpcted communication error occured");
+        return 1;
+    case RLC_Exit:
+        return 0;
+    }
 
-        PatchState ps;
-        if (!patchBegin(&ps, ftlbase)) {
-            // log
-            return 1;
-        }
+    osSetCurrentDir(settings.gameDir);
+    ftlbase = loadProgram(settings.gameProgram);
+
+    PatchState ps;
+    if (!patchBegin(&ps, ftlbase)) {
+        // log
+        return 1;
+    }
     if (!patchApplySeq(&ps, OSDepPatches) || !patchApplySeq(&ps, RequiredPatches)) {
         // log
         osWriteDbg("Required patches failed.\n");

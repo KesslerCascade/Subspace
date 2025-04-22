@@ -12,6 +12,7 @@
 
 void ControlTask_destroy(_In_ ControlTask* self)
 {
+    controlMsgFree(self->msg, CF_ALLOC_AUTO);
     // Autogen begins -----
     objRelease(&self->client);
     // Autogen ends -------

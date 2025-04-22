@@ -6,9 +6,12 @@ if(WIN32)
     set(CMAKE_WIN32_EXECUTABLE true)
 endif()
 
+set(EXTRA_SIDL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+
 set(SUBSPACE_SIDL
     control/controlclient.sidl
-    control/controltask.sidl)
+    control/controltask.sidl
+    control/cmds/gamestart.sidl)
 
 add_sidl(${SUBSPACE_SIDL})
 
@@ -16,6 +19,7 @@ add_executable(subspace
     control/controlclient.c
     control/controlserver.c
     control/controltask.c
+    control/cmds/gamestart.c
     ui/uithread.c
     win32/win32.c
     filesys.c

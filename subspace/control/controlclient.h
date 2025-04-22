@@ -4,6 +4,7 @@
 // clang-format off
 #include <cx/obj.h>
 #include "control.h"
+#include "subspace.h"
 #include <cx/thread/prqueue.h>
 
 typedef struct ControlClient ControlClient;
@@ -16,6 +17,7 @@ typedef struct ControlClient_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
+    void (*queue)(_In_ void* self, ControlMsg* msg);
     void (*send)(_In_ void* self);
     void (*recv)(_In_ void* self);
 } ControlClient_ClassIf;
@@ -31,6 +33,7 @@ typedef struct ControlClient {
     atomic(uintptr) _ref;
     atomic(ptr) _weakref;
 
+    Subspace* subspace;
     ControlState state;
     PrQueue outbound;
 } ControlClient;
@@ -49,9 +52,9 @@ typedef struct ControlClient_WeakRef {
 } ControlClient_WeakRef;
 #define ControlClient_WeakRef(inst) ((ControlClient_WeakRef*)(unused_noeval((inst) && &((inst)->_is_ControlClient_WeakRef)), (inst)))
 
-_objfactory_guaranteed ControlClient* ControlClient_create(socket_t sock);
-// ControlClient* cclientCreate(socket_t sock);
-#define cclientCreate(sock) ControlClient_create(sock)
+_objfactory_guaranteed ControlClient* ControlClient_create(Subspace* ss, socket_t sock);
+// ControlClient* cclientCreate(Subspace* ss, socket_t sock);
+#define cclientCreate(ss, sock) ControlClient_create(ss, sock)
 
 socket_t ControlClient_sock(_In_ ControlClient* self);
 // socket_t cclientSock(ControlClient* self);
@@ -65,6 +68,8 @@ bool ControlClient_sendPending(_In_ ControlClient* self);
 // bool cclientSendPending(ControlClient* self);
 #define cclientSendPending(self) ControlClient_sendPending(ControlClient(self))
 
+// void cclientQueue(ControlClient* self, ControlMsg* msg);
+#define cclientQueue(self, msg) (self)->_->queue(ControlClient(self), msg)
 // void cclientSend(ControlClient* self);
 #define cclientSend(self) (self)->_->send(ControlClient(self))
 // void cclientRecv(ControlClient* self);

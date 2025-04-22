@@ -1,11 +1,14 @@
 #include "control.h"
+#include "subspace.h"
 #include <cx/thread/prqueue.h>
 
 [methodprefix cclient] class ControlClient
 {
+    Subspace *subspace;
     ControlState state;
     PrQueue outbound;
 
+    void queue(ControlMsg *msg);
     void send();
     void recv();
     unbound socket_t sock();
@@ -14,5 +17,5 @@
 
     init();
     destroy();
-    factory create(socket_t sock);
+    factory create(Subspace *ss, socket_t sock);
 }

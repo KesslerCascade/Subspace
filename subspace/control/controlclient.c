@@ -9,13 +9,18 @@
 #include "controlclient.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include <cx/log.h>
+#include <cx/taskqueue.h>
+#include "controlserver.h"
+#include "subspace.h"
 
-_objfactory_guaranteed ControlClient* ControlClient_create(socket_t sock)
+_objfactory_guaranteed ControlClient* ControlClient_create(Subspace* ss, socket_t sock)
 {
     ControlClient* self;
     self = objInstCreate(ControlClient);
     objInstInit(self);
 
+    self->subspace = ss;
     controlInit(&self->state, sock);
 
     return self;
@@ -38,7 +43,7 @@ void ControlClient_destroy(_In_ ControlClient* self)
     }
     prqDestroy(&self->outbound);
 
-    netClose(self->state.sock);    
+    netClose(self->state.sock);
     controlStateDestroy(&self->state);
 }
 
@@ -55,8 +60,17 @@ void ControlClient_send(_In_ ControlClient* self)
 void ControlClient_recv(_In_ ControlClient* self)
 {
     if (controlMsgReady(&self->state)) {
-        ControlMsg* temp = controlGetMsg(&self->state, CF_ALLOC_AUTO);
-        controlMsgFree(temp, CF_ALLOC_AUTO);
+        ControlMsg* msg         = controlGetMsg(&self->state, CF_ALLOC_AUTO);
+        ctask_factory_t handler = controlServerGetHandler(msg->hdr.cmd);
+        if (handler) {
+            Task* task = handler(self, msg);
+            tqRun(self->subspace->workq, &task);
+        } else {
+            logFmt(Info,
+                   _S"Unknown command received from client: ${string}",
+                   stvar(strref, (strref)msg->hdr.cmd));
+            controlMsgFree(msg, CF_ALLOC_AUTO);
+        }
     };   // celebrate?
 }
 
@@ -73,6 +87,12 @@ bool ControlClient_closed(_In_ ControlClient* self)
 bool ControlClient_sendPending(_In_ ControlClient* self)
 {
     return sbufCAvail(self->state.sendbuf) > 0;
+}
+
+void ControlClient_queue(_In_ ControlClient* self, ControlMsg* msg)
+{
+    prqPush(&self->outbound, msg);
+    controlServerNotify();
 }
 
 // Autogen begins -----

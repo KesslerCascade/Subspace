@@ -139,5 +139,6 @@ void controlRecvDone(ControlState* cs);  // finish receiving this message and mo
 void controlFieldFree(ControlField* field, int allocmode);
 void controlFieldFreeMulti(uint32_t nfields, ControlField** fields, int allocmode, bool freearr);
 void controlMsgFree(ControlMsg* msg, int allocmode);
+ControlMsg* controlAllocMsg(int nfields, int allocmode);
 
 void controlStateDestroy(ControlState* cs);

@@ -26,7 +26,10 @@ bool netClose(socket_t sock)
 
 int netError(void)
 {
-    return WSAGetLastError();
+    int err = WSAGetLastError();
+    if (err == WSAEWOULDBLOCK)
+        err = EWOULDBLOCK;
+    return err;
 }
 
 #else

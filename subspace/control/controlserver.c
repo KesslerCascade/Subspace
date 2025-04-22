@@ -4,14 +4,19 @@
 #include "controlclient.h"
 
 #include <cx/container.h>
+#include <cx/math.h>
 #include <cx/thread.h>
 #include <cx/thread/prqueue.h>
 #include "net.h"
+
+#include "control/cmds/gamestart.h"
 
 saDeclare(socket_t);
 saDeclarePtr(ControlState);
 
 typedef struct ControlServer {
+    Subspace* subspace;
+
     Thread* thread;
     sa_ControlClient clients;
     atomic(ptr) active;   // currently active client to send messages to
@@ -21,6 +26,9 @@ typedef struct ControlServer {
 
     socket_t notifysock;   // dummy socket to wake up the thread
     int notifyport;
+
+    RWLock handler_lock;
+    hashtable handlers;
 } ControlServer;
 
 ControlServer svr;
@@ -30,7 +38,7 @@ static int controlThread(Thread* self)
     fd_set rset;
     fd_set wset;
     struct timeval sto = { 0 };
-    sto.tv_sec = 10;
+    sto.tv_sec         = 10;
     sa_int32 removedConns;
 
     saInit(&removedConns, int32, 4, SA_Sorted);
@@ -63,7 +71,7 @@ static int controlThread(Thread* self)
             socket_t newsock        = accept(svr.svrsock, (struct sockaddr*)&addr, &addrlen);
 
             if (newsock) {
-                ControlClient* ncli = cclientCreate(newsock);
+                ControlClient* ncli = cclientCreate(svr.subspace, newsock);
                 saPushC(&svr.clients, object, &ncli);
             }
         }
@@ -95,16 +103,22 @@ static int controlThread(Thread* self)
 
     netClose(svr.svrsock);
     netClose(svr.notifysock);
-    svr.svrsock = 0;
+    svr.svrsock    = 0;
     svr.notifysock = 0;
     return 0;
 }
 
-bool controlServerStart(void)
+bool controlServerStart(Subspace* ss)
 {
     memset(&svr, 0, sizeof(ControlServer));
+    svr.subspace = ss;
+    rwlockInit(&svr.handler_lock);
+    htInit(&svr.handlers, string, ptr, 16);
     saInit(&svr.clients, object, 4);
     srand(time(NULL));
+
+    PcgState pcg;
+    pcgAutoSeed(&pcg);
 
     // try to bind to a random port
     int i;
@@ -112,9 +126,9 @@ bool controlServerStart(void)
         struct sockaddr_in addr = { 0 };
 
         svr.svrsock               = socket(PF_INET, SOCK_STREAM, 0);
-        svr.port                  = rand() % 64512 + 1024;
+        svr.port                  = ss->port > 0 ? ss->port : pcgRange(&pcg, 1025, 65535);
         addr.sin_family           = AF_INET;
-        addr.sin_addr.S_un.S_addr = htonl(0x7f000001);
+        addr.sin_addr.S_un.S_addr = htonl(ss->listenaddr);
         addr.sin_port             = htons(svr.port);
 
         if (bind(svr.svrsock, (struct sockaddr*)&addr, sizeof(addr)) == 0 &&
@@ -133,7 +147,7 @@ bool controlServerStart(void)
         struct sockaddr_in addr = { 0 };
 
         svr.notifysock            = socket(PF_INET, SOCK_DGRAM, 0);
-        svr.notifyport            = rand() % 64512 + 1024;
+        svr.notifyport            = pcgRange(&pcg, 1025, 65535);
         addr.sin_family           = AF_INET;
         addr.sin_addr.S_un.S_addr = htonl(0x7f000001);
         addr.sin_port             = htons(svr.notifyport);
@@ -148,6 +162,9 @@ bool controlServerStart(void)
 
     if (svr.notifysock == 0)
         return false;
+
+    // register all the command handlers
+    CmdGameStart_register();
 
     // start up server thread
     svr.thread = thrCreate(controlThread, _S"Control Server", stvNone);
@@ -166,10 +183,29 @@ void controlServerNotify(void)
     sendto(svr.notifysock, &nothing, 1, 0, (struct sockaddr*)&addr, sizeof(addr));
 }
 
+bool controlServerRegisterHandler(const char* cmd, ctask_factory_t handler)
+{
+    withWriteLock (&svr.handler_lock) {
+        htInsert(&svr.handlers, strref, (strref)cmd, ptr, handler, HT_Ignore);
+    }
+    return true;
+}
+
+ctask_factory_t controlServerGetHandler(const char* cmd)
+{
+    ctask_factory_t ret = NULL;
+    withReadLock (&svr.handler_lock) {
+        htFind(svr.handlers, strref, (strref)cmd, ptr, &ret);
+    }
+    return ret;
+}
+
 void controlServerStop(void)
 {
     thrRequestExit(svr.thread);
     controlServerNotify();
     thrShutdown(svr.thread);
     thrRelease(&svr.thread);
+    rwlockDestroy(&svr.handler_lock);
+    htDestroy(&svr.handlers);
 }

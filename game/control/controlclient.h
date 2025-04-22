@@ -8,9 +8,11 @@ typedef struct MessageQueue {
     ControlMsg** msgs;
 } MessageQueue;
 
+enum RecvLaunchCmdResult { RLC_Timeout = 0, RLC_Launch, RLC_Exit, RLC_Error };
+
 // Standalone static startup messages without memory allocation
-void controlSendStartup(ControlState* cs);
-void controlRecvStartup(ControlState* cs);
+void controlSendGameStart(ControlState* cs);
+int controlRecvLaunchCmd(ControlState* cs);
 
 bool controlClientStart(void);
 void controlClientStop(void);

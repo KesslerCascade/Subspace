@@ -32,8 +32,10 @@ typedef struct Subspace {
     TaskQueue* workq;
     UIThread ui;
 
+    uint32_t listenaddr;
+    int port;
+
     bool devmode;
-    bool luadebug;
     bool exit;  // application is exiting
 } Subspace;
 

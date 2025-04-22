@@ -3,4 +3,5 @@
 
 abstract class ControlTask extends ComplexTask {
     object:ControlClient client;
+    ControlMsg *msg;        // message to process (control task becomes owner)
 }

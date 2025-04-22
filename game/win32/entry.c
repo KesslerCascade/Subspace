@@ -37,9 +37,9 @@ static char* nextp(char* p)
 
 int __stdcall entry()
 {
-    settings.gameDir     = smalloc(MAX_PATH);
-    settings.gameProgram = smalloc(MAX_PATH);
-    settings.gamePath    = smalloc(MAX_PATH);
+    //    settings.gameDir     = smalloc(MAX_PATH);
+    //    settings.gameProgram = smalloc(MAX_PATH);
+    //    settings.gamePath    = smalloc(MAX_PATH);
 
     const char* wincmdline = GetCommandLineA();
     char* cmdline          = sstrdup(wincmdline);
@@ -90,7 +90,7 @@ int __stdcall entry()
         }
     }
 
-#if 1
+#if 0
     strcpy(settings.gameDir, "M:\\Dev\\FTL1.6.3");
     strcpy(settings.gameProgram, "FTLGame.exe");
     strcpy(settings.gamePath, "M:\\Dev\\FTL1.6.3\\FTLGame.exe");
@@ -107,14 +107,14 @@ int __stdcall entry()
     strcpy(settings.gameProgram, "FTLGame.exe");
     strcpy(settings.gamePath,
            "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light\\FTLGame.exe");
-#elif 1
+#elif 0
     strcpy(settings.gameDir, "M:\\Games\\FTL");
     strcpy(settings.gameProgram, "FTLGame.exe");
     strcpy(settings.gamePath, "M:\\Games\\FTL\\FTLGame.exe");
 #endif
 
-    SetCurrentDirectoryA(settings.gameDir);
-    SetEnvironmentVariableA("USERPROFILE", settings.gameDir);
+    //    SetCurrentDirectoryA(settings.gameDir);
+    //    SetEnvironmentVariableA("USERPROFILE", settings.gameDir);
 
 #ifdef _DEBUG
     // AllocConsole();
@@ -144,4 +144,10 @@ void osWriteDbg(const char* str)
     HANDLE hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
     DWORD written  = 0;
     WriteConsoleA(hstdout, (void*)str, strlen(str), &written, NULL);
+}
+
+void osSetCurrentDir(const char* dir)
+{
+    SetCurrentDirectoryA(dir);
+    SetEnvironmentVariableA("USERPROFILE", dir);   // temp
 }

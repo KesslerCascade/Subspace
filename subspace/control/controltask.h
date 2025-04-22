@@ -64,6 +64,7 @@ typedef struct ControlTask {
     uint16 _intflags;        // internal flags reserved for use by the scheduler
     atomic(uint32) _advcount;        // number of times this task has been advanced
     ControlClient* client;
+    ControlMsg* msg;        // message to process (control task becomes owner)
 } ControlTask;
 extern ObjClassInfo ControlTask_clsinfo;
 #define ControlTask(inst) ((ControlTask*)(unused_noeval((inst) && &((inst)->_is_ControlTask)), (inst)))
