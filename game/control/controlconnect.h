@@ -1,6 +1,7 @@
 #pragma once
 
 #include "control.h"
+#include "proto.h"
 
 bool controlConnect(socket_t *sock);
 
@@ -12,3 +13,5 @@ int controlRecvLaunchCmd(ControlState* cs);
 
 // controlSendGameStart + controlRecvLaunchCmd + error handling
 int controlStartupHandshake(ControlState* cs);
+
+void controlSendLaunchFail(ControlState* cs, int failreason);

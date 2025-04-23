@@ -123,3 +123,19 @@ int controlStartupHandshake(ControlState* cs)
     }
     return lcmd;
 }
+
+void controlSendLaunchFail(ControlState* cs, int failreason)
+{
+    ControlMsgHeader mh = { 0 };
+    ControlField ff     = { 0 };
+
+    mh.nfields = 1;
+    strcpy(mh.cmd, "LaunchFail");
+    strcpy(ff.h.name, "reason");
+    ff.h.ftype   = CF_INT;
+    ff.d.cfd_int = failreason;
+
+    ControlField* fields[1] = { &ff };
+    controlPutMsg(cs, &mh, fields);
+    while (controlSend(cs)) {}
+}

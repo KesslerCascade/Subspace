@@ -63,6 +63,7 @@ int sscmain(int argc, char* argv[])
 
     if (!ftlbase) {
         log_str(LOG_Error, "Failed to load game executable!");
+        controlSendLaunchFail(&control, LAUNCH_FAIL_NOEXE);
         return 1;
     }
 
@@ -74,10 +75,12 @@ int sscmain(int argc, char* argv[])
     PatchState ps;
     if (!patchBegin(&ps, ftlbase)) {
         log_str(LOG_Error, "Patching failed to initialize");
+        controlSendLaunchFail(&control, LAUNCH_FAIL_OTHER);
         return 1;
     }
     if (!patchApplySeq(&ps, OSDepPatches) || !patchApplySeq(&ps, RequiredPatches)) {
         log_str(LOG_Error, "Required patches failed");
+        controlSendLaunchFail(&control, LAUNCH_FAIL_REQPATCH);
         return 1;
     }
 
@@ -85,6 +88,7 @@ int sscmain(int argc, char* argv[])
 
     if (!patchEnd(&ps)) {
         log_str(LOG_Error, "Patching failed to complete");
+        controlSendLaunchFail(&control, LAUNCH_FAIL_OTHER);
         return 1;
     }
 
