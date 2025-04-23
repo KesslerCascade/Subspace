@@ -1,4 +1,5 @@
 #include "frameadv.h"
+#include "feature/feature.h"
 #include "ftl/commandgui.h"
 #include "patch/patchlist.h"
 
@@ -30,6 +31,7 @@ static bool frameAdv_Enable(SubspaceFeature* feat, void* settings, bool enabled)
 Patch* FrameAdv_patches[] = { &patch_CommandGui_KeyDown, &patch_CommandGui_OnLoop, 0 };
 
 SubspaceFeature FrameAdv_feature = {
+    .name            = "FrameAdv",
     .enable          = frameAdv_Enable,
     .requiredPatches = FrameAdv_patches,
     .requiredSymbols = { &SYM(CommandGui_SetPaused), 0 }

@@ -1,6 +1,24 @@
 #include "hook/symbol.h"
+#include "log/log.h"
 #include "patch/patch.h"
 #include "subspacegame.h"
+
+static hashtbl feathash;
+
+void registerFeature(SubspaceFeature* feature)
+{
+    if (!feathash.ents) {
+        hashtbl_init(&feathash, 8, HT_STRING_KEYS);
+    }
+
+    hashtbl_add(&feathash, feature->name, feature);
+}
+
+SubspaceFeature* getFeature(const char* name)
+{
+    void* val = hashtbl_get(&feathash, name);
+    return (SubspaceFeature*)val;
+}
 
 bool initFeature(SubspaceFeature* feat, PatchState* ps)
 {
@@ -26,14 +44,20 @@ bool initFeature(SubspaceFeature* feat, PatchState* ps)
     // try to patch
     if (feat->requiredPatches) {
         if (!patchApplySeq(ps, feat->requiredPatches))
-            return false;
+            goto out;
     }
     if (feat->patch) {
         if (!feat->patch(feat, feat->settings, ps))
-            return false;
+            goto out;
     }
 
     feat->available = true;
+out:
+    if (feat->available) {
+        log_fmt(LOG_Verbose, "Feature succesfully initialized: %s", feat->name);
+    } else {
+        log_fmt(LOG_Warn, "Feature failed to patch: %s", feat->name);
+    }
     return true;
 }
 
@@ -51,4 +75,16 @@ bool enableFeature(SubspaceFeature* feat, bool enabled)
     }
 
     return feat->enabled;
+}
+
+void initAllFeatures(PatchState* ps)
+{
+    bool ret = true;
+    for (uint32_t i = 0; i < feathash.nslots; i++) {
+        SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
+        if (feat) {
+            if (!initFeature(feat, ps))
+                return;   // memory allocation failure
+        }
+    }
 }

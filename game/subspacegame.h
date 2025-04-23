@@ -50,10 +50,6 @@ typedef struct SubspaceGameSettings {
     char* gamePath;      // full path to game executable
 
     bool testMode;
-
-    SubspaceFeature* numericHull;
-    SubspaceFeature* frameAdv;
-    SubspaceFeature* timeWarp;
 } SubspaceGameSettings;
 
 typedef struct GameState {
@@ -77,5 +73,3 @@ extern ControlState control;
 
 int sscmain(int argc, char* argv[]);
 void sscmain2(void);   // main function that runs after the game has initialized CRT
-bool initFeature(SubspaceFeature* feat, PatchState* ps);
-bool enableFeature(SubspaceFeature* feat, bool enabled);

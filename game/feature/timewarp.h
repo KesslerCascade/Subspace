@@ -1,8 +1,7 @@
 #pragma once
 #include "ftl/commandgui.h"
+#include "feature.h"
 #include "subspacegame.h"
-
-extern SubspaceFeature TimeWarp_feature;
 
 bool timeWarpBegin();
 bool timeWarpIncrease();

@@ -6,10 +6,7 @@
 
 #include "control/controlclient.h"
 #include "control/controlconnect.h"
-#include "feature/frameadv.h"
-#include "feature/infoblock.h"
-#include "feature/numerichull.h"
-#include "feature/timewarp.h"
+#include "feature/feature.h"
 #include "ftl/ftl.h"
 #include "loader/loader.h"
 #include "log/log.h"
@@ -18,11 +15,10 @@
 #include "osdep.h"
 #include "version.h"
 
+#include "minicrt.h"
+
 SubspaceGameSettings settings = {
-    .addr     = 0x7f000001,   // 127.0.0.1
-    .frameAdv = &FrameAdv_feature,
-    //.numericHull = &NumericHull_feature,
-    .timeWarp = &TimeWarp_feature,
+    .addr = 0x7f000001,   // 127.0.0.1
 };
 GameState gs;
 
@@ -70,6 +66,11 @@ int sscmain(int argc, char* argv[])
         return 1;
     }
 
+    registerFeature(&InfoBlock_feature);
+    registerFeature(&TimeWarp_feature);
+    registerFeature(&FrameAdv_feature);
+    registerFeature(&NumericHull_feature);
+
     PatchState ps;
     if (!patchBegin(&ps, ftlbase)) {
         log_str(LOG_Error, "Patching failed to initialize");
@@ -80,30 +81,7 @@ int sscmain(int argc, char* argv[])
         return 1;
     }
 
-    if (initFeature(&InfoBlock_feature, &ps)) {
-        enableFeature(&InfoBlock_feature, true);
-        log_str(LOG_Verbose, "InfoBlock: PASSED");
-    } else {
-        log_str(LOG_Warn, "InfoBlock: FAILED");
-    }
-    if (initFeature(&TimeWarp_feature, &ps)) {
-        enableFeature(&TimeWarp_feature, true);
-        log_str(LOG_Verbose, "TimeWarp: PASSED");
-    } else {
-        log_str(LOG_Warn, "TimeWarp: FAILED");
-    }
-    if (initFeature(&FrameAdv_feature, &ps)) {
-        enableFeature(&FrameAdv_feature, true);
-        log_str(LOG_Verbose, "FrameAdv: PASSED");
-    } else {
-        log_str(LOG_Warn, "FrameAdv: FAILED");
-    }
-    if (initFeature(&NumericHull_feature, &ps)) {
-        enableFeature(&NumericHull_feature, true);
-        log_str(LOG_Verbose, "NumericHull: PASSED");
-    } else {
-        log_str(LOG_Warn, "NumericHull: FAILED");
-    }
+    initAllFeatures(&ps);
 
     if (!patchEnd(&ps)) {
         log_str(LOG_Error, "Patching failed to complete");

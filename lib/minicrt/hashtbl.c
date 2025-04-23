@@ -256,6 +256,31 @@ bool _hashtbl_getint(hashtbl* tbl, uintptr_t key, uintptr_t *pval)
     return false;
 }
 
+void* hashtbl_get_slot(hashtbl* tbl, uint32_t slot)
+{
+    if (slot > tbl->nslots)
+        return NULL;
+
+    if (!(tbl->bitmap[HT_BITMAP_IDX(slot)] & HT_BITMAP_USED_BIT(slot)) ||
+        (tbl->bitmap[HT_BITMAP_IDX(slot)] & HT_BITMAP_DELETED_BIT(slot)))
+        return NULL;
+
+    return tbl->ents[slot].data;
+}
+
+bool hashtbl_getint_slot(hashtbl* tbl, uint32_t slot, uintptr_t* pval)
+{
+    if (slot > tbl->nslots)
+        return false;
+
+    if (!(tbl->bitmap[HT_BITMAP_IDX(slot)] & HT_BITMAP_USED_BIT(slot)) ||
+        (tbl->bitmap[HT_BITMAP_IDX(slot)] & HT_BITMAP_DELETED_BIT(slot)))
+        return false;
+
+    *pval = (uintptr_t)tbl->ents[slot].data;
+    return true;
+}
+
 void* _hashtbl_del(hashtbl* tbl, uintptr_t key)
 {
     uint32_t slot;

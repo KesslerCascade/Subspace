@@ -1,9 +1,8 @@
 #pragma once
-#include "subspacegame.h"
 #include "ftl/capp.h"
 #include "ftl/commandgui.h"
-
-extern SubspaceFeature FrameAdv_feature;
+#include "feature.h"
+#include "subspacegame.h"
 
 void frameAdvStep(CommandGui *gui);
 void frameAdvEndFrame(CommandGui* gui);   // to be called at the end of each frame

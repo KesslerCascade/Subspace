@@ -1,5 +1,6 @@
 #include "ftl/stdlib.h"
 
+#include "feature/feature.h"
 #include "ftl/cfps.h"
 #include "ftl/globals.h"
 #include "ftl/graphics/colors.h"
@@ -21,26 +22,26 @@ void infoBlockRender(void)
     float y = 5;
 
     CSurface_GL_SetColor(COLOR_WHITE);
-    #ifdef _DEBUG
+#ifdef _DEBUG
     snprintf(buf, sizeof(buf), "Subspace %s (DEBUG BUILD)", subspace_version_str);
-    #else
+#else
     snprintf(buf, sizeof(buf), "Subspace %s", subspace_version_str);
-    #endif
+#endif
     basic_string_set(&tmp, buf);
     sz = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
-    y = sz.y;
+    y  = sz.y;
     basic_string_destroy(&tmp);
 
     snprintf(buf, sizeof(buf), "FTL %d.%d.%d", g_version_major, g_version_minor, g_version_rev);
     basic_string_set(&tmp, buf);
     sz = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
-    y = sz.y;
+    y  = sz.y;
     basic_string_destroy(&tmp);
 
     snprintf(buf, sizeof(buf), "FPS: %d", CFPS_fps(FPSControl));
     basic_string_set(&tmp, buf);
     sz = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
-    y = sz.y;
+    y  = sz.y;
     basic_string_destroy(&tmp);
 }
 
@@ -49,6 +50,7 @@ void infoBlockRender(void)
 Patch* InfoBlock_patches[] = { &patch_FTLButton_OnRender, &patch_TextLibrary_GetText, 0 };
 
 SubspaceFeature InfoBlock_feature = {
+    .name            = "InfoBlock",
     .requiredPatches = InfoBlock_patches,
     .requiredSymbols = { &SYM(freetype_easy_printRightAlign),
                         &SYM(CSurface_GL_SetColor),

@@ -2,6 +2,7 @@
 
 #include "timewarp.h"
 
+#include "feature/feature.h"
 #include "ftl/capp.h"
 #include "ftl/cfps.h"
 #include "ftl/globals.h"
@@ -280,6 +281,7 @@ Patch* TimeWarp_patches[] = {
 };
 
 SubspaceFeature TimeWarp_feature = {
+    .name            = "TimeWarp",
     .patch           = timeWarp_Patch,
     .enable          = timeWarp_Enable,
     .requiredPatches = TimeWarp_patches,

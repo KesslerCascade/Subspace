@@ -1,9 +1,8 @@
 #pragma once
 #include "ftl/shipmanager.h"
 #include "ftl/textlibrary.h"
+#include "feature.h"
 #include "subspacegame.h"
-
-extern SubspaceFeature NumericHull_feature;
 
 void numericHullBeforeRenderHealth(ShipManager* sm, bool renderText);
 void numericHullAfterRenderHealth(bool renderText);
