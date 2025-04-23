@@ -20,6 +20,8 @@ char* _minicrt_strcat(char* d, const char* src);
 #define strcat _minicrt_strcat
 char* _minicrt_strcpy(char* d, const char* src);
 #define strcpy _minicrt_strcpy
+char* _minicrt_strncpy(char* d, const char* src, unsigned int count);
+#define strncpy _minicrt_strncpy
 int _minicrt_strcmp(const char* str1, const char* str2);
 #define strcmp _minicrt_strcmp
 int _minicrt_strncmp(const char* str1, const char* str2, unsigned int count);
@@ -179,6 +181,8 @@ void* _hashtbl_get(hashtbl* tbl, uintptr_t key);
 #define hashtbl_get(tbl, key) _hashtbl_get(tbl, (uintptr_t)(key))
 bool _hashtbl_getint(hashtbl* tbl, uintptr_t key, uintptr_t* pval);
 #define hashtbl_getint(tbl, key, pval) _hashtbl_getint(tbl, (uintptr_t)(key), pval)
+void* hashtbl_get_slot(hashtbl* tbl, uint32_t slot);
+bool hashtbl_getint_slot(hashtbl* tbl, uint32_t slot, uintptr_t* pval);
 void* _hashtbl_del(hashtbl* tbl, uintptr_t key);
 #define hashtbl_del(tbl, key) _hashtbl_del(tbl, (uintptr_t)(key))
 void hashtbl_destroy(hashtbl* tbl);

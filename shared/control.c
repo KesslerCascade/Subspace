@@ -624,6 +624,92 @@ ControlMsg* controlAllocMsg(int nfields, int allocmode)
     return ret;
 }
 
+ControlMsg* controlNewMsg(const char* cmd, int nfields)
+{
+    ControlMsg* ret;
+
+    ret = controlAllocMsg(nfields, CF_ALLOC_AUTO);
+    strncpy(ret->hdr.cmd, cmd, sizeof(ret->hdr.cmd) - 1);
+    return ret;
+}
+
+void controlMsgInt(ControlMsg* msg, int nfield, const char* name, int val)
+{
+    if (nfield > msg->hdr.nfields)
+        return;
+    ControlField* f = msg->fields[nfield];
+    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
+    f->h.ftype   = CF_INT;
+    f->d.cfd_int = val;
+}
+
+void controlMsgUInt(ControlMsg* msg, int nfield, const char* name, unsigned int val)
+{
+    if (nfield > msg->hdr.nfields)
+        return;
+    ControlField* f = msg->fields[nfield];
+    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
+    f->h.ftype = CF_INT;
+    f->h.flags |= CF_UNSIGNED;
+    f->d.cfd_uint = val;
+}
+
+void controlMsgFloat32(ControlMsg* msg, int nfield, const char* name, float val)
+{
+    if (nfield > msg->hdr.nfields)
+        return;
+    ControlField* f = msg->fields[nfield];
+    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
+    f->h.ftype       = CF_FLOAT32;
+    f->d.cfd_float32 = val;
+}
+
+void controlMsgFloat64(ControlMsg* msg, int nfield, const char* name, double val)
+{
+    if (nfield > msg->hdr.nfields)
+        return;
+    ControlField* f = msg->fields[nfield];
+    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
+    f->h.ftype       = CF_FLOAT64;
+    f->d.cfd_float64 = val;
+}
+
+#ifdef SUBSPACE_GAME
+void controlMsgStr(ControlMsg* msg, int nfield, const char* name, const char* val)
+{
+    if (nfield > msg->hdr.nfields)
+        return;
+    ControlField* f = msg->fields[nfield];
+    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
+    f->h.ftype = CF_STRING;
+
+    size_t sz    = strlen(val) + 1;
+    f->d.cfd_str = allocBytes(sz, NULL, CF_ALLOC_AUTO, 0);
+    if (!f->d.cfd_str)
+        return;
+    memcpy(f->d.cfd_str, val, sz);
+}
+#else
+void controlMsgStr(ControlMsg* msg, int nfield, const char* name, strref val)
+{
+    if (nfield > msg->hdr.nfields)
+        return;
+    ControlField* f = msg->fields[nfield];
+    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
+    f->h.ftype = CF_STRING;
+    strDup(&f->d.cfd_str, val);
+}
+#endif
+
+ControlField* controlMsgFindField(ControlMsg* msg, const char* name)
+{
+    for (int i = 0; i < msg->hdr.nfields; i++) {
+        if (!strcmp(msg->fields[i]->h.name, name))
+            return msg->fields[i];
+    }
+    return NULL;
+}
+
 void controlStateDestroy(ControlState* cs)
 {
     // we assume that the socket is closed and abandoned

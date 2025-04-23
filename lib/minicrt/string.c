@@ -67,6 +67,16 @@ char* _minicrt_strcpy(char* d, const char* src)
     return ret;
 }
 
+char* _minicrt_strncpy(char* d, const char* src, unsigned int count)
+{
+    char* ret = d;
+    unsigned int c = 0;
+    for (; c < count && (*d = *src); ++c, ++d, ++src);
+    if (c == count)
+        *d = '\0';
+    return ret;
+}
+
 char* _minicrt_strlwr(char* str)
 {
     char* s = str;

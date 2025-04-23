@@ -141,4 +141,18 @@ void controlFieldFreeMulti(uint32_t nfields, ControlField** fields, int allocmod
 void controlMsgFree(ControlMsg* msg, int allocmode);
 ControlMsg* controlAllocMsg(int nfields, int allocmode);
 
+// Utility functions for building message in auto allocate mode
+ControlMsg* controlNewMsg(const char* cmd, int nfields);
+void controlMsgInt(ControlMsg* msg, int nfield, const char* name, int val);
+void controlMsgUInt(ControlMsg* msg, int nfield, const char* name, unsigned int val);
+void controlMsgFloat32(ControlMsg* msg, int nfield, const char* name, float val);
+void controlMsgFloat64(ControlMsg* msg, int nfield, const char* name, double val);
+#ifdef SUBSPACE_GAME
+void controlMsgStr(ControlMsg* msg, int nfield, const char* name, const char* val);
+#else
+void controlMsgStr(ControlMsg* msg, int nfield, const char* name, strref val);
+#endif
+
+ControlField* controlMsgFindField(ControlMsg* msg, const char* name);
+
 void controlStateDestroy(ControlState* cs);
