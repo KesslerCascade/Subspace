@@ -5,9 +5,9 @@
 #include <cx/obj.h>
 #include <cx/taskqueue.h>
 #include "controlclient.h"
+#include "controlserver.h"
 #include <cx/ssdtree.h>
 #include <cx/fs.h>
-#include "control/controlserver.h"
 #include "subspace.h"
 
 typedef struct TaskQueue TaskQueue;

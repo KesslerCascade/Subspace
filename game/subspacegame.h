@@ -44,6 +44,7 @@ typedef struct SubspaceFeature {
 typedef struct SubspaceGameSettings {
     uint32_t addr;
     int port;
+    uint32_t cookie;     // unique ID to track game instances
 
     char* gameDir;       // root directory where the game is located
     char* gameProgram;   // name of the game executable

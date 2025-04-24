@@ -4,7 +4,8 @@
 
 #include "minicrt.h"
 
-bool controlConnect(socket_t *sock) {
+bool controlConnect(socket_t* sock)
+{
     struct sockaddr_in addr   = { 0 };
     addr.sin_family           = AF_INET;
     addr.sin_addr.S_un.S_addr = htonl(settings.addr);
@@ -28,9 +29,9 @@ bool controlConnect(socket_t *sock) {
 void controlSendGameStart(ControlState* cs)
 {
     ControlMsgHeader mh = { 0 };
-    ControlField vf = { 0 }, majvf = { 0 }, minvf = { 0 };
+    ControlField vf = { 0 }, majvf = { 0 }, minvf = { 0 }, cookief = { 0 };
 
-    mh.nfields = 3;
+    mh.nfields = 4;
     strcpy(mh.cmd, "GameStart");
     strcpy(vf.h.name, "ver");
     vf.h.ftype   = CF_STRING;
@@ -44,7 +45,12 @@ void controlSendGameStart(ControlState* cs)
     minvf.h.ftype   = CF_INT;
     minvf.d.cfd_int = subspace_version_min;
 
-    ControlField* fields[3] = { &vf, &majvf, &minvf };
+    strcpy(cookief.h.name, "cookie");
+    cookief.h.ftype    = CF_INT;
+    cookief.h.flags    = CF_UNSIGNED;
+    cookief.d.cfd_uint = settings.cookie;
+
+    ControlField* fields[4] = { &vf, &majvf, &minvf, &cookief };
     controlPutMsg(cs, &mh, fields);
     while (controlSend(cs)) {}
 }

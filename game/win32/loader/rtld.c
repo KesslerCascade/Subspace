@@ -436,7 +436,12 @@ addr_t loadExe(const char* filename)
     IMAGE_NT_HEADERS* nthdr;
     int needreloc = 0;
 
-    imagebase = (addr_t)LoadLibraryExA(filename, NULL, DONT_RESOLVE_DLL_REFERENCES);
+    int fnlen          = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
+    wchar_t* filenamew = smalloc(fnlen * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, filename, -1, filenamew, fnlen);
+
+    imagebase = (addr_t)LoadLibraryExW(filenamew, NULL, DONT_RESOLVE_DLL_REFERENCES);
+    sfree(filenamew);
     if (!imagebase)
         goto done;
 
@@ -480,13 +485,18 @@ addr_t loadExe(const char* filename)
     IMAGE_NT_HEADERS* nthdr;
     int needreloc = 0;
 
-    hFile = CreateFileA(filename,
+    int fnlen          = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
+    wchar_t* filenamew = smalloc(fnlen * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, filename, -1, filenamew, fnlen);
+
+    hFile = CreateFileW(filenamew,
                         GENERIC_READ,
                         FILE_SHARE_READ,
                         NULL,
                         OPEN_EXISTING,
                         FILE_ATTRIBUTE_NORMAL,
                         0);
+    sfree(filenamew);
     if (!GetFileSizeEx(hFile, &sz))
         goto fail;
 

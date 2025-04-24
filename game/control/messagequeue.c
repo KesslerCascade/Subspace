@@ -12,6 +12,8 @@ MessageQueue* msgqCreate(int initsz, bool withcbs)
     queue->msgs    = malloc(sizeof(void*) * initsz);
     if (withcbs)
         queue->cbs = malloc(sizeof(void*) * initsz);
+    else
+        queue->cbs = NULL;
 
     return queue;
 }

@@ -1,8 +1,8 @@
 #include <cx/taskqueue.sidl>
 #include "controlclient.sidl"
+#include "controlserver.sidl"
 #include <cx/ssdtree.h>
 #include <cx/fs.h>
-#include "control/controlserver.h"
 #include "subspace.h"
 
 abstract class ControlTask extends ComplexTask {

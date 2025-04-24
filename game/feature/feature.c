@@ -54,7 +54,7 @@ bool initFeature(SubspaceFeature* feat, PatchState* ps)
     feat->available = true;
 out:
     if (feat->available) {
-        log_fmt(LOG_Verbose, "Feature succesfully initialized: %s", feat->name);
+        log_fmt(LOG_Verbose, "Feature succesfully patched: %s", feat->name);
     } else {
         log_fmt(LOG_Warn, "Feature failed to patch: %s", feat->name);
     }

@@ -1,6 +1,7 @@
 if(WIN32)
     add_executable(subspacedbg
-        win32/subspacedbg.c)
+        win32/subspacedbg.c
+        )
     target_compile_definitions(subspacedbg PRIVATE _UNICODE UNICODE)
 
     set(CMAKE_WIN32_EXECUTABLE true)
@@ -11,8 +12,13 @@ set(EXTRA_SIDL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 set(SUBSPACE_SIDL
     control/controlclient.sidl
     control/controltask.sidl
+    control/controlserver.sidl
     control/cmds/cmdgamestart.sidl
-    control/cmds/cmdlog.sidl)
+    control/cmds/cmdlaunchfail.sidl
+    control/cmds/cmdlog.sidl
+    gamemgr/gameinst.sidl
+    gamemgr/gamemgr.sidl
+    ui/subspaceui.sidl)
 
 add_sidl(${SUBSPACE_SIDL})
 
@@ -21,8 +27,12 @@ add_executable(subspace
     control/controlserver.c
     control/controltask.c
     control/cmds/cmdgamestart.c
+    control/cmds/cmdlaunchfail.c
     control/cmds/cmdlog.c
-    ui/uithread.c
+    gamemgr/gameinst.c
+    gamemgr/gamemgr.c
+    ui/subspaceui.c
+    win32/process.c
     win32/win32.c
     filesys.c
     log.c

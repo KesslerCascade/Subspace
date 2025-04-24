@@ -1,0 +1,16 @@
+#include <cx/taskqueue.sidl>
+#include "subspace.h"
+
+[methodprefix ssui] class SubspaceUI {
+    Subspace *ss;
+    object:TaskQueue uiq;
+    object:TaskQueue uiworkers;
+    bool started;
+
+    factory create(Subspace *subspace);
+    bool init();
+    bool shutdown();
+
+    void start();
+    void stop();
+}

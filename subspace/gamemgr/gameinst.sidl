@@ -1,0 +1,42 @@
+#include "subspace.h"
+
+class GameMgr;
+class ControlClient;
+
+typedef enum GameInstLaunchMode {
+    GI_PLAY,
+    GI_VALIDATE
+} GameInstLaunchMode;
+
+typedef enum GameInstState {
+    GI_Init,
+    GI_Loading,
+    GI_Menu,
+    GI_Run,
+    GI_Practice,
+    GI_Failed,
+    GI_Exited
+} GameInstState;
+
+[methodprefix ginst] class GameInst
+{
+    Subspace *ss;
+    weak:GameMgr mgr;
+
+    uint32 cookie;      // unique cookie for game comms
+    weak:ControlClient client;
+    ProcessHandle process;
+
+    RWLock lock;
+
+    string exepath;
+    GameInstLaunchMode mode;
+    GameInstState state;
+
+    int failReason;
+
+    factory create(GameMgr *mgr, strref exepath, GameInstLaunchMode mode);
+    factory createForClient(GameMgr *mgr, ControlClient *client, uint32 cookie); // for dev mode clients
+    bool launch();
+    void setState(GameInstState state);
+}

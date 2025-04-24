@@ -148,6 +148,10 @@ void osWriteDbg(const char* str)
 
 void osSetCurrentDir(const char* dir)
 {
-    SetCurrentDirectoryA(dir);
-    SetEnvironmentVariableA("USERPROFILE", dir);   // temp
+    int dlen      = MultiByteToWideChar(CP_UTF8, 0, dir, -1, NULL, 0);
+    wchar_t* dirw = smalloc(dlen * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, dir, -1, dirw, dlen);
+
+    SetCurrentDirectoryW(dirw);
+    SetEnvironmentVariableW(L"USERPROFILE", dirw);   // temp
 }

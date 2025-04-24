@@ -23,9 +23,9 @@ static _objfactory_guaranteed Task* CmdLog_factory(ControlClient* client, Contro
     return Task(self);
 }
 
-void CmdLog_register()
+void CmdLog_register(ControlServer* svr)
 {
-    controlServerRegisterHandler("Log", CmdLog_factory);
+    cserverRegisterHandler(svr, _S"Log", CmdLog_factory);
 }
 
 uint32 CmdLog_run(_In_ CmdLog* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)

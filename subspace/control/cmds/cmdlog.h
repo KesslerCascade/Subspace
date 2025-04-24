@@ -85,9 +85,9 @@ typedef struct CmdLog_WeakRef {
 } CmdLog_WeakRef;
 #define CmdLog_WeakRef(inst) ((CmdLog_WeakRef*)(unused_noeval((inst) && &((inst)->_is_CmdLog_WeakRef)), (inst)))
 
-void CmdLog_register();
-// void cmdlogRegister();
-#define cmdlogRegister() CmdLog_register()
+void CmdLog_register(ControlServer* svr);
+// void cmdlogRegister(ControlServer* svr);
+#define cmdlogRegister(svr) CmdLog_register(ControlServer(svr))
 
 // void cmdlogRequireTask(CmdLog* self, Task* dep, bool failok);
 //

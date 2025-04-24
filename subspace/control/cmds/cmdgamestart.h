@@ -85,9 +85,9 @@ typedef struct CmdGameStart_WeakRef {
 } CmdGameStart_WeakRef;
 #define CmdGameStart_WeakRef(inst) ((CmdGameStart_WeakRef*)(unused_noeval((inst) && &((inst)->_is_CmdGameStart_WeakRef)), (inst)))
 
-void CmdGameStart_register();
-// void cmdgamestartRegister();
-#define cmdgamestartRegister() CmdGameStart_register()
+void CmdGameStart_register(ControlServer* svr);
+// void cmdgamestartRegister(ControlServer* svr);
+#define cmdgamestartRegister(svr) CmdGameStart_register(ControlServer(svr))
 
 // void cmdgamestartRequireTask(CmdGameStart* self, Task* dep, bool failok);
 //

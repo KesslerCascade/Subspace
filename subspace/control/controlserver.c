@@ -1,46 +1,52 @@
-#include "controlserver.h"
-#include <cx/thread.h>
-#include <stdlib.h>
-#include "controlclient.h"
-
+// ==================== Auto-generated section begins ====================
+// clang-format off
+// Do not modify the contents of this section; any changes will be lost!
+#include <cx/obj.h>
+#include <cx/debug/assert.h>
+#include <cx/obj/objstdif.h>
 #include <cx/container.h>
+#include <cx/string.h>
+#include "controlserver.h"
+// clang-format on
+// ==================== Auto-generated section ends ======================
 #include <cx/math.h>
-#include <cx/thread.h>
-#include <cx/thread/prqueue.h>
-#include "net.h"
 
-#include "control/cmds/cmdgamestart.h"
-#include "control/cmds/cmdlog.h"
+#include "cmds/cmdgamestart.h"
+#include "cmds/cmdlaunchfail.h"
+#include "cmds/cmdlog.h"
 
-saDeclare(socket_t);
-saDeclarePtr(ControlState);
+_objfactory_guaranteed ControlServer* ControlServer_create(Subspace* subspace)
+{
+    ControlServer* self;
+    self = objInstCreate(ControlServer);
 
-typedef struct ControlServer {
-    Subspace* subspace;
+    self->ss = subspace;
 
-    Thread* thread;
-    sa_ControlClient clients;
-    atomic(ptr) active;   // currently active client to send messages to
+    objInstInit(self);
+    return self;
+}
 
-    socket_t svrsock;
-    int port;
-
-    socket_t notifysock;   // dummy socket to wake up the thread
-    int notifyport;
-
-    RWLock handler_lock;
-    hashtable handlers;
-} ControlServer;
-
-ControlServer svr;
+_objinit_guaranteed bool ControlServer_init(_In_ ControlServer* self)
+{
+    // Autogen begins -----
+    saInit(&self->clients, object, 1);
+    rwlockInit(&self->handler_lock);
+    htInit(&self->handlers, string, ptr, 16);
+    return true;
+    // Autogen ends -------
+}
 
 static int controlThread(Thread* self)
 {
+    ControlServer* svr = stvlNextObj(&self->args, ControlServer);
     fd_set rset;
     fd_set wset;
     struct timeval sto = { 0 };
     sto.tv_sec         = 10;
     sa_int32 removedConns;
+
+    if (!svr)
+        return 1;
 
     saInit(&removedConns, int32, 4, SA_Sorted);
 
@@ -48,13 +54,13 @@ static int controlThread(Thread* self)
         int maxfd = 0;
 
         FD_ZERO(&rset);
-        FD_SET(svr.svrsock, &rset);
-        FD_SET(svr.notifysock, &rset);
-        maxfd = max(maxfd, svr.svrsock + 1);
-        maxfd = max(maxfd, svr.notifysock + 1);
+        FD_SET(svr->svrsock, &rset);
+        FD_SET(svr->notifysock, &rset);
+        maxfd = max(maxfd, svr->svrsock + 1);
+        maxfd = max(maxfd, svr->notifysock + 1);
 
         FD_ZERO(&wset);
-        foreach (sarray, idx, ControlClient*, cc, svr.clients) {
+        foreach (sarray, idx, ControlClient*, cc, svr->clients) {
             socket_t sock = cclientSock(cc);
             FD_SET(sock, &rset);
             if (cclientSendPending(cc)) {
@@ -65,29 +71,29 @@ static int controlThread(Thread* self)
 
         select(maxfd, &rset, &wset, NULL, &sto);
 
-        if (FD_ISSET(svr.svrsock, &rset)) {
+        if (FD_ISSET(svr->svrsock, &rset)) {
             struct sockaddr_in addr = { 0 };
             int addrlen             = sizeof(addr);
             // new connection inbound
-            socket_t newsock        = accept(svr.svrsock, (struct sockaddr*)&addr, &addrlen);
+            socket_t newsock        = accept(svr->svrsock, (struct sockaddr*)&addr, &addrlen);
 
             if (newsock) {
                 logFmt(Verbose,
                        _S"Accepting connection from ${string}:${int}",
                        stvar(strref, (strref)inet_ntoa(addr.sin_addr)),
                        stvar(int32, ntohs(addr.sin_port)));
-                ControlClient* ncli = cclientCreate(svr.subspace, newsock);
-                saPushC(&svr.clients, object, &ncli);
+                ControlClient* ncli = cclientCreate(svr, newsock);
+                saPushC(&svr->clients, object, &ncli);
             }
         }
 
         // clear out the single byte sent to the notify socket
-        if (FD_ISSET(svr.notifysock, &rset)) {
+        if (FD_ISSET(svr->notifysock, &rset)) {
             char tmp;
-            recv(svr.notifysock, &tmp, 1, 0);
+            recv(svr->notifysock, &tmp, 1, 0);
         }
 
-        foreach (sarray, idx, ControlClient*, cc, svr.clients) {
+        foreach (sarray, idx, ControlClient*, cc, svr->clients) {
             // send any outbound data
             cclientSend(cc);
 
@@ -101,27 +107,23 @@ static int controlThread(Thread* self)
         }
 
         for (int i = saSize(removedConns) - 1; i >= 0; --i) {
-            saRemove(&svr.clients, removedConns.a[i]);
+            saRemove(&svr->clients, removedConns.a[i]);
         }
         saClear(&removedConns);
     }
 
-    netClose(svr.svrsock);
-    netClose(svr.notifysock);
-    svr.svrsock    = 0;
-    svr.notifysock = 0;
+    netClose(svr->svrsock);
+    netClose(svr->notifysock);
+    svr->svrsock    = 0;
+    svr->notifysock = 0;
+    saClear(&svr->clients);
+    objRelease(&svr);
     return 0;
 }
 
-bool controlServerStart(Subspace* ss)
+bool ControlServer_start(_In_ ControlServer* self)
 {
-    memset(&svr, 0, sizeof(ControlServer));
-    svr.subspace = ss;
-    rwlockInit(&svr.handler_lock);
-    htInit(&svr.handlers, string, ptr, 16);
-    saInit(&svr.clients, object, 4);
-    srand(time(NULL));
-
+    Subspace* ss = self->ss;
     PcgState pcg;
     pcgAutoSeed(&pcg);
 
@@ -130,93 +132,114 @@ bool controlServerStart(Subspace* ss)
     for (i = 0; i < 10000; i++) {
         struct sockaddr_in addr = { 0 };
 
-        svr.svrsock               = socket(PF_INET, SOCK_STREAM, 0);
-        svr.port                  = ss->port > 0 ? ss->port : pcgRange(&pcg, 1025, 65535);
+        self->svrsock             = socket(PF_INET, SOCK_STREAM, 0);
+        self->port                = ss->port > 0 ? ss->port : pcgRange(&pcg, 1025, 65535);
         addr.sin_family           = AF_INET;
         addr.sin_addr.S_un.S_addr = htonl(ss->listenaddr);
-        addr.sin_port             = htons(svr.port);
+        addr.sin_port             = htons(self->port);
 
-        if (bind(svr.svrsock, (struct sockaddr*)&addr, sizeof(addr)) == 0 &&
-            listen(svr.svrsock, 5) == 0) {
+        if (bind(self->svrsock, (struct sockaddr*)&addr, sizeof(addr)) == 0 &&
+            listen(self->svrsock, 5) == 0) {
             logFmt(Verbose,
                    _S"Listening on ${string}:${int}",
                    stvar(strref, (strref)inet_ntoa(addr.sin_addr)),
-                   stvar(int32, svr.port));
+                   stvar(int32, self->port));
             break;
         }
 
-        netClose(svr.svrsock);
-        svr.svrsock = 0;
+        netClose(self->svrsock);
+        self->svrsock = 0;
     }
-    netSetNonblock(svr.svrsock, true);
 
-    if (svr.svrsock == 0)
+    if (self->svrsock == 0)
         return false;
+    netSetNonblock(self->svrsock, true);
 
     for (i = 0; i < 10000; i++) {
         struct sockaddr_in addr = { 0 };
 
-        svr.notifysock            = socket(PF_INET, SOCK_DGRAM, 0);
-        svr.notifyport            = pcgRange(&pcg, 1025, 65535);
+        self->notifysock          = socket(PF_INET, SOCK_DGRAM, 0);
+        self->notifyport          = pcgRange(&pcg, 1025, 65535);
         addr.sin_family           = AF_INET;
         addr.sin_addr.S_un.S_addr = htonl(0x7f000001);
-        addr.sin_port             = htons(svr.notifyport);
+        addr.sin_port             = htons(self->notifyport);
 
-        if (bind(svr.notifysock, (struct sockaddr*)&addr, sizeof(addr)) == 0)
+        if (bind(self->notifysock, (struct sockaddr*)&addr, sizeof(addr)) == 0)
             break;
 
-        netClose(svr.notifysock);
-        svr.notifysock = 0;
+        netClose(self->notifysock);
+        self->notifysock = 0;
     }
-    netSetNonblock(svr.notifysock, true);
 
-    if (svr.notifysock == 0)
+    if (self->notifysock == 0)
         return false;
+    netSetNonblock(self->notifysock, true);
 
     // register all the command handlers
-    CmdGameStart_register();
-    CmdLog_register();
+    CmdGameStart_register(self);
+    CmdLaunchFail_register(self);
+    CmdLog_register(self);
 
     // start up server thread
-    svr.thread = thrCreate(controlThread, _S"Control Server", stvNone);
+    ControlServer* csthr = objAcquire(self);   // for the thread to own
+    self->thread         = thrCreate(controlThread, _S"Control Server", stvar(object, csthr));
 
-    return (svr.thread != NULL);
+    return (self->thread != NULL);
 }
 
-void controlServerNotify(void)
+void ControlServer_stop(_In_ ControlServer* self)
+{
+    thrRequestExit(self->thread);
+    cserverNotify(self);
+    thrShutdown(self->thread);
+    thrRelease(&self->thread);
+    htClear(&self->handlers);
+}
+
+void ControlServer_notify(_In_ ControlServer* self)
 {
     struct sockaddr_in addr   = { 0 };
     addr.sin_family           = AF_INET;
     addr.sin_addr.S_un.S_addr = htonl(0x7f000001);
-    addr.sin_port             = htons(svr.notifyport);
+    addr.sin_port             = htons(self->notifyport);
 
     char nothing = '\0';
-    sendto(svr.notifysock, &nothing, 1, 0, (struct sockaddr*)&addr, sizeof(addr));
+    sendto(self->notifysock, &nothing, 1, 0, (struct sockaddr*)&addr, sizeof(addr));
 }
 
-bool controlServerRegisterHandler(const char* cmd, ctask_factory_t handler)
+bool ControlServer_registerHandler(_In_ ControlServer* self, _In_opt_ strref cmd,
+                                   ctask_factory_t handler)
 {
-    withWriteLock (&svr.handler_lock) {
-        htInsert(&svr.handlers, strref, (strref)cmd, ptr, handler, HT_Ignore);
+    withWriteLock (&self->handler_lock) {
+        htInsert(&self->handlers, strref, cmd, ptr, handler, HT_Ignore);
     }
     return true;
 }
 
-ctask_factory_t controlServerGetHandler(const char* cmd)
+ctask_factory_t ControlServer_getHandler(_In_ ControlServer* self, _In_opt_ strref cmd)
 {
     ctask_factory_t ret = NULL;
-    withReadLock (&svr.handler_lock) {
-        htFind(svr.handlers, strref, (strref)cmd, ptr, &ret);
+    withReadLock (&self->handler_lock) {
+        htFind(self->handlers, strref, cmd, ptr, &ret);
     }
     return ret;
 }
 
-void controlServerStop(void)
+int ControlServer_port(_In_ ControlServer* self)
 {
-    thrRequestExit(svr.thread);
-    controlServerNotify();
-    thrShutdown(svr.thread);
-    thrRelease(&svr.thread);
-    rwlockDestroy(&svr.handler_lock);
-    htDestroy(&svr.handlers);
+    return self->port;
 }
+
+void ControlServer_destroy(_In_ ControlServer* self)
+{
+    // Autogen begins -----
+    objRelease(&self->thread);
+    saDestroy(&self->clients);
+    rwlockDestroy(&self->handler_lock);
+    htDestroy(&self->handlers);
+    // Autogen ends -------
+}
+
+// Autogen begins -----
+#include "controlserver.auto.inc"
+// Autogen ends -------

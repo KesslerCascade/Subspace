@@ -1,0 +1,18 @@
+#include "gameinst.sidl"
+
+#include <cx/math.h>
+
+[methodprefix gmgr] class GameMgr {
+    Subspace *ss;
+
+    RWLock gmgrlock;
+    hashtable:uint32:object insts;      // hashed by cookie
+    PcgState pcg;
+
+    factory create(Subspace *subspace);
+    void reg(GameInst *inst);
+    void unreg(GameInst *inst);
+    GameInst *acquireByCookie(uint32 cookie);
+
+    uint32 genCookie();
+}

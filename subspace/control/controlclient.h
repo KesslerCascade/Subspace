@@ -7,6 +7,10 @@
 #include "subspace.h"
 #include <cx/thread/prqueue.h>
 
+typedef struct ControlServer ControlServer;
+typedef struct ControlServer_WeakRef ControlServer_WeakRef;
+typedef struct GameInst GameInst;
+typedef struct GameInst_WeakRef GameInst_WeakRef;
 typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
 saDeclarePtr(ControlClient);
@@ -33,7 +37,9 @@ typedef struct ControlClient {
     atomic(uintptr) _ref;
     atomic(ptr) _weakref;
 
-    Subspace* subspace;
+    Subspace* ss;
+    Weak(ControlServer)* svr;
+    Weak(GameInst)* inst;
     ControlState state;
     PrQueue outbound;
 } ControlClient;
@@ -52,9 +58,9 @@ typedef struct ControlClient_WeakRef {
 } ControlClient_WeakRef;
 #define ControlClient_WeakRef(inst) ((ControlClient_WeakRef*)(unused_noeval((inst) && &((inst)->_is_ControlClient_WeakRef)), (inst)))
 
-_objfactory_guaranteed ControlClient* ControlClient_create(Subspace* ss, socket_t sock);
-// ControlClient* cclientCreate(Subspace* ss, socket_t sock);
-#define cclientCreate(ss, sock) ControlClient_create(ss, sock)
+_objfactory_guaranteed ControlClient* ControlClient_create(ControlServer* svr, socket_t sock);
+// ControlClient* cclientCreate(ControlServer* svr, socket_t sock);
+#define cclientCreate(svr, sock) ControlClient_create(ControlServer(svr), sock)
 
 socket_t ControlClient_sock(_In_ ControlClient* self);
 // socket_t cclientSock(ControlClient* self);

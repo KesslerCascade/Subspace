@@ -1,0 +1,32 @@
+#include "control.h"
+#include "subspace.h"
+#include "net.h"
+#include "controlclient.sidl"
+#include <cx/thread/threadobj.sidl>
+#include <cx/taskqueue.sidl>
+
+typedef _objfactory_guaranteed Task* (*ctask_factory_t)(ControlClient* client, ControlMsg* msg);
+
+[methodprefix cserver] class ControlServer {
+    Subspace *ss;
+    object:Thread thread;
+    sarray:object:ControlClient clients;
+
+    socket_t svrsock;
+    int port;
+
+    socket_t notifysock;
+    int notifyport;
+
+    RWLock handler_lock;
+    hashtable:string:ptr handlers;
+
+    factory create(Subspace *subspace);
+    bool start();
+    void stop();
+    void notify();
+
+    bool registerHandler(strref cmd, ctask_factory_t handler);
+    ctask_factory_t getHandler(strref cmd);
+    int port();
+}

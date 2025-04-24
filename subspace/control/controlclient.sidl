@@ -2,9 +2,13 @@
 #include "subspace.h"
 #include <cx/thread/prqueue.h>
 
+class ControlServer;
+class GameInst;
 [methodprefix cclient] class ControlClient
 {
-    Subspace *subspace;
+    Subspace *ss;
+    weak:ControlServer svr;
+    weak:GameInst inst;
     ControlState state;
     PrQueue outbound;
 
@@ -17,5 +21,5 @@
 
     init();
     destroy();
-    factory create(Subspace *ss, socket_t sock);
+    factory create(ControlServer *svr, socket_t sock);
 }

@@ -31,6 +31,10 @@ static void parseArgs(int argc, char* argv[])
         if (!stricmp(argv[i], "-port") && i + 1 < argc) {
             settings.port = atoi(argv[++i]);
         }
+        if (!stricmp(argv[i], "-cookie") && i + 2 < argc) {
+            settings.cookie = strtol(argv[++i], NULL, 16) << 16;
+            settings.cookie |= strtol(argv[++i], NULL, 16);
+        }
     }
 }
 
@@ -40,7 +44,7 @@ int sscmain(int argc, char* argv[])
     parseArgs(argc, argv);
     netInit();
 
-    if (settings.port == 0) {
+    if (settings.port == 0 || settings.cookie == 0) {
         osShowError("This executible is not intended to be run directly. "
                     "Please launch the main Subspace program to run the game.");
         return 1;
@@ -51,7 +55,6 @@ int sscmain(int argc, char* argv[])
     if (!controlConnect(&sock))
         return 1;
     controlInit(&control, sock);
-    controlSendGameStart(&control);
 
     int lcmd = controlStartupHandshake(&control);
     if (lcmd != RLC_Launch)
@@ -59,7 +62,7 @@ int sscmain(int argc, char* argv[])
 
     osSetCurrentDir(settings.gameDir);
     log_fmt(LOG_Info, "Loading executable:  %s", settings.gamePath);
-    ftlbase = loadProgram(settings.gameProgram);
+    ftlbase = loadProgram(settings.gamePath);
 
     if (!ftlbase) {
         log_str(LOG_Error, "Failed to load game executable!");
@@ -103,6 +106,6 @@ void sscmain2(void)
 {
     controlClientStart();
     log_client();
-    log_str(LOG_Info, "Game communication thread started");
+    log_str(LOG_Info, "Communication thread started");
     return;
 }

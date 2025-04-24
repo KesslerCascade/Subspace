@@ -9,18 +9,17 @@
 #include "controlclient.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include <cx/log.h>
-#include <cx/taskqueue.h>
+#include "gamemgr/gamemgr.h"
 #include "controlserver.h"
-#include "subspace.h"
 
-_objfactory_guaranteed ControlClient* ControlClient_create(Subspace* ss, socket_t sock)
+_objfactory_guaranteed ControlClient* ControlClient_create(ControlServer* svr, socket_t sock)
 {
     ControlClient* self;
     self = objInstCreate(ControlClient);
     objInstInit(self);
 
-    self->subspace = ss;
+    self->svr = objGetWeak(ControlServer, svr);
+    self->ss  = svr->ss;
     controlInit(&self->state, sock);
 
     return self;
@@ -45,6 +44,10 @@ void ControlClient_destroy(_In_ ControlClient* self)
 
     netClose(self->state.sock);
     controlStateDestroy(&self->state);
+    // Autogen begins -----
+    objDestroyWeak(&self->svr);
+    objDestroyWeak(&self->inst);
+    // Autogen ends -------
 }
 
 void ControlClient_send(_In_ ControlClient* self)
@@ -59,22 +62,29 @@ void ControlClient_send(_In_ ControlClient* self)
 
 void ControlClient_recv(_In_ ControlClient* self)
 {
-    if (controlMsgReady(&self->state)) {
-        ControlMsg* msg         = controlGetMsg(&self->state, CF_ALLOC_AUTO);
-        if (!msg)
-            return;
+    ControlServer* svr = objAcquireFromWeak(ControlServer, self->svr);
+    if (!svr)
+        return;
 
-        ctask_factory_t handler = controlServerGetHandler(msg->hdr.cmd);
+    if (controlMsgReady(&self->state)) {
+        ControlMsg* msg = controlGetMsg(&self->state, CF_ALLOC_AUTO);
+        if (!msg) {
+            objRelease(&svr);
+            return;
+        }
+
+        ctask_factory_t handler = cserverGetHandler(svr, (strref)msg->hdr.cmd);
         if (handler) {
             Task* task = handler(self, msg);
-            tqRun(self->subspace->workq, &task);
+            tqRun(self->ss->workq, &task);
         } else {
             logFmt(Info,
                    _S"Unknown command received from client: ${string}",
                    stvar(strref, (strref)msg->hdr.cmd));
             controlMsgFree(msg, CF_ALLOC_AUTO);
         }
-    };   // celebrate?
+    };
+    objRelease(&svr);
 }
 
 socket_t ControlClient_sock(_In_ ControlClient* self)
@@ -94,8 +104,14 @@ bool ControlClient_sendPending(_In_ ControlClient* self)
 
 void ControlClient_queue(_In_ ControlClient* self, ControlMsg* msg)
 {
+    ControlServer* svr = objAcquireFromWeak(ControlServer, self->svr);
+    if (!svr)
+        return;
+
     prqPush(&self->outbound, msg);
-    controlServerNotify();
+    cserverNotify(svr);
+
+    objRelease(&svr);
 }
 
 // Autogen begins -----

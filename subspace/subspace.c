@@ -2,6 +2,8 @@
 #include "version.h"
 
 #include "control/controlserver.h"
+#include "gamemgr/gamemgr.h"
+#include "ui/subspaceui.h"
 
 #include <cx/debug.h>
 #include <cx/log.h>
@@ -13,16 +15,13 @@ DEFINE_ENTRY_POINT
 VFS* filesys;
 Subspace subspace = { .listenaddr = 0x7f000001 };
 
-static void parseArgs(Subspace* ss)
+static void parseArgs(Subspace* ss, VFS* vfs)
 {
     int nargs = saSize(cmdArgs);
     for (int i = 0; i < nargs; i++) {
         if (strEqi(cmdArgs.a[i], _S"-basedir") && i < nargs - 1) {
             i++;
-            if (subspaceCheckBaseDir(filesys, cmdArgs.a[i])) {
-                strDup(&ss->basedir, cmdArgs.a[i]);
-                pathNormalize(&ss->basedir);
-            }
+            subspaceSetBaseDir(ss, vfs, cmdArgs.a[i]);
         }
         if (strEqi(cmdArgs.a[i], _S"-dev")) {
             ss->devmode = true;
@@ -59,11 +58,11 @@ int entryPoint()
     if (!netInit())
         fatalError(_S"Could not initialize networking", true);
 
-    parseArgs(&subspace);
+    parseArgs(&subspace, filesys);
 
     // try to find basedir
     if (strEmpty(subspace.basedir)) {
-        if (!subspaceFindBaseDir(&subspace.basedir, filesys)) {
+        if (!subspaceFindBaseDir(&subspace, filesys)) {
             fatalError(
                 _S
                 "Could not find Subspace installation folder. Please ensure that the required files are present.",
@@ -96,6 +95,8 @@ int entryPoint()
     }
     logFmt(Notice, _S"Subspace ${string} starting up!", stvar(strref, (strref)subspace_version_str));
     logFmt(Info, _S"Install directory is ${string}.", stvar(string, subspace.basedir));
+    if (subspace.devmode)
+        logStr(Notice, _S"Developer mode engaged. Good luck and have fun!");
 
     // Create task queue
     int ncores = osPhysicalCPUs();
@@ -109,25 +110,37 @@ int entryPoint()
     if (subspace.workq)
         ret &= tqStart(subspace.workq);
 
-    if (!uiInit(&subspace.ui, &subspace)) {
+    subspace.ui = ssuiCreate(&subspace);
+    if (!ssuiInit(subspace.ui)) {
         fatalError(_S"Failed to initialize UI.", false);
     }
 
-    if (!controlServerStart(&subspace)) {
+    subspace.gmgr = gmgrCreate(&subspace);
+
+    subspace.svr = cserverCreate(&subspace);
+    if (!cserverStart(subspace.svr)) {
         fatalError(_S"Failed to start control server.", false);
     }
 
-    uiStart(&subspace.ui);
+    ssuiStart(subspace.ui);
+
+    // TEMP FOR TESTING
+    string tmp = 0;
+    ssdStringOut(subspace.settings, _S"ftl/exe", &tmp);
+    GameInst* gitest = ginstCreate(subspace.gmgr, tmp, GI_PLAY);
+    strDestroy(&tmp);
+    gmgrReg(subspace.gmgr, gitest);
+    ginstLaunch(gitest);
 
     do {
         eventWaitTimeout(&subspace.notify, timeS(10));
 
     } while (!subspace.exit);
 
-    uiStop(&subspace.ui);
-    uiShutdown(&subspace.ui);
+    ssuiStop(subspace.ui);
+    ssuiShutdown(subspace.ui);
 
-    controlServerStop();
+    cserverStop(subspace.svr);
 
     setsClose(&subspace.settings);
 
@@ -138,6 +151,9 @@ int entryPoint()
     // Exiting
     tqShutdown(subspace.workq, true);
     objRelease(&subspace.workq);
+    objRelease(&subspace.ui);
+    objRelease(&subspace.gmgr);
+    objRelease(&subspace.svr);
 
     logClose();
 

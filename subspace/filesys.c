@@ -46,7 +46,33 @@ bool subspaceCheckBaseDir(VFS* vfs, strref path)
     return ret;
 }
 
-bool subspaceFindBaseDir(string* out, VFS* vfs)
+void subspaceSetBaseDir(Subspace* ss, VFS* vfs, strref path)
+{
+    strDup(&ss->basedir, path);
+    pathNormalize(&ss->basedir);
+
+    string temp = 0;
+
+    // check if the dev mode file exists
+    strConcat(&temp, ss->basedir, DEVMODE_FILENAME);
+    if (vfsIsFile(vfs, temp))
+        ss->devmode = true;
+
+    // find the appropriate subspacegame executible
+    strConcat(&temp, ss->basedir, GAMEEXE_FILENAME);
+    if (vfsIsFile(vfs, temp))
+        strDup(&ss->gamepath, temp);
+
+    if (ss->devmode) {
+        strConcat(&temp, ss->basedir, GAMEEXE_DEV_FILENAME);
+        if (vfsIsFile(vfs, temp))
+            strDup(&ss->gamepath, temp);
+    }
+
+    strDestroy(&temp);
+}
+
+bool subspaceFindBaseDir(Subspace* ss, VFS* vfs)
 {
     bool ret = false;
 
@@ -58,7 +84,7 @@ bool subspaceFindBaseDir(string* out, VFS* vfs)
     // search all the way up to the root
     do {
         if (subspaceCheckBaseDir(vfs, tpath)) {
-            strDup(out, tpath);
+            subspaceSetBaseDir(ss, vfs, tpath);
             ret = true;
             break;
         }
