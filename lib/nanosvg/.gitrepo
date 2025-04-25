@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/memononen/nanosvg.git
+	branch = master
+	commit = ea6a6aca009422bba0dbad4c80df6e6ba0c82183
+	parent = a8c44378d9d1a80cf2b13dcb83a36e7ffe5a7d4a
+	method = merge
+	cmdver = 0.4.7
