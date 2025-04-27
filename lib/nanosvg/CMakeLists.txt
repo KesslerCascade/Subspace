@@ -13,7 +13,7 @@ if(MATH_LIBRARY)
     target_link_libraries(nanosvg PUBLIC ${MATH_LIBRARY})
 endif()
 
-target_include_directories(nanosvg PUBLIC $<INSTALL_INTERFACE:include/nanosvg>)
+target_include_directories(nanosvg PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src)
 target_compile_definitions(nanosvg PRIVATE NANOSVG_IMPLEMENTATION)
 
 # Same for nanosvgrast
@@ -23,6 +23,8 @@ target_include_directories(nanosvgrast PRIVATE src)
 target_compile_definitions(nanosvgrast PRIVATE NANOSVGRAST_IMPLEMENTATION)
 
 # Installation and export:
+
+if(PROJECT_IS_TOP_LEVEL)
 
 include(CMakePackageConfigHelpers)
 
@@ -73,3 +75,4 @@ install(
   DESTINATION
     ${ConfigPackageLocation}
 )
+endif()

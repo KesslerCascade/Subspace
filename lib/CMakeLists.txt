@@ -34,6 +34,11 @@ else()
     add_subdirectory(cd)
     target_compile_definitions(cd PRIVATE XALLOC_REMAP_MALLOC)
 
+    add_subdirectory(nanosvg)
+    target_link_libraries(nanosvg cx)
+    target_compile_definitions(nanosvg PRIVATE XALLOC_REMAP_MALLOC)
+    target_compile_definitions(nanosvgrast PRIVATE XALLOC_REMAP_MALLOC)
+
     add_subdirectory(sqlite)
 endif()
 
