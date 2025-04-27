@@ -10,6 +10,8 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/log.h>
+#include "gamemgr/gameinst.h"
+#include "process.h"
 
 static _objfactory_guaranteed Task* CmdLog_factory(ControlClient* client, ControlMsg* msg)
 {
@@ -41,6 +43,18 @@ uint32 CmdLog_run(_In_ CmdLog* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, 
             strDup(&msg, f->d.cfd_str);
         }
     }
+
+    GameInst* inst = objAcquireFromWeak(GameInst, self->client->inst);
+    uint32 pid;
+    if (inst && inst->process && procGetID(&inst->process, &pid)) {
+        string pidstr = 0;
+        strFromUInt32(&pidstr, pid, 10);
+        strNConcat(&msg, _S"[", pidstr, _S"] ", msg);
+        strDestroy(&pidstr);
+    } else {
+        strPrepend(_S"[Game] ", &msg);
+    }
+    objRelease(&inst);
 
     if (level < LOG_Count)
         _logStr(level, gamecat, msg);

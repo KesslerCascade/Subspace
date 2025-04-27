@@ -4,6 +4,7 @@
 // clang-format off
 #include <cx/obj.h>
 #include "subspace.h"
+#include "process.h"
 
 typedef struct GameMgr GameMgr;
 typedef struct GameMgr_WeakRef GameMgr_WeakRef;
@@ -13,10 +14,6 @@ typedef struct GameInst GameInst;
 typedef struct GameInst_WeakRef GameInst_WeakRef;
 saDeclarePtr(GameInst);
 saDeclarePtr(GameInst_WeakRef);
-
-#ifdef _PLATFORM_WIN
-typedef void* ProcessHandle;
-#endif
 
 typedef enum GameInstLaunchMode {
     GI_PLAY,

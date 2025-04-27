@@ -10,6 +10,10 @@
 #include <cx/thread/threadobj.h>
 #include <cx/taskqueue.h>
 
+typedef struct ControlServer ControlServer;
+typedef struct ControlServer_WeakRef ControlServer_WeakRef;
+typedef struct GameInst GameInst;
+typedef struct GameInst_WeakRef GameInst_WeakRef;
 typedef struct TaskQueue TaskQueue;
 typedef struct TaskQueue_WeakRef TaskQueue_WeakRef;
 typedef struct TQWorker TQWorker;

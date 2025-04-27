@@ -16,8 +16,7 @@ bool logOpen(VFS *vfs, string filename, LogDest **defer)
 
     gamecat              = logCreateCat(_S"Game", false);
     LogFileConfig config = {
-        .flags = LOG_LocalTime | LOG_ShortLevel | LOG_BracketLevel | LOG_IncludeCategory |
-            LOG_BracketCategory,
+        .flags           = LOG_LocalTime | LOG_ShortLevel | LOG_BracketLevel,
         .dateFormat      = LOG_DateISOCompact,
         .spacing         = 4,
         .rotateMode      = LOG_RotateSize,

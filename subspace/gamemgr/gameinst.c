@@ -73,8 +73,8 @@ bool GameInst_launch(_In_ GameInst* self)
     strFromInt32(&tmp, self->cookie & 0xffff, 16);
     saPushC(&args, string, &tmp);
 
-    ProcessHandle ph = procRun(self->ss->gamepath, args);
-    if (ph) {
+    self->process = procRun(self->ss->gamepath, args);
+    if (self->process) {
         ret = true;
         ginstSetState(self, GI_Launching);
     }

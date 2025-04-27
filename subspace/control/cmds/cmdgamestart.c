@@ -11,9 +11,6 @@
 // ==================== Auto-generated section ends ======================
 #include "gamemgr/gamemgr.h"
 
-#ifdef _PLATFORM_WIN
-#include <cx/platform/win/win_fs.h>
-
 static _objfactory_guaranteed Task* CmdGameStart_factory(ControlClient* client, ControlMsg* msg)
 {
     CmdGameStart* self;
