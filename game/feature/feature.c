@@ -20,17 +20,48 @@ SubspaceFeature* getFeature(const char* name)
     return (SubspaceFeature*)val;
 }
 
-bool initFeature(SubspaceFeature* feat, PatchState* ps)
+bool validateFeature(SubspaceFeature* feat, PatchState* ps)
 {
-    feat->available = false;
+    if (feat->valid)
+        return true;
 
     // validate extra needed symbols can be resolved
     if (feat->requiredSymbols) {
         for (Symbol** s = feat->requiredSymbols; *s; s++) {
             if (!_symResolve(ps->base, *s))
-                return false;
+                goto out;
         }
     }
+
+    // try to validate
+    if (feat->requiredPatches) {
+        if (!patchValidateSeq(ps, feat->requiredPatches))
+            goto out;
+    }
+    if (feat->validate) {
+        if (!feat->validate(feat, ps))
+            goto out;
+    }
+
+    // everything checked out
+    feat->valid = true;
+
+out:
+    if (feat->valid) {
+        log_fmt(LOG_Verbose, "Feature succesfully validated: %s", feat->name);
+    } else {
+        log_fmt(LOG_Warn, "Feature failed to validate: %s", feat->name);
+    }
+    return feat->valid;
+}
+
+bool patchFeature(SubspaceFeature* feat, PatchState* ps)
+{
+    if (feat->available)
+        return true;
+
+    if (!feat->valid)
+        return false;
 
     // allocate needed space for settings
     if (feat->settingsSize > 0) {
@@ -58,7 +89,7 @@ out:
     } else {
         log_fmt(LOG_Warn, "Feature failed to patch: %s", feat->name);
     }
-    return true;
+    return feat->available;
 }
 
 bool enableFeature(SubspaceFeature* feat, bool enabled)
@@ -77,14 +108,26 @@ bool enableFeature(SubspaceFeature* feat, bool enabled)
     return feat->enabled;
 }
 
-void initAllFeatures(PatchState* ps)
+void validateAllFeatures(PatchState* ps)
+{
+    bool ret = true;
+    for (uint32_t i = 0; i < feathash.nslots; i++) {
+        SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
+        if (feat)
+            validateFeature(feat, ps);
+    }
+}
+
+void patchAllFeatures(PatchState* ps)
 {
     bool ret = true;
     for (uint32_t i = 0; i < feathash.nslots; i++) {
         SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
         if (feat) {
-            if (!initFeature(feat, ps))
-                return;   // memory allocation failure
+            patchFeature(feat, ps);
+
+            // TEMPORARY FOR NOW
+            enableFeature(feat, true);
         }
     }
 }

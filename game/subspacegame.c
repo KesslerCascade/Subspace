@@ -81,13 +81,17 @@ int sscmain(int argc, char* argv[])
         controlSendLaunchFail(&control, LAUNCH_FAIL_OTHER);
         return 1;
     }
+
+    patchValidateSeq(&ps, OSDepPatches);
+    patchValidateSeq(&ps, RequiredPatches);
+    validateAllFeatures(&ps);
+
     if (!patchApplySeq(&ps, OSDepPatches) || !patchApplySeq(&ps, RequiredPatches)) {
         log_str(LOG_Error, "Required patches failed");
         controlSendLaunchFail(&control, LAUNCH_FAIL_REQPATCH);
         return 1;
     }
-
-    initAllFeatures(&ps);
+    patchAllFeatures(&ps);
 
     if (!patchEnd(&ps)) {
         log_str(LOG_Error, "Patching failed to complete");

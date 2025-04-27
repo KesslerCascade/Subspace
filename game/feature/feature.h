@@ -8,7 +8,9 @@ extern SubspaceFeature TimeWarp_feature;
 void registerFeature(SubspaceFeature* feature);
 SubspaceFeature* getFeature(const char* name);
 
-bool initFeature(SubspaceFeature* feat, PatchState* ps);
+bool validateFeature(SubspaceFeature* feat, PatchState* ps);
+bool patchFeature(SubspaceFeature* feat, PatchState* ps);
 bool enableFeature(SubspaceFeature* feat, bool enabled);
-void initAllFeatures(PatchState* ps);
+void validateAllFeatures(PatchState* ps);
+void patchAllFeatures(PatchState* ps);
 void sendFeatureAvail(void);

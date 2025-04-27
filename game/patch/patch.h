@@ -34,6 +34,7 @@ typedef Patch* PatchSequence[];
 
 bool patchBegin(PatchState* ps, addr_t base);
 bool patchEnd(PatchState* ps);
+bool patchValidateSeq(PatchState* ps, PatchSequence seq);
 bool patchApplySeq(PatchState* ps, PatchSequence seq);
 
 // Helper functions that can be used in patch structures
