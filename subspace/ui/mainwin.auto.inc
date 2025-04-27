@@ -1,0 +1,28 @@
+// ==================== Auto-generated section begins ====================
+// clang-format off
+// Do not modify the contents of this section; any changes will be lost!
+MainWin_ClassIf MainWin_ClassIf_tmpl = {
+    ._size = sizeof(MainWin_ClassIf),
+};
+
+static MainWin_ClassIf _impl_MainWin_MainWin_ClassIf = {
+    ._size = sizeof(MainWin_ClassIf),
+    ._implements = (ObjIface*)&MainWin_ClassIf_tmpl,
+    .show = (void (*)(void*))MainWin_show,
+    .update = (void (*)(void*))MainWin_update,
+};
+
+static ObjIface* _ifimpl_MainWin[] = {
+    (ObjIface*)&_impl_MainWin_MainWin_ClassIf,
+    NULL
+};
+
+ObjClassInfo MainWin_clsinfo = {
+    .instsize = sizeof(MainWin),
+    .classif = (ObjIface*)&MainWin_ClassIf_tmpl,
+    .init = (bool(*)(void*))MainWin_init,
+    .destroy = (void(*)(void*))MainWin_destroy,
+    .ifimpl = _ifimpl_MainWin,
+};
+
+// ==================== Auto-generated section ends ======================

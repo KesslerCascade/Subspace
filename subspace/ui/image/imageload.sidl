@@ -1,0 +1,28 @@
+#include <cx/taskqueue.sidl>
+#include "image.sidl"
+#include "imagedrivers.h"
+#include <iup.h>
+
+class ImageLoad extends MultiphaseTask {
+    int driver;
+
+    VFSFile *srcfile;
+    uint64 srcfilesz;
+
+    uint8 *srcbuf;
+    uint8 *srcbufp;
+    size_t srcbufsz;
+
+    int preferred_width;
+    int preferred_height;
+    int preferred_dpi;
+
+    object:Image image;
+
+    [canfail] factory loadFile(strref driver, VFS *vfs, strref fname);
+    [canfail] factory loadBuffer(strref driver, uint8 *buf, size_t sz);
+    init();
+
+    unbound uint32 loadPhase(TaskQueue* tq, TQWorker* worker, TaskControl *tcon);
+    unbound uint32 finishPhase(TaskQueue* tq, TQWorker* worker, TaskControl *tcon);
+}

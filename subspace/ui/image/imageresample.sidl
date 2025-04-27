@@ -1,0 +1,14 @@
+#include <cx/taskqueue.sidl>
+#include "image.sidl"
+
+class ImageResample extends Task {
+    int targetWidth;
+    int targetHeight;
+    int targetDPI;
+
+    object:Image image;
+
+    [canfail] factory toSize(Image *image, int width, int height);
+    [canfail] factory toDPI(Image *image, int dpi);
+    init();
+}

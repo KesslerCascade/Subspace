@@ -5,6 +5,7 @@
 #include <cx/obj.h>
 #include <cx/taskqueue.h>
 #include "subspace.h"
+#include "lang/lang.h"
 
 typedef struct TaskQueue TaskQueue;
 typedef struct TaskQueue_WeakRef TaskQueue_WeakRef;
@@ -18,6 +19,8 @@ typedef struct TRGate TRGate;
 typedef struct TRGate_WeakRef TRGate_WeakRef;
 typedef struct ComplexTaskQueue ComplexTaskQueue;
 typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
+typedef struct MainWin MainWin;
+typedef struct MainWin_WeakRef MainWin_WeakRef;
 typedef struct TaskControl TaskControl;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
@@ -50,6 +53,7 @@ typedef struct SubspaceUI {
     TaskQueue* uiq;
     TaskQueue* uiworkers;
     bool started;
+    MainWin* main;
 } SubspaceUI;
 extern ObjClassInfo SubspaceUI_clsinfo;
 #define SubspaceUI(inst) ((SubspaceUI*)(unused_noeval((inst) && &((inst)->_is_SubspaceUI)), (inst)))

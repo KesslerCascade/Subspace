@@ -1,0 +1,24 @@
+#include <cx/fs.h>
+#include <iup.h>
+
+class Image {
+    int width;
+    int height;
+    int bpp;            // bytes per pixel, will be 3 or 4
+    int dpi;
+
+    uint8 *pixels;
+
+    Image *slice(int x, int y, int w, int h);
+    Ihandle *iupImage();
+
+    [extern] bool resample(int nwidth, int nheight);
+    [extern] bool resampleToDPI(int ndpi);
+
+    factory createEmpty();
+    factory createBlank(int w, int h);
+    factory createSolid(int w, int h, int r, int g, int b);
+    void clear();
+    init();
+    destroy();
+}

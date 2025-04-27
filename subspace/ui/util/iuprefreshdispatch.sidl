@@ -1,0 +1,8 @@
+#include <cx/taskqueue.sidl>
+#include <iup.h>
+
+class IupRefreshDispatch extends Task {
+    Ihandle *h;
+
+    factory create(Ihandle *hdl);
+}

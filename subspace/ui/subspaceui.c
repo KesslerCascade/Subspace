@@ -10,6 +10,8 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
+#include "mainwin.h"
+
 #include <cd.h>
 #include <iup.h>
 #include <iup_plot.h>
@@ -34,10 +36,15 @@ static bool uicb(TaskQueue *tq)
 
 static bool uiThreadInit(TaskQueue* tq, void* data)
 {
+    SubspaceUI* ui = (SubspaceUI*)data;
+
     IupOpen(NULL, NULL);
     IupSetGlobal("LOCKLOOP", "YES");
     IupSetGlobal("UTF8MODE", "YES");
     IupSetGlobal("UTF8MODE_FILE", "YES");
+
+    if (ui->ss->devmode)
+        IupSetGlobal("GLOBALLAYOUTDLGKEY", "Yes");
 
     IupControlsOpen();
     IupPlotOpen();
@@ -119,9 +126,9 @@ bool SubspaceUI_shutdown(_In_ SubspaceUI* self)
 static bool uiStartFunc(TaskQueue* tq, void* data)
 {
     SubspaceUI* ui = (SubspaceUI*)data;
-    IupMessage("Hello World 1", "Hello world from IUP.");
-    ui->ss->exit = true;
-    eventSignal(&ui->ss->notify);
+
+    ui->main = mainwinCreate(ui);
+    mainwinShow(ui->main);
 
     return true;
 }
@@ -139,8 +146,7 @@ void SubspaceUI_start(_In_ SubspaceUI* self)
 static bool uiStopFunc(TaskQueue* tq, void* data)
 {
     SubspaceUI* ui = (SubspaceUI*)data;
-    ui->ss->exit = true;
-    eventSignal(&ui->ss->notify);
+    objRelease(&ui->main);
 
     return true;
 }
@@ -160,6 +166,7 @@ void SubspaceUI_destroy(_In_ SubspaceUI* self)
     // Autogen begins -----
     objRelease(&self->uiq);
     objRelease(&self->uiworkers);
+    objRelease(&self->main);
     // Autogen ends -------
 }
 

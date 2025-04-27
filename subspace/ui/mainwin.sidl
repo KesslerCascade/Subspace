@@ -1,0 +1,17 @@
+#include <iup.h>
+#include "subspace.h"
+
+class SubspaceUI;
+class MainWin {
+    Subspace *ss;
+    weak:SubspaceUI ui;
+
+    Ihandle *win;
+    uint32 activeInst;      // cookie of game instance that's being tracked through the UI
+
+    void show();
+    void update();
+    standalone int onClose(Ihandle *iupself);
+    factory create(SubspaceUI *ui);
+    init();
+}

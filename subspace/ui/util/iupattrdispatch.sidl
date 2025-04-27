@@ -1,0 +1,12 @@
+#include <cx/taskqueue.sidl>
+#include <iup.h>
+
+class IupAttrDispatch extends Task {
+    Ihandle *h;
+    string attr;
+    string val;
+    Ihandle *vhdl;
+
+    factory create(Ihandle *hdl, strref attr, strref val);
+    factory createHandle(Ihandle *hdl, strref attr, Ihandle *vhdl);
+}

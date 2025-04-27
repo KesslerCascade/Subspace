@@ -19,7 +19,15 @@ set(SUBSPACE_SIDL
     gamemgr/gameinst.sidl
     gamemgr/gamemgr.sidl
     lang/langdb.sidl
+    ui/mainwin.sidl
     ui/subspaceui.sidl
+    ui/image/image.sidl
+    ui/image/imageload.sidl
+    ui/image/imageresample.sidl
+    ui/util/iupattrdispatch.sidl
+    ui/util/iupimageattachdispatch.sidl
+    ui/util/iuprefreshdispatch.sidl
+    )
 
 add_sidl(${SUBSPACE_SIDL})
 
@@ -34,8 +42,20 @@ add_executable(subspace
     gamemgr/gamemgr.c
     lang/lang.c
     lang/langdb.c
+    ui/mainwin.c
     ui/subspaceui.c
+    ui/image/image.c
+    ui/image/imageload.c
+    ui/image/imageresample.c
+    ui/image/resample.c
+    ui/image/drivers/imagepng.c
+    ui/image/drivers/imagesvg.c
+    ui/util/iupattrdispatch.c
+    ui/util/iupimageattachdispatch.c
+    ui/util/iuploadimage.c
+    ui/util/iuprefreshdispatch.c
     win32/process.c
+    win32/subspace.manifest
     win32/win32.c
     filesys.c
     log.c
@@ -45,7 +65,7 @@ add_executable(subspace
     ${SHARED_SOURCE_DIR}/control.c
     ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_SIDL})
-target_link_libraries(subspace cx iupcontrols iupplot sqlite)
+target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast)
 target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(WIN32)
