@@ -18,7 +18,8 @@ set(SUBSPACE_SIDL
     control/cmds/cmdlog.sidl
     gamemgr/gameinst.sidl
     gamemgr/gamemgr.sidl
-    ui/subspaceui.sidl)
+    lang/langdb.sidl
+    ui/subspaceui.sidl
 
 add_sidl(${SUBSPACE_SIDL})
 
@@ -31,6 +32,8 @@ add_executable(subspace
     control/cmds/cmdlog.c
     gamemgr/gameinst.c
     gamemgr/gamemgr.c
+    lang/lang.c
+    lang/langdb.c
     ui/subspaceui.c
     win32/process.c
     win32/win32.c

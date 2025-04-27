@@ -1,0 +1,11 @@
+#include <cx/serialize.h>
+
+class LanguageDB
+{
+    hashtable:string:string primary;
+    hashtable:string:string fallback;
+
+    factory create();
+    bool load(StreamBuffer *sb, bool fallback); // streambuffer must be in pull mode
+    strref get(strref key);
+}

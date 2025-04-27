@@ -3,6 +3,7 @@
 
 #include "control/controlserver.h"
 #include "gamemgr/gamemgr.h"
+#include "lang/lang.h"
 #include "ui/subspaceui.h"
 
 #include <cx/debug.h>
@@ -121,6 +122,14 @@ int entryPoint()
     if (!cserverStart(subspace.svr)) {
         fatalError(_S"Failed to start control server.", false);
     }
+
+    // load language translations
+    string lang = 0;
+    ssdStringOutD(subspace.settings, _S"ui/lang", &lang, _S"en-us");
+    if (!langLoad(&subspace, lang)) {
+        fatalError(_S"Could not load any UI language.", false);
+    }
+    strDestroy(&lang);
 
     ssuiStart(subspace.ui);
 

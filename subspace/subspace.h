@@ -13,6 +13,8 @@
 #define GAMEEXE_FILENAME     _S "/subspacegame.exe"
 #define GAMEEXE_DEV_FILENAME _S "/build/game-win32/game/Debug/subspacegame.exe"
 #define LOG_FILENAME         _S "/log/subspace.log"
+#define LANGDIR_FILENAME     _S "subspace:/lang"
+#define LANGLIST_FILENAME    _S "subspace:/lang/languages.json"
 
 #define LUA_MAIN_FILENAME _S "subspace.lua"
 
@@ -26,6 +28,7 @@ typedef struct ControlServer ControlServer;
 typedef struct GameMgr GameMgr;
 typedef struct FeatureRegistry FeatureRegistry;
 typedef struct SubspaceUI SubspaceUI;
+typedef struct LanguageDB LanguageDB;
 
 typedef struct Subspace {
     string basedir;
@@ -40,6 +43,7 @@ typedef struct Subspace {
     SubspaceUI* ui;
     GameMgr* gmgr;
     FeatureRegistry* features;
+    LanguageDB* lang;
 
     // global settings
     uint32_t listenaddr;
