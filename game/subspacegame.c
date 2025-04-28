@@ -111,5 +111,6 @@ void sscmain2(void)
     controlClientStart();
     log_client();
     log_str(LOG_Info, "Communication thread started");
+    sendAllFeatureState();
     return;
 }

@@ -13,4 +13,5 @@ bool patchFeature(SubspaceFeature* feat, PatchState* ps);
 bool enableFeature(SubspaceFeature* feat, bool enabled);
 void validateAllFeatures(PatchState* ps);
 void patchAllFeatures(PatchState* ps);
-void sendFeatureAvail(void);
+void sendFeatureState(SubspaceFeature* feat, int replyto);
+void sendAllFeatureState();

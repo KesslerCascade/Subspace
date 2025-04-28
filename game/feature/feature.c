@@ -1,3 +1,4 @@
+#include "control/controlclient.h"
 #include "hook/symbol.h"
 #include "log/log.h"
 #include "patch/patch.h"
@@ -125,9 +126,26 @@ void patchAllFeatures(PatchState* ps)
         SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
         if (feat) {
             patchFeature(feat, ps);
+        }
+    }
+}
 
-            // TEMPORARY FOR NOW
-            enableFeature(feat, true);
+void sendFeatureState(SubspaceFeature* feat, int replyto)
+{
+    ControlMsg* msg  = controlNewMsg("FeatureState", 3);
+    msg->hdr.replyid = replyto;
+    controlMsgStr(msg, 0, "feature", feat->name);
+    controlMsgInt(msg, 1, "available", feat->available);
+    controlMsgInt(msg, 1, "enabled", feat->enabled);
+    controlClientQueue(msg);
+}
+
+void sendAllFeatureState()
+{
+    for (uint32_t i = 0; i < feathash.nslots; i++) {
+        SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
+        if (feat) {
+            sendFeatureState(feat, 0);
         }
     }
 }
