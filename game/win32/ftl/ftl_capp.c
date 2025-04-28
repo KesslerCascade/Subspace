@@ -6,6 +6,7 @@
 #include "ftl/mainmenu.h"
 #include "ftl/misc.h"
 #include "ftl/mousecontrol.h"
+#include "ftl/resourcecontrol.h"
 #include "ftl/startup.h"
 #include "ftl/textlibrary.h"
 #include "ftl/worldmanager.h"
@@ -28,8 +29,22 @@ DisasmTrace CApp_OnExecute_trace = {
              { I_SUB, .argf = { ARG_REG }, .args = { { REG_ESP } } },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL CApp::OnInit
               { I_TEST, .argf = { ARG_REG, ARG_REG }, .args = { { REG_AL }, { REG_AL } } },
-             { DT_OP(FINISH) } },
-    .out  = { &SYM(CApp_OnInit) }
+             { DT_OP(SKIP), .imin = 12, .imax = 22 },
+             { I_MOV,
+                .argf   = { ARG_MATCH },
+                .args   = { { REG_ECX, .idx = REG_UNDEF } },
+                .argout = { 0, DT_OUT_SYM2 } },
+             { I_MOV,
+                .argf = { ARG_MATCH, ARG_ADDR },
+                .args = { { REG_ESP, .idx = REG_UNDEF, .disp = 4 }, { .addr = 0x3f800000 } } },
+             { I_MOV,
+                .argf = { ARG_MATCH, ARG_ADDR },
+                .args = { { REG_ESP, .idx = REG_UNDEF, .disp = 0 }, { .addr = 0x0 } } },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL ResourceControl::RenderLoadingBar
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_OnInit),
+             &SYM(ResourceControl_GlobalResources),
+             &SYM(ResourceControl_RenderLoadingBar) }
 };
 
 INITWRAP(CApp_OnInit);

@@ -12,6 +12,7 @@ extern Patch patch_CommandGui_OnLoop;
 extern Patch patch_CommandGui_RenderStatic;
 extern Patch patch_FTLButton_OnRender;
 extern Patch patch_MouseControl_OnRender;
+extern Patch patch_ResourceControl_RenderLoadingBar;
 extern Patch patch_ShipStatus_RenderHealth;
 extern Patch patch_ShipStatus_OnRender;
 extern Patch patch_TextLibrary_GetText;

@@ -14,6 +14,7 @@ int subspace_CApp_OnKeyDown_pre(CApp* self, int key);
 
 // FTL functions & wrapers below
 
+extern DisasmTrace CApp_OnExecute_trace;
 extern DisasmTrace CApp_OnExecute_worldgen_trace;   // used for finding serveral different offsets
 extern DisasmTrace CApp_OnExecute_rungame_trace_1;
 extern DisasmTrace CApp_OnExecute_rungame_trace_2;

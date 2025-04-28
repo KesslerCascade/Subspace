@@ -55,3 +55,9 @@ DisasmTrace TargetTickTime_trace = {
 Symbol SYM(TargetFrameTimeMS) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &TargetTickTime_trace }, { 0 } }
 };
+
+Symbol SYM(ResourceControl_GlobalResources) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN15ResourceControl15GlobalResourcesE" },
+             { 0 } }
+};

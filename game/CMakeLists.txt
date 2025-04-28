@@ -19,6 +19,7 @@ if(WIN32)
         win32/ftl/ftl_misc.c
         win32/ftl/ftl_mousecontrol.c
         win32/ftl/ftl_osdep.c
+        win32/ftl/ftl_resourcecontrol.c
         win32/ftl/ftl_shipmanager.c
         win32/ftl/ftl_ship.c
         win32/ftl/ftl_shipmanager.c
@@ -71,6 +72,7 @@ add_executable(subspacegame
     hook/commandgui/commandgui_renderstatic.c
     hook/ftlbutton/ftlbutton_onrender.c
     hook/mousecontrol/mousecontrol_onrender.c
+    hook/resourcecontrol/resourcecontrol_renderloadingbar.c
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
     hook/textlibrary/textlibrary_gettext.c
