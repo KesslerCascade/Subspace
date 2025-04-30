@@ -1,0 +1,6 @@
+#include "ui/panel/panel.sidl"
+
+class GameInfoPanel extends Panel {
+    factory create(SubspaceUI *ui);
+    override make;
+}

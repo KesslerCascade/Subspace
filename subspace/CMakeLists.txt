@@ -24,9 +24,12 @@ set(SUBSPACE_SIDL
     ui/image/image.sidl
     ui/image/imageload.sidl
     ui/image/imageresample.sidl
+    ui/panel/panel.sidl
+    ui/panel/gameinfo/gameinfopanel.sidl
+    ui/panel/welcome/welcomepanel.sidl
     ui/util/iupattrdispatch.sidl
-    ui/util/iupimageattachdispatch.sidl
     ui/util/iuprefreshdispatch.sidl
+    ui/util/iupsetimagedispatch.sidl
     )
 
 add_sidl(${SUBSPACE_SIDL})
@@ -43,6 +46,7 @@ add_executable(subspace
     lang/lang.c
     lang/langdb.c
     ui/mainwin.c
+    ui/mainwinlayout.c
     ui/subspaceui.c
     ui/image/image.c
     ui/image/imageload.c
@@ -50,10 +54,13 @@ add_executable(subspace
     ui/image/resample.c
     ui/image/drivers/imagepng.c
     ui/image/drivers/imagesvg.c
+    ui/panel/panel.c
+    ui/panel/gameinfo/gameinfopanel.c
+    ui/panel/welcome/welcomepanel.c
     ui/util/iupattrdispatch.c
-    ui/util/iupimageattachdispatch.c
     ui/util/iuploadimage.c
     ui/util/iuprefreshdispatch.c
+    ui/util/iupsetimagedispatch.c
     win32/process.c
     win32/subspace.manifest
     win32/win32.c

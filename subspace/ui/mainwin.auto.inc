@@ -8,8 +8,10 @@ MainWin_ClassIf MainWin_ClassIf_tmpl = {
 static MainWin_ClassIf _impl_MainWin_MainWin_ClassIf = {
     ._size = sizeof(MainWin_ClassIf),
     ._implements = (ObjIface*)&MainWin_ClassIf_tmpl,
+    .make = (bool (*)(void*))MainWin_make,
     .show = (void (*)(void*))MainWin_show,
     .update = (void (*)(void*))MainWin_update,
+    .setLayoutDirty = (void (*)(void*))MainWin_setLayoutDirty,
 };
 
 static ObjIface* _ifimpl_MainWin[] = {

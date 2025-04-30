@@ -1,5 +1,13 @@
 {
     "subspace_title": "Subspace",
     "ftl": "Faster Than Light",
-    "fltl": "Flaster Than Light"
+    "welcome": "Welcome to Subspace!",
+    "welcomesubheader": "A quality-of-life and data tracking framework for the game Faster Than Light.",
+    "welcomefirst": "First, we need to find where your game is located.",
+    "welcomeopt1": "Use the",
+    "welcomeopt2": "window (which may also be accessed using the wrench icon in the sidebar), and configure the path to the FTL executable using the Browse button.",
+    "options": "Options",
+    "play": "Play",
+    "hamburgertip": "Menu",
+    "optionstip": "Options Window"
 }

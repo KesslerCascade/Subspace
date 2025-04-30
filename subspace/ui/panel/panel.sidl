@@ -1,0 +1,18 @@
+#include <iup.h>
+#include "subspace.h"
+#include "lang/lang.h"
+
+extern const char *panelbg;
+
+class SubspaceUI;
+class Panel implements Sortable {
+    Subspace *ss;
+    weak:SubspaceUI ui;
+
+    Ihandle *h;
+    Ihandle *parent;
+    strref name;
+    string title;
+    bool make();
+    bool update();
+}

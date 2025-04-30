@@ -128,6 +128,8 @@ static bool uiStartFunc(TaskQueue* tq, void* data)
     SubspaceUI* ui = (SubspaceUI*)data;
 
     ui->main = mainwinCreate(ui);
+    if (!mainwinMake(ui->main))
+        return false;
     mainwinShow(ui->main);
 
     return true;

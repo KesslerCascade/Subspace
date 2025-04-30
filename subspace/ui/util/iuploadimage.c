@@ -1,6 +1,7 @@
 #include "iuploadimage.h"
 #include "ui/subspaceui.h"
-#include "ui/util/iupimageattachdispatch.h"
+#include "ui/util/iuprefreshdispatch.h"
+#include "ui/util/iupsetimagedispatch.h"
 
 bool cbAttachImage(stvlist* cvars, stvlist* args)
 {
@@ -12,20 +13,26 @@ bool cbAttachImage(stvlist* cvars, stvlist* args)
     if (!stvlNext(cvars, weakref, &wtq) || !(uiq = objAcquireFromWeak(TaskQueue, wtq)))
         return false;
 
-    Ihandle* ih = stvlNextPtr(cvars);
-    if (!ih || !stvlNext(cvars, string, &name))
+    if (!stvlNext(cvars, string, &name))
         goto out;
 
-    IupImageAttachDispatch* itask = iupimageattachdispatchCreate(ih, name, self->image);
+    IupSetImageDispatch* itask = iupsetimagedispatchCreate(name, self->image);
     tqRun(uiq, &itask);
     ret = true;
+
+    Ihandle* torefresh = stvlNextPtr(cvars);
+    if (torefresh) {
+        IupRefreshDispatch* rtask = iuprefreshdispatchCreate(torefresh);
+        tqRun(uiq, &rtask);
+    }
 
 out:
     objRelease(&uiq);
     return ret;
 }
 
-void iupLoadImage(SubspaceUI* ui, Ihandle* control, strref attr, strref driver, strref filename)
+void iupLoadImage(SubspaceUI* ui, strref iupname, strref driver, strref filename,
+                  Ihandle* torefresh)
 {
     ImageLoad* iload     = imageloadLoadFile(driver, ui->ss->fs, filename);
     int dpi              = atoi(IupGetGlobal("SCREENDPI"));
@@ -36,7 +43,7 @@ void iupLoadImage(SubspaceUI* ui, Ihandle* control, strref attr, strref driver, 
     cchainAttach(&iload->oncomplete,
                  cbAttachImage,
                  stvar(weakref, objGetWeak(TaskQueue, ui->uiq)),
-                 stvar(ptr, control),
-                 stvar(string, _S"IMAGE"));
+                 stvar(strref, iupname),
+                 stvar(ptr, torefresh));
     tqRun(ui->uiworkers, &iload);
 }

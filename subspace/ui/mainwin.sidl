@@ -1,5 +1,9 @@
 #include <iup.h>
 #include "subspace.h"
+#include "ui/panel/panel.sidl"
+
+#define MAINWIN_DEFAULT_WIDTH 600
+#define MAINWIN_DEFAULT_HEIGHT 300
 
 class SubspaceUI;
 class MainWin {
@@ -7,11 +11,34 @@ class MainWin {
     weak:SubspaceUI ui;
 
     Ihandle *win;
+    Ihandle *sidebar;
+    Ihandle *zbox;
+    Ihandle *root;          // root of dynamic layout
+    Ihandle *timer;
     uint32 activeInst;      // cookie of game instance that's being tracked through the UI
 
+    hashtable:string:object panels;  // all panels (except welcome)
+    object:Panel welcomepanel;
+
+    bool make();
     void show();
     void update();
-    standalone int onClose(Ihandle *iupself);
+
+    [extern] unbound void loadLayout();
+    [extern] unbound void saveLayout();
+    [extern] unbound Ihandle *createPlaceholder();
+    [extern] unbound Ihandle *createTabs();
+    [extern] unbound Ihandle *createSplit(bool vertical);
+    [extern] unbound void replaceSplitChild(Ihandle* split, Ihandle* oh, Ihandle* nh);
+
+    int width;
+    int height;
+    bool layoutDirty;
+
+    standalone int onClose(Ihandle *ih);
+    standalone int onResize(Ihandle *ih, int width, int height);
+    standalone int onTimer(Ihandle *ih);
+    void setLayoutDirty();
     factory create(SubspaceUI *ui);
     init();
 }

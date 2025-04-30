@@ -6,46 +6,46 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "iupimageattachdispatch.h"
+#include "iupsetimagedispatch.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
-_objfactory_guaranteed IupImageAttachDispatch*
-IupImageAttachDispatch_create(Ihandle* hdl, _In_opt_ strref attr, Image* img)
+_objfactory_guaranteed IupSetImageDispatch* IupSetImageDispatch_create(_In_opt_ strref iupname, Image* img)
 {
-    IupImageAttachDispatch* self;
-    self = objInstCreate(IupImageAttachDispatch);
+    IupSetImageDispatch* self;
+    self = objInstCreate(IupSetImageDispatch);
 
-    self->h = hdl;
-    strDup(&self->attr, attr);
+    strDup(&self->iupname, iupname);
     self->img = objAcquire(img);
 
-    self->name = _S"IupImageAttachDispatch";
+    self->name = _S"IupSetImageDispatch";
     objInstInit(self);
     return self;
 }
 
-uint32 IupImageAttachDispatch_run(_In_ IupImageAttachDispatch* self, _In_ TaskQueue* tq,
-                                  _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
+uint32 IupSetImageDispatch_run(_In_ IupSetImageDispatch* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
 {
     Ihandle* imgh = imageIupImage(self->img);
     if (!imgh)
         return TASK_Result_Failure;
 
-    IupSetAttributeHandle(self->h, strC(self->attr), imgh);
-    IupRefresh(self->h);
+    const char* name = strC(self->iupname);
+    Ihandle* oldh    = IupGetHandle(name);
+    if (oldh)
+        IupDestroy(oldh);
+    IupSetHandle(name, imgh);
 
     return TASK_Result_Success;
 }
 
-void IupImageAttachDispatch_destroy(_In_ IupImageAttachDispatch* self)
+void IupSetImageDispatch_destroy(_In_ IupSetImageDispatch* self)
 {
     // Autogen begins -----
-    strDestroy(&self->attr);
+    strDestroy(&self->iupname);
     objRelease(&self->img);
     // Autogen ends -------
 }
 
 // Autogen begins -----
-#include "iupimageattachdispatch.auto.inc"
+#include "iupsetimagedispatch.auto.inc"
 // Autogen ends -------

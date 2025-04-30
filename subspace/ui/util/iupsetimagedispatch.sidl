@@ -1,0 +1,10 @@
+#include <cx/taskqueue.sidl>
+#include <iup.h>
+#include <ui/image/image.sidl>
+
+class IupSetImageDispatch extends Task {
+    string iupname;
+    object:Image img;
+
+    factory create(strref iupname, Image *img);
+}
