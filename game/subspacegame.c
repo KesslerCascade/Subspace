@@ -20,7 +20,7 @@
 SubspaceGameSettings settings = {
     .addr = 0x7f000001,   // 127.0.0.1
 };
-GameState gs;
+GameGlobalState gs;
 
 static void parseArgs(int argc, char* argv[])
 {
@@ -99,9 +99,13 @@ int sscmain(int argc, char* argv[])
         return 1;
     }
 
-    if (!settings.testMode) {
+    switch (settings.mode) {
+    case LAUNCH_PLAY:
         ftlentry = getProgramEntry(ftlbase);
         ftlentry();
+        break;
+    case LAUNCH_VALIDATE:
+        break;
     }
     return 0;
 }

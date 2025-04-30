@@ -6,24 +6,23 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "cmdlaunchfail.h"
+#include "cmdloading.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "gamemgr/gamemgr.h"
+#include "gamemgr/gameinst.h"
 
-ControlCmd_impl("LaunchFail", CmdLaunchFail);
+ControlCmd_impl("Loading", CmdLoading);
 
-uint32 CmdLaunchFail_run(_In_ CmdLaunchFail* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
+uint32 CmdLoading_run(_In_ CmdLoading* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
 {
     GameInst* inst = objAcquireFromWeak(GameInst, self->client->inst);
     if (inst) {
-        ControlField* reasonf = controlMsgFindField(self->msg, "reason");
-        if (reasonf) {
-            withWriteLock(&inst->lock) {
-                inst->failReason = reasonf->d.cfd_int;
-            }
+        ControlField* pctf = controlMsgFindField(self->msg, "pct");
+        withWriteLock(&inst->lock) {
+            if (pctf)
+                inst->loadPct = pctf->d.cfd_float32;
+            ginstSetStateLocked(inst, GI_Loading);
         }
-        ginstSetState(inst, GI_Failed);
         objRelease(&inst);
     }
 
@@ -31,6 +30,6 @@ uint32 CmdLaunchFail_run(_In_ CmdLaunchFail* self, _In_ TaskQueue* tq, _In_ TQWo
 }
 
 // Autogen begins -----
-void CmdLaunchFail_register(ControlServer* svr);
-#include "cmdlaunchfail.auto.inc"
+void CmdLoading_register(ControlServer* svr);
+#include "cmdloading.auto.inc"
 // Autogen ends -------

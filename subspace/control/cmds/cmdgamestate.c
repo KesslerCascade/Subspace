@@ -6,24 +6,20 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "cmdlaunchfail.h"
+#include "cmdgamestate.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "gamemgr/gamemgr.h"
+#include "gamemgr/gameinst.h"
 
-ControlCmd_impl("LaunchFail", CmdLaunchFail);
+ControlCmd_impl("GameState", CmdGameState);
 
-uint32 CmdLaunchFail_run(_In_ CmdLaunchFail* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
+uint32 CmdGameState_run(_In_ CmdGameState* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
 {
     GameInst* inst = objAcquireFromWeak(GameInst, self->client->inst);
     if (inst) {
-        ControlField* reasonf = controlMsgFindField(self->msg, "reason");
-        if (reasonf) {
-            withWriteLock(&inst->lock) {
-                inst->failReason = reasonf->d.cfd_int;
-            }
-        }
-        ginstSetState(inst, GI_Failed);
+        ControlField* statef = controlMsgFindField(self->msg, "state");
+        if (statef)
+            ginstSetState(inst, statef->d.cfd_int);
         objRelease(&inst);
     }
 
@@ -31,6 +27,6 @@ uint32 CmdLaunchFail_run(_In_ CmdLaunchFail* self, _In_ TaskQueue* tq, _In_ TQWo
 }
 
 // Autogen begins -----
-void CmdLaunchFail_register(ControlServer* svr);
-#include "cmdlaunchfail.auto.inc"
+void CmdGameState_register(ControlServer* svr);
+#include "cmdgamestate.auto.inc"
 // Autogen ends -------

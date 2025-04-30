@@ -5,6 +5,7 @@
 #include <cx/obj.h>
 #include "subspace.h"
 #include "process.h"
+#include "proto.h"
 
 typedef struct GameMgr GameMgr;
 typedef struct GameMgr_WeakRef GameMgr_WeakRef;
@@ -15,18 +16,13 @@ typedef struct GameInst_WeakRef GameInst_WeakRef;
 saDeclarePtr(GameInst);
 saDeclarePtr(GameInst_WeakRef);
 
-typedef enum GameInstLaunchMode {
-    GI_PLAY,
-    GI_VALIDATE
-} GameInstLaunchMode;
-
 typedef enum GameInstState {
-    GI_Init,
+    GI_Init = GAME_INIT,
+    GI_Loading = GAME_LOADING,
+    GI_Menu = GAME_MENU,
+    GI_Run = GAME_RUN,
+    GI_Practice = GAME_PRACTICE,
     GI_Launching,
-    GI_Loading,
-    GI_Menu,
-    GI_Run,
-    GI_Practice,
     GI_Failed,
     GI_Exited
 } GameInstState;
@@ -38,6 +34,7 @@ typedef struct GameInst_ClassIf {
 
     bool (*launch)(_In_ void* self);
     void (*setState)(_In_ void* self, GameInstState state);
+    void (*setStateLocked)(_In_ void* self, GameInstState state);
 } GameInst_ClassIf;
 extern GameInst_ClassIf GameInst_ClassIf_tmpl;
 
@@ -58,9 +55,11 @@ typedef struct GameInst {
     ProcessHandle process;
     RWLock lock;
     string exepath;
-    GameInstLaunchMode mode;
+    LaunchMode mode;
     GameInstState state;
+    float loadPct;
     int failReason;
+    sa_string availFeatures;
 } GameInst;
 extern ObjClassInfo GameInst_clsinfo;
 #define GameInst(inst) ((GameInst*)(unused_noeval((inst) && &((inst)->_is_GameInst)), (inst)))
@@ -77,8 +76,8 @@ typedef struct GameInst_WeakRef {
 } GameInst_WeakRef;
 #define GameInst_WeakRef(inst) ((GameInst_WeakRef*)(unused_noeval((inst) && &((inst)->_is_GameInst_WeakRef)), (inst)))
 
-_objfactory_guaranteed GameInst* GameInst_create(GameMgr* mgr, _In_opt_ strref exepath, GameInstLaunchMode mode);
-// GameInst* ginstCreate(GameMgr* mgr, strref exepath, GameInstLaunchMode mode);
+_objfactory_guaranteed GameInst* GameInst_create(GameMgr* mgr, _In_opt_ strref exepath, LaunchMode mode);
+// GameInst* ginstCreate(GameMgr* mgr, strref exepath, LaunchMode mode);
 #define ginstCreate(mgr, exepath, mode) GameInst_create(GameMgr(mgr), exepath, mode)
 
 _objfactory_guaranteed GameInst* GameInst_createForClient(GameMgr* mgr, ControlClient* client, uint32 cookie);
@@ -91,4 +90,6 @@ _objfactory_guaranteed GameInst* GameInst_createForClient(GameMgr* mgr, ControlC
 #define ginstLaunch(self) (self)->_->launch(GameInst(self))
 // void ginstSetState(GameInst* self, GameInstState state);
 #define ginstSetState(self, state) (self)->_->setState(GameInst(self), state)
+// void ginstSetStateLocked(GameInst* self, GameInstState state);
+#define ginstSetStateLocked(self, state) (self)->_->setStateLocked(GameInst(self), state)
 

@@ -1,5 +1,5 @@
 #include "control/controltask.sidl"
 
-class CmdLog extends ControlTask {
+class CmdLoading extends ControlTask {
     [extern] standalone void register(ControlServer *svr);
 }

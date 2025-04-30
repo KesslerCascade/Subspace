@@ -4,6 +4,7 @@
 // clang-format off
 #include <cx/obj.h>
 #include "gameinst.h"
+#include "process.h"
 #include <cx/math.h>
 
 typedef struct GameMgr GameMgr;
@@ -39,6 +40,7 @@ typedef struct GameMgr {
 
     Subspace* ss;
     RWLock gmgrlock;
+    ProcWatchState* pws;
     hashtable insts;        // hashed by cookie
     PcgState pcg;
 } GameMgr;

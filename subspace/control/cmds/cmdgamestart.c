@@ -70,7 +70,7 @@ uint32 CmdGameStart_run(_In_ CmdGameStart* self, _In_ TaskQueue* tq, _In_ TQWork
         strcpy(msg->hdr.cmd, "Launch");
         strcpy(msg->fields[0]->h.name, "launchmode");
         msg->fields[0]->h.ftype   = CF_INT;
-        msg->fields[0]->d.cfd_int = 0;
+        msg->fields[0]->d.cfd_int = inst->mode;
 
         strcpy(msg->fields[1]->h.name, "gamedir");
         msg->fields[1]->h.ftype = CF_STRING;

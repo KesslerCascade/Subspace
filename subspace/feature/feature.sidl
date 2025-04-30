@@ -1,0 +1,3 @@
+[methodprefix feature] class SubspaceFeature {
+    RWLock lock;
+}

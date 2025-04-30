@@ -13,9 +13,14 @@ set(SUBSPACE_SIDL
     control/controlclient.sidl
     control/controltask.sidl
     control/controlserver.sidl
+    control/cmds/cmdfeaturestate.sidl
     control/cmds/cmdgamestart.sidl
+    control/cmds/cmdgamestate.sidl
     control/cmds/cmdlaunchfail.sidl
+    control/cmds/cmdloading.sidl
     control/cmds/cmdlog.sidl
+    control/cmds/cmdvalidate.sidl
+    feature/feature.sidl
     gamemgr/gameinst.sidl
     gamemgr/gamemgr.sidl
     lang/langdb.sidl
@@ -38,9 +43,14 @@ add_executable(subspace
     control/controlclient.c
     control/controlserver.c
     control/controltask.c
+    control/cmds/cmdfeaturestate.c
     control/cmds/cmdgamestart.c
+    control/cmds/cmdgamestate.c
     control/cmds/cmdlaunchfail.c
+    control/cmds/cmdloading.c
     control/cmds/cmdlog.c
+    control/cmds/cmdvalidate.c
+    feature/feature.c
     gamemgr/gameinst.c
     gamemgr/gamemgr.c
     lang/lang.c

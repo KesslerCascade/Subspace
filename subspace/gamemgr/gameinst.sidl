@@ -1,21 +1,17 @@
 #include "subspace.h"
 #include "process.h"
+#include "proto.h"
 
 class GameMgr;
 class ControlClient;
 
-typedef enum GameInstLaunchMode {
-    GI_PLAY,
-    GI_VALIDATE
-} GameInstLaunchMode;
-
 typedef enum GameInstState {
-    GI_Init,
+    GI_Init = GAME_INIT,
+    GI_Loading = GAME_LOADING,
+    GI_Menu = GAME_MENU,
+    GI_Run = GAME_RUN,
+    GI_Practice = GAME_PRACTICE,
     GI_Launching,
-    GI_Loading,
-    GI_Menu,
-    GI_Run,
-    GI_Practice,
     GI_Failed,
     GI_Exited
 } GameInstState;
@@ -32,13 +28,16 @@ typedef enum GameInstState {
     RWLock lock;
 
     string exepath;
-    GameInstLaunchMode mode;
+    LaunchMode mode;
     GameInstState state;
 
+    float loadPct;
     int failReason;
+    [sorted] sarray:string availFeatures;
 
-    factory create(GameMgr *mgr, strref exepath, GameInstLaunchMode mode);
+    factory create(GameMgr *mgr, strref exepath, LaunchMode mode);
     factory createForClient(GameMgr *mgr, ControlClient *client, uint32 cookie); // for dev mode clients
     bool launch();
     void setState(GameInstState state);
+    void setStateLocked(GameInstState state);
 }

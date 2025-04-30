@@ -11,9 +11,13 @@
 // ==================== Auto-generated section ends ======================
 #include <cx/math.h>
 
+#include "cmds/cmdfeaturestate.h"
 #include "cmds/cmdgamestart.h"
+#include "cmds/cmdgamestate.h"
 #include "cmds/cmdlaunchfail.h"
+#include "cmds/cmdloading.h"
 #include "cmds/cmdlog.h"
+#include "cmds/cmdvalidate.h"
 
 _objfactory_guaranteed ControlServer* ControlServer_create(Subspace* subspace)
 {
@@ -176,9 +180,13 @@ bool ControlServer_start(_In_ ControlServer* self)
     netSetNonblock(self->notifysock, true);
 
     // register all the command handlers
+    CmdFeatureState_register(self);
     CmdGameStart_register(self);
+    CmdGameState_register(self);
     CmdLaunchFail_register(self);
+    CmdLoading_register(self);
     CmdLog_register(self);
+    CmdValidate_register(self);
 
     // start up server thread
     ControlServer* csthr = objAcquire(self);   // for the thread to own

@@ -32,6 +32,23 @@ typedef struct ControlTask_WeakRef ControlTask_WeakRef;
 saDeclarePtr(ControlTask);
 saDeclarePtr(ControlTask_WeakRef);
 
+#define ControlCmd_impl(cmd, clsname)                                                           \
+static _objfactory_guaranteed Task* clsname ## _factory(ControlClient* client, ControlMsg* msg) \
+{                                                                                               \
+    clsname* self;                                                                              \
+    self = objInstCreate(clsname);                                                              \
+    objInstInit(self);                                                                          \
+                                                                                                \
+    self->client = objAcquire(client);                                                          \
+    self->msg    = msg;                                                                         \
+                                                                                                \
+    return Task(self);                                                                          \
+}                                                                                               \
+void clsname ## _register(ControlServer* svr)                                                   \
+{                                                                                               \
+    cserverRegisterHandler(svr, _S cmd, clsname ## _factory);                                   \
+}
+
 typedef struct ControlTask_ClassIf {
     ObjIface* _implements;
     ObjIface* _parent;

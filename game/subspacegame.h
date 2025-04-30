@@ -1,6 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
+#include "proto.h"
 
 typedef uintptr_t addr_t;
 
@@ -55,10 +56,10 @@ typedef struct SubspaceGameSettings {
     char* gameProgram;   // name of the game executable
     char* gamePath;      // full path to game executable
 
-    bool testMode;
+    LaunchMode mode;
 } SubspaceGameSettings;
 
-typedef struct GameState {
+typedef struct GameGlobalState {
     // Numeric Hull
     bool overrideHullText;
     int hull;
@@ -71,10 +72,10 @@ typedef struct GameState {
     float warpFactor;
     float warpFactorActual;   // set by CFPS if we're capped due to framerate
     double avgFrameMS;        // milliseconds per frame, averaged over the last several frames
-} GameState;
+} GameGlobalState;
 
 extern SubspaceGameSettings settings;
-extern GameState gs;
+extern GameGlobalState gs;
 extern ControlState control;
 
 int sscmain(int argc, char* argv[]);

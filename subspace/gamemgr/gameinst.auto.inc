@@ -10,6 +10,7 @@ static GameInst_ClassIf _impl_GameInst_GameInst_ClassIf = {
     ._implements = (ObjIface*)&GameInst_ClassIf_tmpl,
     .launch = (bool (*)(void*))GameInst_launch,
     .setState = (void (*)(void*, GameInstState))GameInst_setState,
+    .setStateLocked = (void (*)(void*, GameInstState))GameInst_setStateLocked,
 };
 
 static ObjIface* _ifimpl_GameInst[] = {

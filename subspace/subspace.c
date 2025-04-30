@@ -136,7 +136,7 @@ int entryPoint()
     // TEMP FOR TESTING
     string tmp = 0;
     ssdStringOut(subspace.settings, _S"ftl/exe", &tmp);
-    GameInst* gitest = ginstCreate(subspace.gmgr, tmp, GI_PLAY);
+    GameInst* gitest = ginstCreate(subspace.gmgr, tmp, LAUNCH_PLAY);
     strDestroy(&tmp);
     gmgrReg(subspace.gmgr, gitest);
     ginstLaunch(gitest);

@@ -1,4 +1,5 @@
 #include "gameinst.sidl"
+#include "process.h"
 
 #include <cx/math.h>
 
@@ -6,6 +7,7 @@
     Subspace *ss;
 
     RWLock gmgrlock;
+    ProcWatchState *pws;
     hashtable:uint32:object insts;      // hashed by cookie
     PcgState pcg;
 

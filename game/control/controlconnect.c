@@ -94,7 +94,8 @@ int controlRecvLaunchCmd(ControlState* cs)
             return RLC_Error;
 
         if (!strcmp(f.h.name, "launchmode")) {
-            if (f.d.cfd_int != 0)
+            settings.mode = f.d.cfd_int;
+            if (settings.mode < LAUNCH_PLAY || settings.mode > LAUNCH_VALIDATE)
                 return RLC_Error;
         }
         if (!strcmp(f.h.name, "gamedir")) {
@@ -122,7 +123,7 @@ int controlStartupHandshake(ControlState* cs)
         osShowError("Main subspace program did not respond");
         break;
     case RLC_Error:
-        osShowError("An unexpcted communication error occured");
+        osShowError("An unexpected communication error occured");
         break;
     case RLC_Exit:
         break;

@@ -1,5 +1,5 @@
 #include "control/controltask.sidl"
 
 class CmdLaunchFail extends ControlTask {
-    standalone void register(ControlServer *svr);
+    [extern] standalone void register(ControlServer *svr);
 }

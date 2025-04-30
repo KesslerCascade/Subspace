@@ -24,6 +24,7 @@ _objfactory_guaranteed GameMgr* GameMgr_create(Subspace* subspace)
 _objinit_guaranteed bool GameMgr_init(_In_ GameMgr* self)
 {
     pcgAutoSeed(&self->pcg);
+    self->pws = procStartWatchThread();
     // Autogen begins -----
     rwlockInit(&self->gmgrlock);
     htInit(&self->insts, uint32, object, 16);
@@ -33,6 +34,7 @@ _objinit_guaranteed bool GameMgr_init(_In_ GameMgr* self)
 
 void GameMgr_destroy(_In_ GameMgr* self)
 {
+    procStopWatchThread(self->pws);
     // Autogen begins -----
     rwlockDestroy(&self->gmgrlock);
     htDestroy(&self->insts);

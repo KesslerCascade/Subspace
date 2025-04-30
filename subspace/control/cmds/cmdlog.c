@@ -13,22 +13,7 @@
 #include "gamemgr/gameinst.h"
 #include "process.h"
 
-static _objfactory_guaranteed Task* CmdLog_factory(ControlClient* client, ControlMsg* msg)
-{
-    CmdLog* self;
-    self = objInstCreate(CmdLog);
-    objInstInit(self);
-
-    self->client = objAcquire(client);
-    self->msg    = msg;
-
-    return Task(self);
-}
-
-void CmdLog_register(ControlServer* svr)
-{
-    cserverRegisterHandler(svr, _S"Log", CmdLog_factory);
-}
+ControlCmd_impl("Log", CmdLog);
 
 uint32 CmdLog_run(_In_ CmdLog* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
 {
@@ -64,5 +49,6 @@ uint32 CmdLog_run(_In_ CmdLog* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, 
 }
 
 // Autogen begins -----
+void CmdLog_register(ControlServer* svr);
 #include "cmdlog.auto.inc"
 // Autogen ends -------
