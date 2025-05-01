@@ -8,6 +8,7 @@
     "welcomeopt2": "window (which may also be accessed using the wrench icon in the sidebar), and configure the path to the FTL executable using the Browse button.",
     "options": "Options",
     "play": "Play",
-    "hamburgertip": "Menu",
-    "optionstip": "Options Window"
+    "hamburger_tip": "Menu",
+    "options_tip": "Options",
+    "options_title": "Subspace Options"
 }

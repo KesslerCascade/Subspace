@@ -3,6 +3,7 @@
 #include "lang/lang.h"
 
 class MainWin;
+class OptionsWin;
 [methodprefix ssui] class SubspaceUI {
     Subspace *ss;
     object:TaskQueue uiq;
@@ -10,6 +11,7 @@ class MainWin;
     bool started;
 
     object:MainWin main;
+    object:OptionsWin options;
 
     factory create(Subspace *subspace);
     bool init();

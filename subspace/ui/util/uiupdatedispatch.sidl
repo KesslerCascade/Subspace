@@ -1,0 +1,9 @@
+#include <cx/taskqueue.sidl>
+#include "ui/subspaceui.sidl"
+
+class UIUpdateDispatch extends Task {
+    object:SubspaceUI ui;
+    string panelname;
+
+    factory create(SubspaceUI *ui, strref panelname);
+}

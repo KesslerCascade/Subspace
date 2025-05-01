@@ -9,8 +9,10 @@
 #include "welcomepanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include "ui/optionswin.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
+#include "ui/util/iupsetobj.h"
 
 saDeclarePtr(Ihandle);
 
@@ -23,6 +25,16 @@ _objfactory_guaranteed WelcomePanel* WelcomePanel_create(SubspaceUI* ui)
     self->name = _S"welcome";
     objInstInit(self);
     return self;
+}
+
+static int optionsbtn_action(Ihandle* ih)
+{
+    SubspaceUI* ui = iupGetUI(ih);
+    if (!ui)
+        return IUP_IGNORE;
+
+    optionswinShow(ui->options);
+    return IUP_DEFAULT;
 }
 
 extern bool Panel_make(_In_ Panel* self);   // parent
@@ -102,6 +114,8 @@ bool WelcomePanel_make(_In_ WelcomePanel* self)
     IupSetAttribute(optbtn, "CSPACING", "3");
     IupSetAttribute(optbtn, "FOCUSFEEDBACK", "No");
     iupLoadImage(self->ui, _S"IMAGE_WRENCH_SMALL", _S"svg", _S"subspace:/wrench-small.svg", optbtn);
+    iupSetObj(optbtn, ObjNone, self, self->ui);
+    IupSetCallback(optbtn, "FLAT_ACTION", optionsbtn_action);
 
     Ihandle* multibox = IupMultiBox(NULL);
     IupSetAttribute(multibox, "CGAPHORIZ", "2");

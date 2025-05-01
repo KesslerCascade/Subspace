@@ -1,0 +1,21 @@
+#include <iup.h>
+#include "subspace.h"
+
+#define OPTIONSWIN_WIDTH 500
+#define OPTIONSWIN_HEIGHT 400
+
+class SubspaceUI;
+class OptionsWin {
+    Subspace *ss;
+    SubspaceUI *ui;
+
+    Ihandle *win;
+    bool make();
+    void show();
+    void update();
+    void finish();
+
+    standalone int onClose(Ihandle *ih);
+    factory create(SubspaceUI *ui);
+    init();
+}

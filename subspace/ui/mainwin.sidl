@@ -23,6 +23,8 @@ class MainWin {
     bool make();
     void show();
     void update();
+    bool updatePanel(strref name);
+    void finish();
 
     [extern] unbound void loadLayout();
     [extern] unbound void saveLayout();

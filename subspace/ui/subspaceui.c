@@ -11,6 +11,7 @@
 // ==================== Auto-generated section ends ======================
 
 #include "mainwin.h"
+#include "optionswin.h"
 
 #include <cd.h>
 #include <iup.h>
@@ -21,15 +22,15 @@
 #include <windows.h>
 #endif
 
-static bool uicb(TaskQueue *tq)
+static bool uicb(TaskQueue* tq)
 {
     IupLoopStep();
 
-    #ifdef WIN32
+#ifdef WIN32
     MSG msg;
     if (PeekMessage(&msg, 0, 0, 0, PM_NOREMOVE))
         return false;   // more messages to process
-    #endif
+#endif
 
     return true;
 }
@@ -132,6 +133,9 @@ static bool uiStartFunc(TaskQueue* tq, void* data)
     ui->main = mainwinCreate(ui);
     if (!mainwinMake(ui->main))
         return false;
+    ui->options = optionswinCreate(ui);
+    if (!optionswinMake(ui->options))
+        return false;
     mainwinShow(ui->main);
 
     return true;
@@ -152,6 +156,10 @@ static bool uiStopFunc(TaskQueue* tq, void* data)
     SubspaceUI* ui = (SubspaceUI*)IupGetGlobal("UIOBJ");
     if (!ui)
         return false;
+
+    optionswinFinish(ui->options);
+    mainwinFinish(ui->main);
+    objRelease(&ui->options);
     objRelease(&ui->main);
 
     return true;
@@ -173,6 +181,7 @@ void SubspaceUI_destroy(_In_ SubspaceUI* self)
     objRelease(&self->uiq);
     objRelease(&self->uiworkers);
     objRelease(&self->main);
+    objRelease(&self->options);
     // Autogen ends -------
 }
 

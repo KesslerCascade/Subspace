@@ -27,6 +27,8 @@ typedef struct MainWin_ClassIf {
     bool (*make)(_In_ void* self);
     void (*show)(_In_ void* self);
     void (*update)(_In_ void* self);
+    bool (*updatePanel)(_In_ void* self, _In_opt_ strref name);
+    void (*finish)(_In_ void* self);
     void (*setLayoutDirty)(_In_ void* self);
 } MainWin_ClassIf;
 extern MainWin_ClassIf MainWin_ClassIf_tmpl;
@@ -116,6 +118,10 @@ int MainWin_onTimer(Ihandle* ih);
 #define mainwinShow(self) (self)->_->show(MainWin(self))
 // void mainwinUpdate(MainWin* self);
 #define mainwinUpdate(self) (self)->_->update(MainWin(self))
+// bool mainwinUpdatePanel(MainWin* self, strref name);
+#define mainwinUpdatePanel(self, name) (self)->_->updatePanel(MainWin(self), name)
+// void mainwinFinish(MainWin* self);
+#define mainwinFinish(self) (self)->_->finish(MainWin(self))
 // void mainwinSetLayoutDirty(MainWin* self);
 #define mainwinSetLayoutDirty(self) (self)->_->setLayoutDirty(MainWin(self))
 

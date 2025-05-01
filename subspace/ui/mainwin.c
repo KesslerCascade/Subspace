@@ -14,6 +14,7 @@
 #include "panel/welcome/welcomepanel.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
+#include "optionswin.h"
 #include "subspaceui.h"
 
 static void MainWin_registerPanels(MainWin* self, SubspaceUI* ui)
@@ -46,6 +47,16 @@ _objinit_guaranteed bool MainWin_init(_In_ MainWin* self)
     htInit(&self->panels, string, object, 16);
     return true;
     // Autogen ends -------
+}
+
+static int optionsbtn_action(Ihandle* ih)
+{
+    SubspaceUI* ui = iupGetUI(ih);
+    if (!ui)
+        return IUP_IGNORE;
+
+    optionswinShow(ui->options);
+    return IUP_DEFAULT;
 }
 
 bool MainWin_make(_In_ MainWin* self)
@@ -81,6 +92,7 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(options, "BORDERWIDTH", "0");
     IupSetAttribute(options, "TIP", langGetC(self->ss, _S"options_tip"));
     iupSetObj(options, ObjNone, self, self->ui);
+    IupSetCallback(options, "FLAT_ACTION", optionsbtn_action);
     iupLoadImage(self->ui, _S"IMAGE_OPTIONS", _S"svg", _S"subspace:/options.svg", options);
     iupLoadImage(self->ui, _S"IMAGE_OPTIONS_HOVER", _S"svg", _S"subspace:/options-hover.svg", NULL);
 
@@ -127,15 +139,42 @@ void MainWin_show(_In_ MainWin* self)
 
 void MainWin_update(_In_ MainWin* self)
 {
+    string tmp = 0;
+    if (ssdStringOut(self->ss->settings, _S"ftl/exe", &tmp)) {
+        IupSetAttribute(self->zbox, "VALUE_HANDLE", (char*)self->root);
+    } else {
+        IupSetAttribute(self->zbox, "VALUE_HANDLE", (char*)self->welcomepanel->h);
+    }
+
     return;
+}
+
+bool MainWin_updatePanel(_In_ MainWin* self, _In_opt_ strref name)
+{
+    Panel* panel;
+    if (htFind(self->panels, strref, name, object, &panel)) {
+        panelUpdate(panel);
+        objRelease(&panel);
+        return true;
+    }
+
+    return false;
+}
+
+void MainWin_finish(_In_ MainWin* self)
+{
+    if (self->win)
+        IupDestroy(self->win);
+    if (self->timer)
+        IupDestroy(self->timer);
+    self->win   = NULL;
+    self->timer = NULL;
 }
 
 void MainWin_destroy(_In_ MainWin* self)
 {
-    IupDestroy(self->win);
-    IupDestroy(self->timer);
+    MainWin_finish(self);
     // Autogen begins -----
-    objDestroyWeak(&self->ui);
     htDestroy(&self->panels);
     objRelease(&self->welcomepanel);
     // Autogen ends -------
