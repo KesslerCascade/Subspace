@@ -16,7 +16,7 @@ _objfactory_guaranteed GameInfoPanel* GameInfoPanel_create(SubspaceUI* ui)
     GameInfoPanel* self;
     self = objInstCreate(GameInfoPanel);
     self->ss = ui->ss;
-    self->ui   = objGetWeak(SubspaceUI, ui);
+    self->ui = ui;
     strDup(&self->title, _S"Game Info");
     self->name = _S"gameinfo";
     objInstInit(self);

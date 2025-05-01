@@ -7,7 +7,7 @@ extern const char *panelbg;
 class SubspaceUI;
 class Panel implements Sortable {
     Subspace *ss;
-    weak:SubspaceUI ui;
+    SubspaceUI *ui;
 
     Ihandle *h;
     Ihandle *parent;

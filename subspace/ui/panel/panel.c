@@ -10,13 +10,13 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/subspaceui.h"
+#include "ui/util/iupsetobj.h"
 
 const char* panelbg = "32 32 32";
 
 void Panel_destroy(_In_ Panel* self)
 {
     // Autogen begins -----
-    objDestroyWeak(&self->ui);
     strDestroy(&self->title);
     // Autogen ends -------
 }
@@ -24,7 +24,7 @@ void Panel_destroy(_In_ Panel* self)
 bool Panel_make(_In_ Panel* self)
 {
     if (self->h) {
-        IupSetAttribute(self->h, "CXOBJ", (const char*)self);
+        iupSetObj(self->h, self, ObjNone, self->ui);
         if (!strEmpty(self->title))
             IupSetAttribute(self->h, "TABTITLE", strC(self->title));
     }

@@ -35,7 +35,7 @@ typedef struct WelcomePanel {
     atomic(ptr) _weakref;
 
     Subspace* ss;
-    Weak(SubspaceUI)* ui;
+    SubspaceUI* ui;
     Ihandle* h;
     Ihandle* parent;
     strref name;

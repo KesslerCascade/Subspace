@@ -19,7 +19,7 @@ _objfactory_guaranteed WelcomePanel* WelcomePanel_create(SubspaceUI* ui)
     WelcomePanel* self;
     self = objInstCreate(WelcomePanel);
     self->ss = ui->ss;
-    self->ui   = objGetWeak(SubspaceUI, ui);
+    self->ui   = ui;
     self->name = _S"welcome";
     objInstInit(self);
     return self;
@@ -29,10 +29,6 @@ extern bool Panel_make(_In_ Panel* self);   // parent
 #define parent_make() Panel_make((Panel*)(self))
 bool WelcomePanel_make(_In_ WelcomePanel* self)
 {
-    SubspaceUI* ui = objAcquireFromWeak(SubspaceUI, self->ui);
-    if (!ui)
-        return false;
-
     sa_Ihandle welcometxt;
     sa_Ihandle welcomefirst;
     sa_Ihandle welcomesubheader;
@@ -105,7 +101,7 @@ bool WelcomePanel_make(_In_ WelcomePanel* self)
     IupSetAttribute(optbtn, "CPADDING", "4x1");
     IupSetAttribute(optbtn, "CSPACING", "3");
     IupSetAttribute(optbtn, "FOCUSFEEDBACK", "No");
-    iupLoadImage(ui, _S"IMAGE_WRENCH_SMALL", _S"svg", _S"subspace:/wrench-small.svg", optbtn);
+    iupLoadImage(self->ui, _S"IMAGE_WRENCH_SMALL", _S"svg", _S"subspace:/wrench-small.svg", optbtn);
 
     Ihandle* multibox = IupMultiBox(NULL);
     IupSetAttribute(multibox, "CGAPHORIZ", "2");
@@ -145,7 +141,6 @@ bool WelcomePanel_make(_In_ WelcomePanel* self)
     saDestroy(&welcomeopt1);
     saDestroy(&welcomeopt2);
     saDestroy(&words);
-    objRelease(&ui);
 
     return true;
 }

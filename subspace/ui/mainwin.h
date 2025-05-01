@@ -42,7 +42,7 @@ typedef struct MainWin {
     atomic(ptr) _weakref;
 
     Subspace* ss;
-    Weak(SubspaceUI)* ui;
+    SubspaceUI* ui;
     Ihandle* win;
     Ihandle* sidebar;
     Ihandle* zbox;

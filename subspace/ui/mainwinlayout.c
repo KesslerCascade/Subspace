@@ -1,9 +1,10 @@
 #include <cx/container.h>
+#include "ui/util/iupsetobj.h"
 #include "mainwin.h"
 
 static int split_valuechange(Ihandle *ih)
 {
-    MainWin* mainwin = (MainWin*)IupGetAttribute(ih, "OWNEROBJ");
+    MainWin* mainwin = iupGetParentObj(MainWin, ih);
     if (!mainwin)
         return IUP_DEFAULT;
 
@@ -22,7 +23,7 @@ Ihandle* MainWin_createSplit(_In_ MainWin* self, bool vertical)
     IupSetAttribute(ret, "BARSIZE", "4");
     Ihandle* sep = IupGetChild(ret, 0);
     IupSetAttribute(sep, "STYLE", "FILL");
-    IupSetAttribute(ret, "OWNEROBJ", (char*)self);
+    iupSetObj(ret, ObjNone, self, self->ui);
     IupSetCallback(ret, "VALUECHANGED_CB", split_valuechange);
     return ret;
 }
@@ -55,7 +56,7 @@ typedef int (*iftcxytp_t)(Ihandle* ih, int x, int y);
 void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh)
 {
     int oldpos = IupGetChildPos(split, oh);
-    IupSetAttribute(nh, "OWNEROBJ", (char*)self);
+    iupSetObj(nh, ObjNone, self, self->ui);
     if (oldpos == 1) {
         // have to do some fancy footwork to keep the ordering correct
         IupDetach(oh);
@@ -77,7 +78,7 @@ void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, 
 static int tab_dropdata(Ihandle* ih, char* type, void* data, int size, int x, int y)
 {
     Ihandle* mtab    = IupGetHandle((char*)data);
-    MainWin* mainwin = (MainWin*)IupGetAttribute(ih, "OWNEROBJ");
+    MainWin* mainwin = iupGetParentObj(MainWin, ih);
     if (!mtab || !mainwin)
         return IUP_IGNORE;
     Ihandle* origparent = IupGetParent(mtab);
@@ -131,7 +132,7 @@ Ihandle* MainWin_createTabs(_In_ MainWin* self)
     IupSetCallback(tab, "DRAGDATASIZE_CB", (Icallback)tab_dragdatasize);
     IupSetCallback(tab, "DRAGDATA_CB", (Icallback)tab_dragdata);
     IupSetCallback(tab, "DROPDATA_CB", (Icallback)tab_dropdata);
-    IupSetAttribute(tab, "OWNEROBJ", (char*)self);
+    iupSetObj(tab, ObjNone, self, self->ui);
     return tab;
 }
 
@@ -143,7 +144,7 @@ Ihandle* MainWin_createPlaceholder(_In_ MainWin* self)
     IupSetAttribute(ih, "DROPTARGET", "YES");
     IupSetAttribute(ih, "DROPTYPES", "TABDATA");
     IupSetCallback(ih, "DROPDATA_CB", (Icallback)tab_dropdata);
-    IupSetAttribute(ih, "OWNEROBJ", (char*)self);
+    iupSetObj(ih, ObjNone, self, self->ui);
     return ih;
 }
 
@@ -272,7 +273,7 @@ static void saveLayoutNode(MainWin* self, SSDNode* node, Ihandle* in,
 
             for (int i = 0; i < IupGetChildCount(in); i++) {
                 Ihandle* ci  = IupGetChild(in, i);
-                Panel* panel = ci ? (Panel*)IupGetAttribute(ci, "CXOBJ") : NULL;
+                Panel* panel = ci ? iupGetObj(Panel, ci) : NULL;
                 if (panel && !strEmpty(panel->name))
                     saPush(&tabnames, strref, panel->name);
             }

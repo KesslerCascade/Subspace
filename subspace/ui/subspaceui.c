@@ -42,6 +42,7 @@ static bool uiThreadInit(TaskQueue* tq, void* data)
     IupSetGlobal("LOCKLOOP", "YES");
     IupSetGlobal("UTF8MODE", "YES");
     IupSetGlobal("UTF8MODE_FILE", "YES");
+    IupSetGlobal("UIOBJ", (char*)ui);
 
     if (ui->ss->devmode)
         IupSetGlobal("GLOBALLAYOUTDLGKEY", "Yes");
@@ -69,7 +70,7 @@ bool SubspaceUI_init(_In_ SubspaceUI* self)
     TaskQueueConfig conf;
     tqPresetSingle(&conf);
     conf.pool.ui = uicb;
-    self->uiq   = tqCreate(_S"UI", &conf);
+    self->uiq    = tqCreate(_S"UI", &conf);
     if (!self->uiq || !tqStart(self->uiq))
         return false;
 
@@ -80,24 +81,26 @@ bool SubspaceUI_init(_In_ SubspaceUI* self)
         return false;
 
     // Some initialization must be performed in the UI thread itself
-    tqCall(self->uiq, uiThreadInit, (void*)self);
+    SubspaceUI*
+        uithreadref = objAcquire(self);   // the UI thread owns a reference to ensure that the UI
+                                          // object isn't destroyed so long as it's running
+    tqCall(self->uiq, uiThreadInit, (void*)uithreadref);
 
-    return true;    
+    return true;
 }
 
-typedef struct UIThreadShutdownData {
-    SubspaceUI* ui;
-    SharedEvent* e;
-} UIThreadShutdownData;
 static bool uiThreadShutdown(TaskQueue* tq, void* data)
 {
-    UIThreadShutdownData* d = (UIThreadShutdownData*)data;
+    SharedEvent* e = (SharedEvent*)data;
+    SubspaceUI* ui = (SubspaceUI*)IupGetGlobal("UIOBJ");
     IupClose();
 
-    eventSignal(&d->e->ev);
-    sheventRelease(&d->e);
+    // ok for UI object to be destroyed now
+    objRelease(&ui);
 
-    xaFree(d);
+    eventSignal(&e->ev);
+    sheventRelease(&e);
+
     return true;
 }
 
@@ -107,13 +110,10 @@ bool SubspaceUI_shutdown(_In_ SubspaceUI* self)
         return false;
     ssuiStop(self);
 
-    UIThreadShutdownData* sd = xaAllocStruct(UIThreadShutdownData, XA_Zero);
-    SharedEvent *callEvent = sheventCreate(0);
+    SharedEvent* callEvent = sheventCreate(0);
 
     // Tear down UI from inside the UI thread itself
-    sd->e     = sheventAcquire(callEvent);
-    sd->ui = self;
-    tqCall(self->uiq, uiThreadShutdown, sd);
+    tqCall(self->uiq, uiThreadShutdown, (void*)sheventAcquire(callEvent));
     eventWaitTimeout(&callEvent->ev, timeS(10));
 
     tqShutdown(self->uiworkers, true);
@@ -125,7 +125,9 @@ bool SubspaceUI_shutdown(_In_ SubspaceUI* self)
 
 static bool uiStartFunc(TaskQueue* tq, void* data)
 {
-    SubspaceUI* ui = (SubspaceUI*)data;
+    SubspaceUI* ui = (SubspaceUI*)IupGetGlobal("UIOBJ");
+    if (!ui)
+        return false;
 
     ui->main = mainwinCreate(ui);
     if (!mainwinMake(ui->main))
@@ -141,13 +143,15 @@ void SubspaceUI_start(_In_ SubspaceUI* self)
         return;
 
     // Need to run the function to create the UI from the UI thread itself
-    tqCall(self->uiq, uiStartFunc, self);
+    tqCall(self->uiq, uiStartFunc, NULL);
     self->started = true;
 }
 
 static bool uiStopFunc(TaskQueue* tq, void* data)
 {
-    SubspaceUI* ui = (SubspaceUI*)data;
+    SubspaceUI* ui = (SubspaceUI*)IupGetGlobal("UIOBJ");
+    if (!ui)
+        return false;
     objRelease(&ui->main);
 
     return true;

@@ -8,7 +8,7 @@
 class SubspaceUI;
 class MainWin {
     Subspace *ss;
-    weak:SubspaceUI ui;
+    SubspaceUI *ui;
 
     Ihandle *win;
     Ihandle *sidebar;

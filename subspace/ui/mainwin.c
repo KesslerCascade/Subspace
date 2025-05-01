@@ -13,6 +13,7 @@
 #include "panel/gameinfo/gameinfopanel.h"
 #include "panel/welcome/welcomepanel.h"
 #include "ui/util/iuploadimage.h"
+#include "ui/util/iupsetobj.h"
 #include "subspaceui.h"
 
 static void MainWin_registerPanels(MainWin* self, SubspaceUI* ui)
@@ -30,11 +31,11 @@ _objfactory_guaranteed MainWin* MainWin_create(SubspaceUI* ui)
     MainWin* self;
     self = objInstCreate(MainWin);
 
-    self->ui = objGetWeak(SubspaceUI, ui);
+    self->ui = ui;
     self->ss = ui->ss;
 
     objInstInit(self);
-    MainWin_registerPanels(self, ui);
+    MainWin_registerPanels(self, self->ui);
 
     return self;
 }
@@ -49,12 +50,8 @@ _objinit_guaranteed bool MainWin_init(_In_ MainWin* self)
 
 bool MainWin_make(_In_ MainWin* self)
 {
-    SubspaceUI* ui = objAcquireFromWeak(SubspaceUI, self->ui);
-    if (!ui)
-        return false;
-
     self->timer = IupTimer();
-    IupSetAttribute(self->timer, "OWNEROBJ", (char*)self);
+    iupSetObj(self->timer, ObjNone, self, self->ui);
     IupSetCallback(self->timer, "ACTION_CB", MainWin_onTimer);
     IupSetAttribute(self->timer, "TIME", "10000");
     IupSetAttribute(self->timer, "RUN", "YES");
@@ -72,18 +69,20 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(hamburger, "HLCOLOR", NULL);
     IupSetAttribute(hamburger, "PSCOLOR", NULL);
     IupSetAttribute(hamburger, "BORDERWIDTH", "0");
-    IupSetAttribute(hamburger, "TIP", langGetC(self->ss, _S"hamburgertip"));
-    iupLoadImage(ui, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", hamburger);
-    iupLoadImage(ui, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
+    IupSetAttribute(hamburger, "TIP", langGetC(self->ss, _S"hamburger_tip"));
+    iupSetObj(hamburger, ObjNone, self, self->ui);
+    iupLoadImage(self->ui, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", hamburger);
+    iupLoadImage(self->ui, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
     Ihandle* options = IupFlatButton(NULL);
     IupSetAttribute(options, "IMAGE", "IMAGE_OPTIONS");
     IupSetAttribute(options, "IMAGEHIGHLIGHT", "IMAGE_OPTIONS_HOVER");
     IupSetAttribute(options, "HLCOLOR", NULL);
     IupSetAttribute(options, "PSCOLOR", NULL);
     IupSetAttribute(options, "BORDERWIDTH", "0");
-    IupSetAttribute(options, "TIP", langGetC(self->ss, _S"optionstip"));
-    iupLoadImage(ui, _S"IMAGE_OPTIONS", _S"svg", _S"subspace:/options.svg", options);
-    iupLoadImage(ui, _S"IMAGE_OPTIONS_HOVER", _S"svg", _S"subspace:/options-hover.svg", NULL);
+    IupSetAttribute(options, "TIP", langGetC(self->ss, _S"options_tip"));
+    iupSetObj(options, ObjNone, self, self->ui);
+    iupLoadImage(self->ui, _S"IMAGE_OPTIONS", _S"svg", _S"subspace:/options.svg", options);
+    iupLoadImage(self->ui, _S"IMAGE_OPTIONS_HOVER", _S"svg", _S"subspace:/options-hover.svg", NULL);
 
     self->sidebar = IupVbox(hamburger, options, NULL);
     IupSetAttribute(self->sidebar, "CGAP", "2");
@@ -109,13 +108,14 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(self->win, "SIZE", strC(tmp));
     IupSetAttribute(self->win, "SHRINK", "Yes");
     IupSetAttribute(self->win, "TITLE", langGetC(self->ss, _S"subspace_title"));
-    IupSetAttribute(self->win, "CXOBJ", (const char*)self);
+    iupSetObj(self->win, self, ObjNone, self->ui);
+
+    IupSetHandle("SUBSPACE_MAINWIN", self->win);
 
     IupSetCallback(self->win, "CLOSE_CB", (Icallback)MainWin_onClose);
     IupSetCallback(self->win, "RESIZE_CB", (Icallback)MainWin_onResize);
 
     strDestroy(&tmp);
-    objRelease(&ui);
     return true;
 }
 
@@ -151,7 +151,7 @@ static void checkLayout(MainWin* self)
 
 int MainWin_onClose(Ihandle* ih)
 {
-    MainWin* self = (MainWin*)IupGetAttribute(ih, "CXOBJ");
+    MainWin* self = iupGetObj(MainWin, ih);
     checkLayout(self);
     self->ss->exit = true;
     eventSignal(&self->ss->notify);
@@ -164,7 +164,7 @@ int MainWin_onResize(Ihandle* ih, int width, int height)
     if (IupGetInt(ih, "MAXIMIZED") > 0 || IupGetInt(ih, "MINIMIZED") > 0)
         return IUP_DEFAULT;   // don't save maximized "size"
 
-    MainWin* self = (MainWin*)IupGetAttribute(ih, "CXOBJ");
+    MainWin* self = iupGetObj(MainWin, ih);
     int w, h;
     if (IupGetIntInt(ih, "SIZE", &w, &h) == 2 && (w != self->width || h != self->height)) {
         self->width  = w;
@@ -177,8 +177,9 @@ int MainWin_onResize(Ihandle* ih, int width, int height)
 
 int MainWin_onTimer(Ihandle* ih)
 {
-    MainWin* self = (MainWin*)IupGetAttribute(ih, "OWNEROBJ");
-    checkLayout(self);
+    MainWin* self = iupGetParentObj(MainWin, ih);
+    if (self)
+        checkLayout(self);
     return IUP_DEFAULT;
 }
 
