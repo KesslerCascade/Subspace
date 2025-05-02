@@ -113,7 +113,7 @@ bool WelcomePanel_make(_In_ WelcomePanel* self)
     IupSetAttribute(optbtn, "CPADDING", "4x1");
     IupSetAttribute(optbtn, "CSPACING", "3");
     IupSetAttribute(optbtn, "FOCUSFEEDBACK", "No");
-    iupLoadImage(self->ui, _S"IMAGE_WRENCH_SMALL", _S"svg", _S"subspace:/wrench-small.svg", optbtn);
+    iupLoadImage(self->ss, _S"IMAGE_WRENCH_SMALL", _S"svg", _S"subspace:/wrench-small.svg", optbtn);
     iupSetObj(optbtn, ObjNone, self, self->ui);
     IupSetCallback(optbtn, "FLAT_ACTION", optionsbtn_action);
 

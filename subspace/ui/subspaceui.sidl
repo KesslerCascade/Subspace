@@ -7,7 +7,6 @@ class OptionsWin;
 [methodprefix ssui] class SubspaceUI {
     Subspace *ss;
     object:TaskQueue uiq;
-    object:TaskQueue uiworkers;
     bool started;
 
     object:MainWin main;

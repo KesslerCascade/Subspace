@@ -42,7 +42,7 @@ typedef struct Subspace {
     ControlServer* svr;
     SubspaceUI* ui;
     GameMgr* gmgr;
-    FeatureRegistry* features;
+    FeatureRegistry* freg;
     LanguageDB* lang;
 
     // global settings

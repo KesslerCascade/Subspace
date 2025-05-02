@@ -53,7 +53,6 @@ typedef struct SubspaceUI {
 
     Subspace* ss;
     TaskQueue* uiq;
-    TaskQueue* uiworkers;
     bool started;
     MainWin* main;
     OptionsWin* options;

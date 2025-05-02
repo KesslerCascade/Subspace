@@ -2,6 +2,7 @@
 #include "version.h"
 
 #include "control/controlserver.h"
+#include "feature/featureregistry.h"
 #include "gamemgr/gamemgr.h"
 #include "lang/lang.h"
 #include "ui/subspaceui.h"
@@ -43,6 +44,122 @@ static void parseArgs(Subspace* ss, VFS* vfs)
     }
 }
 
+static void subspaceStartup(LogDest** pdeferredlogs)
+{
+    // 01 -------- event that workers can use to notify the main thread of something
+    eventInit(&subspace.notify);
+
+    // 02 -------- Filesystem setup
+    subspace.fs = vfsCreate(0);
+    vfsMountVFS(subspace.fs, _S"/", filesys, subspace.basedir);
+
+    // 03 -------- mount subspace:/ namespace
+    if (!subspaceMount(&subspace)) {
+        fatalError(
+            _S
+            "Required data files are missing. Please ensure the Subspace installation is complete.",
+            false);
+    }
+    vfsSetCurDir(subspace.fs, SSNS);
+
+    // 04 -------- Load Settings
+    subspace.settings = setsOpen(subspace.fs, SETTINGS_FILENAME, 0);
+
+    // 05 -------- Log file setup
+    if (!logOpen(subspace.fs, LOG_FILENAME, pdeferredlogs)) {
+        fatalError(
+            _S"Could not open log file. Please ensure there is only one copy of Subspace running.",
+            false);
+    }
+    logFmt(Notice, _S"Subspace ${string} starting up!", stvar(strref, (strref)subspace_version_str));
+    logFmt(Info, _S"Install directory is ${string}.", stvar(string, subspace.basedir));
+    if (subspace.devmode)
+        logStr(Notice, _S"Developer mode engaged. Good luck and have fun!");
+
+    // 06 -------- Feature registry
+    subspace.freg = fregCreate(&subspace);
+
+    // 07 -------- GameMgr setup
+    subspace.gmgr = gmgrCreate(&subspace);
+
+    // 08 -------- Task queue setup
+    int ncores   = osPhysicalCPUs();
+    int nthreads = osLogicalCPUs();
+    TaskQueueConfig conf;
+    bool ret = true;
+
+    tqPresetBalanced(&conf);
+    tqEnableMonitor(&conf);
+    conf.pool.wInitial = ncores;
+    conf.pool.wIdle    = ncores;
+    conf.pool.wBusy    = nthreads;
+    conf.pool.wMax     = nthreads * 2;
+    subspace.workq     = tqCreate(_S"Main", &conf);
+    if (subspace.workq)
+        ret &= tqStart(subspace.workq);
+
+    // 09 -------- load language translations
+    string lang = 0;
+    ssdStringOutD(subspace.settings, _S"ui/lang", &lang, _S"en-us");
+    if (!langLoad(&subspace, lang)) {
+        fatalError(_S"Could not load any UI language.", false);
+    }
+    strDestroy(&lang);
+
+    // 10 -------- UI setup
+    subspace.ui = ssuiCreate(&subspace);
+    if (!ssuiInit(subspace.ui)) {
+        fatalError(_S"Failed to initialize UI.", false);
+    }
+
+    // 11 -------- Control Server setup
+    subspace.svr = cserverCreate(&subspace);
+    if (!cserverStart(subspace.svr)) {
+        fatalError(_S"Failed to start control server.", false);
+    }
+}
+
+static void subspaceShutdown()
+{
+    // 11 -------- Control Server shutdown
+    cserverStop(subspace.svr);
+
+    // 10 -------- UI teardown
+    ssuiShutdown(subspace.ui);
+
+    // 09 -------- Language translations
+    objRelease(&subspace.lang);
+
+    // 08 -------- Task queue shutdown
+    tqShutdown(subspace.workq, true);
+
+    // 08 -------- Game manager
+    objRelease(&subspace.gmgr);
+
+    // 06 -------- Feature registry
+    objRelease(&subspace.freg);
+
+    // 05 -------- Log file
+    logClose();
+
+    // 04 -------- Load Settings
+    setsClose(&subspace.settings);
+
+    // 03 -------- unmount the subspace:/ namespace
+    vfsSetCurDir(subspace.fs, _S"/");
+    subspaceUnmount(&subspace);
+
+    // 02 -------- Filesystem setup
+    vfsDestroy(&subspace.fs);
+
+    // 01 -------- event that workers can use to notify the main thread of something
+    eventDestroy(&subspace.notify);
+
+    // Release some objects that were kept avialable during shutdown
+    objRelease(&subspace.svr);
+    objRelease(&subspace.workq);
+}
+
 int entryPoint()
 {
     // do memory logging for crash dumps
@@ -71,67 +188,7 @@ int entryPoint()
         }
     }
 
-    // event that workers can use to notify the main thread of something
-    eventInit(&subspace.notify);
-
-    subspace.fs = vfsCreate(0);
-    vfsMountVFS(subspace.fs, _S"/", filesys, subspace.basedir);
-
-    // mount subspace:/ namespace
-    if (!subspaceMount(&subspace)) {
-        fatalError(
-            _S
-            "Required data files are missing. Please ensure the Subspace installation is complete.",
-            false);
-    }
-    vfsSetCurDir(subspace.fs, SSNS);
-
-    subspace.settings = setsOpen(subspace.fs, SETTINGS_FILENAME, 0);
-
-    // Set up log file
-    if (!logOpen(subspace.fs, LOG_FILENAME, &deferbuf)) {
-        fatalError(
-            _S"Could not open log file. Please ensure there is only one copy of Subspace running.",
-            false);
-    }
-    logFmt(Notice, _S"Subspace ${string} starting up!", stvar(strref, (strref)subspace_version_str));
-    logFmt(Info, _S"Install directory is ${string}.", stvar(string, subspace.basedir));
-    if (subspace.devmode)
-        logStr(Notice, _S"Developer mode engaged. Good luck and have fun!");
-
-    // Create task queue
-    int ncores = osPhysicalCPUs();
-    TaskQueueConfig conf;
-    bool ret = true;
-
-    tqPresetBalanced(&conf);
-    tqEnableMonitor(&conf);
-    conf.pool.wInitial = ncores;
-    subspace.workq     = tqCreate(_S"Main", &conf);
-    if (subspace.workq)
-        ret &= tqStart(subspace.workq);
-
-    subspace.ui = ssuiCreate(&subspace);
-    if (!ssuiInit(subspace.ui)) {
-        fatalError(_S"Failed to initialize UI.", false);
-    }
-
-    subspace.gmgr = gmgrCreate(&subspace);
-
-    subspace.svr = cserverCreate(&subspace);
-    if (!cserverStart(subspace.svr)) {
-        fatalError(_S"Failed to start control server.", false);
-    }
-
-    // load language translations
-    string lang = 0;
-    ssdStringOutD(subspace.settings, _S"ui/lang", &lang, _S"en-us");
-    if (!langLoad(&subspace, lang)) {
-        fatalError(_S"Could not load any UI language.", false);
-    }
-    strDestroy(&lang);
-
-    ssuiStart(subspace.ui);
+    subspaceStartup(&deferbuf);
 
     // TEMP FOR TESTING
     string tmp = 0;
@@ -141,30 +198,14 @@ int entryPoint()
     gmgrReg(subspace.gmgr, gitest);
     ginstLaunch(gitest);
 
+    ssuiStart(subspace.ui);
     do {
         eventWaitTimeout(&subspace.notify, timeS(10));
 
     } while (!subspace.exit);
-
     ssuiStop(subspace.ui);
-    ssuiShutdown(subspace.ui);
 
-    cserverStop(subspace.svr);
-
-    setsClose(&subspace.settings);
-
-    // unmount the subspace:/ namespace
-    vfsSetCurDir(subspace.fs, _S"/");
-    subspaceUnmount(&subspace);
-
-    // Exiting
-    tqShutdown(subspace.workq, true);
-    objRelease(&subspace.workq);
-    objRelease(&subspace.ui);
-    objRelease(&subspace.gmgr);
-    objRelease(&subspace.svr);
-
-    logClose();
+    subspaceShutdown();
 
     return 0;
 }

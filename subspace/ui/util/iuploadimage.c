@@ -31,10 +31,9 @@ out:
     return ret;
 }
 
-void iupLoadImage(SubspaceUI* ui, strref iupname, strref driver, strref filename,
-                  Ihandle* torefresh)
+void iupLoadImage(Subspace* ss, strref iupname, strref driver, strref filename, Ihandle* torefresh)
 {
-    ImageLoad* iload     = imageloadLoadFile(driver, ui->ss->fs, filename);
+    ImageLoad* iload     = imageloadLoadFile(driver, ss->fs, filename);
     int dpi              = atoi(IupGetGlobal("SCREENDPI"));
     iload->preferred_dpi = (dpi > 0) ? dpi : 96;
 
@@ -42,8 +41,8 @@ void iupLoadImage(SubspaceUI* ui, strref iupname, strref driver, strref filename
     // to the main UI thread
     cchainAttach(&iload->oncomplete,
                  cbAttachImage,
-                 stvar(weakref, objGetWeak(TaskQueue, ui->uiq)),
+                 stvar(weakref, objGetWeak(TaskQueue, ss->ui->uiq)),
                  stvar(strref, iupname),
                  stvar(ptr, torefresh));
-    tqRun(ui->uiworkers, &iload);
+    tqRun(ss->workq, &iload);
 }

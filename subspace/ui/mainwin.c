@@ -82,8 +82,8 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(hamburger, "BORDERWIDTH", "0");
     IupSetAttribute(hamburger, "TIP", langGetC(self->ss, _S"hamburger_tip"));
     iupSetObj(hamburger, ObjNone, self, self->ui);
-    iupLoadImage(self->ui, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", hamburger);
-    iupLoadImage(self->ui, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
+    iupLoadImage(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", hamburger);
+    iupLoadImage(self->ss, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
     Ihandle* options = IupFlatButton(NULL);
     IupSetAttribute(options, "IMAGE", "IMAGE_OPTIONS");
     IupSetAttribute(options, "IMAGEHIGHLIGHT", "IMAGE_OPTIONS_HOVER");
@@ -93,8 +93,8 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(options, "TIP", langGetC(self->ss, _S"options_tip"));
     iupSetObj(options, ObjNone, self, self->ui);
     IupSetCallback(options, "FLAT_ACTION", optionsbtn_action);
-    iupLoadImage(self->ui, _S"IMAGE_OPTIONS", _S"svg", _S"subspace:/options.svg", options);
-    iupLoadImage(self->ui, _S"IMAGE_OPTIONS_HOVER", _S"svg", _S"subspace:/options-hover.svg", NULL);
+    iupLoadImage(self->ss, _S"IMAGE_OPTIONS", _S"svg", _S"subspace:/options.svg", options);
+    iupLoadImage(self->ss, _S"IMAGE_OPTIONS_HOVER", _S"svg", _S"subspace:/options-hover.svg", NULL);
 
     self->sidebar = IupVbox(hamburger, options, NULL);
     IupSetAttribute(self->sidebar, "CGAP", "2");

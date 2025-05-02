@@ -75,12 +75,6 @@ bool SubspaceUI_init(_In_ SubspaceUI* self)
     if (!self->uiq || !tqStart(self->uiq))
         return false;
 
-    // it also gets some worker threads for tasks like decoding images
-    tqPresetBalanced(&conf);
-    self->uiworkers = tqCreate(_S"UIWorkers", &conf);
-    if (!self->uiworkers || !tqStart(self->uiworkers))
-        return false;
-
     // Some initialization must be performed in the UI thread itself
     SubspaceUI*
         uithreadref = objAcquire(self);   // the UI thread owns a reference to ensure that the UI
@@ -117,7 +111,6 @@ bool SubspaceUI_shutdown(_In_ SubspaceUI* self)
     tqCall(self->uiq, uiThreadShutdown, (void*)sheventAcquire(callEvent));
     eventWaitTimeout(&callEvent->ev, timeS(10));
 
-    tqShutdown(self->uiworkers, true);
     tqShutdown(self->uiq, true);
     sheventRelease(&callEvent);
 
@@ -179,7 +172,6 @@ void SubspaceUI_destroy(_In_ SubspaceUI* self)
 {
     // Autogen begins -----
     objRelease(&self->uiq);
-    objRelease(&self->uiworkers);
     objRelease(&self->main);
     objRelease(&self->options);
     // Autogen ends -------
