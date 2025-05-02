@@ -10,6 +10,10 @@
 #include <cx/thread/threadobj.h>
 #include <cx/taskqueue.h>
 
+typedef struct ComplexTask ComplexTask;
+typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
+typedef struct ComplexTask ComplexTask;
+typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
 typedef struct ControlServer ControlServer;
 typedef struct ControlServer_WeakRef ControlServer_WeakRef;
 typedef struct GameInst GameInst;
@@ -20,19 +24,40 @@ typedef struct TQWorker TQWorker;
 typedef struct TQWorker_WeakRef TQWorker_WeakRef;
 typedef struct ComplexTask ComplexTask;
 typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
-typedef struct ComplexTask ComplexTask;
-typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
 typedef struct TRGate TRGate;
 typedef struct TRGate_WeakRef TRGate_WeakRef;
 typedef struct ComplexTaskQueue ComplexTaskQueue;
 typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
+typedef struct TRFifoNode TRFifoNode;
 typedef struct TaskControl TaskControl;
 typedef struct ControlServer ControlServer;
 typedef struct ControlServer_WeakRef ControlServer_WeakRef;
+typedef struct ControlHandler ControlHandler;
+typedef struct ControlHandler_WeakRef ControlHandler_WeakRef;
 saDeclarePtr(ControlServer);
 saDeclarePtr(ControlServer_WeakRef);
+saDeclarePtr(ControlHandler);
+saDeclarePtr(ControlHandler_WeakRef);
 
-typedef _objfactory_guaranteed Task* (*ctask_factory_t)(ControlClient* client, ControlMsg* msg);
+typedef struct GameInst GameInst;
+typedef void (*controlservercb_t)(GameInst *inst, ControlClient *client, ControlMsg* msg, hashtable fields);
+
+#define DECL_CFIELDVAL(type) bool _cfieldVal_##type(hashtable fields, strref name, type *out)
+#define DECL_CFIELDVALD(type) type _cfieldValD_##type(hashtable fields, strref name, type def)
+DECL_CFIELDVAL(bool);
+DECL_CFIELDVALD(bool);
+DECL_CFIELDVAL(int32);
+DECL_CFIELDVALD(int32);
+DECL_CFIELDVAL(uint32);
+DECL_CFIELDVALD(uint32);
+DECL_CFIELDVAL(float32);
+DECL_CFIELDVALD(float32);
+DECL_CFIELDVAL(float64);
+DECL_CFIELDVALD(float64);
+
+#define cfieldVal(type, fields, name, out) _cfieldVal_##type(fields, name, out)
+#define cfieldValD(type, fields, name, def) _cfieldValD_##type(fields, name, def)
+strref cfieldString(hashtable fields, strref name);
 
 typedef struct ControlServer_ClassIf {
     ObjIface* _implements;
@@ -42,8 +67,8 @@ typedef struct ControlServer_ClassIf {
     bool (*start)(_In_ void* self);
     void (*stop)(_In_ void* self);
     void (*notify)(_In_ void* self);
-    bool (*registerHandler)(_In_ void* self, _In_opt_ strref cmd, ctask_factory_t handler);
-    ctask_factory_t (*getHandler)(_In_ void* self, _In_opt_ strref cmd);
+    bool (*registerHandler)(_In_ void* self, _In_opt_ strref cmd, controlservercb_t cb, bool needinst, TaskResource* require);
+    ControlHandler* (*getHandler)(_In_ void* self, _In_opt_ strref cmd);
     int (*port)(_In_ void* self);
 } ControlServer_ClassIf;
 extern ControlServer_ClassIf ControlServer_ClassIf_tmpl;
@@ -67,6 +92,7 @@ typedef struct ControlServer {
     int notifyport;
     RWLock handler_lock;
     hashtable handlers;
+    TRFifo* featureFifo;
 } ControlServer;
 extern ObjClassInfo ControlServer_clsinfo;
 #define ControlServer(inst) ((ControlServer*)(unused_noeval((inst) && &((inst)->_is_ControlServer)), (inst)))
@@ -93,10 +119,44 @@ _objfactory_guaranteed ControlServer* ControlServer_create(Subspace* subspace);
 #define cserverStop(self) (self)->_->stop(ControlServer(self))
 // void cserverNotify(ControlServer* self);
 #define cserverNotify(self) (self)->_->notify(ControlServer(self))
-// bool cserverRegisterHandler(ControlServer* self, strref cmd, ctask_factory_t handler);
-#define cserverRegisterHandler(self, cmd, handler) (self)->_->registerHandler(ControlServer(self), cmd, handler)
-// ctask_factory_t cserverGetHandler(ControlServer* self, strref cmd);
+// bool cserverRegisterHandler(ControlServer* self, strref cmd, controlservercb_t cb, bool needinst, TaskResource* require);
+#define cserverRegisterHandler(self, cmd, cb, needinst, require) (self)->_->registerHandler(ControlServer(self), cmd, cb, needinst, TaskResource(require))
+// ControlHandler* cserverGetHandler(ControlServer* self, strref cmd);
 #define cserverGetHandler(self, cmd) (self)->_->getHandler(ControlServer(self), cmd)
 // int cserverPort(ControlServer* self);
 #define cserverPort(self) (self)->_->port(ControlServer(self))
+
+typedef struct ControlHandler {
+    union {
+        ObjIface* _;
+        void* _is_ControlHandler;
+        void* _is_ObjInst;
+    };
+    ObjClassInfo* _clsinfo;
+    atomic(uintptr) _ref;
+    atomic(ptr) _weakref;
+
+    controlservercb_t cb;
+    TaskResource* require;
+    bool needinst;
+} ControlHandler;
+extern ObjClassInfo ControlHandler_clsinfo;
+#define ControlHandler(inst) ((ControlHandler*)(unused_noeval((inst) && &((inst)->_is_ControlHandler)), (inst)))
+#define ControlHandlerNone ((ControlHandler*)NULL)
+
+typedef struct ControlHandler_WeakRef {
+    union {
+        ObjInst* _inst;
+        void* _is_ControlHandler_WeakRef;
+        void* _is_ObjInst_WeakRef;
+    };
+    atomic(uintptr) _ref;
+    RWLock _lock;
+} ControlHandler_WeakRef;
+#define ControlHandler_WeakRef(inst) ((ControlHandler_WeakRef*)(unused_noeval((inst) && &((inst)->_is_ControlHandler_WeakRef)), (inst)))
+
+_objfactory_guaranteed ControlHandler* ControlHandler_create(controlservercb_t cb, bool needinst, TaskResource* require);
+// ControlHandler* controlhandlerCreate(controlservercb_t cb, bool needinst, TaskResource* require);
+#define controlhandlerCreate(cb, needinst, require) ControlHandler_create(cb, needinst, TaskResource(require))
+
 

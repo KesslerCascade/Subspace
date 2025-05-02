@@ -1,5 +1,0 @@
-#include "control/controltask.sidl"
-
-class CmdGameStart extends ControlTask {
-    standalone void register(ControlServer *svr);
-}

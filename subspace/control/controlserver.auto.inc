@@ -11,8 +11,8 @@ static ControlServer_ClassIf _impl_ControlServer_ControlServer_ClassIf = {
     .start = (bool (*)(void*))ControlServer_start,
     .stop = (void (*)(void*))ControlServer_stop,
     .notify = (void (*)(void*))ControlServer_notify,
-    .registerHandler = (bool (*)(void*, strref, ctask_factory_t))ControlServer_registerHandler,
-    .getHandler = (ctask_factory_t (*)(void*, strref))ControlServer_getHandler,
+    .registerHandler = (bool (*)(void*, strref, controlservercb_t, bool, TaskResource*))ControlServer_registerHandler,
+    .getHandler = (ControlHandler* (*)(void*, strref))ControlServer_getHandler,
     .port = (int (*)(void*))ControlServer_port,
 };
 
@@ -27,6 +27,16 @@ ObjClassInfo ControlServer_clsinfo = {
     .init = (bool(*)(void*))ControlServer_init,
     .destroy = (void(*)(void*))ControlServer_destroy,
     .ifimpl = _ifimpl_ControlServer,
+};
+
+static ObjIface* _ifimpl_ControlHandler[] = {
+    NULL
+};
+
+ObjClassInfo ControlHandler_clsinfo = {
+    .instsize = sizeof(ControlHandler),
+    .destroy = (void(*)(void*))ControlHandler_destroy,
+    .ifimpl = _ifimpl_ControlHandler,
 };
 
 // ==================== Auto-generated section ends ======================

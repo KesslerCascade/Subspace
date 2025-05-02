@@ -5,10 +5,28 @@
 #include <cx/thread/threadobj.sidl>
 #include <cx/taskqueue.sidl>
 
-typedef _objfactory_guaranteed Task* (*ctask_factory_t)(ControlClient* client, ControlMsg* msg);
+typedef struct GameInst GameInst;
+typedef void (*controlservercb_t)(GameInst *inst, ControlClient *client, ControlMsg* msg, hashtable fields);
+
+#define DECL_CFIELDVAL(type) bool _cfieldVal_##type(hashtable fields, strref name, type *out)
+#define DECL_CFIELDVALD(type) type _cfieldValD_##type(hashtable fields, strref name, type def)
+DECL_CFIELDVAL(bool);
+DECL_CFIELDVALD(bool);
+DECL_CFIELDVAL(int32);
+DECL_CFIELDVALD(int32);
+DECL_CFIELDVAL(uint32);
+DECL_CFIELDVALD(uint32);
+DECL_CFIELDVAL(float32);
+DECL_CFIELDVALD(float32);
+DECL_CFIELDVAL(float64);
+DECL_CFIELDVALD(float64);
+
+#define cfieldVal(type, fields, name, out) _cfieldVal_##type(fields, name, out)
+#define cfieldValD(type, fields, name, def) _cfieldValD_##type(fields, name, def)
+strref cfieldString(hashtable fields, strref name);
 
 [methodprefix cserver] class ControlServer {
-    Subspace *ss;
+    Subspace* ss;
     object:Thread thread;
     sarray:object:ControlClient clients;
 
@@ -19,14 +37,23 @@ typedef _objfactory_guaranteed Task* (*ctask_factory_t)(ControlClient* client, C
     int notifyport;
 
     RWLock handler_lock;
-    hashtable:string:ptr handlers;
+    hashtable:string:object handlers;
+    object:TRFifo featureFifo;
 
-    factory create(Subspace *subspace);
+    factory create(Subspace* subspace);
     bool start();
     void stop();
     void notify();
 
-    bool registerHandler(strref cmd, ctask_factory_t handler);
-    ctask_factory_t getHandler(strref cmd);
+    bool registerHandler(strref cmd, controlservercb_t cb, bool needinst, TaskResource* require);
+    ControlHandler* getHandler(strref cmd);
     int port();
+}
+
+class ControlHandler {
+    controlservercb_t cb;
+    object:TaskResource require;
+    bool needinst;
+
+    factory create(controlservercb_t cb, bool needinst, TaskResource* require);
 }

@@ -6,24 +6,13 @@ ControlTask_ClassIf ControlTask_ClassIf_tmpl = {
     ._parent = (ObjIface*)&ComplexTask_ClassIf_tmpl,
 };
 
-static Sortable _impl_ControlTask_Sortable = {
-    ._size = sizeof(Sortable),
-    ._implements = (ObjIface*)&Sortable_tmpl,
-};
-
-static Hashable _impl_ControlTask_Hashable = {
-    ._size = sizeof(Hashable),
-    ._implements = (ObjIface*)&Hashable_tmpl,
-};
-
 static ControlTask_ClassIf _impl_ControlTask_ControlTask_ClassIf = {
     ._size = sizeof(ControlTask_ClassIf),
     ._implements = (ObjIface*)&ControlTask_ClassIf_tmpl,
+    .run = (uint32 (*)(void*, TaskQueue*, TQWorker*, TaskControl*))ControlTask_run,
 };
 
 static ObjIface* _ifimpl_ControlTask[] = {
-    (ObjIface*)&_impl_ControlTask_Sortable,
-    (ObjIface*)&_impl_ControlTask_Hashable,
     (ObjIface*)&_impl_ControlTask_ControlTask_ClassIf,
     NULL
 };
@@ -33,7 +22,6 @@ ObjClassInfo ControlTask_clsinfo = {
     .classif = (ObjIface*)&ControlTask_ClassIf_tmpl,
     .parent = &ComplexTask_clsinfo,
     .destroy = (void(*)(void*))ControlTask_destroy,
-    ._abstract = true,
     .ifimpl = _ifimpl_ControlTask,
 };
 

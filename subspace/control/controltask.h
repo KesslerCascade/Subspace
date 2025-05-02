@@ -22,32 +22,18 @@ typedef struct TRGate TRGate;
 typedef struct TRGate_WeakRef TRGate_WeakRef;
 typedef struct ComplexTaskQueue ComplexTaskQueue;
 typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
+typedef struct ComplexTask ComplexTask;
+typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
 typedef struct ControlServer ControlServer;
 typedef struct ControlServer_WeakRef ControlServer_WeakRef;
 typedef struct GameInst GameInst;
 typedef struct GameInst_WeakRef GameInst_WeakRef;
 typedef struct TaskControl TaskControl;
+typedef struct TRFifoNode TRFifoNode;
 typedef struct ControlTask ControlTask;
 typedef struct ControlTask_WeakRef ControlTask_WeakRef;
 saDeclarePtr(ControlTask);
 saDeclarePtr(ControlTask_WeakRef);
-
-#define ControlCmd_impl(cmd, clsname)                                                           \
-static _objfactory_guaranteed Task* clsname ## _factory(ControlClient* client, ControlMsg* msg) \
-{                                                                                               \
-    clsname* self;                                                                              \
-    self = objInstCreate(clsname);                                                              \
-    objInstInit(self);                                                                          \
-                                                                                                \
-    self->client = objAcquire(client);                                                          \
-    self->msg    = msg;                                                                         \
-                                                                                                \
-    return Task(self);                                                                          \
-}                                                                                               \
-void clsname ## _register(ControlServer* svr)                                                   \
-{                                                                                               \
-    cserverRegisterHandler(svr, _S cmd, clsname ## _factory);                                   \
-}
 
 typedef struct ControlTask_ClassIf {
     ObjIface* _implements;
@@ -89,6 +75,7 @@ typedef struct ControlTask {
     uint16 _intflags;        // internal flags reserved for use by the scheduler
     atomic(uint32) _advcount;        // number of times this task has been advanced
     ControlClient* client;
+    ControlHandler* handler;
     ControlMsg* msg;        // message to process (control task becomes owner)
 } ControlTask;
 extern ObjClassInfo ControlTask_clsinfo;
@@ -108,6 +95,10 @@ typedef struct ControlTask_WeakRef {
     RWLock _lock;
 } ControlTask_WeakRef;
 #define ControlTask_WeakRef(inst) ((ControlTask_WeakRef*)(unused_noeval((inst) && &((inst)->_is_ControlTask_WeakRef)), (inst)))
+
+_objfactory_guaranteed ControlTask* ControlTask_create(ControlClient* client, ControlHandler* handler, ControlMsg* msg);
+// ControlTask* controltaskCreate(ControlClient* client, ControlHandler* handler, ControlMsg* msg);
+#define controltaskCreate(client, handler, msg) ControlTask_create(ControlClient(client), ControlHandler(handler), msg)
 
 // void controltaskRequireTask(ControlTask* self, Task* dep, bool failok);
 //

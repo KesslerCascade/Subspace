@@ -14,13 +14,6 @@ set(SUBSPACE_SIDL
     control/controltask.sidl
     control/controlserver.sidl
     db/database.sidl
-    control/cmds/cmdfeaturestate.sidl
-    control/cmds/cmdgamestart.sidl
-    control/cmds/cmdgamestate.sidl
-    control/cmds/cmdlaunchfail.sidl
-    control/cmds/cmdloading.sidl
-    control/cmds/cmdlog.sidl
-    control/cmds/cmdvalidate.sidl
     feature/feature.sidl
     feature/featureregistry.sidl
     feature/frameadv/frameadv.sidl
@@ -49,6 +42,7 @@ add_sidl(${SUBSPACE_SIDL})
 
 add_executable(subspace
     control/controlclient.c
+    control/controlfields.c
     control/controlserver.c
     control/controltask.c
     control/cmds/cmdfeaturestate.c
@@ -57,6 +51,7 @@ add_executable(subspace
     control/cmds/cmdlaunchfail.c
     control/cmds/cmdloading.c
     control/cmds/cmdlog.c
+    control/cmds/cmds.c
     control/cmds/cmdvalidate.c
     db/database.c
     feature/feature.c

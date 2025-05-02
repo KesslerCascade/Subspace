@@ -5,24 +5,10 @@
 #include <cx/fs.h>
 #include "subspace.h"
 
-#define ControlCmd_impl(cmd, clsname)                                                           \
-static _objfactory_guaranteed Task* clsname ## _factory(ControlClient* client, ControlMsg* msg) \
-{                                                                                               \
-    clsname* self;                                                                              \
-    self = objInstCreate(clsname);                                                              \
-    objInstInit(self);                                                                          \
-                                                                                                \
-    self->client = objAcquire(client);                                                          \
-    self->msg    = msg;                                                                         \
-                                                                                                \
-    return Task(self);                                                                          \
-}                                                                                               \
-void clsname ## _register(ControlServer* svr)                                                   \
-{                                                                                               \
-    cserverRegisterHandler(svr, _S cmd, clsname ## _factory);                                   \
-}
-
-abstract class ControlTask extends ComplexTask {
+class ControlTask extends ComplexTask {
     object:ControlClient client;
+    object:ControlHandler handler;
     ControlMsg *msg;        // message to process (control task becomes owner)
+
+    factory create(ControlClient *client, ControlHandler *handler, ControlMsg *msg);
 }

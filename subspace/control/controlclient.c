@@ -11,6 +11,7 @@
 // ==================== Auto-generated section ends ======================
 #include "gamemgr/gamemgr.h"
 #include "controlserver.h"
+#include "controltask.h"
 
 _objfactory_guaranteed ControlClient* ControlClient_create(ControlServer* svr, socket_t sock)
 {
@@ -73,9 +74,9 @@ void ControlClient_recv(_In_ ControlClient* self)
             return;
         }
 
-        ctask_factory_t handler = cserverGetHandler(svr, (strref)msg->hdr.cmd);
+        ControlHandler* handler = cserverGetHandler(svr, (strref)msg->hdr.cmd);
         if (handler) {
-            Task* task = handler(self, msg);
+            ControlTask* task = controltaskCreate(self, handler, msg);
             tqRun(self->ss->workq, &task);
         } else {
             logFmt(Info,

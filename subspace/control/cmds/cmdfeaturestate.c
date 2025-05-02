@@ -1,23 +1,26 @@
-// ==================== Auto-generated section begins ====================
-// clang-format off
-// Do not modify the contents of this section; any changes will be lost!
-#include <cx/obj.h>
-#include <cx/debug/assert.h>
-#include <cx/obj/objstdif.h>
-#include <cx/container.h>
-#include <cx/string.h>
-#include "cmdfeaturestate.h"
-// clang-format on
-// ==================== Auto-generated section ends ======================
+#include "cmds.h"
 
-ControlCmd_impl("FeatureState", CmdFeatureState);
-
-uint32 CmdFeatureState_run(_In_ CmdFeatureState* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
+void cmdFeatureState(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
 {
-    return TASK_Result_Success;
+    strref featname = cfieldString(fields, _S"feature");
+    if (strEmpty(featname))
+        return;
+
+    withWriteLock (&inst->lock) {
+        ClientFeature* feat = NULL;
+        if (!htFind(inst->features, strref, featname, object, &feat)) {
+            feat = clientfeatureCreate(featname);
+            htInsert(&inst->features, string, feat->name, object, feat);
+        }
+
+        cfieldVal(bool, fields, _S"available", &feat->available);
+        cfieldVal(bool, fields, _S"enabled", &feat->enabled);
+
+        objRelease(&feat);
+    }
 }
 
-// Autogen begins -----
-void CmdFeatureState_register(ControlServer* svr);
-#include "cmdfeaturestate.auto.inc"
-// Autogen ends -------
+void cmdFeatureBatch(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
+{
+    return;
+}

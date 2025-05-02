@@ -11,13 +11,7 @@
 // ==================== Auto-generated section ends ======================
 #include <cx/math.h>
 
-#include "cmds/cmdfeaturestate.h"
-#include "cmds/cmdgamestart.h"
-#include "cmds/cmdgamestate.h"
-#include "cmds/cmdlaunchfail.h"
-#include "cmds/cmdloading.h"
-#include "cmds/cmdlog.h"
-#include "cmds/cmdvalidate.h"
+#include "cmds/cmds.h"
 
 _objfactory_guaranteed ControlServer* ControlServer_create(Subspace* subspace)
 {
@@ -32,10 +26,12 @@ _objfactory_guaranteed ControlServer* ControlServer_create(Subspace* subspace)
 
 _objinit_guaranteed bool ControlServer_init(_In_ ControlServer* self)
 {
+    self->featureFifo = trfifoCreate();
+
     // Autogen begins -----
     saInit(&self->clients, object, 1);
     rwlockInit(&self->handler_lock);
-    htInit(&self->handlers, string, ptr, 16);
+    htInit(&self->handlers, string, object, 16);
     return true;
     // Autogen ends -------
 }
@@ -180,13 +176,7 @@ bool ControlServer_start(_In_ ControlServer* self)
     netSetNonblock(self->notifysock, true);
 
     // register all the command handlers
-    CmdFeatureState_register(self);
-    CmdGameStart_register(self);
-    CmdGameState_register(self);
-    CmdLaunchFail_register(self);
-    CmdLoading_register(self);
-    CmdLog_register(self);
-    CmdValidate_register(self);
+    registerCmds(self);
 
     // start up server thread
     ControlServer* csthr = objAcquire(self);   // for the thread to own
@@ -216,19 +206,22 @@ void ControlServer_notify(_In_ ControlServer* self)
 }
 
 bool ControlServer_registerHandler(_In_ ControlServer* self, _In_opt_ strref cmd,
-                                   ctask_factory_t handler)
+                                   controlservercb_t cb, bool needinst, TaskResource* require)
 {
+    ControlHandler* hobj = controlhandlerCreate(cb, needinst, require);
     withWriteLock (&self->handler_lock) {
-        htInsert(&self->handlers, strref, cmd, ptr, handler, HT_Ignore);
+        htInsertC(&self->handlers, strref, cmd, object, &hobj);
     }
     return true;
 }
 
-ctask_factory_t ControlServer_getHandler(_In_ ControlServer* self, _In_opt_ strref cmd)
+ControlHandler* ControlServer_getHandler(_In_ ControlServer* self, _In_opt_ strref cmd)
 {
-    ctask_factory_t ret = NULL;
+    ControlHandler* ret = NULL;
     withReadLock (&self->handler_lock) {
-        htFind(self->handlers, strref, cmd, ptr, &ret);
+        htelem elem = htFind(self->handlers, strref, cmd, none, NULL);
+        if (elem)
+            ret = (ControlHandler*)hteVal(self->handlers, object, elem);
     }
     return ret;
 }
@@ -245,6 +238,28 @@ void ControlServer_destroy(_In_ ControlServer* self)
     saDestroy(&self->clients);
     rwlockDestroy(&self->handler_lock);
     htDestroy(&self->handlers);
+    objRelease(&self->featureFifo);
+    // Autogen ends -------
+}
+
+_objfactory_guaranteed ControlHandler* ControlHandler_create(controlservercb_t cb, bool needinst, TaskResource* require)
+{
+    ControlHandler* self;
+    self = objInstCreate(ControlHandler);
+
+    self->cb       = cb;
+    self->needinst = needinst;
+    if (require)
+        self->require = objAcquire(require);
+
+    objInstInit(self);
+    return self;
+}
+
+void ControlHandler_destroy(_In_ ControlHandler* self)
+{
+    // Autogen begins -----
+    objRelease(&self->require);
     // Autogen ends -------
 }
 
