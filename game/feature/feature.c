@@ -1,3 +1,4 @@
+#include "feature.h"
 #include "control/controlclient.h"
 #include "hook/symbol.h"
 #include "log/log.h"
@@ -106,6 +107,9 @@ bool enableFeature(SubspaceFeature* feat, bool enabled)
         feat->enabled = enabled;
     }
 
+    // update controlserver
+    sendFeatureState(feat, 0);
+
     return feat->enabled;
 }
 
@@ -136,16 +140,24 @@ void sendFeatureState(SubspaceFeature* feat, int replyto)
     msg->hdr.replyid = replyto;
     controlMsgStr(msg, 0, "feature", feat->name);
     controlMsgInt(msg, 1, "available", feat->available);
-    controlMsgInt(msg, 1, "enabled", feat->enabled);
+    controlMsgInt(msg, 2, "enabled", feat->enabled);
     controlClientQueue(msg);
 }
 
 void sendAllFeatureState()
 {
+    ControlMsg* msg = controlNewMsg("FeatureBatch", 1);
+    controlMsgInt(msg, 0, "start", 1);
+    controlClientQueue(msg);
+
     for (uint32_t i = 0; i < feathash.nslots; i++) {
         SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
         if (feat) {
             sendFeatureState(feat, 0);
         }
     }
+
+    msg = controlNewMsg("FeatureBatch", 1);
+    controlMsgInt(msg, 0, "end", 1);
+    controlClientQueue(msg);
 }
