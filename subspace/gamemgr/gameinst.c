@@ -50,7 +50,7 @@ _objinit_guaranteed bool GameInst_init(_In_ GameInst* self)
 {
     // Autogen begins -----
     rwlockInit(&self->lock);
-    saInit(&self->availFeatures, string, 1, SA_Sorted);
+    htInit(&self->features, string, object, 16);
     return true;
     // Autogen ends -------
 }
@@ -146,7 +146,7 @@ void GameInst_destroy(_In_ GameInst* self)
     objDestroyWeak(&self->client);
     rwlockDestroy(&self->lock);
     strDestroy(&self->exepath);
-    saDestroy(&self->availFeatures);
+    htDestroy(&self->features);
     // Autogen ends -------
 }
 

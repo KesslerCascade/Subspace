@@ -3,6 +3,7 @@
 // Do not make changes to this file or they will be overwritten.
 // clang-format off
 #include <cx/obj.h>
+#include "feature/feature.h"
 #include "subspace.h"
 #include "process.h"
 #include "proto.h"
@@ -57,9 +58,9 @@ typedef struct GameInst {
     string exepath;
     LaunchMode mode;
     GameInstState state;
+    hashtable features;
     float loadPct;
     int failReason;
-    sa_string availFeatures;
 } GameInst;
 extern ObjClassInfo GameInst_clsinfo;
 #define GameInst(inst) ((GameInst*)(unused_noeval((inst) && &((inst)->_is_GameInst)), (inst)))

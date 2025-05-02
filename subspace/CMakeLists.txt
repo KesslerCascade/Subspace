@@ -22,6 +22,11 @@ set(SUBSPACE_SIDL
     control/cmds/cmdlog.sidl
     control/cmds/cmdvalidate.sidl
     feature/feature.sidl
+    feature/featureregistry.sidl
+    feature/frameadv/frameadv.sidl
+    feature/infoblock/infoblock.sidl
+    feature/numerichull/numerichull.sidl
+    feature/timewarp/timewarp.sidl
     gamemgr/gameinst.sidl
     gamemgr/gamemgr.sidl
     lang/langdb.sidl
@@ -53,7 +58,14 @@ add_executable(subspace
     control/cmds/cmdloading.c
     control/cmds/cmdlog.c
     control/cmds/cmdvalidate.c
+    db/database.c
     feature/feature.c
+    feature/features.c
+    feature/featureregistry.c
+    feature/frameadv/frameadv.c
+    feature/infoblock/infoblock.c
+    feature/numerichull/numerichull.c
+    feature/timewarp/timewarp.c
     gamemgr/gameinst.c
     gamemgr/gamemgr.c
     lang/lang.c

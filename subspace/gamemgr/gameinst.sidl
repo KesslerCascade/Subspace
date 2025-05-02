@@ -1,3 +1,4 @@
+#include "feature/feature.sidl"
 #include "subspace.h"
 #include "process.h"
 #include "proto.h"
@@ -30,10 +31,10 @@ typedef enum GameInstState {
     string exepath;
     LaunchMode mode;
     GameInstState state;
+    hashtable:string:object features;
 
     float loadPct;
     int failReason;
-    [sorted] sarray:string availFeatures;
 
     factory create(GameMgr *mgr, strref exepath, LaunchMode mode);
     factory createForClient(GameMgr *mgr, ControlClient *client, uint32 cookie); // for dev mode clients

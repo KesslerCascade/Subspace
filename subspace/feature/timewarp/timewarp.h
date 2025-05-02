@@ -1,0 +1,51 @@
+#pragma once
+// This header file is auto-generated!
+// Do not make changes to this file or they will be overwritten.
+// clang-format off
+#include <cx/obj.h>
+#include "feature/feature.h"
+
+typedef struct TimeWarp TimeWarp;
+typedef struct TimeWarp_WeakRef TimeWarp_WeakRef;
+saDeclarePtr(TimeWarp);
+saDeclarePtr(TimeWarp_WeakRef);
+
+typedef struct TimeWarp {
+    union {
+        ObjIface* _;
+        void* _is_TimeWarp;
+        void* _is_SubspaceFeature;
+        void* _is_ObjInst;
+    };
+    ObjClassInfo* _clsinfo;
+    atomic(uintptr) _ref;
+    atomic(ptr) _weakref;
+
+    Subspace* ss;
+    RWLock lock;
+    string name;
+    bool available;
+    bool enabled;
+    bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+} TimeWarp;
+extern ObjClassInfo TimeWarp_clsinfo;
+#define TimeWarp(inst) ((TimeWarp*)(unused_noeval((inst) && &((inst)->_is_TimeWarp)), (inst)))
+#define TimeWarpNone ((TimeWarp*)NULL)
+
+typedef struct TimeWarp_WeakRef {
+    union {
+        ObjInst* _inst;
+        void* _is_TimeWarp_WeakRef;
+        void* _is_SubspaceFeature_WeakRef;
+        void* _is_ObjInst_WeakRef;
+    };
+    atomic(uintptr) _ref;
+    RWLock _lock;
+} TimeWarp_WeakRef;
+#define TimeWarp_WeakRef(inst) ((TimeWarp_WeakRef*)(unused_noeval((inst) && &((inst)->_is_TimeWarp_WeakRef)), (inst)))
+
+_objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss);
+// TimeWarp* timewarpCreate(Subspace* ss);
+#define timewarpCreate(ss) TimeWarp_create(ss)
+
+

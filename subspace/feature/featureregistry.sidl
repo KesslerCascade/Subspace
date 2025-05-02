@@ -1,0 +1,16 @@
+#include "feature.sidl"
+#include "subspace.h"
+
+#define fregGet(fname, registry) objDynCast(fname, fregFind(registry, #fname))
+
+[methodprefix freg] class FeatureRegistry {
+    Subspace *ss;
+
+    // This doesn't need to be locked because it's populated during
+    // program load and never changes.
+    hashtable:string:object features;
+
+    SubspaceFeature *find(strref name);
+
+    factory create(Subspace *ss);
+}

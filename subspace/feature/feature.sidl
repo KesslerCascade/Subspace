@@ -1,3 +1,19 @@
-[methodprefix feature] class SubspaceFeature {
+#include "subspace.h"
+
+[methodprefix feature] abstract class SubspaceFeature {
+    Subspace *ss;
     RWLock lock;
+    string name;
+
+    bool available;
+    bool enabled;
+    bool optional;   // Features that are expected to be unavailable, e.g. version-specific
+}
+
+class ClientFeature {
+    string name;
+    bool available;
+    bool enabled;
+
+    factory create(strref name);
 }

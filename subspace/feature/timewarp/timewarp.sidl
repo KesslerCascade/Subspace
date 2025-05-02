@@ -1,0 +1,5 @@
+#include "feature/feature.sidl"
+
+class TimeWarp extends SubspaceFeature {
+    factory create(Subspace *ss);
+}

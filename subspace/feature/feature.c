@@ -22,6 +22,25 @@ void SubspaceFeature_destroy(_In_ SubspaceFeature* self)
 {
     // Autogen begins -----
     rwlockDestroy(&self->lock);
+    strDestroy(&self->name);
+    // Autogen ends -------
+}
+
+_objfactory_guaranteed ClientFeature* ClientFeature_create(_In_opt_ strref name)
+{
+    ClientFeature* self;
+    self = objInstCreate(ClientFeature);
+
+    strDup(&self->name, name);
+
+    objInstInit(self);
+    return self;
+}
+
+void ClientFeature_destroy(_In_ ClientFeature* self)
+{
+    // Autogen begins -----
+    strDestroy(&self->name);
     // Autogen ends -------
 }
 
