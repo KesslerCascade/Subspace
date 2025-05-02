@@ -13,6 +13,7 @@ set(SUBSPACE_SIDL
     control/controlclient.sidl
     control/controltask.sidl
     control/controlserver.sidl
+    db/database.sidl
     control/cmds/cmdfeaturestate.sidl
     control/cmds/cmdgamestart.sidl
     control/cmds/cmdgamestate.sidl

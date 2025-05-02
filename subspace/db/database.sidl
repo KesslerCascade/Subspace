@@ -1,0 +1,13 @@
+#include <cx/taskqueue/resource/trfifo.sidl>
+#include "subspace.h"
+
+class Database {
+    Subspace *ss;
+
+    bool open();
+    void close();
+
+    object:TRFifo fifo;   // for database multi-threading
+
+    factory create(Subspace *ss);
+}
