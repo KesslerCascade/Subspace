@@ -374,6 +374,24 @@ static int copyResources(addr_t imagebase, IMAGE_DATA_DIRECTORY* data)
     return 1;
 }
 
+static bool tlssane;
+
+static int tlsSanityCheck(addr_t imagebase, IMAGE_SECTION_HEADER* sh, void* userdata)
+{
+    IMAGE_TLS_DIRECTORY* tlsinfo = (IMAGE_TLS_DIRECTORY*)userdata;
+
+    // check if the start and end address of the TLS info are in this section
+
+    if (tlsinfo->StartAddressOfRawData >= rva(imagebase, sh->VirtualAddress) &&
+        tlsinfo->StartAddressOfRawData <
+            rva(imagebase, sh->VirtualAddress) + sh->Misc.VirtualSize &&
+        tlsinfo->EndAddressOfRawData >= rva(imagebase, sh->VirtualAddress) &&
+        tlsinfo->EndAddressOfRawData < rva(imagebase, sh->VirtualAddress) + sh->Misc.VirtualSize)
+        tlssane = true;
+
+    return 1;
+}
+
 static int copyTLS(addr_t imagebase, IMAGE_DATA_DIRECTORY* data)
 {
     addr_t mybase                = addr(GetModuleHandle(NULL));
@@ -388,6 +406,11 @@ static int copyTLS(addr_t imagebase, IMAGE_DATA_DIRECTORY* data)
     // memory ourselves and copy the initializer template into it.
 
     // TODO: Add sanity check that TLS data isn't too big to fit!
+
+    tlssane = false;
+    enumSections(imagebase, tlsSanityCheck, tlsinfo);
+    if (!tlssane)
+        return 0;
 
     VirtualProtect(ptr(mytls->StartAddressOfRawData), sizeof(_tls), PAGE_READWRITE, &old);
     memcpy(ptr(mytls->StartAddressOfRawData),
