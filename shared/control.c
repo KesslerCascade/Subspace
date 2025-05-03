@@ -29,7 +29,7 @@ bool sendToSocket(StreamBuffer* sb, const uint8_t* buf, size_t off, size_t sz, v
 {
     ControlState* cs = (ControlState*)ctx;
     intptr_t bsent   = send(cs->sock, buf + off, sz, 0);
-    cs->lastsent     = bsent > 0 ? bsent : 0;
+    cs->lastsent += bsent > 0 ? bsent : 0;
     return false;   // always peek, because send() might short write and we don't want to consume
                     // all the data
 }
@@ -40,6 +40,7 @@ static void sendNotify(StreamBuffer* sb, size_t sz, void* ctx)
     while (sz > 0) {
         size_t tosend = min(sz, TCPBUF_SEND / 2);
         bool shortsnd = true;
+        cs->lastsent  = 0;
         if (sbufCSend(sb, sendToSocket, tosend) && cs->lastsent > 0) {
             sbufCSkip(sb, cs->lastsent);
             sz -= cs->lastsent;
@@ -200,6 +201,7 @@ bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** field
 
         if (cfh->ftype == CF_STRING && (cfh->flags & CF_ARRAY)) {
             // special case, have to count all the strings, plus lengths
+            dsize = 4;
             for (uint32_t j = 0; j < fields[i]->count; j++) {
 #ifdef SUBSPACE_GAME
                 dsize += strlen(fields[i]->d.cfd_str_arr[j]) + 2;
@@ -227,8 +229,10 @@ bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** field
                 dsize = fields[i]->count;
             }
 
-            if (cfh->flags & CF_ARRAY)
+            if (cfh->flags & CF_ARRAY) {
                 dsize *= fields[i]->count;
+                dsize += 4;
+            }
         }
 
         cfh->size = sizeof(ControlFieldHeader) + dsize;
@@ -247,7 +251,9 @@ bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** field
 
         sbufPWrite(sb, (uint8_t*)cfh, sizeof(ControlFieldHeader));
         if (cfh->flags & CF_ARRAY) {
-            for (uint32_t j = 0; j < hdr->nfields; j++) {
+            sbufPWrite(sb, (uint8_t*)&fields[i]->count, 4);
+            pad -= 4;
+            for (uint32_t j = 0; j < fields[i]->count; j++) {
                 switch (cfh->ftype) {
                 case CF_INT:
                     pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_int_arr[j], 0);
@@ -526,7 +532,8 @@ ControlMsg* controlGetMsg(ControlState* cs, int allocmode)
                 }
                 freeBytes(ret->fields, allocmode);
                 freeBytes(ret, allocmode);
-                return NULL;
+                ret = NULL;
+                goto out;
             }
         }
     }
