@@ -153,5 +153,4 @@ void osSetCurrentDir(const char* dir)
     MultiByteToWideChar(CP_UTF8, 0, dir, -1, dirw, dlen);
 
     SetCurrentDirectoryW(dirw);
-    SetEnvironmentVariableW(L"USERPROFILE", dirw);   // temp
 }

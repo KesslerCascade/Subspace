@@ -115,6 +115,18 @@ int controlRecvLaunchCmd(ControlState* cs)
         if (!strcmp(f.h.name, "gamepath")) {
             settings.gamePath = sstrdup(f.d.cfd_str);
         }
+        if (!strcmp(f.h.name, "saveoverride")) {
+            // FTL needs this to end in a backslash, so ensure that it does
+            if (f.d.cfd_str[strlen(f.d.cfd_str) - 1] == '\\') {
+                settings.saveOverride = sstrdup(f.d.cfd_str);
+            } else {
+                size_t len            = strlen(f.d.cfd_str);
+                settings.saveOverride = smalloc(len + 2);
+                memcpy(settings.saveOverride, f.d.cfd_str, len);
+                settings.saveOverride[len]     = '\\';
+                settings.saveOverride[len + 1] = '\0';
+            }
+        }
     }
 
     controlRecvDone(cs);

@@ -31,5 +31,12 @@
     "options_ftl_ver": "FTL-versio:",
     "options_ftl_ver_unknown": "Nekonata",
     "ftl_browse_title": "Trovu FTL-ludan efektivigeblan programon",
-    "exe_files": "Efektiveblaj Programoj"
+    "exe_files": "Efektiveblaj Programoj",
+    "options_saveoverride": "Superregi konservitan dosierlokon",
+    "options_saveoverride_tip": "Defaŭlte, FTL konservas siajn konservitajn dosierojn en la dosierujo Dokumentoj de la uzanto.\n\nĈi tiu opcio permesas al vi elekti alian lokon por konservi la konservitajn dosierojn anstataŭe.",
+    "options_saveoverride_user": "Uzi dosierujon de uzanto laŭ instanco",
+    "options_saveoverride_user_tip": "Anstataŭ fiksa loko, konservu la konservitajn dosierojn sub subdosierujo \"uzanto\" de la FTL-ludinstalaĵo.\n\nTio povas esti utila se vi ŝanĝas inter malsamaj kopioj de la ludo kaj volas uzi malsaman profilon por ĉiu.",
+    "options_saveoverride_folder": "Konservi dosierujon:",
+    "options_saveoverride_browse": "Foli&umi...",
+    "options_saveoverride_browse_title": "Elektu konservi dosierlokon"
 }

@@ -106,12 +106,14 @@ void OptionsWin_show(_In_ OptionsWin* self)
 {
     optionswinMake(self);
 
+    IupMap(self->win);
+    optionswinUpdateAll(self);
+
     IupShowXY(self->win, IUP_CENTER, IUP_CENTER);
     IupSetAttribute(self->win, "SIMULATEMODAL", "YES");
     char* rsz = IupGetAttribute(self->win, "RASTERSIZE");
     IupSetAttribute(self->win, "MINSIZE", rsz);
 
-    optionswinUpdateAll(self);
     optionswinShowPage(self, 0);
 }
 

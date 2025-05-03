@@ -30,7 +30,11 @@ void cmdGameStart(GameInst* inst, ControlClient* client, ControlMsg* msg, hashta
     }
 
     if (inst && !strEmpty(inst->exepath)) {
-        ControlMsg* rmsg  = controlNewMsg("Launch", 4);
+        string saveovr = 0;
+        ssdStringOut(ss->settings, _S"ftl/saveoverride", &saveovr);
+        int nargs = strEmpty(saveovr) ? 4 : 5;
+
+        ControlMsg* rmsg  = controlNewMsg("Launch", nargs);
         string tmpstr     = 0;
         rmsg->hdr.replyid = msg->hdr.msgid;
         controlMsgInt(rmsg, 0, "launchmode", inst->mode);
@@ -46,6 +50,12 @@ void cmdGameStart(GameInst* inst, ControlClient* client, ControlMsg* msg, hashta
         pathToPlatform(&tmpstr, inst->exepath);
         controlMsgStr(rmsg, 3, "gamepath", tmpstr);
 
+        if (!strEmpty(saveovr)) {
+            pathToPlatform(&tmpstr, saveovr);
+            controlMsgStr(rmsg, 4, "saveoverride", tmpstr);
+        }
+
+        strDestroy(&saveovr);
         strDestroy(&tmpstr);
         cclientQueue(client, rmsg);
     } else {

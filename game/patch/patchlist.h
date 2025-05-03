@@ -10,6 +10,7 @@ extern Patch patch_CombatControl_RenderTarget;
 extern Patch patch_CommandGui_KeyDown;
 extern Patch patch_CommandGui_OnLoop;
 extern Patch patch_CommandGui_RenderStatic;
+extern Patch patch_FileHelper_getUserFolder;
 extern Patch patch_FTLButton_OnRender;
 extern Patch patch_MouseControl_OnRender;
 extern Patch patch_ResourceControl_RenderLoadingBar;

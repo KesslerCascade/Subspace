@@ -2,6 +2,7 @@
 #include "ftl/cevent.h"
 #include "ftl/cfps.h"
 #include "ftl/commandgui.h"
+#include "ftl/filehelper.h"
 #include "ftl/globals.h"
 #include "ftl/mainmenu.h"
 #include "ftl/misc.h"
@@ -215,6 +216,31 @@ DisasmTrace CApp_OnExecute_audio_trace = {
              { I_CALL, .argout = { DT_OUT_SYM1 } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(operator_delete) }
+};
+
+DisasmTrace CApp_OnExecute_audio_filehelper_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Starting audio library...\n",
+    .ops  = { { DT_OP(SKIP), .imin = 5, .imax = 15 },
+             { I_MOV, .argf = { ARG_MATCH }, .args = { { REG_ESP, .idx = REG_UNDEF } } },
+             { DT_OP(CALL) },
+             { I_LEA, .outip = { DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 18, .imax = 35 },
+             { I_MOV,
+                .argf = { ARG_ADDR, ARG_ADDR },
+                .args = { { .addr = 0 }, { .addr = 0x72657375 } } },   // "user"
+              { DT_OP(SKIP), .imin = 18, .imax = 100 },
+             { I_MOV, .argf = { ARG_MATCH }, .args = { { REG_ESP, .idx = REG_UNDEF } } },
+             { DT_OP(CALL) },
+             { I_LEA, .outip = { DT_OUT_SYM2 } },
+             { DT_OP(SKIP), .imin = 10, .imax = 32 },
+             { I_CALL },
+             { DT_OP(SKIP), .imin = 5, .imax = 15 },
+             { I_MOV,
+                .argf = { ARG_ADDR, ARG_ADDR },
+                .args = { { .addr = 8 }, { .addr = 0x72657375 } } },   // "user"
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(FileHelper_getSaveFile), &SYM(FileHelper_getUserFolder) }
 };
 
 Symbol SYM(CApp_world_offset) = {

@@ -49,11 +49,16 @@ typedef struct GeneralPage {
     sa_string langnames;
     string compatimg;
     string verstr;
+    string overrideloc;
     Ihandle* langselect;
     Ihandle* ftlloctext;
     Ihandle* ftlcompatimg;
     Ihandle* ftlcompatlabel;
     Ihandle* ftlver;
+    Ihandle* saveoverridecheck;
+    Ihandle* saveoverrideusercheck;
+    Ihandle* saveoverridetext;
+    Ihandle* saveoverridehbox;
     GameInst* validateinst;
     bool vpending;        // validated instance should be saved to settings
 } GeneralPage;

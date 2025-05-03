@@ -13,6 +13,7 @@ if(WIN32)
         win32/ftl/ftl_combatcontrol.c
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
+        win32/ftl/ftl_filehelper.c
         win32/ftl/ftl_ftlbutton.c
         win32/ftl/ftl_globals.c
         win32/ftl/ftl_mainmenu.c
@@ -70,6 +71,7 @@ add_executable(subspacegame
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
     hook/commandgui/commandgui_renderstatic.c
+    hook/filehelper/filehelper_getuserfolder.c
     hook/ftlbutton/ftlbutton_onrender.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c

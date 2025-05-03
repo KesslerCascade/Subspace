@@ -104,7 +104,7 @@ static int browseforftl(Ihandle* ih)
 
     Ihandle* idlg = IupFileDlg();
     IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->options->win);
-    IupSetAttribute(idlg, "DIALOGTYPE", "NO");
+    IupSetAttribute(idlg, "DIALOGTYPE", "OPEN");
     IupSetAttribute(idlg, "FILTER", "*.exe");
     IupSetAttribute(idlg, "FILTERINFO", langGetC(gp->ss, _S"exe_files"));
     IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, _S"ftl_browse_title"));
@@ -137,6 +137,93 @@ static int browseforftl(Ihandle* ih)
 
         strDestroy(&ftlexe);
     }
+
+    return IUP_DEFAULT;
+}
+
+static int saveovrchange(Ihandle* ih, int state)
+{
+    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    if (!gp)
+        return IUP_IGNORE;
+
+    if (state == 1) {
+        IupSetAttribute(gp->saveoverrideusercheck, "VALUE", "OFF");
+        IupSetAttribute(gp->saveoverrideusercheck, "VISIBLE", "YES");
+        IupSetAttribute(gp->saveoverridetext, "VALUE", "");
+        IupSetAttribute(gp->saveoverridehbox, "VISIBLE", "YES");
+    } else {
+        ssdRemove(gp->ss->settings, _S"ftl/saveoverride");
+        IupSetAttribute(gp->saveoverrideusercheck, "VISIBLE", "NO");
+        IupSetAttribute(gp->saveoverridehbox, "VISIBLE", "NO");
+    }
+    return IUP_DEFAULT;
+}
+
+static int saveovruserchange(Ihandle* ih, int state)
+{
+    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    if (!gp)
+        return IUP_IGNORE;
+
+    if (state == 1) {
+        ssdSet(gp->ss->settings, _S"ftl/saveoverride", true, stvar(string, _S"user/"));
+        IupSetAttribute(gp->saveoverridehbox, "VISIBLE", "NO");
+    } else {
+        ssdRemove(gp->ss->settings, _S"ftl/saveoverride");
+        IupSetAttribute(gp->saveoverridetext, "VALUE", "");
+        IupSetAttribute(gp->saveoverridehbox, "VISIBLE", "YES");
+    }
+    return IUP_DEFAULT;
+}
+
+static int saveovrtextchange(Ihandle* ih, int c, char* new_value)
+{
+    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    if (!gp)
+        return IUP_IGNORE;
+
+    string ovrdir = 0;
+    pathFromPlatform(&ovrdir, (strref)new_value);
+    pathNormalize(&ovrdir);
+    ssdSet(gp->ss->settings, _S"ftl/saveoverride", true, stvar(string, ovrdir));
+    strDestroy(&ovrdir);
+
+    return IUP_DEFAULT;
+}
+
+static int browseforsaveovr(Ihandle* ih)
+{
+    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    if (!gp)
+        return IUP_IGNORE;
+
+    Ihandle* idlg   = IupFileDlg();
+    string startdir = 0;
+    if (ssdStringOut(gp->ss->settings, _S"ftl/exe", &startdir)) {
+        pathParent(&startdir, startdir);
+        pathToPlatform(&startdir, startdir);
+    }
+    IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->options->win);
+    IupSetAttribute(idlg, "DIALOGTYPE", "DIR");
+    IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, _S"options_saveoverride_browse_title"));
+    if (!strEmpty(startdir))
+        IupSetAttribute(idlg, "DIRECTORY", strC(startdir));
+
+    IupPopup(idlg, IUP_CENTER, IUP_CENTER);
+
+    if (IupGetInt(idlg, "STATUS") == 0) {
+        const char* val = IupGetAttribute(idlg, "VALUE");
+        IupSetAttribute(gp->saveoverridetext, "VALUE", val);
+
+        string ovrdir = 0;
+        pathFromPlatform(&ovrdir, (strref)val);
+        pathNormalize(&ovrdir);
+        ssdSet(gp->ss->settings, _S"ftl/saveoverride", true, stvar(string, ovrdir));
+        strDestroy(&ovrdir);
+    }
+
+    strDestroy(&startdir);
 
     return IUP_DEFAULT;
 }
@@ -224,6 +311,37 @@ bool GeneralPage_make(_In_ GeneralPage* self, Ihandle* list)
 
     Ihandle* ftlverhbox = IupHbox(ftlverlabel, self->ftlver, NULL);
 
+    self->saveoverridecheck = IupToggle(langGetC(self->ss, _S"options_saveoverride"), NULL);
+    setTip(self->saveoverridecheck,
+           langGet(self->ss, _S"options_saveoverride_tip"),
+           langGet(self->ss, _S"options_saveoverride"),
+           1);
+    iupSetObj(self->saveoverridecheck, ObjNone, self, self->ui);
+    IupSetCallback(self->saveoverridecheck, "ACTION", (Icallback)saveovrchange);
+
+    self->saveoverrideusercheck = IupToggle(langGetC(self->ss, _S"options_saveoverride_user"), NULL);
+    setTip(self->saveoverrideusercheck,
+           langGet(self->ss, _S"options_saveoverride_user_tip"),
+           langGet(self->ss, _S"options_saveoverride_user"),
+           1);
+    iupSetObj(self->saveoverrideusercheck, ObjNone, self, self->ui);
+    IupSetCallback(self->saveoverrideusercheck, "ACTION", (Icallback)saveovruserchange);
+    IupSetAttribute(self->saveoverrideusercheck, "VISIBLE", "NO");
+
+    Ihandle* saveovrlabel  = IupLabel(langGetC(self->ss, _S"options_saveoverride_folder"));
+    self->saveoverridetext = IupText(NULL);
+    IupSetAttribute(self->saveoverridetext, "EXPAND", "HORIZONTAL");
+    iupSetObj(self->saveoverridetext, ObjNone, self, self->ui);
+    IupSetCallback(self->saveoverridetext, "ACTION", (Icallback)saveovrtextchange);
+
+    Ihandle* saveovrbrowse = IupButton(langGetC(self->ss, _S"options_saveoverride_browse"), NULL);
+    IupSetAttribute(saveovrbrowse, "CPADDING", "6x1");
+    iupSetObj(saveovrbrowse, ObjNone, self, self->ui);
+    IupSetCallback(saveovrbrowse, "ACTION", (Icallback)browseforsaveovr);
+
+    self->saveoverridehbox = IupHbox(saveovrlabel, self->saveoverridetext, saveovrbrowse, NULL);
+    IupSetAttribute(self->saveoverridehbox, "VISIBLE", "NO");
+
     Ihandle* spacer2 = IupSpace();
     IupSetAttribute(spacer2, "SIZE", "1x4");
 
@@ -235,6 +353,9 @@ bool GeneralPage_make(_In_ GeneralPage* self, Ihandle* list)
                                ftlhbox,
                                ftlverhbox,
                                spacer2,
+                               self->saveoverridecheck,
+                               self->saveoverrideusercheck,
+                               self->saveoverridehbox,
                                IupFill(),
                                NULL);
     IupSetAttribute(thevbox, "CMARGIN", "0x0");
@@ -373,6 +494,26 @@ bool GeneralPage_update(_In_ GeneralPage* self)
         }
     }
 
+    string overrideloc = 0;
+    if (ssdStringOut(self->ss->settings, _S"ftl/saveoverride", &overrideloc)) {
+        IupSetAttribute(self->saveoverridecheck, "VALUE", "ON");
+        IupSetAttribute(self->saveoverrideusercheck, "VISIBLE", "YES");
+        if (strEq(overrideloc, _S"user/")) {
+            IupSetAttribute(self->saveoverrideusercheck, "VALUE", "ON");
+            IupSetAttribute(self->saveoverridehbox, "VISIBLE", "NO");
+        } else {
+            IupSetAttribute(self->saveoverrideusercheck, "VALUE", "OFF");
+            IupSetAttribute(self->saveoverridehbox, "VISIBLE", "YES");
+            pathToPlatform(&self->overrideloc, overrideloc);
+            IupSetAttribute(self->saveoverridetext, "VALUE", strC(self->overrideloc));
+        }
+    } else {
+        IupSetAttribute(self->saveoverridecheck, "VALUE", "OFF");
+        IupSetAttribute(self->saveoverrideusercheck, "VISIBLE", "NO");
+        IupSetAttribute(self->saveoverridehbox, "VISIBLE", "NO");
+    }
+    IupRefresh(self->saveoverridehbox);
+
     return parent_update();
 }
 
@@ -392,6 +533,7 @@ void GeneralPage_destroy(_In_ GeneralPage* self)
     saDestroy(&self->langnames);
     strDestroy(&self->compatimg);
     strDestroy(&self->verstr);
+    strDestroy(&self->overrideloc);
     objRelease(&self->validateinst);
     // Autogen ends -------
 }

@@ -19,6 +19,7 @@ extern DisasmTrace CApp_OnExecute_worldgen_trace;   // used for finding serveral
 extern DisasmTrace CApp_OnExecute_rungame_trace_1;
 extern DisasmTrace CApp_OnExecute_rungame_trace_2;
 extern DisasmTrace CApp_OnExecute_audio_trace;
+extern DisasmTrace CApp_OnExecute_audio_filehelper_trace;
 extern DisasmTrace CApp_OnInit_v1_trace;
 extern DisasmTrace CApp_OnInit_v2_trace;
 extern DisasmTrace CApp_OnKeyDown_trace;

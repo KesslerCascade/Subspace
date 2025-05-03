@@ -7,11 +7,17 @@ class GeneralPage extends OptionsPage {
 
     string compatimg;
     string verstr;
+    string overrideloc;
+
     Ihandle *langselect;
     Ihandle *ftlloctext;
     Ihandle *ftlcompatimg;
     Ihandle *ftlcompatlabel;
     Ihandle *ftlver;
+    Ihandle *saveoverridecheck;
+    Ihandle *saveoverrideusercheck;
+    Ihandle *saveoverridetext;
+    Ihandle *saveoverridehbox;
 
     object:GameInst validateinst;
     bool vpending;  // validated instance should be saved to settings
