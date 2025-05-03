@@ -77,6 +77,34 @@ uint32 GameMgr_genCookie(_In_ GameMgr* self)
     }
     return ret;
 }
+bool GameMgr_launchGame(_In_ GameMgr* self, LaunchMode mode, GameInst** out)
+{
+    Subspace* ss = self->ss;
+
+    string exepath = 0;
+    ssdStringOut(ss->settings, _S"ftl/exe", &exepath);
+    GameInst* ninst = ginstCreate(self, exepath, mode);
+    strDestroy(&exepath);
+    gmgrReg(self, ninst);
+    bool ret = ginstLaunch(ninst);
+
+    // failed to launch, don't track it in gamemgr
+    if (!ret)
+        gmgrUnreg(self, ninst);
+
+    // if we're launching to play, set this as the focused instance
+    if (ret && mode == LAUNCH_PLAY) {
+        objDestroyWeak(&ss->curinst);
+        ss->curinst = objGetWeak(GameInst, ninst);
+        subspaceUpdateUI(ss);
+    }
+
+    if (out)
+        *out = objAcquire(ninst);
+    objRelease(&ninst);
+    return ret;
+}
+
 // Autogen begins -----
 #include "gamemgr.auto.inc"
 // Autogen ends -------

@@ -29,6 +29,8 @@ typedef struct GameMgr GameMgr;
 typedef struct FeatureRegistry FeatureRegistry;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct LanguageDB LanguageDB;
+typedef struct GameInst GameInst;
+typedef struct GameInst_WeakRef GameInst_WeakRef;
 
 typedef struct Subspace {
     string basedir;
@@ -38,18 +40,22 @@ typedef struct Subspace {
     SSDNode* settings;
     Event notify;   // notification event for the main thread
 
+    Weak(GameInst)* curinst;   // game instance that is focused by the UI
+
     TaskQueue* workq;
     ControlServer* svr;
     SubspaceUI* ui;
     GameMgr* gmgr;
     FeatureRegistry* freg;
     LanguageDB* lang;
+    string langid;
 
     // global settings
     uint32_t listenaddr;
     int port;
     bool devmode;
     bool exit;   // application is exiting
+    bool reloadui;
 } Subspace;
 
 bool subspaceCheckBaseDir(VFS* vfs, strref path);
@@ -57,6 +63,8 @@ bool subspaceFindBaseDir(Subspace* ss, VFS* vfs);
 void subspaceSetBaseDir(Subspace* ss, VFS* vfs, strref path);
 bool subspaceMount(Subspace* ss);
 void subspaceUnmount(Subspace* ss);
+void subspaceUpdateUI(Subspace* ss);       // use sparingly, updates entire UI
+GameInst* subspaceCurInst(Subspace* ss);   // acquires inst, must release!
 bool logOpen(VFS* vfs, string filename, LogDest** defer);
 bool logClose(void);
 void fatalError(strref msg, bool osdeperr);

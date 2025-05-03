@@ -14,7 +14,8 @@ typedef enum GameInstState {
     GI_Practice = GAME_PRACTICE,
     GI_Launching,
     GI_Failed,
-    GI_Exited
+    GI_Exited,
+    GI_Validated
 } GameInstState;
 
 [methodprefix ginst] class GameInst
@@ -32,6 +33,7 @@ typedef enum GameInstState {
     LaunchMode mode;
     GameInstState state;
     hashtable:string:object features;
+    int32 ver[3];
 
     float loadPct;
     int failReason;
@@ -41,4 +43,5 @@ typedef enum GameInstState {
     bool launch();
     void setState(GameInstState state);
     void setStateLocked(GameInstState state);
+    GameInstState getState();
 }

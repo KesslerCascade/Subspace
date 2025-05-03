@@ -38,6 +38,9 @@ typedef struct SubspaceUI_ClassIf {
     bool (*shutdown)(_In_ void* self);
     void (*start)(_In_ void* self);
     void (*stop)(_In_ void* self);
+    void (*update)(_In_ void* self);
+    void (*updateMain)(_In_ void* self, _In_opt_ strref panel);
+    void (*updateOptions)(_In_ void* self, _In_opt_ strref page);
 } SubspaceUI_ClassIf;
 extern SubspaceUI_ClassIf SubspaceUI_ClassIf_tmpl;
 
@@ -84,4 +87,10 @@ _objfactory_guaranteed SubspaceUI* SubspaceUI_create(Subspace* subspace);
 #define ssuiStart(self) (self)->_->start(SubspaceUI(self))
 // void ssuiStop(SubspaceUI* self);
 #define ssuiStop(self) (self)->_->stop(SubspaceUI(self))
+// void ssuiUpdate(SubspaceUI* self);
+#define ssuiUpdate(self) (self)->_->update(SubspaceUI(self))
+// void ssuiUpdateMain(SubspaceUI* self, strref panel);
+#define ssuiUpdateMain(self, panel) (self)->_->updateMain(SubspaceUI(self), panel)
+// void ssuiUpdateOptions(SubspaceUI* self, strref page);
+#define ssuiUpdateOptions(self, page) (self)->_->updateOptions(SubspaceUI(self), page)
 

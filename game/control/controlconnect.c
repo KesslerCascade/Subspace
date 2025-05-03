@@ -1,4 +1,6 @@
 #include "controlconnect.h"
+#include "feature/feature.h"
+#include "ftl/misc.h"
 #include "net.h"
 #include "subspacegame.h"
 
@@ -24,6 +26,12 @@ bool controlConnect(socket_t* sock)
 
     *sock = csock;
     return true;
+}
+
+void controlDisconnect(socket_t* sock)
+{
+    netClose(*sock);
+    *sock = 0;
 }
 
 void controlSendGameStart(ControlState* cs)
@@ -113,6 +121,42 @@ int controlRecvLaunchCmd(ControlState* cs)
     return RLC_Launch;
 }
 
+void controlSendValidate(ControlState* cs, bool success, int failreason)
+{
+    ControlMsg* msg;
+    msg = controlAllocMsg(3, CF_ALLOC_SALLOC);
+
+    strcpy(msg->hdr.cmd, "Validate");
+    controlMsgInt(msg, 0, "result", success ? 1 : 0);
+
+    if (success) {
+        ControlField* verf = msg->fields[1];
+        strcpy(verf->h.name, "ver");
+        verf->h.ftype          = CF_INT;
+        verf->h.flags          = CF_ARRAY;
+        verf->count            = 3;
+        verf->d.cfd_int_arr    = smalloc(sizeof(int) * 3);
+        verf->d.cfd_int_arr[0] = g_version_major;
+        verf->d.cfd_int_arr[1] = g_version_minor;
+        verf->d.cfd_int_arr[2] = g_version_rev;
+
+        ControlField* featf = msg->fields[2];
+        strcpy(featf->h.name, "features");
+        featf->h.ftype       = CF_STRING;
+        featf->h.flags       = CF_ARRAY;
+        featf->d.cfd_str_arr = smalloc(sizeof(char*));
+
+        fillValidateFeatures(featf);
+    } else {
+        controlMsgInt(msg, 1, "reason", failreason);
+        controlMsgInt(msg, 2, "unused", 0);
+    }
+
+    controlPutMsg(cs, &msg->hdr, msg->fields);
+    while (controlSend(cs)) {}
+    controlMsgFree(msg, CF_ALLOC_SALLOC);
+}
+
 int controlStartupHandshake(ControlState* cs)
 {
     controlSendGameStart(cs);
@@ -133,6 +177,12 @@ int controlStartupHandshake(ControlState* cs)
 
 void controlSendLaunchFail(ControlState* cs, int failreason)
 {
+    if (settings.mode == LAUNCH_VALIDATE) {
+        // in validation mode we want to send back a validation result, not a launch failure
+        controlSendValidate(cs, false, failreason);
+        return;
+    }
+
     ControlMsgHeader mh = { 0 };
     ControlField ff     = { 0 };
 

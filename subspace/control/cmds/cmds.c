@@ -10,6 +10,7 @@ DECLCMD(GameState);
 DECLCMD(LaunchFail);
 DECLCMD(Loading);
 DECLCMD(Log);
+DECLCMD(Validate);
 
 #define REGCMD(cmdname) \
 cserverRegisterHandler(csvr, _S #cmdname, cmd ## cmdname, false, (TaskResource*)NULL)
@@ -26,6 +27,7 @@ void registerCmds(ControlServer* csvr)
     REGCMDREQI(FeatureState, csvr->featureFifo);
     REGCMDREQI(FeatureBatch, csvr->featureFifo);
     REGCMD(GameStart);
+    REGCMDI(Validate);
     REGCMDI(GameState);
     REGCMDI(LaunchFail);
     REGCMDI(Loading);

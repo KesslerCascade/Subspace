@@ -44,6 +44,16 @@ static void parseArgs(Subspace* ss, VFS* vfs)
     }
 }
 
+GameInst* subspaceCurInst(Subspace* ss)
+{
+    return objAcquireFromWeak(GameInst, ss->curinst);
+}
+
+void subspaceUpdateUI(Subspace* ss)
+{
+    ssuiUpdate(ss->ui);
+}
+
 static void subspaceStartup(LogDest** pdeferredlogs)
 {
     // 01 -------- event that workers can use to notify the main thread of something
@@ -98,21 +108,13 @@ static void subspaceStartup(LogDest** pdeferredlogs)
     if (subspace.workq)
         ret &= tqStart(subspace.workq);
 
-    // 09 -------- load language translations
-    string lang = 0;
-    ssdStringOutD(subspace.settings, _S"ui/lang", &lang, _S"en-us");
-    if (!langLoad(&subspace, lang)) {
-        fatalError(_S"Could not load any UI language.", false);
-    }
-    strDestroy(&lang);
-
-    // 10 -------- UI setup
+    // 09 -------- UI setup
     subspace.ui = ssuiCreate(&subspace);
     if (!ssuiInit(subspace.ui)) {
         fatalError(_S"Failed to initialize UI.", false);
     }
 
-    // 11 -------- Control Server setup
+    // 10 -------- Control Server setup
     subspace.svr = cserverCreate(&subspace);
     if (!cserverStart(subspace.svr)) {
         fatalError(_S"Failed to start control server.", false);
@@ -121,14 +123,11 @@ static void subspaceStartup(LogDest** pdeferredlogs)
 
 static void subspaceShutdown()
 {
-    // 11 -------- Control Server shutdown
+    // 10 -------- Control Server shutdown
     cserverStop(subspace.svr);
 
-    // 10 -------- UI teardown
+    // 09 -------- UI teardown
     ssuiShutdown(subspace.ui);
-
-    // 09 -------- Language translations
-    objRelease(&subspace.lang);
 
     // 08 -------- Task queue shutdown
     tqShutdown(subspace.workq, true);
@@ -190,20 +189,14 @@ int entryPoint()
 
     subspaceStartup(&deferbuf);
 
-    // TEMP FOR TESTING
-    string tmp = 0;
-    ssdStringOut(subspace.settings, _S"ftl/exe", &tmp);
-    GameInst* gitest = ginstCreate(subspace.gmgr, tmp, LAUNCH_PLAY);
-    strDestroy(&tmp);
-    gmgrReg(subspace.gmgr, gitest);
-    ginstLaunch(gitest);
-
-    ssuiStart(subspace.ui);
     do {
-        eventWaitTimeout(&subspace.notify, timeS(10));
-
-    } while (!subspace.exit);
-    ssuiStop(subspace.ui);
+        subspace.reloadui = false;
+        ssuiStart(subspace.ui);
+        do {
+            eventWaitTimeout(&subspace.notify, timeS(10));
+        } while (!(subspace.exit || subspace.reloadui));
+        ssuiStop(subspace.ui);
+    } while (subspace.reloadui);
 
     subspaceShutdown();
 

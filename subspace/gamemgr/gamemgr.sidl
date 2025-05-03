@@ -16,5 +16,7 @@
     void unreg(GameInst *inst);
     GameInst *acquireByCookie(uint32 cookie);
 
+    bool launchGame(LaunchMode mode, GameInst **out);
+
     uint32 genCookie();
 }

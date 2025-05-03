@@ -10,9 +10,10 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/mainwin.h"
+#include "ui/optionswin.h"
 
 _objfactory_guaranteed UIUpdateDispatch*
-UIUpdateDispatch_create(SubspaceUI* ui, _In_opt_ strref panelname)
+UIUpdateDispatch_mainWin(SubspaceUI* ui, _In_opt_ strref panelname)
 {
     UIUpdateDispatch* self;
     self = objInstCreate(UIUpdateDispatch);
@@ -25,9 +26,46 @@ UIUpdateDispatch_create(SubspaceUI* ui, _In_opt_ strref panelname)
     return self;
 }
 
+_objfactory_guaranteed UIUpdateDispatch* UIUpdateDispatch_all(SubspaceUI* ui)
+{
+    UIUpdateDispatch* self;
+    self = objInstCreate(UIUpdateDispatch);
+
+    self->ui  = objAcquire(ui);
+    self->all = true;
+
+    self->name = _S"UIUpdateDispatch";
+    objInstInit(self);
+    return self;
+}
+
+_objfactory_guaranteed UIUpdateDispatch*
+UIUpdateDispatch_options(SubspaceUI* ui, _In_opt_ strref pagename)
+{
+    UIUpdateDispatch* self;
+    self = objInstCreate(UIUpdateDispatch);
+
+    self->ui      = objAcquire(ui);
+    self->options = true;
+    strDup(&self->panelname, pagename);
+
+    self->name = _S"UIUpdateDispatch";
+    objInstInit(self);
+    return self;
+}
+
 uint32 UIUpdateDispatch_run(_In_ UIUpdateDispatch* self, _In_ TaskQueue* tq, _In_ TQWorker* worker,
                             _Inout_ TaskControl* tcon)
 {
+    if (self->options) {
+        optionswinUpdatePage(self->ui->options, self->panelname);
+        return TASK_Result_Success;
+    } else if (self->all) {
+        mainwinUpdateAll(self->ui->main);
+        optionswinUpdateAll(self->ui->options);
+        return TASK_Result_Success;
+    }
+
     if (strEmpty(self->panelname))
         mainwinUpdate(self->ui->main);
     else

@@ -12,6 +12,7 @@ class MainWin {
 
     Ihandle *win;
     Ihandle *sidebar;
+    Ihandle *playbtn;
     Ihandle *zbox;
     Ihandle *root;          // root of dynamic layout
     Ihandle *timer;
@@ -24,6 +25,7 @@ class MainWin {
     void show();
     void update();
     bool updatePanel(strref name);
+    void updateAll();
     void finish();
 
     [extern] unbound void loadLayout();

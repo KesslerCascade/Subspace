@@ -4,6 +4,7 @@
 #include "proto.h"
 
 bool controlConnect(socket_t *sock);
+void controlDisconnect(socket_t* sock);
 
 enum RecvLaunchCmdResult { RLC_Timeout = 0, RLC_Launch, RLC_Exit, RLC_Error };
 

@@ -105,6 +105,8 @@ int sscmain(int argc, char* argv[])
         ftlentry();
         break;
     case LAUNCH_VALIDATE:
+        controlSendValidate(&control, true, 0);
+        controlDisconnect(&sock);
         break;
     }
     return 0;

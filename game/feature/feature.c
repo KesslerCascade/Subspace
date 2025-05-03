@@ -128,9 +128,8 @@ void patchAllFeatures(PatchState* ps)
     bool ret = true;
     for (uint32_t i = 0; i < feathash.nslots; i++) {
         SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
-        if (feat) {
+        if (feat)
             patchFeature(feat, ps);
-        }
     }
 }
 
@@ -160,4 +159,17 @@ void sendAllFeatureState()
     msg = controlNewMsg("FeatureBatch", 1);
     controlMsgInt(msg, 0, "end", 1);
     controlClientQueue(msg);
+}
+
+void fillValidateFeatures(ControlField* featf)
+{
+    for (uint32_t i = 0; i < feathash.nslots; i++) {
+        SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
+        if (feat && feat->available) {
+            featf->d.cfd_str_arr               = srealloc(featf->d.cfd_str_arr,
+                                            sizeof(char*) * (featf->count + 1));
+            featf->d.cfd_str_arr[featf->count] = sstrdup(feat->name);
+            featf->count++;
+        }
+    }
 }

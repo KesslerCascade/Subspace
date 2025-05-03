@@ -29,6 +29,8 @@ set(SUBSPACE_SIDL
     ui/image/image.sidl
     ui/image/imageload.sidl
     ui/image/imageresample.sidl
+    ui/page/optionspage.sidl
+    ui/page/general/optionsgeneral.sidl
     ui/panel/panel.sidl
     ui/panel/gameinfo/gameinfopanel.sidl
     ui/panel/welcome/welcomepanel.sidl
@@ -75,6 +77,8 @@ add_executable(subspace
     ui/image/resample.c
     ui/image/drivers/imagepng.c
     ui/image/drivers/imagesvg.c
+    ui/page/optionspage.c
+    ui/page/general/optionsgeneral.c
     ui/panel/panel.c
     ui/panel/gameinfo/gameinfopanel.c
     ui/panel/welcome/welcomepanel.c

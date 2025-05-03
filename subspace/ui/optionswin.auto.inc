@@ -8,9 +8,11 @@ OptionsWin_ClassIf OptionsWin_ClassIf_tmpl = {
 static OptionsWin_ClassIf _impl_OptionsWin_OptionsWin_ClassIf = {
     ._size = sizeof(OptionsWin_ClassIf),
     ._implements = (ObjIface*)&OptionsWin_ClassIf_tmpl,
+    .showPage = (void (*)(void*, int))OptionsWin_showPage,
     .make = (bool (*)(void*))OptionsWin_make,
     .show = (void (*)(void*))OptionsWin_show,
-    .update = (void (*)(void*))OptionsWin_update,
+    .updatePage = (bool (*)(void*, strref))OptionsWin_updatePage,
+    .updateAll = (void (*)(void*))OptionsWin_updateAll,
     .finish = (void (*)(void*))OptionsWin_finish,
 };
 
@@ -23,6 +25,7 @@ ObjClassInfo OptionsWin_clsinfo = {
     .instsize = sizeof(OptionsWin),
     .classif = (ObjIface*)&OptionsWin_ClassIf_tmpl,
     .init = (bool(*)(void*))OptionsWin_init,
+    .destroy = (void(*)(void*))OptionsWin_destroy,
     .ifimpl = _ifimpl_OptionsWin,
 };
 

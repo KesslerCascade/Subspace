@@ -25,7 +25,8 @@ typedef enum GameInstState {
     GI_Practice = GAME_PRACTICE,
     GI_Launching,
     GI_Failed,
-    GI_Exited
+    GI_Exited,
+    GI_Validated
 } GameInstState;
 
 typedef struct GameInst_ClassIf {
@@ -36,6 +37,7 @@ typedef struct GameInst_ClassIf {
     bool (*launch)(_In_ void* self);
     void (*setState)(_In_ void* self, GameInstState state);
     void (*setStateLocked)(_In_ void* self, GameInstState state);
+    GameInstState (*getState)(_In_ void* self);
 } GameInst_ClassIf;
 extern GameInst_ClassIf GameInst_ClassIf_tmpl;
 
@@ -59,6 +61,7 @@ typedef struct GameInst {
     LaunchMode mode;
     GameInstState state;
     hashtable features;
+    int32 ver[3];
     float loadPct;
     int failReason;
 } GameInst;
@@ -93,4 +96,6 @@ _objfactory_guaranteed GameInst* GameInst_createForClient(GameMgr* mgr, ControlC
 #define ginstSetState(self, state) (self)->_->setState(GameInst(self), state)
 // void ginstSetStateLocked(GameInst* self, GameInstState state);
 #define ginstSetStateLocked(self, state) (self)->_->setStateLocked(GameInst(self), state)
+// GameInstState ginstGetState(GameInst* self);
+#define ginstGetState(self) (self)->_->getState(GameInst(self))
 

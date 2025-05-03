@@ -4,6 +4,7 @@ extern SubspaceFeature FrameAdv_feature;
 extern SubspaceFeature InfoBlock_feature;
 extern SubspaceFeature NumericHull_feature;
 extern SubspaceFeature TimeWarp_feature;
+typedef struct ControlField ControlField;
 
 void registerFeature(SubspaceFeature* feature);
 SubspaceFeature* getFeature(const char* name);
@@ -15,3 +16,4 @@ void validateAllFeatures(PatchState* ps);
 void patchAllFeatures(PatchState* ps);
 void sendFeatureState(SubspaceFeature* feat, int replyto);
 void sendAllFeatureState();
+void fillValidateFeatures(ControlField* featf);

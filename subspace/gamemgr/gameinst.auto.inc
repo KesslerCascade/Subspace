@@ -11,6 +11,7 @@ static GameInst_ClassIf _impl_GameInst_GameInst_ClassIf = {
     .launch = (bool (*)(void*))GameInst_launch,
     .setState = (void (*)(void*, GameInstState))GameInst_setState,
     .setStateLocked = (void (*)(void*, GameInstState))GameInst_setStateLocked,
+    .getState = (GameInstState (*)(void*))GameInst_getState,
 };
 
 static ObjIface* _ifimpl_GameInst[] = {

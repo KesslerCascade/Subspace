@@ -10,6 +10,7 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
+#include "ui/util/uiupdatedispatch.h"
 #include "mainwin.h"
 #include "optionswin.h"
 
@@ -127,8 +128,6 @@ static bool uiStartFunc(TaskQueue* tq, void* data)
     if (!mainwinMake(ui->main))
         return false;
     ui->options = optionswinCreate(ui);
-    if (!optionswinMake(ui->options))
-        return false;
     mainwinShow(ui->main);
 
     return true;
@@ -138,6 +137,14 @@ void SubspaceUI_start(_In_ SubspaceUI* self)
 {
     if (self->started)
         return;
+
+    // load language translations
+    string lang = 0;
+    ssdStringOutD(self->ss->settings, _S"ui/lang", &lang, _S"en-us");
+    if (!langLoad(self->ss, lang)) {
+        fatalError(_S"Could not load any UI language.", false);
+    }
+    strDestroy(&lang);
 
     // Need to run the function to create the UI from the UI thread itself
     tqCall(self->uiq, uiStartFunc, NULL);
@@ -166,6 +173,9 @@ void SubspaceUI_stop(_In_ SubspaceUI* self)
     // Notify the UI thread that it should start shutting things down
     tqCall(self->uiq, uiStopFunc, self);
     self->started = false;
+
+    objRelease(&self->ss->lang);
+    strDestroy(&self->ss->langid);
 }
 
 void SubspaceUI_destroy(_In_ SubspaceUI* self)
@@ -175,6 +185,24 @@ void SubspaceUI_destroy(_In_ SubspaceUI* self)
     objRelease(&self->main);
     objRelease(&self->options);
     // Autogen ends -------
+}
+
+void SubspaceUI_update(_In_ SubspaceUI* self)
+{
+    UIUpdateDispatch* disp = uiupdatedispatchAll(self);
+    tqRun(self->uiq, &disp);
+}
+
+void SubspaceUI_updateMain(_In_ SubspaceUI* self, _In_opt_ strref panel)
+{
+    UIUpdateDispatch* disp = uiupdatedispatchMainWin(self, panel);
+    tqRun(self->uiq, &disp);
+}
+
+void SubspaceUI_updateOptions(_In_ SubspaceUI* self, _In_opt_ strref page)
+{
+    UIUpdateDispatch* disp = uiupdatedispatchOptions(self, page);
+    tqRun(self->uiq, &disp);
 }
 
 // Autogen begins -----

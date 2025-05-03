@@ -18,4 +18,8 @@ class OptionsWin;
 
     void start();
     void stop();
+
+    void update();
+    void updateMain(strref panel);
+    void updateOptions(strref page);
 }

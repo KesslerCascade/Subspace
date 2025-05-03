@@ -5,7 +5,10 @@
 #include <cx/obj.h>
 #include <iup.h>
 #include "subspace.h"
+#include "ui/page/optionspage.h"
 
+typedef struct SubspaceUI SubspaceUI;
+typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct OptionsWin OptionsWin;
@@ -21,9 +24,11 @@ typedef struct OptionsWin_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
+    void (*showPage)(_In_ void* self, int num);
     bool (*make)(_In_ void* self);
     void (*show)(_In_ void* self);
-    void (*update)(_In_ void* self);
+    bool (*updatePage)(_In_ void* self, _In_opt_ strref name);
+    void (*updateAll)(_In_ void* self);
     void (*finish)(_In_ void* self);
 } OptionsWin_ClassIf;
 extern OptionsWin_ClassIf OptionsWin_ClassIf_tmpl;
@@ -41,6 +46,9 @@ typedef struct OptionsWin {
     Subspace* ss;
     SubspaceUI* ui;
     Ihandle* win;
+    Ihandle* pagelist;
+    Ihandle* pagezbox;
+    sa_OptionsPage pages;
 } OptionsWin;
 extern ObjClassInfo OptionsWin_clsinfo;
 #define OptionsWin(inst) ((OptionsWin*)(unused_noeval((inst) && &((inst)->_is_OptionsWin)), (inst)))
@@ -65,12 +73,16 @@ int OptionsWin_onClose(Ihandle* ih);
 // int optionswinOnClose(Ihandle* ih);
 #define optionswinOnClose(ih) OptionsWin_onClose(ih)
 
+// void optionswinShowPage(OptionsWin* self, int num);
+#define optionswinShowPage(self, num) (self)->_->showPage(OptionsWin(self), num)
 // bool optionswinMake(OptionsWin* self);
 #define optionswinMake(self) (self)->_->make(OptionsWin(self))
 // void optionswinShow(OptionsWin* self);
 #define optionswinShow(self) (self)->_->show(OptionsWin(self))
-// void optionswinUpdate(OptionsWin* self);
-#define optionswinUpdate(self) (self)->_->update(OptionsWin(self))
+// bool optionswinUpdatePage(OptionsWin* self, strref name);
+#define optionswinUpdatePage(self, name) (self)->_->updatePage(OptionsWin(self), name)
+// void optionswinUpdateAll(OptionsWin* self);
+#define optionswinUpdateAll(self) (self)->_->updateAll(OptionsWin(self))
 // void optionswinFinish(OptionsWin* self);
 #define optionswinFinish(self) (self)->_->finish(OptionsWin(self))
 

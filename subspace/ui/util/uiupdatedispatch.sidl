@@ -4,6 +4,10 @@
 class UIUpdateDispatch extends Task {
     object:SubspaceUI ui;
     string panelname;
+    bool options;
+    bool all;
 
-    factory create(SubspaceUI *ui, strref panelname);
+    factory mainWin(SubspaceUI *ui, strref panelname);
+    factory all(SubspaceUI *ui);
+    factory options(SubspaceUI *ui, strref pagename);
 }

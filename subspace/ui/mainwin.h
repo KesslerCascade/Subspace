@@ -28,6 +28,7 @@ typedef struct MainWin_ClassIf {
     void (*show)(_In_ void* self);
     void (*update)(_In_ void* self);
     bool (*updatePanel)(_In_ void* self, _In_opt_ strref name);
+    void (*updateAll)(_In_ void* self);
     void (*finish)(_In_ void* self);
     void (*setLayoutDirty)(_In_ void* self);
 } MainWin_ClassIf;
@@ -47,6 +48,7 @@ typedef struct MainWin {
     SubspaceUI* ui;
     Ihandle* win;
     Ihandle* sidebar;
+    Ihandle* playbtn;
     Ihandle* zbox;
     Ihandle* root;        // root of dynamic layout
     Ihandle* timer;
@@ -120,6 +122,8 @@ int MainWin_onTimer(Ihandle* ih);
 #define mainwinUpdate(self) (self)->_->update(MainWin(self))
 // bool mainwinUpdatePanel(MainWin* self, strref name);
 #define mainwinUpdatePanel(self, name) (self)->_->updatePanel(MainWin(self), name)
+// void mainwinUpdateAll(MainWin* self);
+#define mainwinUpdateAll(self) (self)->_->updateAll(MainWin(self))
 // void mainwinFinish(MainWin* self);
 #define mainwinFinish(self) (self)->_->finish(MainWin(self))
 // void mainwinSetLayoutDirty(MainWin* self);

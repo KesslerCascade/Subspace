@@ -12,6 +12,7 @@ static MainWin_ClassIf _impl_MainWin_MainWin_ClassIf = {
     .show = (void (*)(void*))MainWin_show,
     .update = (void (*)(void*))MainWin_update,
     .updatePanel = (bool (*)(void*, strref))MainWin_updatePanel,
+    .updateAll = (void (*)(void*))MainWin_updateAll,
     .finish = (void (*)(void*))MainWin_finish,
     .setLayoutDirty = (void (*)(void*))MainWin_setLayoutDirty,
 };

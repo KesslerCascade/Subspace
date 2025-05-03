@@ -11,6 +11,7 @@ static GameMgr_ClassIf _impl_GameMgr_GameMgr_ClassIf = {
     .reg = (void (*)(void*, GameInst*))GameMgr_reg,
     .unreg = (void (*)(void*, GameInst*))GameMgr_unreg,
     .acquireByCookie = (GameInst* (*)(void*, uint32))GameMgr_acquireByCookie,
+    .launchGame = (bool (*)(void*, LaunchMode, GameInst**))GameMgr_launchGame,
     .genCookie = (uint32 (*)(void*))GameMgr_genCookie,
 };
 

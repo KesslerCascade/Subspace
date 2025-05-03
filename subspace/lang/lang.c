@@ -68,5 +68,8 @@ bool langLoad(Subspace* ss, strref lang)
     if (!strEq(lang, _S"en-us"))
         ret |= langLoadOne(ss, _S"en-us", true);
 
+    if (ret)
+        strDup(&ss->langid, lang);
+
     return ret;
 }

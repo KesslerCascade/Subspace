@@ -10,6 +10,7 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
+#include "gamemgr/gamemgr.h"
 #include "panel/gameinfo/gameinfopanel.h"
 #include "panel/welcome/welcomepanel.h"
 #include "ui/util/iuploadimage.h"
@@ -59,6 +60,16 @@ static int optionsbtn_action(Ihandle* ih)
     return IUP_DEFAULT;
 }
 
+static int playbtn_action(Ihandle* ih)
+{
+    Subspace* ss = iupGetSubspace(ih);
+    if (!ss)
+        return IUP_IGNORE;
+
+    gmgrLaunchGame(ss->gmgr, LAUNCH_PLAY, NULL);
+    return IUP_DEFAULT;
+}
+
 bool MainWin_make(_In_ MainWin* self)
 {
     self->timer = IupTimer();
@@ -84,6 +95,7 @@ bool MainWin_make(_In_ MainWin* self)
     iupSetObj(hamburger, ObjNone, self, self->ui);
     iupLoadImage(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", hamburger);
     iupLoadImage(self->ss, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
+
     Ihandle* options = IupFlatButton(NULL);
     IupSetAttribute(options, "IMAGE", "IMAGE_OPTIONS");
     IupSetAttribute(options, "IMAGEHIGHLIGHT", "IMAGE_OPTIONS_HOVER");
@@ -96,12 +108,30 @@ bool MainWin_make(_In_ MainWin* self)
     iupLoadImage(self->ss, _S"IMAGE_OPTIONS", _S"svg", _S"subspace:/options.svg", options);
     iupLoadImage(self->ss, _S"IMAGE_OPTIONS_HOVER", _S"svg", _S"subspace:/options-hover.svg", NULL);
 
-    self->sidebar = IupVbox(hamburger, options, NULL);
+    self->playbtn = IupFlatButton(NULL);
+    IupSetAttribute(self->playbtn, "IMAGE", "IMAGE_PLAY");
+    IupSetAttribute(self->playbtn, "IMAGEHIGHLIGHT", "IMAGE_PLAY_HOVER");
+    IupSetAttribute(self->playbtn, "IMAGEINACTIVE", "IMAGE_PLAY_DISABLED");
+    IupSetAttribute(self->playbtn, "HLCOLOR", NULL);
+    IupSetAttribute(self->playbtn, "PSCOLOR", NULL);
+    IupSetAttribute(self->playbtn, "BORDERWIDTH", "0");
+    IupSetAttribute(self->playbtn, "TIP", langGetC(self->ss, _S"play_tip"));
+    iupSetObj(self->playbtn, ObjNone, self, self->ui);
+    IupSetCallback(self->playbtn, "FLAT_ACTION", playbtn_action);
+    iupLoadImage(self->ss, _S"IMAGE_PLAY", _S"svg", _S"subspace:/play.svg", self->playbtn);
+    iupLoadImage(self->ss, _S"IMAGE_PLAY_HOVER", _S"svg", _S"subspace:/play-hover.svg", NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_PLAY_DISABLED",
+                 _S"svg",
+                 _S"subspace:/play-disabled.svg",
+                 self->playbtn);
+
+    self->sidebar = IupVbox(hamburger, self->playbtn, options, NULL);
     IupSetAttribute(self->sidebar, "CGAP", "2");
     IupSetAttribute(self->sidebar, "NCMARGIN", "2x2");
 
     Ihandle* sep = IupFlatSeparator();
-    self->zbox   = IupZbox(self->welcomepanel->h);
+    self->zbox   = IupZbox(self->welcomepanel->h, NULL);
     mainwinLoadLayout(self);
     IupAppend(self->zbox, self->root);
 
@@ -112,7 +142,7 @@ bool MainWin_make(_In_ MainWin* self)
         IupSetAttribute(self->zbox, "VALUE_HANDLE", (char*)self->welcomepanel->h);
     }
 
-    self->win = IupDialog(IupHbox(self->sidebar, sep, self->zbox));
+    self->win = IupDialog(IupHbox(self->sidebar, sep, self->zbox, NULL));
     IupSetAttribute(self->win, "MINSIZE", "500x300");   // pixels, not the same units as SIZE
     self->width  = ssdVal(int32, self->ss->settings, _S"ui/size/width", MAINWIN_DEFAULT_WIDTH);
     self->height = ssdVal(int32, self->ss->settings, _S"ui/size/height", MAINWIN_DEFAULT_HEIGHT);
@@ -140,13 +170,43 @@ void MainWin_show(_In_ MainWin* self)
 void MainWin_update(_In_ MainWin* self)
 {
     string tmp = 0;
+    bool haveexe = false, pbenabled = false;
+    ;
     if (ssdStringOut(self->ss->settings, _S"ftl/exe", &tmp)) {
+        haveexe = true;
         IupSetAttribute(self->zbox, "VALUE_HANDLE", (char*)self->root);
     } else {
         IupSetAttribute(self->zbox, "VALUE_HANDLE", (char*)self->welcomepanel->h);
     }
+    strDestroy(&tmp);
+
+    // update play button status
+    if (haveexe) {
+        GameInst* inst = subspaceCurInst(self->ss);
+        if (inst) {
+            GameInstState st = ginstGetState(inst);
+            if (st == GI_Init || st == GI_Exited)
+                pbenabled = true;
+            objRelease(&inst);
+        } else {
+            pbenabled = true;
+        }
+    }
+
+    IupSetAttribute(self->playbtn, "ACTIVE", pbenabled ? "YES" : "NO");
 
     return;
+}
+
+void MainWin_updateAll(_In_ MainWin* self)
+{
+    MainWin_update(self);
+
+    // update all the panels
+    foreach (hashtable, hti, self->panels) {
+        Panel* panel = (Panel*)htiVal(object, hti);
+        panelUpdate(panel);
+    }
 }
 
 bool MainWin_updatePanel(_In_ MainWin* self, _In_opt_ strref name)

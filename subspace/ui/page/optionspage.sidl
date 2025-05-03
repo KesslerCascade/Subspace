@@ -1,0 +1,17 @@
+#include <iup.h>
+#include "subspace.h"
+#include "lang/lang.h"
+
+class SubspaceUI;
+class OptionsPage {
+    Subspace *ss;
+    SubspaceUI *ui;
+
+    Ihandle *h;
+    Ihandle *parent;
+    strref name;
+    string imgname;
+    string title;
+    bool make(Ihandle *list);
+    bool update();
+}

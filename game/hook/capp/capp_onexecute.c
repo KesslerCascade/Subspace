@@ -1,4 +1,5 @@
 #include "ftl/capp.h"
+#include "ftl/misc.h"
 #include "hook/hook.h"
 #include "patch/patchlist.h"
 
@@ -18,7 +19,9 @@ int subspace_CApp_OnExecute_pre(CApp* self)
 
 static bool validate(addr_t base, Patch* p, PatchState* ps)
 {
-    return symAddr(base, CApp_OnExecute) != 0;
+    // this is one of the required patches, so we stick the version number globals in here
+    return symResolve(base, CApp_OnExecute) && symResolve(base, version_major) &&
+        symResolve(base, version_minor) && symResolve(base, version_rev);
 }
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)

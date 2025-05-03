@@ -1,5 +1,6 @@
 #include <iup.h>
 #include "subspace.h"
+#include "ui/page/optionspage.sidl"
 
 #define OPTIONSWIN_WIDTH 500
 #define OPTIONSWIN_HEIGHT 400
@@ -10,9 +11,16 @@ class OptionsWin {
     SubspaceUI *ui;
 
     Ihandle *win;
+    Ihandle *pagelist;
+    Ihandle *pagezbox;
+
+    sarray:object:OptionsPage pages;
+    void showPage(int num);
+
     bool make();
     void show();
-    void update();
+    bool updatePage(strref name);
+    void updateAll();
     void finish();
 
     standalone int onClose(Ihandle *ih);

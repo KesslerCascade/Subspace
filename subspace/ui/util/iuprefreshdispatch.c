@@ -25,6 +25,8 @@ _objfactory_guaranteed IupRefreshDispatch* IupRefreshDispatch_create(Ihandle* hd
 uint32 IupRefreshDispatch_run(_In_ IupRefreshDispatch* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
 {
     IupRefresh(self->h);
+    IupUpdate(self->h);
+    IupUpdateChildren(self->h);
     return TASK_Result_Success;
 }
 

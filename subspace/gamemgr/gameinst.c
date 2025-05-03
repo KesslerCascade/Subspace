@@ -12,6 +12,7 @@
 #include <cx/format.h>
 #include "control/controlclient.h"
 #include "control/controlserver.h"
+#include "ui/subspaceui.h"
 #include "gamemgr.h"
 #include "process.h"
 
@@ -61,6 +62,7 @@ static void instCloseCb(ProcessHandle* h, uint32 pid, void* userdata)
     GameInst* inst      = objAcquireFromWeak(GameInst, giw);
 
     if (inst) {
+        Subspace* ss  = inst->ss;
         // unregister from game manager since it's not running anymore
         GameMgr* gmgr = objAcquireFromWeak(GameMgr, inst->mgr);
         if (gmgr) {
@@ -68,10 +70,17 @@ static void instCloseCb(ProcessHandle* h, uint32 pid, void* userdata)
             objRelease(&gmgr);
         }
 
+        if (ss->curinst == atomicLoad(ptr, &inst->_weakref, Relaxed)) {
+            objDestroyWeak(&ss->curinst);
+            ssuiUpdateMain(ss->ui, NULL);
+            ssuiUpdateMain(ss->ui, _S"gameinfo");
+        }
+
         withWriteLock (&inst->lock) {
             procCloseHandle(&inst->process);
             inst->process = NULL;
-            ginstSetStateLocked(inst, GI_Exited);
+            if (inst->state != GI_Failed && inst->state != GI_Validated)
+                ginstSetStateLocked(inst, GI_Exited);
         }
         objRelease(&inst);
     }
@@ -122,6 +131,16 @@ bool GameInst_launch(_In_ GameInst* self)
     return ret;
 }
 
+GameInstState GameInst_getState(_In_ GameInst* self)
+{
+    GameInstState ret;
+    withReadLock (&self->lock) {
+        ret = self->state;
+    }
+
+    return ret;
+}
+
 void GameInst_setState(_In_ GameInst* self, GameInstState state)
 {
     withWriteLock (&self->lock) {
@@ -133,7 +152,10 @@ void GameInst_setStateLocked(_In_ GameInst* self, GameInstState state)
 {
     if (self->state != state) {
         self->state = state;
-        // TODO: Notify UI if this is the focused instance
+        if ((void*)self->ss->curinst == atomicLoad(ptr, &self->_weakref, Relaxed)) {
+            ssuiUpdateMain(self->ss->ui, NULL);
+            ssuiUpdateMain(self->ss->ui, _S"gameinfo");
+        }
     }
 }
 

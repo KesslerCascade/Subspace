@@ -1,0 +1,22 @@
+#include "ui/page/optionspage.sidl"
+#include "gamemgr/gameinst.sidl"
+
+class GeneralPage extends OptionsPage {
+    sarray:string langids;
+    [sorted] sarray:string langnames;
+
+    string compatimg;
+    string verstr;
+    Ihandle *langselect;
+    Ihandle *ftlloctext;
+    Ihandle *ftlcompatimg;
+    Ihandle *ftlcompatlabel;
+    Ihandle *ftlver;
+
+    object:GameInst validateinst;
+    bool vpending;  // validated instance should be saved to settings
+
+    factory create(SubspaceUI *ui);
+    override make;
+    override update;
+}
