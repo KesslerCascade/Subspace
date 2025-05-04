@@ -57,6 +57,9 @@ UIUpdateDispatch_options(SubspaceUI* ui, _In_opt_ strref pagename)
 uint32 UIUpdateDispatch_run(_In_ UIUpdateDispatch* self, _In_ TaskQueue* tq, _In_ TQWorker* worker,
                             _Inout_ TaskControl* tcon)
 {
+    if (!self->ui->main || !self->ui->options)   // make sure we aren't shutting down
+        return TASK_Result_Failure;
+
     if (self->options) {
         optionswinUpdatePage(self->ui->options, self->panelname);
         return TASK_Result_Success;
