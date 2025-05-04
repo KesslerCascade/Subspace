@@ -12,6 +12,7 @@
 #include <cx/format.h>
 #include "control/controlclient.h"
 #include "control/controlserver.h"
+#include "feature/featureregistry.h"
 #include "ui/subspaceui.h"
 #include "gamemgr.h"
 #include "process.h"
@@ -157,6 +158,40 @@ void GameInst_setStateLocked(_In_ GameInst* self, GameInstState state)
             ssuiUpdateMain(self->ss->ui, _S"gameinfo");
         }
     }
+}
+
+void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
+{
+    Subspace* ss = self->ss;
+    // game has signaled that it's ready
+
+    // reconcile feature state with the connected client
+    foreach (hashtable, hti, ss->freg->features) {
+        SubspaceFeature* feat = (SubspaceFeature*)htiVal(object, hti);
+        withWriteLock (&feat->lock) {
+            ClientFeature* cfeat = NULL;
+            if (htFind(self->features, string, feat->name, object, &cfeat)) {
+                feat->available = cfeat->available;
+                if (feat->enabled) {
+                    ControlMsg* msg = controlNewMsg("EnableFeature", 2);
+                    controlMsgStr(msg, 0, "feature", feat->name);
+                    controlMsgInt(msg, 1, "enabled", 1);
+                    cclientQueue(client, msg);
+                }
+                // cfeat->enabled will be set when the client sends a FeatureState update
+                objRelease(&cfeat);
+            } else {
+                feat->available = false;
+            }
+        }
+    }
+
+    // give it the clear to start
+    ControlMsg* msg = controlNewMsg("ClearToStart", 0);
+    cclientQueue(client, msg);
+
+    // update UI because feature availabilty may have changed
+    subspaceUpdateUI(ss);
 }
 
 void GameInst_destroy(_In_ GameInst* self)

@@ -44,4 +44,6 @@ typedef enum GameInstState {
     void setState(GameInstState state);
     void setStateLocked(GameInstState state);
     GameInstState getState();
+
+    void onGameReady(ControlClient *client);
 }

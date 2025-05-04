@@ -1,4 +1,4 @@
-#include "cmds.h"
+#include "control/cmds.h"
 
 void cmdFeatureState(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
 {
@@ -18,9 +18,4 @@ void cmdFeatureState(GameInst* inst, ControlClient* client, ControlMsg* msg, has
 
         objRelease(&feat);
     }
-}
-
-void cmdFeatureBatch(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
-{
-    return;
 }

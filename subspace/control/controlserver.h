@@ -10,10 +10,6 @@
 #include <cx/thread/threadobj.h>
 #include <cx/taskqueue.h>
 
-typedef struct ComplexTask ComplexTask;
-typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
-typedef struct ComplexTask ComplexTask;
-typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
 typedef struct ControlServer ControlServer;
 typedef struct ControlServer_WeakRef ControlServer_WeakRef;
 typedef struct GameInst GameInst;
@@ -24,11 +20,12 @@ typedef struct TQWorker TQWorker;
 typedef struct TQWorker_WeakRef TQWorker_WeakRef;
 typedef struct ComplexTask ComplexTask;
 typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
+typedef struct ComplexTask ComplexTask;
+typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
 typedef struct TRGate TRGate;
 typedef struct TRGate_WeakRef TRGate_WeakRef;
 typedef struct ComplexTaskQueue ComplexTaskQueue;
 typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
-typedef struct TRFifoNode TRFifoNode;
 typedef struct TaskControl TaskControl;
 typedef struct ControlServer ControlServer;
 typedef struct ControlServer_WeakRef ControlServer_WeakRef;
@@ -92,7 +89,7 @@ typedef struct ControlServer {
     int notifyport;
     RWLock handler_lock;
     hashtable handlers;
-    TRFifo* featureFifo;
+    TRFifo* preGameReady;
 } ControlServer;
 extern ObjClassInfo ControlServer_clsinfo;
 #define ControlServer(inst) ((ControlServer*)(unused_noeval((inst) && &((inst)->_is_ControlServer)), (inst)))

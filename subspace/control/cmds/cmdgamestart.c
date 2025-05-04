@@ -1,5 +1,5 @@
+#include "control/cmds.h"
 #include "gamemgr/gamemgr.h"
-#include "cmds.h"
 
 void cmdGameStart(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
 {

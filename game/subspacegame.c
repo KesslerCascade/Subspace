@@ -4,6 +4,7 @@
 
 #include "net.h"
 
+#include "control/cmds.h"
 #include "control/controlclient.h"
 #include "control/controlconnect.h"
 #include "feature/feature.h"
@@ -115,8 +116,25 @@ int sscmain(int argc, char* argv[])
 void sscmain2(void)
 {
     controlClientStart();
+    registerCmds();
     log_client();
     log_str(LOG_Info, "Communication thread started");
     sendAllFeatureState();
+
+    ControlMsg* msg = controlNewMsg("GameReady", 1);
+    controlMsgInt(msg, 0, "start", 1);
+    controlClientQueue(msg);
+
+    // loop until we get the all-clear
+    while (!gs.clearToStart) {
+        controlClientProcess();
+        osSleep(1);
+
+        // ensure we don't get stuck here if the connection closes
+        if (!control.sock || control.closed) {
+            osExit(1);
+        }
+    }
+
     return;
 }

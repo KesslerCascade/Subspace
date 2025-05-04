@@ -11,7 +11,7 @@
 // ==================== Auto-generated section ends ======================
 #include <cx/math.h>
 
-#include "cmds/cmds.h"
+#include "cmds.h"
 
 _objfactory_guaranteed ControlServer* ControlServer_create(Subspace* subspace)
 {
@@ -26,7 +26,7 @@ _objfactory_guaranteed ControlServer* ControlServer_create(Subspace* subspace)
 
 _objinit_guaranteed bool ControlServer_init(_In_ ControlServer* self)
 {
-    self->featureFifo = trfifoCreate();
+    self->preGameReady = trfifoCreate();
 
     // Autogen begins -----
     saInit(&self->clients, object, 1);
@@ -238,7 +238,7 @@ void ControlServer_destroy(_In_ ControlServer* self)
     saDestroy(&self->clients);
     rwlockDestroy(&self->handler_lock);
     htDestroy(&self->handlers);
-    objRelease(&self->featureFifo);
+    objRelease(&self->preGameReady);
     // Autogen ends -------
 }
 

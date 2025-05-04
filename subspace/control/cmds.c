@@ -4,7 +4,7 @@
     void cmd ## cmdname(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
 
 DECLCMD(FeatureState);
-DECLCMD(FeatureBatch);
+DECLCMD(GameReady);
 DECLCMD(GameStart);
 DECLCMD(GameState);
 DECLCMD(LaunchFail);
@@ -24,9 +24,9 @@ cserverRegisterHandler(csvr, _S #cmdname, cmd ## cmdname, true, req)
 
 void registerCmds(ControlServer* csvr)
 {
-    REGCMDREQI(FeatureState, csvr->featureFifo);
-    REGCMDREQI(FeatureBatch, csvr->featureFifo);
+    REGCMDREQI(FeatureState, csvr->preGameReady);
     REGCMD(GameStart);
+    REGCMDREQ(GameReady, csvr->preGameReady);
     REGCMDI(Validate);
     REGCMDI(GameState);
     REGCMDI(LaunchFail);

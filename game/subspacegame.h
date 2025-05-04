@@ -61,6 +61,8 @@ typedef struct SubspaceGameSettings {
 } SubspaceGameSettings;
 
 typedef struct GameGlobalState {
+    bool clearToStart;
+
     // Numeric Hull
     bool overrideHullText;
     int hull;

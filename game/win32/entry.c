@@ -138,19 +138,3 @@ int __stdcall entry()
     // probably will never reach this, but just in case
     ExitProcess(ret);
 }
-
-void osWriteDbg(const char* str)
-{
-    HANDLE hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
-    DWORD written  = 0;
-    WriteConsoleA(hstdout, (void*)str, strlen(str), &written, NULL);
-}
-
-void osSetCurrentDir(const char* dir)
-{
-    int dlen      = MultiByteToWideChar(CP_UTF8, 0, dir, -1, NULL, 0);
-    wchar_t* dirw = smalloc(dlen * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, dir, -1, dirw, dlen);
-
-    SetCurrentDirectoryW(dirw);
-}

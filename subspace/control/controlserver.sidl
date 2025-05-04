@@ -38,7 +38,7 @@ strref cfieldString(hashtable fields, strref name);
 
     RWLock handler_lock;
     hashtable:string:object handlers;
-    object:TRFifo featureFifo;
+    object:TRFifo preGameReady;
 
     factory create(Subspace* subspace);
     bool start();

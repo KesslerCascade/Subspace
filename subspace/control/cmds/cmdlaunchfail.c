@@ -1,4 +1,4 @@
-#include "cmds.h"
+#include "control/cmds.h"
 
 void cmdLaunchFail(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
 {

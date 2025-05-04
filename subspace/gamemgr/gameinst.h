@@ -38,6 +38,7 @@ typedef struct GameInst_ClassIf {
     void (*setState)(_In_ void* self, GameInstState state);
     void (*setStateLocked)(_In_ void* self, GameInstState state);
     GameInstState (*getState)(_In_ void* self);
+    void (*onGameReady)(_In_ void* self, ControlClient* client);
 } GameInst_ClassIf;
 extern GameInst_ClassIf GameInst_ClassIf_tmpl;
 
@@ -98,4 +99,6 @@ _objfactory_guaranteed GameInst* GameInst_createForClient(GameMgr* mgr, ControlC
 #define ginstSetStateLocked(self, state) (self)->_->setStateLocked(GameInst(self), state)
 // GameInstState ginstGetState(GameInst* self);
 #define ginstGetState(self) (self)->_->getState(GameInst(self))
+// void ginstOnGameReady(GameInst* self, ControlClient* client);
+#define ginstOnGameReady(self, client) (self)->_->onGameReady(GameInst(self), ControlClient(client))
 

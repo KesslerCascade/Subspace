@@ -43,17 +43,18 @@ set(SUBSPACE_SIDL
 add_sidl(${SUBSPACE_SIDL})
 
 add_executable(subspace
+    control/cmds.c
     control/controlclient.c
     control/controlfields.c
     control/controlserver.c
     control/controltask.c
     control/cmds/cmdfeaturestate.c
+    control/cmds/cmdgameready.c
     control/cmds/cmdgamestart.c
     control/cmds/cmdgamestate.c
     control/cmds/cmdlaunchfail.c
     control/cmds/cmdloading.c
     control/cmds/cmdlog.c
-    control/cmds/cmds.c
     control/cmds/cmdvalidate.c
     db/database.c
     feature/feature.c

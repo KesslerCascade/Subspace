@@ -145,20 +145,12 @@ void sendFeatureState(SubspaceFeature* feat, int replyto)
 
 void sendAllFeatureState()
 {
-    ControlMsg* msg = controlNewMsg("FeatureBatch", 1);
-    controlMsgInt(msg, 0, "start", 1);
-    controlClientQueue(msg);
-
     for (uint32_t i = 0; i < feathash.nslots; i++) {
         SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
         if (feat) {
             sendFeatureState(feat, 0);
         }
     }
-
-    msg = controlNewMsg("FeatureBatch", 1);
-    controlMsgInt(msg, 0, "end", 1);
-    controlClientQueue(msg);
 }
 
 void fillValidateFeatures(ControlField* featf)

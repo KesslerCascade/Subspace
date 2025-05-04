@@ -42,6 +42,7 @@ if(WIN32)
         win32/patch/patch_osdep.c
         win32/entry.c
         win32/kernel32_overrides.c
+        win32/osdep.c
         win32/thread.c
         win32/winerror.c
         win32/winmain.c)
@@ -52,6 +53,9 @@ add_executable(subspacegame
     control/controlclient.c
     control/controlconnect.c
     control/messagequeue.c
+    control/cmds.c
+    control/cmds/cmdcleartostart.c
+    control/cmds/cmdenablefeature.c
     feature/feature.c
     feature/frameadv.c
     feature/infoblock.c
