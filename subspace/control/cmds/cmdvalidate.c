@@ -39,5 +39,5 @@ void cmdValidate(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtab
         }
     }
 
-    ssuiUpdateOptions(inst->ss->ui, _S"general");
+    ssuiUpdateOptions(inst->ss->ui, _S"setup");
 }
