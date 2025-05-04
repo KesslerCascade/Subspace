@@ -92,6 +92,7 @@ bool OptionsWin_make(_In_ OptionsWin* self)
     string tmp = 0;
     strFormat(&tmp, _S"${int}x${int}", stvar(int32, OPTIONSWIN_WIDTH), stvar(int32, OPTIONSWIN_HEIGHT));
     IupSetAttribute(self->win, "SIZE", strC(tmp));
+    IupSetAttribute(self->win, "RESIZE", "NO");
     IupSetAttribute(self->win, "TITLE", langGetC(self->ss, _S"options_title"));
     iupSetObj(self->win, self, ObjNone, self->ui);
     IupSetAttribute(self->win, "PARENTDIALOG", "SUBSPACE_MAINWIN");
@@ -111,8 +112,6 @@ void OptionsWin_show(_In_ OptionsWin* self)
 
     IupShowXY(self->win, IUP_CENTER, IUP_CENTER);
     IupSetAttribute(self->win, "SIMULATEMODAL", "YES");
-    char* rsz = IupGetAttribute(self->win, "RASTERSIZE");
-    IupSetAttribute(self->win, "MINSIZE", rsz);
 
     optionswinShowPage(self, 0);
 }

@@ -149,14 +149,19 @@ static int saveovrchange(Ihandle* ih, int state)
 
     if (state == 1) {
         IupSetAttribute(gp->saveoverrideusercheck, "VALUE", "OFF");
+        IupSetAttribute(gp->saveoverrideusercheck, "FLOATING", "NO");
         IupSetAttribute(gp->saveoverrideusercheck, "VISIBLE", "YES");
         IupSetAttribute(gp->saveoverridetext, "VALUE", "");
+        IupSetAttribute(gp->saveoverridehbox, "FLOATING", "NO");
         IupSetAttribute(gp->saveoverridehbox, "VISIBLE", "YES");
     } else {
         ssdRemove(gp->ss->settings, _S"ftl/saveoverride");
         IupSetAttribute(gp->saveoverrideusercheck, "VISIBLE", "NO");
+        IupSetAttribute(gp->saveoverrideusercheck, "FLOATING", "YES");
         IupSetAttribute(gp->saveoverridehbox, "VISIBLE", "NO");
+        IupSetAttribute(gp->saveoverridehbox, "FLOATING", "YES");
     }
+    IupRefresh(ih);
     return IUP_DEFAULT;
 }
 
@@ -169,11 +174,14 @@ static int saveovruserchange(Ihandle* ih, int state)
     if (state == 1) {
         ssdSet(gp->ss->settings, _S"ftl/saveoverride", true, stvar(string, _S"user/"));
         IupSetAttribute(gp->saveoverridehbox, "VISIBLE", "NO");
+        IupSetAttribute(gp->saveoverridehbox, "FLOATING", "YES");
     } else {
         ssdRemove(gp->ss->settings, _S"ftl/saveoverride");
         IupSetAttribute(gp->saveoverridetext, "VALUE", "");
+        IupSetAttribute(gp->saveoverridehbox, "FLOATING", "NO");
         IupSetAttribute(gp->saveoverridehbox, "VISIBLE", "YES");
     }
+    IupRefresh(ih);
     return IUP_DEFAULT;
 }
 
@@ -298,7 +306,7 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     Ihandle* ftlloclabel = IupLabel(langGetC(self->ss, _S"options_ftl_loc"));
     IupSetAttribute(ftlloclabel, "FONT", "Helvetica, Bold 10");
     Ihandle* ftlloclonglabel = IupLabel(langGetC(self->ss, _S"options_ftl_loc_long"));
-    IupSetAttribute(ftlloclonglabel, "SIZE", "1x30");
+    IupSetAttribute(ftlloclonglabel, "SIZE", "1x32");
     IupSetAttribute(ftlloclonglabel, "EXPAND", "HORIZONTAL");
     IupSetAttribute(ftlloclonglabel, "ALIGNMENT", "ALEFT:ATOP");
     IupSetAttribute(ftlloclonglabel, "WORDWRAP", "YES");
@@ -326,6 +334,7 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
            1);
     iupSetObj(self->saveoverrideusercheck, ObjNone, self, self->ui);
     IupSetCallback(self->saveoverrideusercheck, "ACTION", (Icallback)saveovruserchange);
+    IupSetAttribute(self->saveoverrideusercheck, "FLOATING", "YES");
     IupSetAttribute(self->saveoverrideusercheck, "VISIBLE", "NO");
 
     Ihandle* saveovrlabel  = IupLabel(langGetC(self->ss, _S"options_saveoverride_folder"));
@@ -340,10 +349,14 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     IupSetCallback(saveovrbrowse, "ACTION", (Icallback)browseforsaveovr);
 
     self->saveoverridehbox = IupHbox(saveovrlabel, self->saveoverridetext, saveovrbrowse, NULL);
+    IupSetAttribute(self->saveoverridehbox, "FLOATING", "YES");
     IupSetAttribute(self->saveoverridehbox, "VISIBLE", "NO");
 
     Ihandle* spacer2 = IupSpace();
     IupSetAttribute(spacer2, "SIZE", "1x4");
+
+    Ihandle* septemp = IupLabel("");
+    IupSetAttribute(septemp, "SEPARATOR", "HORIZONTAL");
 
     Ihandle* thevbox = IupVbox(langhbox,
                                spacer1,
@@ -356,6 +369,7 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
                                self->saveoverridecheck,
                                self->saveoverrideusercheck,
                                self->saveoverridehbox,
+                               septemp,
                                IupFill(),
                                NULL);
     IupSetAttribute(thevbox, "CMARGIN", "0x0");
@@ -497,19 +511,24 @@ bool SetupPage_update(_In_ SetupPage* self)
     string overrideloc = 0;
     if (ssdStringOut(self->ss->settings, _S"ftl/saveoverride", &overrideloc)) {
         IupSetAttribute(self->saveoverridecheck, "VALUE", "ON");
+        IupSetAttribute(self->saveoverrideusercheck, "FLOATING", "NO");
         IupSetAttribute(self->saveoverrideusercheck, "VISIBLE", "YES");
         if (strEq(overrideloc, _S"user/")) {
             IupSetAttribute(self->saveoverrideusercheck, "VALUE", "ON");
             IupSetAttribute(self->saveoverridehbox, "VISIBLE", "NO");
+            IupSetAttribute(self->saveoverridehbox, "FLOATING", "YES");
         } else {
             IupSetAttribute(self->saveoverrideusercheck, "VALUE", "OFF");
+            IupSetAttribute(self->saveoverridehbox, "FLOATING", "NO");
             IupSetAttribute(self->saveoverridehbox, "VISIBLE", "YES");
             pathToPlatform(&self->overrideloc, overrideloc);
             IupSetAttribute(self->saveoverridetext, "VALUE", strC(self->overrideloc));
         }
     } else {
         IupSetAttribute(self->saveoverridecheck, "VALUE", "OFF");
+        IupSetAttribute(self->saveoverrideusercheck, "FLOATING", "YES");
         IupSetAttribute(self->saveoverrideusercheck, "VISIBLE", "NO");
+        IupSetAttribute(self->saveoverridehbox, "VISIBLE", "YES");
         IupSetAttribute(self->saveoverridehbox, "VISIBLE", "NO");
     }
     IupRefresh(self->saveoverridehbox);
