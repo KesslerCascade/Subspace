@@ -1,0 +1,40 @@
+{
+    "version": 3,
+    "configurePresets": [
+        {
+            "name": "base",
+            "hidden": true,
+            "binaryDir": "${sourceDir}/../build/${presetName}"
+        },
+        {
+            "name": "game-win32",
+            "inherits": "base",
+            "generator": "Visual Studio 16 2019",
+            "architecture": {
+                "value": "Win32",
+                "strategy": "set"
+            },
+            "toolset": {
+                "value": "v141_xp",
+                "strategy": "set"
+            },
+            "cacheVariables": {
+                "BUILD_GAME": true
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "game-debug",
+            "displayName": "Game (Debug)",
+            "configurePreset": "game-win32",
+            "configuration": "Debug"
+        },
+        {
+            "name": "game-release",
+            "displayName": "Game (Release)",
+            "configurePreset": "game-win32",
+            "configuration": "Release"
+        }
+    ]
+}

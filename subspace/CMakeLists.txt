@@ -1,3 +1,22 @@
+cmake_minimum_required (VERSION 3.21)
+
+include (../lib/cx/cmake/organize_targets.cmake)
+
+set(TOP_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
+set(TOP_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
+set(SHARED_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../shared)
+
+project (subspace)
+
+enable_language(C)
+enable_language(CXX)
+
+include_directories(${SHARED_SOURCE_DIR})
+
+add_subdirectory(../lib lib)
+
+include (../lib/cx/cmake/werror.cmake)
+
 if(WIN32)
     add_executable(subspacedbg
         win32/subspacedbg.c
