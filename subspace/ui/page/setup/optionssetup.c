@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "optionsgeneral.h"
+#include "optionssetup.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -17,16 +17,16 @@
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
 
-_objfactory_guaranteed GeneralPage* GeneralPage_create(SubspaceUI* ui)
+_objfactory_guaranteed SetupPage* SetupPage_create(SubspaceUI* ui)
 {
-    GeneralPage* self;
-    self = objInstCreate(GeneralPage);
+    SetupPage* self;
+    self = objInstCreate(SetupPage);
 
     self->ui = ui;
     self->ss = ui->ss;
 
-    self->name = _S"general";
-    strDup(&self->title, langGet(self->ss, _S"options_general"));
+    self->name = _S"setup";
+    strDup(&self->title, langGet(self->ss, _S"options_setup"));
     strDup(&self->imgname, _S"IMAGE_WRENCH_SMALL_BLACK");
     objInstInit(self);
     return self;
@@ -45,7 +45,7 @@ static void setTip(Ihandle* ih, strref tip, strref title, int icon)
     IupSetInt(ih, "TIPDELAY", 30000);
 }
 
-static void setCompatState(GeneralPage* gp, strref state)
+static void setCompatState(SetupPage* gp, strref state)
 {
     string tmp = 0;
 
@@ -70,7 +70,7 @@ static int langselect_change(Ihandle* ih, char* text, int item, int state)
     if (state != 1)
         return IUP_DEFAULT;
 
-    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    SetupPage* gp = iupGetParentObj(SetupPage, ih);
 
     if (gp && item > 0 && item <= saSize(gp->langids) &&
         !strEq(gp->langids.a[item - 1], gp->ss->langid)) {
@@ -98,7 +98,7 @@ static int langselect_change(Ihandle* ih, char* text, int item, int state)
 
 static int browseforftl(Ihandle* ih)
 {
-    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    SetupPage* gp = iupGetParentObj(SetupPage, ih);
     if (!gp)
         return IUP_IGNORE;
 
@@ -143,7 +143,7 @@ static int browseforftl(Ihandle* ih)
 
 static int saveovrchange(Ihandle* ih, int state)
 {
-    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    SetupPage* gp = iupGetParentObj(SetupPage, ih);
     if (!gp)
         return IUP_IGNORE;
 
@@ -162,7 +162,7 @@ static int saveovrchange(Ihandle* ih, int state)
 
 static int saveovruserchange(Ihandle* ih, int state)
 {
-    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    SetupPage* gp = iupGetParentObj(SetupPage, ih);
     if (!gp)
         return IUP_IGNORE;
 
@@ -179,7 +179,7 @@ static int saveovruserchange(Ihandle* ih, int state)
 
 static int saveovrtextchange(Ihandle* ih, int c, char* new_value)
 {
-    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    SetupPage* gp = iupGetParentObj(SetupPage, ih);
     if (!gp)
         return IUP_IGNORE;
 
@@ -194,7 +194,7 @@ static int saveovrtextchange(Ihandle* ih, int c, char* new_value)
 
 static int browseforsaveovr(Ihandle* ih)
 {
-    GeneralPage* gp = iupGetParentObj(GeneralPage, ih);
+    SetupPage* gp = iupGetParentObj(SetupPage, ih);
     if (!gp)
         return IUP_IGNORE;
 
@@ -228,7 +228,7 @@ static int browseforsaveovr(Ihandle* ih)
     return IUP_DEFAULT;
 }
 
-static void fillLanguages(GeneralPage* self, Ihandle* langselect)
+static void fillLanguages(SetupPage* self, Ihandle* langselect)
 {
     hashtable languages, languages_rev;
     htInit(&languages, string, string, 32);
@@ -256,7 +256,7 @@ static void fillLanguages(GeneralPage* self, Ihandle* langselect)
 
 extern bool OptionsPage_make(_In_ OptionsPage* self, Ihandle* list);   // parent
 #define parent_make(list) OptionsPage_make((OptionsPage*)(self), list)
-bool GeneralPage_make(_In_ GeneralPage* self, Ihandle* list)
+bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
 {
     self->langselect = IupList(NULL);
     IupSetAttribute(self->langselect, "DROPDOWN", "YES");
@@ -393,7 +393,7 @@ bool GeneralPage_make(_In_ GeneralPage* self, Ihandle* list)
 
 extern bool OptionsPage_update(_In_ OptionsPage* self);   // parent
 #define parent_update() OptionsPage_update((OptionsPage*)(self))
-bool GeneralPage_update(_In_ GeneralPage* self)
+bool SetupPage_update(_In_ SetupPage* self)
 {
     for (int i = 0; i < saSize(self->langids); i++) {
         if (strEq(self->ss->langid, self->langids.a[i])) {
@@ -517,7 +517,7 @@ bool GeneralPage_update(_In_ GeneralPage* self)
     return parent_update();
 }
 
-_objinit_guaranteed bool GeneralPage_init(_In_ GeneralPage* self)
+_objinit_guaranteed bool SetupPage_init(_In_ SetupPage* self)
 {
     // Autogen begins -----
     saInit(&self->langids, string, 1);
@@ -526,7 +526,7 @@ _objinit_guaranteed bool GeneralPage_init(_In_ GeneralPage* self)
     // Autogen ends -------
 }
 
-void GeneralPage_destroy(_In_ GeneralPage* self)
+void SetupPage_destroy(_In_ SetupPage* self)
 {
     // Autogen begins -----
     saDestroy(&self->langids);
@@ -539,5 +539,5 @@ void GeneralPage_destroy(_In_ GeneralPage* self)
 }
 
 // Autogen begins -----
-#include "optionsgeneral.auto.inc"
+#include "optionssetup.auto.inc"
 // Autogen ends -------

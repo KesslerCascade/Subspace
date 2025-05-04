@@ -13,7 +13,7 @@
     "play_tip": "Play FTL!",
     "options_title": "Subspace Options",
     "options_close": "&Close",
-    "options_general": "General",
+    "options_setup": "Setup",
     "options_lang": "Language:",
     "langconfirm_title": "Subspace User Interface Language Change",
     "langconfirm": "Changing the language requires reloading the user interface. Do you wish to do this now?",
@@ -38,5 +38,6 @@
     "options_saveoverride_user_tip": "Instead of a fixed location, store the save files under a \"user\" subfolder of the FTL game installation.\n\nThis can be useful if you switch between different copies of the game and want to use a different profile for each.",
     "options_saveoverride_folder": "Save folder:",
     "options_saveoverride_browse": "Br&owse...",
-    "options_saveoverride_browse_title": "Choose save file location"
+    "options_saveoverride_browse_title": "Choose save file location",
+    "panel_gameinfo": "Game Info"
 }

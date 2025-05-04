@@ -10,7 +10,7 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
-#include "ui/page/general/optionsgeneral.h"
+#include "ui/page/setup/optionssetup.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iupsetobj.h"
 
@@ -18,7 +18,7 @@ static void OoptionsWin_registerPages(OptionsWin* self, SubspaceUI* ui)
 {
     OptionsPage* p;
 
-    p = OptionsPage(generalpageCreate(ui));
+    p = OptionsPage(setuppageCreate(ui));
     saPushC(&self->pages, object, &p);
 }
 

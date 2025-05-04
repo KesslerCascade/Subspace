@@ -13,7 +13,7 @@
     "play_tip": "Ludu FTL!",
     "options_title": "Subspacaj Opcioj",
     "options_close": "&Fermi",
-    "options_general": "Generalo",
+    "options_setup": "Agordo",
     "options_lang": "Lingvo:",
     "langconfirm_title": "Subspaca Uzantinterfaca Lingvoŝanĝo",
     "langconfirm": "Ŝanĝi la lingvon postulas reŝargi la uzantinterfacon. Ĉu vi volas fari tion nun?",
@@ -38,5 +38,6 @@
     "options_saveoverride_user_tip": "Anstataŭ fiksa loko, konservu la konservitajn dosierojn sub subdosierujo \"uzanto\" de la FTL-ludinstalaĵo.\n\nTio povas esti utila se vi ŝanĝas inter malsamaj kopioj de la ludo kaj volas uzi malsaman profilon por ĉiu.",
     "options_saveoverride_folder": "Konservi dosierujon:",
     "options_saveoverride_browse": "Foli&umi...",
-    "options_saveoverride_browse_title": "Elektu konservi dosierlokon"
+    "options_saveoverride_browse_title": "Elektu konservi dosierlokon",
+    "panel_gameinfo": "Ludinformoj"
 }

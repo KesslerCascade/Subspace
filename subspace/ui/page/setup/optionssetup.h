@@ -12,25 +12,25 @@ typedef struct GameMgr GameMgr;
 typedef struct GameMgr_WeakRef GameMgr_WeakRef;
 typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
-typedef struct GeneralPage GeneralPage;
-typedef struct GeneralPage_WeakRef GeneralPage_WeakRef;
-saDeclarePtr(GeneralPage);
-saDeclarePtr(GeneralPage_WeakRef);
+typedef struct SetupPage SetupPage;
+typedef struct SetupPage_WeakRef SetupPage_WeakRef;
+saDeclarePtr(SetupPage);
+saDeclarePtr(SetupPage_WeakRef);
 
-typedef struct GeneralPage_ClassIf {
+typedef struct SetupPage_ClassIf {
     ObjIface* _implements;
     ObjIface* _parent;
     size_t _size;
 
     bool (*make)(_In_ void* self, Ihandle* list);
     bool (*update)(_In_ void* self);
-} GeneralPage_ClassIf;
-extern GeneralPage_ClassIf GeneralPage_ClassIf_tmpl;
+} SetupPage_ClassIf;
+extern SetupPage_ClassIf SetupPage_ClassIf_tmpl;
 
-typedef struct GeneralPage {
+typedef struct SetupPage {
     union {
-        GeneralPage_ClassIf* _;
-        void* _is_GeneralPage;
+        SetupPage_ClassIf* _;
+        void* _is_SetupPage;
         void* _is_OptionsPage;
         void* _is_ObjInst;
     };
@@ -61,29 +61,29 @@ typedef struct GeneralPage {
     Ihandle* saveoverridehbox;
     GameInst* validateinst;
     bool vpending;        // validated instance should be saved to settings
-} GeneralPage;
-extern ObjClassInfo GeneralPage_clsinfo;
-#define GeneralPage(inst) ((GeneralPage*)(unused_noeval((inst) && &((inst)->_is_GeneralPage)), (inst)))
-#define GeneralPageNone ((GeneralPage*)NULL)
+} SetupPage;
+extern ObjClassInfo SetupPage_clsinfo;
+#define SetupPage(inst) ((SetupPage*)(unused_noeval((inst) && &((inst)->_is_SetupPage)), (inst)))
+#define SetupPageNone ((SetupPage*)NULL)
 
-typedef struct GeneralPage_WeakRef {
+typedef struct SetupPage_WeakRef {
     union {
         ObjInst* _inst;
-        void* _is_GeneralPage_WeakRef;
+        void* _is_SetupPage_WeakRef;
         void* _is_OptionsPage_WeakRef;
         void* _is_ObjInst_WeakRef;
     };
     atomic(uintptr) _ref;
     RWLock _lock;
-} GeneralPage_WeakRef;
-#define GeneralPage_WeakRef(inst) ((GeneralPage_WeakRef*)(unused_noeval((inst) && &((inst)->_is_GeneralPage_WeakRef)), (inst)))
+} SetupPage_WeakRef;
+#define SetupPage_WeakRef(inst) ((SetupPage_WeakRef*)(unused_noeval((inst) && &((inst)->_is_SetupPage_WeakRef)), (inst)))
 
-_objfactory_guaranteed GeneralPage* GeneralPage_create(SubspaceUI* ui);
-// GeneralPage* generalpageCreate(SubspaceUI* ui);
-#define generalpageCreate(ui) GeneralPage_create(SubspaceUI(ui))
+_objfactory_guaranteed SetupPage* SetupPage_create(SubspaceUI* ui);
+// SetupPage* setuppageCreate(SubspaceUI* ui);
+#define setuppageCreate(ui) SetupPage_create(SubspaceUI(ui))
 
-// bool generalpageMake(GeneralPage* self, Ihandle* list);
-#define generalpageMake(self, list) (self)->_->make(GeneralPage(self), list)
-// bool generalpageUpdate(GeneralPage* self);
-#define generalpageUpdate(self) (self)->_->update(GeneralPage(self))
+// bool setuppageMake(SetupPage* self, Ihandle* list);
+#define setuppageMake(self, list) (self)->_->make(SetupPage(self), list)
+// bool setuppageUpdate(SetupPage* self);
+#define setuppageUpdate(self) (self)->_->update(SetupPage(self))
 
