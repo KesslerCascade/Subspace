@@ -72,7 +72,7 @@ static int controlThread(void* data)
 
             // read any inbound messages and queue them
             if (FD_ISSET(control.sock, &rset)) {
-                if (controlMsgReady(&control)) {
+                while (controlMsgReady(&control)) {
                     ControlMsg* msg = controlGetMsg(&control, CF_ALLOC_AUTO);
 
                     lock_acq(&client.lock);

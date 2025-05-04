@@ -67,7 +67,7 @@ void ControlClient_recv(_In_ ControlClient* self)
     if (!svr)
         return;
 
-    if (controlMsgReady(&self->state)) {
+    while (controlMsgReady(&self->state)) {
         ControlMsg* msg = controlGetMsg(&self->state, CF_ALLOC_AUTO);
         if (!msg) {
             objRelease(&svr);
