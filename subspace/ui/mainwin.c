@@ -12,18 +12,44 @@
 #include <cx/format.h>
 #include "gamemgr/gamemgr.h"
 #include "panel/gameinfo/gameinfopanel.h"
+#include "panel/notableevent/notableeventpanel.h"
+#include "panel/scrapgraph/scrapgraphpanel.h"
+#include "panel/sectordetail/sectordetailpanel.h"
 #include "panel/welcome/welcomepanel.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
 #include "optionswin.h"
 #include "subspaceui.h"
 
+#define REGISTERPANEL(mprefix)         \
+    p = Panel(mprefix##Create(ui));    \
+    saPush(&titles, string, p->title); \
+    htInsertC(&tpanels, strref, p->title, object, &p)
+
+void MainWin_makeMenu(_In_ MainWin* self);
 static void MainWin_registerPanels(MainWin* self, SubspaceUI* ui)
 {
     Panel* p;
 
-    p = Panel(gameinfopanelCreate(ui));
-    htInsertC(&self->panels, strref, p->name, object, &p);
+    sa_string titles;
+    saInit(&titles, string, 8, SA_Sorted);
+    hashtable tpanels;   // temp hashtable
+    htInit(&tpanels, string, object, 8);
+
+    REGISTERPANEL(gameinfopanel);
+    REGISTERPANEL(notableeventpanel);
+    REGISTERPANEL(scrapgraphpanel);
+    REGISTERPANEL(sectordetailpanel);
+
+    // insert them into the real hashtable in sorted order, for convenience later
+    foreach (sarray, idx, string, title, titles) {
+        htelem e = htFind(tpanels, string, title, none, NULL);
+        p        = (Panel*)hteVal(tpanels, object, e);
+        htInsert(&self->panels, strref, p->name, object, p);
+    }
+
+    htDestroy(&tpanels);
+    saDestroy(&titles);
 
     self->welcomepanel = Panel(welcomepanelCreate(ui));
 }
@@ -70,6 +96,28 @@ static int playbtn_action(Ihandle* ih)
     return IUP_DEFAULT;
 }
 
+static int menubtn_action(Ihandle* ih)
+{
+    MainWin* win = iupGetParentObj(MainWin, ih);
+    if (win) {
+        int x, y, w, h, mx, my;
+        IupGetIntInt(ih, "SCREENPOSITION", &x, &y);
+        IupGetIntInt(ih, "RASTERSIZE", &w, &h);
+        IupGetIntInt(NULL, "CURSORPOS", &mx, &my);
+
+        // If the mouse cursor is within the button, use that.
+        // Otherwise pop up the menu in the center of the button,
+        // i.e. if it was activated using the keyboard.
+
+        if (mx < x || mx > x + w || my < y || my > y + h) {
+            mx = x + w / 2;
+            my = y + h / 2;
+        }
+        mainwinShowMenu(win, mx, my);
+    }
+    return IUP_DEFAULT;
+}
+
 bool MainWin_make(_In_ MainWin* self)
 {
     self->timer = IupTimer();
@@ -93,6 +141,7 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(hamburger, "BORDERWIDTH", "0");
     IupSetAttribute(hamburger, "TIP", langGetC(self->ss, _S"hamburger_tip"));
     iupSetObj(hamburger, ObjNone, self, self->ui);
+    IupSetCallback(hamburger, "FLAT_ACTION", menubtn_action);
     iupLoadImage(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", hamburger);
     iupLoadImage(self->ss, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
 
@@ -157,6 +206,8 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetCallback(self->win, "CLOSE_CB", (Icallback)MainWin_onClose);
     IupSetCallback(self->win, "RESIZE_CB", (Icallback)MainWin_onResize);
 
+    MainWin_makeMenu(self);
+
     strDestroy(&tmp);
     return true;
 }
@@ -164,7 +215,7 @@ bool MainWin_make(_In_ MainWin* self)
 void MainWin_show(_In_ MainWin* self)
 {
     IupShowXY(self->win, IUP_CENTER, IUP_CENTER);
-    mainwinUpdate(self);
+    mainwinUpdateAll(self);
 }
 
 void MainWin_update(_In_ MainWin* self)
@@ -227,8 +278,11 @@ void MainWin_finish(_In_ MainWin* self)
         IupDestroy(self->win);
     if (self->timer)
         IupDestroy(self->timer);
+    if (self->menu)
+        IupDestroy(self->menu);
     self->win   = NULL;
     self->timer = NULL;
+    self->menu  = NULL;
 }
 
 void MainWin_destroy(_In_ MainWin* self)
@@ -288,8 +342,11 @@ void MainWin_setLayoutDirty(_In_ MainWin* self)
 }
 
 // Autogen begins -----
+void MainWin_makeMenu(_In_ MainWin* self);
+void MainWin_showMenu(_In_ MainWin* self, int x, int y);
 void MainWin_loadLayout(_In_ MainWin* self);
 void MainWin_saveLayout(_In_ MainWin* self);
+bool MainWin_isPanelInLayout(_In_ MainWin* self, _In_opt_ strref name);
 Ihandle* MainWin_createPlaceholder(_In_ MainWin* self);
 Ihandle* MainWin_createTabs(_In_ MainWin* self);
 Ihandle* MainWin_createSplit(_In_ MainWin* self, bool vertical);

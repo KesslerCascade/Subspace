@@ -1,0 +1,7 @@
+#include "ui/page/optionspage.sidl"
+#include "gamemgr/gameinst.sidl"
+
+class FeaturesPage extends OptionsPage {
+    factory create(SubspaceUI *ui);
+    override make;
+}

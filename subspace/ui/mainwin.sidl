@@ -18,11 +18,18 @@ class MainWin {
     Ihandle *timer;
     uint32 activeInst;      // cookie of game instance that's being tracked through the UI
 
+    Ihandle *menu;          // hamburger menu
+
+    Ihandle *showpanelmenu;    // submenu
+    Ihandle *showpanelsep;     // separator so it can be hidden
+
     hashtable:string:object panels;  // all panels (except welcome)
     object:Panel welcomepanel;
 
     bool make();
+    [extern] void makeMenu();
     void show();
+    [extern] void showMenu(int x, int y);
     void update();
     bool updatePanel(strref name);
     void updateAll();
@@ -30,6 +37,7 @@ class MainWin {
 
     [extern] unbound void loadLayout();
     [extern] unbound void saveLayout();
+    [extern] unbound bool isPanelInLayout(strref name);
     [extern] unbound Ihandle *createPlaceholder();
     [extern] unbound Ihandle *createTabs();
     [extern] unbound Ihandle *createSplit(bool vertical);

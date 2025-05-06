@@ -103,6 +103,7 @@ add_executable(subspacegame
     hook/commandgui/commandgui_renderstatic.c
     hook/filehelper/filehelper_getuserfolder.c
     hook/ftlbutton/ftlbutton_onrender.c
+    hook/mainmenu/mainmenu_open.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
     hook/shipstatus/shipstatus_renderhealth.c

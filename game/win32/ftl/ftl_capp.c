@@ -498,24 +498,38 @@ DisasmTrace CApp_OnLoop_trace = {
               { DT_OP(SKIP), .imin = 0, .imax = 6 },
              { I_CMP },
              { I_JA },
-             { DT_OP(JMPTBL), .val = 0 },   // switch(), case 0
+             { DT_OP(LABEL), .val = 1 },    // remember the switch statement
+              { DT_OP(JMPTBL), .val = 0 },   // switch(), case 0
               { DT_OP(SKIP), .imin = 6, .imax = 14 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX } },
                 .argsym = { 0, &SYM(CApp_gui_offset) } },
-             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CommandGui_IsGameOver
+             { I_CALL,
+                .argout = { DT_OUT_SYM2 },
+                .argcap = CT_CAPTURE4 },   // CommandGui_IsGameOver
               { DT_OP(SKIP), .imin = 2, .imax = 7 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX } },
                 .argsym = { 0, &SYM(CApp_gui_offset) } },
              { I_CALL, .argout = { DT_OUT_SYM3 } },   // CommandGui_Restart
-              { DT_OP(FINISH) } },
-    .out  = { &SYM(CommandGui_IsPaused),               // DT_OUT_SYM1
-              &SYM(CommandGui_IsGameOver),             // DT_OUT_SYM2
-              &SYM(CommandGui_Restart),                // DT_OUT_SYM3
-              &SYM(CFPS_OnLoop),                       // DT_OUT_SYM4
-              &SYM(MouseControl_OnLoop),               // DT_OUT_SYM5
-              &SYM(CommandGui_OnLoop) }
+              { DT_OP(GOTO), .val = 1 },               // go back to the switch statement
+              { DT_OP(JMPTBL), .val = 5 },             // switch(), case 5
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL,
+                .argf   = { ARG_MATCH },
+                .argcap = { CT_MATCH4 } },   // CALL CommandGui_IsGameOver
+              { DT_OP(SKIP), .imin = 10, .imax = 20 },
+             { I_LEA },
+             { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL MainMenu::Open
+              { I_JMP },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_IsPaused),     // DT_OUT_SYM1
+              &SYM(CommandGui_IsGameOver),   // DT_OUT_SYM2
+              &SYM(CommandGui_Restart),      // DT_OUT_SYM3
+              &SYM(CFPS_OnLoop),             // DT_OUT_SYM4
+              &SYM(MouseControl_OnLoop),     // DT_OUT_SYM5
+              &SYM(CommandGui_OnLoop),       // DT_OUT_SYM6
+              &SYM(MainMenu_Open) }
 };

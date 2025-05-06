@@ -25,7 +25,9 @@ typedef struct MainWin_ClassIf {
     size_t _size;
 
     bool (*make)(_In_ void* self);
+    void (*makeMenu)(_In_ void* self);
     void (*show)(_In_ void* self);
+    void (*showMenu)(_In_ void* self, int x, int y);
     void (*update)(_In_ void* self);
     bool (*updatePanel)(_In_ void* self, _In_opt_ strref name);
     void (*updateAll)(_In_ void* self);
@@ -53,6 +55,9 @@ typedef struct MainWin {
     Ihandle* root;        // root of dynamic layout
     Ihandle* timer;
     uint32 activeInst;        // cookie of game instance that's being tracked through the UI
+    Ihandle* menu;        // hamburger menu
+    Ihandle* showpanelmenu;        // submenu
+    Ihandle* showpanelsep;        // separator so it can be hidden
     hashtable panels;        // all panels (except welcome)
     Panel* welcomepanel;
     int width;
@@ -86,6 +91,10 @@ void MainWin_saveLayout(_In_ MainWin* self);
 // void mainwinSaveLayout(MainWin* self);
 #define mainwinSaveLayout(self) MainWin_saveLayout(MainWin(self))
 
+bool MainWin_isPanelInLayout(_In_ MainWin* self, _In_opt_ strref name);
+// bool mainwinIsPanelInLayout(MainWin* self, strref name);
+#define mainwinIsPanelInLayout(self, name) MainWin_isPanelInLayout(MainWin(self), name)
+
 Ihandle* MainWin_createPlaceholder(_In_ MainWin* self);
 // Ihandle* mainwinCreatePlaceholder(MainWin* self);
 #define mainwinCreatePlaceholder(self) MainWin_createPlaceholder(MainWin(self))
@@ -116,8 +125,12 @@ int MainWin_onTimer(Ihandle* ih);
 
 // bool mainwinMake(MainWin* self);
 #define mainwinMake(self) (self)->_->make(MainWin(self))
+// void mainwinMakeMenu(MainWin* self);
+#define mainwinMakeMenu(self) (self)->_->makeMenu(MainWin(self))
 // void mainwinShow(MainWin* self);
 #define mainwinShow(self) (self)->_->show(MainWin(self))
+// void mainwinShowMenu(MainWin* self, int x, int y);
+#define mainwinShowMenu(self, x, y) (self)->_->showMenu(MainWin(self), x, y)
 // void mainwinUpdate(MainWin* self);
 #define mainwinUpdate(self) (self)->_->update(MainWin(self))
 // bool mainwinUpdatePanel(MainWin* self, strref name);

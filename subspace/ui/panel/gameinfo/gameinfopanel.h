@@ -40,6 +40,15 @@ typedef struct GameInfoPanel {
     Ihandle* parent;
     strref name;
     string title;
+    Ihandle* notrunning;
+    Ihandle* playbtn;
+    Ihandle* loading;
+    Ihandle* progressbar;
+    Ihandle* atmenu;
+    Ihandle* info;
+    Ihandle* zbox;
+    string loadpct;
+    Ihandle* cursub;
 } GameInfoPanel;
 extern ObjClassInfo GameInfoPanel_clsinfo;
 #define GameInfoPanel(inst) ((GameInfoPanel*)(unused_noeval((inst) && &((inst)->_is_GameInfoPanel)), (inst)))

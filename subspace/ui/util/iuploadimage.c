@@ -35,6 +35,10 @@ void iupLoadImage(Subspace* ss, strref iupname, strref driver, strref filename, 
 {
     ImageLoad* iload     = imageloadLoadFile(driver, ss->fs, filename);
     int dpi              = atoi(IupGetGlobal("SCREENDPI"));
+
+    if (!iload)
+        return;
+
     iload->preferred_dpi = (dpi > 0) ? dpi : 96;
 
     // Run it in the worker queue, but use a callback to dispatch the actual attribute setting back

@@ -34,3 +34,13 @@ DisasmTrace MainMenu_OnRender_trace = {
              &SYM(version_major),
              &SYM(freetype_easy_measurePrintLines) }
 };
+
+INITWRAP(MainMenu_Open);
+Symbol SYM(MainMenu_Open) = {
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+             { .type = SYMBOL_FIND_IMPORT, .name = "_ZN8MainMenu4OpenEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(MainMenu_Open) = { .nargs   = 1,
+                                     .stdcall = true,
+                                     .args    = { { 4, ARG_PTR, REG_ECX, false } } };

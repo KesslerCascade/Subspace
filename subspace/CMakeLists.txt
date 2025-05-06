@@ -49,9 +49,13 @@ set(SUBSPACE_SIDL
     ui/image/imageload.sidl
     ui/image/imageresample.sidl
     ui/page/optionspage.sidl
+    ui/page/features/optionsfeatures.sidl
     ui/page/setup/optionssetup.sidl
     ui/panel/panel.sidl
     ui/panel/gameinfo/gameinfopanel.sidl
+    ui/panel/notableevent/notableeventpanel.sidl
+    ui/panel/scrapgraph/scrapgraphpanel.sidl
+    ui/panel/sectordetail/sectordetailpanel.sidl
     ui/panel/welcome/welcomepanel.sidl
     ui/util/iupattrdispatch.sidl
     ui/util/iuprefreshdispatch.sidl
@@ -89,6 +93,7 @@ add_executable(subspace
     lang/langdb.c
     ui/mainwin.c
     ui/mainwinlayout.c
+    ui/mainwinmenu.c
     ui/optionswin.c
     ui/subspaceui.c
     ui/image/image.c
@@ -98,9 +103,13 @@ add_executable(subspace
     ui/image/drivers/imagepng.c
     ui/image/drivers/imagesvg.c
     ui/page/optionspage.c
+    ui/page/features/optionsfeatures.c
     ui/page/setup/optionssetup.c
     ui/panel/panel.c
     ui/panel/gameinfo/gameinfopanel.c
+    ui/panel/notableevent/notableeventpanel.c
+    ui/panel/scrapgraph/scrapgraphpanel.c
+    ui/panel/sectordetail/sectordetailpanel.c
     ui/panel/welcome/welcomepanel.c
     ui/util/iupattrdispatch.c
     ui/util/iuploadimage.c

@@ -1,6 +1,18 @@
 #include "ui/panel/panel.sidl"
 
 class GameInfoPanel extends Panel {
+    Ihandle *notrunning;
+    Ihandle *playbtn;
+    Ihandle *loading;
+    Ihandle *progressbar;
+    Ihandle *atmenu;
+    Ihandle *info;
+    Ihandle *zbox;
+
+    string loadpct;
+    Ihandle *cursub;
+
     factory create(SubspaceUI *ui);
     override make;
+    override update;
 }

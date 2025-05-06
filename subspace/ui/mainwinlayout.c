@@ -215,10 +215,9 @@ void MainWin_loadLayout(_In_ MainWin* self)
     // create default layout
 
     self->root = mainwinCreateSplit(self, true);
-    IupSetAttribute(self->root, "VALUE", "500");
 
     Ihandle* left = mainwinCreateSplit(self, false);
-    IupSetAttribute(left, "VALUE", "500");
+    IupSetAttribute(left, "VALUE", "400");
     Panel* panel;
     Ihandle* tab;
     if (htFind(self->panels, string, _S"gameinfo", object, &panel)) {
@@ -229,15 +228,37 @@ void MainWin_loadLayout(_In_ MainWin* self)
         tab = mainwinCreatePlaceholder(self);
     }
     IupAppend(left, tab);
-    IupAppend(left, mainwinCreatePlaceholder(self));
+
+    if (htFind(self->panels, string, _S"scrapgraph", object, &panel)) {
+        tab = mainwinCreateTabs(self);
+        IupAppend(tab, panel->h);
+        objRelease(&panel);
+
+        if (htFind(self->panels, string, _S"sectordetail", object, &panel)) {
+            IupAppend(tab, panel->h);
+            objRelease(&panel);
+        }
+    } else {
+        tab = mainwinCreatePlaceholder(self);
+    }
+    IupAppend(left, tab);
 
     Ihandle* right = mainwinCreateSplit(self, false);
     IupSetAttribute(right, "VALUE", "750");
-    IupAppend(right, mainwinCreatePlaceholder(self));
+
+    if (htFind(self->panels, string, _S"notableevent", object, &panel)) {
+        tab = mainwinCreateTabs(self);
+        IupAppend(tab, panel->h);
+        objRelease(&panel);
+    } else {
+        tab = mainwinCreatePlaceholder(self);
+    }
+    IupAppend(right, tab);
     IupAppend(right, mainwinCreatePlaceholder(self));
 
     IupAppend(self->root, left);
     IupAppend(self->root, right);
+    IupSetAttribute(self->root, "VALUE", "633");
 }
 
 static void saveLayoutNode(MainWin* self, SSDNode* node, Ihandle* in,
@@ -298,4 +319,32 @@ void MainWin_saveLayout(_In_ MainWin* self)
     if (!layout)
         return;
     saveLayoutNode(self, layout, self->root, NULL);
+}
+
+static bool findPanelNode(MainWin* self, Ihandle* in, strref name)
+{
+    const char* cls = NULL;
+    if (!in)
+        return false;
+    cls = IupGetClassName(in);
+    if (!strcmp(cls, "split")) {
+        if (findPanelNode(self, IupGetChild(in, 1), name))
+            return true;
+        if (findPanelNode(self, IupGetChild(in, 2), name))
+            return true;
+    } else if (cls && !strcmp(cls, "flattabs")) {
+        for (int i = 0; i < IupGetChildCount(in); i++) {
+            Ihandle* ci  = IupGetChild(in, i);
+            Panel* panel = ci ? iupGetObj(Panel, ci) : NULL;
+            if (panel && strEq(panel->name, name))
+                return true;
+        }
+    }
+
+    return false;
+}
+
+bool MainWin_isPanelInLayout(_In_ MainWin* self, _In_opt_ strref name)
+{
+    return findPanelNode(self, self->root, name);
 }

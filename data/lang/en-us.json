@@ -39,5 +39,21 @@
     "options_saveoverride_folder": "Save folder:",
     "options_saveoverride_browse": "Br&owse...",
     "options_saveoverride_browse_title": "Choose save file location",
-    "panel_gameinfo": "Game Info"
+    "panel_gameinfo": "Game Info",
+    "ftl_notrunning": "FTL is not running",
+    "ftl_howtoplay1": "You may use the",
+    "ftl_howtoplay2": "button to start it.",
+    "ftl_howtoplay3": "Or load historical data using the menu.",
+    "ftl_loading": "FTL is loading",
+    "ftl_progress": "Loading progress:",
+    "ftl_waitingforrun": "Waiting for run to begin",
+    "ftl_newgame": "To start a run, begin a new game or continue a saved game in FTL.",
+    "ftl_gopractice": "Alternatively, if the practice mode feature is enabled, you can load a practice save through the menu.",
+    "panel_notableevent": "Notable Events",
+    "panel_scrapgraph": "Scrap per Sector",
+    "panel_sectordetail": "Sector Detail",
+    "options_features": "Features",
+    "menu_exit": "E&xit",
+    "menu_about": "&About",
+    "menu_show": "&Show"
 }

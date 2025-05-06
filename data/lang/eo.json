@@ -39,5 +39,18 @@
     "options_saveoverride_folder": "Konservi dosierujon:",
     "options_saveoverride_browse": "Foli&umi...",
     "options_saveoverride_browse_title": "Elektu konservi dosierlokon",
-    "panel_gameinfo": "Ludinformoj"
+    "panel_gameinfo": "Ludinformoj",
+    "ftl_notrunning": "FTL ne funkcias",
+    "ftl_howtoplay1": "Vi povas uzi la butonon",
+    "ftl_howtoplay2": "por komenci ĝin.",
+    "ftl_howtoplay3": "Aŭ ŝargu historiajn datumojn per la menuo.",
+    "ftl_loading": "FTL ŝarĝiĝas",
+    "ftl_progress": "Ŝarĝa progreso:",
+    "ftl_waitingforrun": "Atendante la komencon de la kuro...",
+    "ftl_newgame": "Por komenci kuron, komencu novan ludon aŭ daŭrigu konservitan ludon en FTL.",
+    "ftl_gopractice": "Alternative, se la ekzercreĝimo estas ebligita, vi povas ŝargi ekzercan konservilon per la menuo.",
+    "panel_notableevent": "Rimarkindaj eventoj",
+    "panel_scrapgraph": "Scrap per Sector",
+    "panel_sectordetail": "Rubpeco po Sektoro",
+    "options_features": "Trajtoj"
 }
