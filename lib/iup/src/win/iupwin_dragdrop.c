@@ -1136,12 +1136,16 @@ void iupwinDestroyDragDrop(Ihandle* ih)
   IwinDropTarget* pDropTarget;
 
   Iarray* list = (Iarray*)iupAttribGet(ih, "_IUPWIN_DRAG_TYPES");
-  if (list)
+  if (list) {
     winDestroyTypesList(list);
+    iupAttribSet(ih, "_IUPWIN_DRAG_TYPES", NULL);
+  }
 
   list = (Iarray*)iupAttribGet(ih, "_IUPWIN_DROP_TYPES");
-  if (list)
+  if (list) {
     winDestroyTypesList(list);
+    iupAttribSet(ih, "_IUPWIN_DROP_TYPES", NULL);
+  }
 
   pDropTarget = (IwinDropTarget*)iupAttribGet(ih, "_IUPWIN_DROPTARGET");
   if (pDropTarget)
