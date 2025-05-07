@@ -12,6 +12,7 @@ static MainWin_ClassIf _impl_MainWin_MainWin_ClassIf = {
     .makeMenu = (void (*)(void*))MainWin_makeMenu,
     .show = (void (*)(void*))MainWin_show,
     .showMenu = (void (*)(void*, int, int))MainWin_showMenu,
+    .showLayoutMenu = (void (*)(void*, Ihandle*, Ihandle*, int, int))MainWin_showLayoutMenu,
     .update = (void (*)(void*))MainWin_update,
     .updatePanel = (bool (*)(void*, strref))MainWin_updatePanel,
     .updateAll = (void (*)(void*))MainWin_updateAll,

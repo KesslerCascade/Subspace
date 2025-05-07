@@ -12,6 +12,7 @@ class MainWin {
 
     Ihandle *win;
     Ihandle *sidebar;
+    Ihandle *menubtn;
     Ihandle *playbtn;
     Ihandle *zbox;
     Ihandle *root;          // root of dynamic layout
@@ -20,8 +21,7 @@ class MainWin {
 
     Ihandle *menu;          // hamburger menu
 
-    Ihandle *showpanelmenu;    // submenu
-    Ihandle *showpanelsep;     // separator so it can be hidden
+    Ihandle *layoutmenu;    // right-click context menu for tabs / placeholders
 
     hashtable:string:object panels;  // all panels (except welcome)
     object:Panel welcomepanel;
@@ -29,7 +29,8 @@ class MainWin {
     bool make();
     [extern] void makeMenu();
     void show();
-    [extern] void showMenu(int x, int y);
+    [extern] void showMenu(int mx, int my);
+    [extern] void showLayoutMenu(Ihandle *tabparent, Ihandle *ih, int mx, int my);
     void update();
     bool updatePanel(strref name);
     void updateAll();
@@ -41,7 +42,11 @@ class MainWin {
     [extern] unbound Ihandle *createPlaceholder();
     [extern] unbound Ihandle *createTabs();
     [extern] unbound Ihandle *createSplit(bool vertical);
-    [extern] unbound void replaceSplitChild(Ihandle* split, Ihandle* oh, Ihandle* nh);
+    [extern] unbound void replaceSplitChild(Ihandle* split, Ihandle* oh, Ihandle* nh, bool destroy);
+    [extern] unbound void addTab(Ihandle *attachto, Ihandle *addbefore, strref name);
+    [extern] unbound void removeTab(Ihandle *tabparent, Ihandle *toremove);
+    [extern] unbound void addSplit(Ihandle *at, bool vertical);
+    [extern] unbound void removePlaceholder(Ihandle *ph);   // deletes the parent split
 
     int width;
     int height;

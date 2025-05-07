@@ -2,7 +2,7 @@
 #include "ui/util/iupsetobj.h"
 #include "mainwin.h"
 
-static int split_valuechange(Ihandle *ih)
+static int split_valuechange(Ihandle* ih)
 {
     MainWin* mainwin = iupGetParentObj(MainWin, ih);
     if (!mainwin)
@@ -18,6 +18,7 @@ Ihandle* MainWin_createSplit(_In_ MainWin* self, bool vertical)
     Ihandle* ret = IupSplit(NULL, NULL);
     IupSetAttribute(ret, "ORIENTATION", vertical ? "VERTICAL" : "HORIZONTAL");
     IupSetAttribute(ret, "ORIGORIENTATION", vertical ? "VERTICAL" : "HORIZONTAL");
+    IupSetAttribute(ret, "VALUE", "500");
     IupSetAttribute(ret, "MINMAX", "200:800");
     IupSetAttribute(ret, "COLOR", "128 128 128");
     IupSetAttribute(ret, "BARSIZE", "4");
@@ -51,28 +52,75 @@ static int tab_dragdata(Ihandle* ih, char* type, void* data, int size)
     return IUP_IGNORE;
 }
 
+static int tab_rightclick(Ihandle* ih, int pos)
+{
+    Ihandle* tab   = IupGetChild(ih, pos);
+    SubspaceUI* ui = iupGetUI(ih);
+    if (ui && tab) {
+        int mx, my;
+        IupGetIntInt(NULL, "CURSORPOS", &mx, &my);
+        mainwinShowLayoutMenu(ui->main, ih, tab, mx, my);
+    }
+
+    return IUP_DEFAULT;
+}
+
+static int placeholder_buttoncb(Ihandle* ih, int button, int pressed, int x, int y, char* status)
+{
+    SubspaceUI* ui = iupGetUI(ih);
+    if (ui && button == IUP_BUTTON3 && pressed == 0) {
+        int mx, my;
+        IupGetIntInt(NULL, "CURSORPOS", &mx, &my);
+        mainwinShowLayoutMenu(ui->main, NULL, ih, mx, my);
+    }
+
+    return IUP_DEFAULT;
+}
+
 typedef int (*iftcxytp_t)(Ihandle* ih, int x, int y);
 
-void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh)
+void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh,
+                               bool destroy)
 {
+    // special handling for if this is actually the root and not a child of a split.
+    // better to do it here than duplicate it everywhere.
+    if (split == self->zbox) {
+        devAssert(oh == self->root);
+
+        if (destroy)
+            IupDestroy(oh);
+        else
+            IupDetach(oh);
+        IupAppend(split, nh);
+        IupMap(nh);
+
+        self->root = nh;
+        IupSetAttributeHandle(self->zbox, "VALUE", self->root);
+        IupRefresh(self->root);
+        return;
+    }
+
     int oldpos = IupGetChildPos(split, oh);
     iupSetObj(nh, ObjNone, self, self->ui);
     if (oldpos == 1) {
         // have to do some fancy footwork to keep the ordering correct
-        IupDetach(oh);
-        IupDestroy(oh);
+        if (destroy)
+            IupDestroy(oh);
+        else
+            IupDetach(oh);
         Ihandle* p1 = IupGetChild(split, 1);
         IupInsert(split, p1, nh);
         IupMap(nh);
-        IupRefresh(split);
     } else {
         // can just remove and append
-        IupDetach(oh);
-        IupDestroy(oh);
+        if (destroy)
+            IupDestroy(oh);
+        else
+            IupDetach(oh);
         IupAppend(split, nh);
         IupMap(nh);
-        IupRefresh(split);
     }
+    IupRefresh(split);
 }
 
 static int tab_dropdata(Ihandle* ih, char* type, void* data, int size, int x, int y)
@@ -99,7 +147,7 @@ static int tab_dropdata(Ihandle* ih, char* type, void* data, int size, int x, in
     } else if (!strcmp(cls, "backgroundbox")) {
         // destination is a placeholder, need to delete it and replace with tabs
         Ihandle* tabs = mainwinCreateTabs(mainwin);
-        mainwinReplaceSplitChild(mainwin, IupGetParent(ih), ih, tabs);
+        mainwinReplaceSplitChild(mainwin, IupGetParent(ih), ih, tabs, true);
         IupReparent(mtab, tabs, NULL);
         IupRefresh(tabs);
         ih = tabs;
@@ -108,7 +156,7 @@ static int tab_dropdata(Ihandle* ih, char* type, void* data, int size, int x, in
     // if the source is empty now, replace it with a placeholder
     if (IupGetChildCount(origparent) == 0) {
         Ihandle* ph = mainwinCreatePlaceholder(mainwin);
-        mainwinReplaceSplitChild(mainwin, IupGetParent(origparent), origparent, ph);
+        mainwinReplaceSplitChild(mainwin, IupGetParent(origparent), origparent, ph, true);
     }
 
     mainwinSetLayoutDirty(mainwin);
@@ -132,6 +180,7 @@ Ihandle* MainWin_createTabs(_In_ MainWin* self)
     IupSetCallback(tab, "DRAGDATASIZE_CB", (Icallback)tab_dragdatasize);
     IupSetCallback(tab, "DRAGDATA_CB", (Icallback)tab_dragdata);
     IupSetCallback(tab, "DROPDATA_CB", (Icallback)tab_dropdata);
+    IupSetCallback(tab, "RIGHTCLICK_CB", (Icallback)tab_rightclick);
     iupSetObj(tab, ObjNone, self, self->ui);
     return tab;
 }
@@ -144,6 +193,7 @@ Ihandle* MainWin_createPlaceholder(_In_ MainWin* self)
     IupSetAttribute(ih, "DROPTARGET", "YES");
     IupSetAttribute(ih, "DROPTYPES", "TABDATA");
     IupSetCallback(ih, "DROPDATA_CB", (Icallback)tab_dropdata);
+    IupSetCallback(ih, "BUTTON_CB", (Icallback)placeholder_buttoncb);
     iupSetObj(ih, ObjNone, self, self->ui);
     return ih;
 }
@@ -276,7 +326,7 @@ static void saveLayoutNode(MainWin* self, SSDNode* node, Ihandle* in,
             if (orientstr && !strcmp(orientstr, "VERTICAL"))
                 ssdSet(node, _S"vertical", false, stvar(bool, true));
 
-            int size     = IupGetInt(in, "VALUE");
+            int size = IupGetInt(in, "VALUE");
             if (size > 0)
                 ssdSet(node, _S"size", false, stvar(int32, size));
 
@@ -347,4 +397,82 @@ static bool findPanelNode(MainWin* self, Ihandle* in, strref name)
 bool MainWin_isPanelInLayout(_In_ MainWin* self, _In_opt_ strref name)
 {
     return findPanelNode(self, self->root, name);
+}
+
+void MainWin_addTab(_In_ MainWin* self, Ihandle* attachto, Ihandle* addbefore, _In_opt_ strref name)
+{
+    const char* cls = IupGetClassName(attachto);
+    Panel* panel    = NULL;
+
+    htFind(self->panels, strref, name, object, &panel);
+
+    if (panel && IupGetParent(panel->h) == NULL) {
+        if (!strcmp(cls, "flattabs")) {
+            IupInsert(attachto, addbefore, panel->h);
+        } else if (!strcmp(cls, "backgroundbox")) {
+            // swap out placeholder for tabs
+            Ihandle* tabs = mainwinCreateTabs(self);
+            IupAppend(tabs, panel->h);
+            mainwinReplaceSplitChild(self, IupGetParent(attachto), attachto, tabs, true);
+        }
+    }
+
+    IupMap(panel->h);
+    IupRefresh(panel->h);
+    mainwinSetLayoutDirty(self);
+
+    objRelease(&panel);
+
+    return;
+}
+
+void MainWin_removeTab(_In_ MainWin* self, Ihandle* tabparent, Ihandle* toremove)
+{
+    IupDetach(toremove);
+
+    // if the parent is empty now, replace it with a placeholder
+    if (IupGetChildCount(tabparent) == 0) {
+        Ihandle* ph = mainwinCreatePlaceholder(self);
+        mainwinReplaceSplitChild(self, IupGetParent(tabparent), tabparent, ph, true);
+    }
+
+    mainwinSetLayoutDirty(self);
+
+    return;
+}
+
+void MainWin_addSplit(_In_ MainWin* self, Ihandle* at, bool vertical)
+{
+    Ihandle* parent = IupGetParent(at);
+    Ihandle* nsplit = mainwinCreateSplit(self, vertical);
+
+    mainwinReplaceSplitChild(self, parent, at, nsplit, false);
+    IupAppend(nsplit, at);
+    Ihandle* ph = mainwinCreatePlaceholder(self);
+    IupAppend(nsplit, ph);
+    IupMap(at);
+    IupMap(ph);
+    IupRefresh(nsplit);
+    mainwinSetLayoutDirty(self);
+
+    return;
+}
+
+void MainWin_removePlaceholder(_In_ MainWin* self, Ihandle* ph)
+{
+    Ihandle* parent = IupGetParent(ph);   // this is the split we're deleting
+
+    if (ph == self->root)
+        return;   // not valid to remove the last placeholder
+
+    IupDestroy(ph);
+    Ihandle* other = IupGetChild(parent, 1);
+    if (!other)
+        return;   // shouldn't happen?
+
+    IupDetach(other);
+    mainwinReplaceSplitChild(self, IupGetParent(parent), parent, other, true);
+    mainwinSetLayoutDirty(self);
+
+    return;
 }

@@ -27,7 +27,8 @@ typedef struct MainWin_ClassIf {
     bool (*make)(_In_ void* self);
     void (*makeMenu)(_In_ void* self);
     void (*show)(_In_ void* self);
-    void (*showMenu)(_In_ void* self, int x, int y);
+    void (*showMenu)(_In_ void* self, int mx, int my);
+    void (*showLayoutMenu)(_In_ void* self, Ihandle* tabparent, Ihandle* ih, int mx, int my);
     void (*update)(_In_ void* self);
     bool (*updatePanel)(_In_ void* self, _In_opt_ strref name);
     void (*updateAll)(_In_ void* self);
@@ -50,14 +51,14 @@ typedef struct MainWin {
     SubspaceUI* ui;
     Ihandle* win;
     Ihandle* sidebar;
+    Ihandle* menubtn;
     Ihandle* playbtn;
     Ihandle* zbox;
     Ihandle* root;        // root of dynamic layout
     Ihandle* timer;
     uint32 activeInst;        // cookie of game instance that's being tracked through the UI
     Ihandle* menu;        // hamburger menu
-    Ihandle* showpanelmenu;        // submenu
-    Ihandle* showpanelsep;        // separator so it can be hidden
+    Ihandle* layoutmenu;        // right-click context menu for tabs / placeholders
     hashtable panels;        // all panels (except welcome)
     Panel* welcomepanel;
     int width;
@@ -107,9 +108,27 @@ Ihandle* MainWin_createSplit(_In_ MainWin* self, bool vertical);
 // Ihandle* mainwinCreateSplit(MainWin* self, bool vertical);
 #define mainwinCreateSplit(self, vertical) MainWin_createSplit(MainWin(self), vertical)
 
-void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh);
-// void mainwinReplaceSplitChild(MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh);
-#define mainwinReplaceSplitChild(self, split, oh, nh) MainWin_replaceSplitChild(MainWin(self), split, oh, nh)
+void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh, bool destroy);
+// void mainwinReplaceSplitChild(MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh, bool destroy);
+#define mainwinReplaceSplitChild(self, split, oh, nh, destroy) MainWin_replaceSplitChild(MainWin(self), split, oh, nh, destroy)
+
+void MainWin_addTab(_In_ MainWin* self, Ihandle* attachto, Ihandle* addbefore, _In_opt_ strref name);
+// void mainwinAddTab(MainWin* self, Ihandle* attachto, Ihandle* addbefore, strref name);
+#define mainwinAddTab(self, attachto, addbefore, name) MainWin_addTab(MainWin(self), attachto, addbefore, name)
+
+void MainWin_removeTab(_In_ MainWin* self, Ihandle* tabparent, Ihandle* toremove);
+// void mainwinRemoveTab(MainWin* self, Ihandle* tabparent, Ihandle* toremove);
+#define mainwinRemoveTab(self, tabparent, toremove) MainWin_removeTab(MainWin(self), tabparent, toremove)
+
+void MainWin_addSplit(_In_ MainWin* self, Ihandle* at, bool vertical);
+// void mainwinAddSplit(MainWin* self, Ihandle* at, bool vertical);
+#define mainwinAddSplit(self, at, vertical) MainWin_addSplit(MainWin(self), at, vertical)
+
+void MainWin_removePlaceholder(_In_ MainWin* self, Ihandle* ph);
+// void mainwinRemovePlaceholder(MainWin* self, Ihandle* ph);
+//
+// deletes the parent split
+#define mainwinRemovePlaceholder(self, ph) MainWin_removePlaceholder(MainWin(self), ph)
 
 int MainWin_onClose(Ihandle* ih);
 // int mainwinOnClose(Ihandle* ih);
@@ -129,8 +148,10 @@ int MainWin_onTimer(Ihandle* ih);
 #define mainwinMakeMenu(self) (self)->_->makeMenu(MainWin(self))
 // void mainwinShow(MainWin* self);
 #define mainwinShow(self) (self)->_->show(MainWin(self))
-// void mainwinShowMenu(MainWin* self, int x, int y);
-#define mainwinShowMenu(self, x, y) (self)->_->showMenu(MainWin(self), x, y)
+// void mainwinShowMenu(MainWin* self, int mx, int my);
+#define mainwinShowMenu(self, mx, my) (self)->_->showMenu(MainWin(self), mx, my)
+// void mainwinShowLayoutMenu(MainWin* self, Ihandle* tabparent, Ihandle* ih, int mx, int my);
+#define mainwinShowLayoutMenu(self, tabparent, ih, mx, my) (self)->_->showLayoutMenu(MainWin(self), tabparent, ih, mx, my)
 // void mainwinUpdate(MainWin* self);
 #define mainwinUpdate(self) (self)->_->update(MainWin(self))
 // bool mainwinUpdatePanel(MainWin* self, strref name);

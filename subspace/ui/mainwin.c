@@ -100,19 +100,8 @@ static int menubtn_action(Ihandle* ih)
 {
     MainWin* win = iupGetParentObj(MainWin, ih);
     if (win) {
-        int x, y, w, h, mx, my;
-        IupGetIntInt(ih, "SCREENPOSITION", &x, &y);
-        IupGetIntInt(ih, "RASTERSIZE", &w, &h);
+        int mx, my;
         IupGetIntInt(NULL, "CURSORPOS", &mx, &my);
-
-        // If the mouse cursor is within the button, use that.
-        // Otherwise pop up the menu in the center of the button,
-        // i.e. if it was activated using the keyboard.
-
-        if (mx < x || mx > x + w || my < y || my > y + h) {
-            mx = x + w / 2;
-            my = y + h / 2;
-        }
         mainwinShowMenu(win, mx, my);
     }
     return IUP_DEFAULT;
@@ -133,16 +122,16 @@ bool MainWin_make(_In_ MainWin* self)
     }
     panelMake(self->welcomepanel);
 
-    Ihandle* hamburger = IupFlatButton(NULL);
-    IupSetAttribute(hamburger, "IMAGE", "IMAGE_HAMBURGER");
-    IupSetAttribute(hamburger, "IMAGEHIGHLIGHT", "IMAGE_HAMBURGER_HOVER");
-    IupSetAttribute(hamburger, "HLCOLOR", NULL);
-    IupSetAttribute(hamburger, "PSCOLOR", NULL);
-    IupSetAttribute(hamburger, "BORDERWIDTH", "0");
-    IupSetAttribute(hamburger, "TIP", langGetC(self->ss, _S"hamburger_tip"));
-    iupSetObj(hamburger, ObjNone, self, self->ui);
-    IupSetCallback(hamburger, "FLAT_ACTION", menubtn_action);
-    iupLoadImage(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", hamburger);
+    self->menubtn = IupFlatButton(NULL);
+    IupSetAttribute(self->menubtn, "IMAGE", "IMAGE_HAMBURGER");
+    IupSetAttribute(self->menubtn, "IMAGEHIGHLIGHT", "IMAGE_HAMBURGER_HOVER");
+    IupSetAttribute(self->menubtn, "HLCOLOR", NULL);
+    IupSetAttribute(self->menubtn, "PSCOLOR", NULL);
+    IupSetAttribute(self->menubtn, "BORDERWIDTH", "0");
+    IupSetAttribute(self->menubtn, "TIP", langGetC(self->ss, _S"hamburger_tip"));
+    iupSetObj(self->menubtn, ObjNone, self, self->ui);
+    IupSetCallback(self->menubtn, "FLAT_ACTION", menubtn_action);
+    iupLoadImage(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", self->menubtn);
     iupLoadImage(self->ss, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
 
     Ihandle* options = IupFlatButton(NULL);
@@ -175,7 +164,7 @@ bool MainWin_make(_In_ MainWin* self)
                  _S"subspace:/play-disabled.svg",
                  self->playbtn);
 
-    self->sidebar = IupVbox(hamburger, self->playbtn, options, NULL);
+    self->sidebar = IupVbox(self->menubtn, self->playbtn, options, NULL);
     IupSetAttribute(self->sidebar, "CGAP", "2");
     IupSetAttribute(self->sidebar, "NCMARGIN", "2x2");
 
@@ -280,9 +269,12 @@ void MainWin_finish(_In_ MainWin* self)
         IupDestroy(self->timer);
     if (self->menu)
         IupDestroy(self->menu);
+    if (self->layoutmenu)
+        IupDestroy(self->layoutmenu);
     self->win   = NULL;
     self->timer = NULL;
     self->menu  = NULL;
+    self->layoutmenu = NULL;
 }
 
 void MainWin_destroy(_In_ MainWin* self)
@@ -343,13 +335,18 @@ void MainWin_setLayoutDirty(_In_ MainWin* self)
 
 // Autogen begins -----
 void MainWin_makeMenu(_In_ MainWin* self);
-void MainWin_showMenu(_In_ MainWin* self, int x, int y);
+void MainWin_showMenu(_In_ MainWin* self, int mx, int my);
+void MainWin_showLayoutMenu(_In_ MainWin* self, Ihandle* tabparent, Ihandle* ih, int mx, int my);
 void MainWin_loadLayout(_In_ MainWin* self);
 void MainWin_saveLayout(_In_ MainWin* self);
 bool MainWin_isPanelInLayout(_In_ MainWin* self, _In_opt_ strref name);
 Ihandle* MainWin_createPlaceholder(_In_ MainWin* self);
 Ihandle* MainWin_createTabs(_In_ MainWin* self);
 Ihandle* MainWin_createSplit(_In_ MainWin* self, bool vertical);
-void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh);
+void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh, bool destroy);
+void MainWin_addTab(_In_ MainWin* self, Ihandle* attachto, Ihandle* addbefore, _In_opt_ strref name);
+void MainWin_removeTab(_In_ MainWin* self, Ihandle* tabparent, Ihandle* toremove);
+void MainWin_addSplit(_In_ MainWin* self, Ihandle* at, bool vertical);
+void MainWin_removePlaceholder(_In_ MainWin* self, Ihandle* ph);
 #include "mainwin.auto.inc"
 // Autogen ends -------
