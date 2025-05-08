@@ -1,6 +1,7 @@
 #include "ftl/stdlib.h"
 
 #include "feature/feature.h"
+#include "feature/timewarp.h"
 #include "ftl/cfps.h"
 #include "ftl/globals.h"
 #include "ftl/graphics/colors.h"
@@ -38,7 +39,13 @@ void infoBlockRender(void)
     y  = sz.y;
     basic_string_destroy(&tmp);
 
-    snprintf(buf, sizeof(buf), "FPS: %d", CFPS_fps(FPSControl));
+    // if we're time warping, the calculated FPS will include dummy frames that aren't actually
+    // rendered
+    if (TimeWarp_feature.enabled && gs.timeWarpActive && gs.warpFactor > 1) {
+        snprintf(buf, sizeof(buf), "FPS: %d (%d)", gs.lastRender1s, gs.lastFrame1s);
+    } else {
+        snprintf(buf, sizeof(buf), "FPS: %d", gs.lastRender1s);
+    }
     basic_string_set(&tmp, buf);
     sz = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
     y  = sz.y;

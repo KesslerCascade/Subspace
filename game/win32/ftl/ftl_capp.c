@@ -299,6 +299,9 @@ Symbol SYM(CApp_OnRender) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp8OnRenderEv" },
              { 0 } }
 };
+FuncInfo FUNCINFO(CApp_OnRender) = { .nargs   = 1,
+                                     .stdcall = true,
+                                     .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
 DisasmTrace CApp_OnKeyDown_trace = {
     .c    = DTRACE_ADDR,

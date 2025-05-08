@@ -7,6 +7,7 @@ typedef struct TextLibrary TextLibrary;
 typedef struct ResourceControl ResourceControl;
 
 DECLSYM(opt_framelimit);
+#define g_opt_framelimit (*(char*)symAddr(ftlbase, opt_framelimit))
 
 DECLSYM(Globals_Library);
 #define g_Library ((TextLibrary*)symAddr(ftlbase, Globals_Library))

@@ -95,6 +95,7 @@ add_executable(subspacegame
     hook/capp/capp_onexecute.c
     hook/capp/capp_onkeydown.c
     hook/capp/capp_onloop.c
+    hook/capp/capp_onrender.c
     hook/cfps/cfps_onloop.c
     hook/cfps/cfps_targetframetime.c
     hook/combatcontrol/combatcontrol_rendertarget.c

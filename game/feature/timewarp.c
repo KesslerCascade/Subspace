@@ -17,17 +17,20 @@ static int warpFrames;
 
 static double warpTime;
 static double realTime;
+static double avgFrameMS;   // milliseconds per frame, averaged over the last several frames
 
 static float colorTimer     = 0;
 static float animationTimer = 0;
 static float fadeTimer      = 16;
+
+static char savedFrameLimit;   // whether frame limiter was on or off when time warp began
 
 static const GL_Color warpTextColors[2] = {
     { 1, 0.715, 0, 1   },
     { 1, 0.898, 0, 0.9 }
 };
 
-#define MAX_WARP_FACTOR 16
+#define MAX_WARP_FACTOR 32
 #define MIN_WARP_FACTOR 0.125
 
 #define TIMEWARP_FONT         24
@@ -62,6 +65,8 @@ bool timeWarpBegin()
     if (gs.timeWarpActive)
         return true;
 
+    savedFrameLimit = g_opt_framelimit;   // save frame limiter state in case we need to change it
+
     gs.timeWarpActive = true;
     gs.warpFactor     = 1;
     fadeTimer         = 0;
@@ -80,6 +85,13 @@ bool timeWarpIncrease()
 
     if (gs.warpFactor > 0.99 && gs.warpFactor < 1.01)
         timeWarpEnd();
+
+    // Warp factors > 1 use frameskip warp which REQUIRES that the frame limiter be enabled.
+    // Otherwise if vsync is on, there will be a burst of frames at the maximum rate, then a long
+    // pause waiting for vsync. This causes CFPS calculation to get all screwed up and advance
+    // the time step far slower than it should.
+    if (gs.warpFactor > 1)
+        g_opt_framelimit = 1;
 
     if (fadeTimer > 16)
         fadeTimer = 2;
@@ -110,6 +122,8 @@ void timeWarpEnd()
     if (!gs.timeWarpActive)
         return;
 
+    g_opt_framelimit = savedFrameLimit;
+
     gs.timeWarpActive   = false;
     gs.warpFactor       = 1;
     gs.warpFactorActual = 1;
@@ -125,7 +139,7 @@ float timeWarpAdjustSpeedFactor(float orig)
     float speedFactor = MIN(orig * gs.warpFactor, 0.5);
 
     warpFrames++;
-    int warpFrameCheck = MAX((int)(5 * gs.warpFactor), 5);
+    int warpFrameCheck = MAX((int)(2 * gs.warpFactor), 5);
 
     // calculate the actual warp factor based on real time elapsed vs advanced game time,
     // but don't do it every frame because GetTime calls QueryPerformanceCounter a couple times
@@ -144,12 +158,12 @@ float timeWarpAdjustSpeedFactor(float orig)
             double frameTimeAdj   = 0;
             double idealFrameTime = MIN(baseFrameTime / gs.warpFactor, baseFrameTime);
 
-            gs.avgFrameMS = frameTime /
+            avgFrameMS = frameTime /
                 (double)warpFrameCheck;   // actually the average over the last few frames
-            if (gs.avgFrameMS > idealFrameTime * 1.02)
-                frameTimeAdj = -gs.avgFrameMS / 1000;
-            else if (gs.avgFrameMS < idealFrameTime * 0.98)
-                frameTimeAdj = gs.avgFrameMS / 1000;
+            if (avgFrameMS > idealFrameTime * 1.02)
+                frameTimeAdj = -avgFrameMS / 1000;
+            else if (avgFrameMS < idealFrameTime * 0.98)
+                frameTimeAdj = avgFrameMS / 1000;
 
             g_TargetFrameTimeMS = MAX(MIN(g_TargetFrameTimeMS + frameTimeAdj, baseFrameTime), 0);
         }
@@ -175,11 +189,17 @@ void timeWarpRender()
     if (gs.timeWarpActive || fadeTimer < 16) {
         float speedFactorReal = CFPS_SpeedFactor(FPSControl);
 
+        // In time warps > 1 we're also frame skipping, so timeWarpRender wlil be called less often,
+        // and we need to adjust for that
+        if (gs.warpFactor > 1)
+            speedFactorReal *= (int)gs.warpFactor;
+
         if (gs.timeWarpActive)
             animationTimer += speedFactorReal;   // animation takes warp factor into account!
 
         if (gs.warpFactor > 0.1) {
-            speedFactorReal /= gs.warpFactor;
+            speedFactorReal /= gs.warpFactor;   // cancel out the warp factor for color & fade
+                                                // timers
         }
 
         colorTimer += speedFactorReal;
@@ -265,20 +285,15 @@ static bool timeWarp_Patch(SubspaceFeature* feat, void* settings, PatchState* ps
 static bool timeWarp_Enable(SubspaceFeature* feat, void* settings, bool enabled)
 {
     if (!enabled)
-        gs.frameAdvStep = false;
+        timeWarpEnd();
 
     return enabled;
 }
 
-Patch* TimeWarp_patches[] = {
-    &patch_CFPS_OnLoop,
-    &patch_CFPS_TargetFrameTime,
-    &patch_MouseControl_OnRender,
-    &patch_CommandGui_KeyDown,
-    &patch_CommandGui_OnLoop,
-    &patch_ShipStatus_OnRender,
-    0
-};
+Patch* TimeWarp_patches[] = { &patch_CFPS_OnLoop,           &patch_CFPS_TargetFrameTime,
+                              &patch_MouseControl_OnRender, &patch_CommandGui_KeyDown,
+                              &patch_CommandGui_OnLoop,     &patch_ShipStatus_OnRender,
+                              &patch_CApp_OnRender,         0 };
 
 SubspaceFeature TimeWarp_feature = {
     .name            = "TimeWarp",

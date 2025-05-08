@@ -74,7 +74,13 @@ typedef struct GameGlobalState {
     bool timeWarpActive;
     float warpFactor;
     float warpFactorActual;   // set by CFPS if we're capped due to framerate
-    double avgFrameMS;        // milliseconds per frame, averaged over the last several frames
+
+    double countStart;
+    int frameCount;     // number of frames procesed since countStart
+    int renderCount;    // number of frames rendered since countStart
+
+    int lastFrame1s;    // number of frames processed in the previous second
+    int lastRender1s;   // number of frames rendered in the previous second
 } GameGlobalState;
 
 extern SubspaceGameSettings settings;
