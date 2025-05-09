@@ -3,7 +3,7 @@
 // Do not modify the contents of this section; any changes will be lost!
 SetupPage_ClassIf SetupPage_ClassIf_tmpl = {
     ._size = sizeof(SetupPage_ClassIf),
-    ._parent = (ObjIface*)&OptionsPage_ClassIf_tmpl,
+    ._parent = (ObjIface*)&SettingsPage_ClassIf_tmpl,
 };
 
 static SetupPage_ClassIf _impl_SetupPage_SetupPage_ClassIf = {
@@ -21,7 +21,7 @@ static ObjIface* _ifimpl_SetupPage[] = {
 ObjClassInfo SetupPage_clsinfo = {
     .instsize = sizeof(SetupPage),
     .classif = (ObjIface*)&SetupPage_ClassIf_tmpl,
-    .parent = &OptionsPage_clsinfo,
+    .parent = &SettingsPage_clsinfo,
     .init = (bool(*)(void*))SetupPage_init,
     .destroy = (void(*)(void*))SetupPage_destroy,
     .ifimpl = _ifimpl_SetupPage,

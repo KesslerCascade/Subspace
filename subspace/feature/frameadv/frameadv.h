@@ -5,8 +5,8 @@
 #include <cx/obj.h>
 #include "feature/feature.h"
 
-typedef struct OptionsPage OptionsPage;
-typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
+typedef struct SettingsPage SettingsPage;
+typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct FrameAdv FrameAdv;
 typedef struct FrameAdv_WeakRef FrameAdv_WeakRef;
 saDeclarePtr(FrameAdv);
@@ -17,7 +17,8 @@ typedef struct FrameAdv_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
-    OptionsPage* (*getOptions)(_In_ void* self);
+    SettingsPage* (*getSettingsPage)(_In_ void* self);
+    void (*enable)(_In_ void* self, bool enabled);
 } FrameAdv_ClassIf;
 extern FrameAdv_ClassIf FrameAdv_ClassIf_tmpl;
 
@@ -38,6 +39,7 @@ typedef struct FrameAdv {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    hashtable settings;        // Settings that are synchronized with the game client
 } FrameAdv;
 extern ObjClassInfo FrameAdv_clsinfo;
 #define FrameAdv(inst) ((FrameAdv*)(unused_noeval((inst) && &((inst)->_is_FrameAdv)), (inst)))
@@ -59,6 +61,8 @@ _objfactory_guaranteed FrameAdv* FrameAdv_create(Subspace* ss);
 // FrameAdv* frameadvCreate(Subspace* ss);
 #define frameadvCreate(ss) FrameAdv_create(ss)
 
-// OptionsPage* frameadvGetOptions(FrameAdv* self);
-#define frameadvGetOptions(self) (self)->_->getOptions(FrameAdv(self))
+// SettingsPage* frameadvGetSettingsPage(FrameAdv* self);
+#define frameadvGetSettingsPage(self) (self)->_->getSettingsPage(FrameAdv(self))
+// void frameadvEnable(FrameAdv* self, bool enabled);
+#define frameadvEnable(self, enabled) (self)->_->enable(FrameAdv(self), enabled)
 

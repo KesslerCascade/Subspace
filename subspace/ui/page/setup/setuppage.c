@@ -6,13 +6,13 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "optionssetup.h"
+#include "setuppage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
 #include "feature/featureregistry.h"
 #include "gamemgr/gamemgr.h"
-#include "ui/optionswin.h"
+#include "ui/settingswin.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
@@ -27,7 +27,7 @@ _objfactory_guaranteed SetupPage* SetupPage_create(SubspaceUI* ui)
     self->visible = true;
 
     self->name = _S"setup";
-    strDup(&self->title, langGet(self->ss, _S"options_setup"));
+    strDup(&self->title, langGet(self->ss, _S"settings_setup"));
     strDup(&self->imgname, _S"IMAGE_WRENCH_SMALL_BLACK");
     objInstInit(self);
     return self;
@@ -50,9 +50,9 @@ static void setCompatState(SetupPage* gp, strref state)
 {
     string tmp = 0;
 
-    strConcat(&tmp, _S"options_ftl_compat_", state);
+    strConcat(&tmp, _S"settings_ftl_compat_", state);
     IupSetAttribute(gp->ftlcompatlabel, "TITLE", langGetC(gp->ss, tmp));
-    strNConcat(&tmp, _S"options_ftl_compat_", state, _S"_tip");
+    strNConcat(&tmp, _S"settings_ftl_compat_", state, _S"_tip");
     setTip(gp->ftlcompatlabel, langGet(gp->ss, tmp), NULL, 0);
     setTip(gp->ftlcompatimg, langGet(gp->ss, tmp), NULL, 0);
     strConcat(&tmp, _S"IMAGE_COMPAT_", state);
@@ -78,7 +78,7 @@ static int langselect_change(Ihandle* ih, char* text, int item, int state)
         ssdSet(gp->ss->settings, _S"ui/lang", true, stvar(string, gp->langids.a[item - 1]));
 
         Ihandle* imsg = IupMessageDlg();
-        IupSetAttributeHandle(imsg, "PARENTDIALOG", gp->ss->ui->options->win);
+        IupSetAttributeHandle(imsg, "PARENTDIALOG", gp->ss->ui->settingsw->win);
         IupSetAttribute(imsg, "BUTTONS", "YESNO");
         IupSetAttribute(imsg, "DIALOGTYPE", "QUESTION");
         IupSetAttribute(imsg, "TITLE", langGetC(gp->ss, _S"langconfirm_title"));
@@ -104,7 +104,7 @@ static int browseforftl(Ihandle* ih)
         return IUP_IGNORE;
 
     Ihandle* idlg = IupFileDlg();
-    IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->options->win);
+    IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->settingsw->win);
     IupSetAttribute(idlg, "DIALOGTYPE", "OPEN");
     IupSetAttribute(idlg, "FILTER", "*.exe");
     IupSetAttribute(idlg, "FILTERINFO", langGetC(gp->ss, _S"exe_files"));
@@ -124,7 +124,7 @@ static int browseforftl(Ihandle* ih)
         gmgrReg(gp->ss->gmgr, gp->validateinst);
         bool ret = ginstLaunch(gp->validateinst);
 
-        IupSetAttribute(gp->ftlver, "TITLE", langGetC(gp->ss, _S"options_ftl_ver_unknown"));
+        IupSetAttribute(gp->ftlver, "TITLE", langGetC(gp->ss, _S"settings_ftl_ver_unknown"));
         setCompatState(gp, _S"unknown");
 
         // failed to launch, don't track it in gamemgr
@@ -213,9 +213,9 @@ static int browseforsaveovr(Ihandle* ih)
         pathParent(&startdir, startdir);
         pathToPlatform(&startdir, startdir);
     }
-    IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->options->win);
+    IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->settingsw->win);
     IupSetAttribute(idlg, "DIALOGTYPE", "DIR");
-    IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, _S"options_saveoverride_browse_title"));
+    IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, _S"settings_saveoverride_browse_title"));
     if (!strEmpty(startdir))
         IupSetAttribute(idlg, "DIRECTORY", strC(startdir));
 
@@ -263,8 +263,8 @@ static void fillLanguages(SetupPage* self, Ihandle* langselect)
     htDestroy(&languages_rev);
 }
 
-extern bool OptionsPage_make(_In_ OptionsPage* self, Ihandle* list);   // parent
-#define parent_make(list) OptionsPage_make((OptionsPage*)(self), list)
+extern bool SettingsPage_make(_In_ SettingsPage* self, Ihandle* list);   // parent
+#define parent_make(list) SettingsPage_make((SettingsPage*)(self), list)
 bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
 {
     self->langselect = IupList(NULL);
@@ -275,7 +275,7 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     iupSetObj(self->langselect, ObjNone, self, self->ui);
     IupSetCallback(self->langselect, "ACTION", (Icallback)langselect_change);
 
-    Ihandle* langhbox = IupHbox(IupLabel(langGetC(self->ss, _S"options_lang")),
+    Ihandle* langhbox = IupHbox(IupLabel(langGetC(self->ss, _S"settings_lang")),
                                 self->langselect,
                                 IupFill(),
                                 NULL);
@@ -289,24 +289,24 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     self->ftlloctext = IupText(NULL);
     IupSetAttribute(self->ftlloctext, "EXPAND", "HORIZONTAL");
     IupSetAttribute(self->ftlloctext, "ACTIVE", "NO");
-    self->ftlcompatlabel = IupLabel(langGetC(self->ss, _S"options_ftl_compat_unknown"));
+    self->ftlcompatlabel = IupLabel(langGetC(self->ss, _S"settings_ftl_compat_unknown"));
     self->ftlcompatimg   = IupLabel("");
     IupSetAttribute(self->ftlcompatimg, "IMAGE", "IMAGE_COMPAT_UNKNOWN");
     Ihandle* ftlcompathbox = IupHbox(self->ftlcompatimg, self->ftlcompatlabel, NULL);
     IupSetAttribute(ftlcompathbox, "CGAP", "1");
     IupSetAttribute(ftlcompathbox, "CMARGIN", "3x1");
 
-    setTip(self->ftlcompatimg, langGet(self->ss, _S"options_ftl_compat_unknown_tip"), NULL, 0);
-    setTip(self->ftlcompatlabel, langGet(self->ss, _S"options_ftl_compat_unknown_tip"), NULL, 0);
+    setTip(self->ftlcompatimg, langGet(self->ss, _S"settings_ftl_compat_unknown_tip"), NULL, 0);
+    setTip(self->ftlcompatlabel, langGet(self->ss, _S"settings_ftl_compat_unknown_tip"), NULL, 0);
 
-    Ihandle* browsebtn = IupButton(langGetC(self->ss, _S"options_ftl_browse"), NULL);
+    Ihandle* browsebtn = IupButton(langGetC(self->ss, _S"settings_ftl_browse"), NULL);
     IupSetAttribute(browsebtn, "CPADDING", "6x1");
     iupSetObj(browsebtn, ObjNone, self, self->ui);
     IupSetCallback(browsebtn, "ACTION", (Icallback)browseforftl);
 
-    Ihandle* ftlloclabel = IupLabel(langGetC(self->ss, _S"options_ftl_loc"));
+    Ihandle* ftlloclabel = IupLabel(langGetC(self->ss, _S"settings_ftl_loc"));
     IupSetAttribute(ftlloclabel, "FONT", "Helvetica, Bold 10");
-    Ihandle* ftlloclonglabel = IupLabel(langGetC(self->ss, _S"options_ftl_loc_long"));
+    Ihandle* ftlloclonglabel = IupLabel(langGetC(self->ss, _S"settings_ftl_loc_long"));
     IupSetAttribute(ftlloclonglabel, "SIZE", "1x32");
     IupSetAttribute(ftlloclonglabel, "EXPAND", "HORIZONTAL");
     IupSetAttribute(ftlloclonglabel, "ALIGNMENT", "ALEFT:ATOP");
@@ -315,36 +315,36 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     Ihandle* ftlhbox = IupHbox(self->ftlloctext, ftlcompathbox, browsebtn, NULL);
     IupSetAttribute(ftlhbox, "ALIGNMENT", "ACENTER");
 
-    Ihandle* ftlverlabel = IupLabel(langGetC(self->ss, _S"options_ftl_ver"));
-    self->ftlver         = IupLabel(langGetC(self->ss, _S"options_ftl_ver_unknown"));
+    Ihandle* ftlverlabel = IupLabel(langGetC(self->ss, _S"settings_ftl_ver"));
+    self->ftlver         = IupLabel(langGetC(self->ss, _S"settings_ftl_ver_unknown"));
 
     Ihandle* ftlverhbox = IupHbox(ftlverlabel, self->ftlver, NULL);
 
-    self->saveoverridecheck = IupToggle(langGetC(self->ss, _S"options_saveoverride"), NULL);
+    self->saveoverridecheck = IupToggle(langGetC(self->ss, _S"settings_saveoverride"), NULL);
     setTip(self->saveoverridecheck,
-           langGet(self->ss, _S"options_saveoverride_tip"),
-           langGet(self->ss, _S"options_saveoverride"),
+           langGet(self->ss, _S"settings_saveoverride_tip"),
+           langGet(self->ss, _S"settings_saveoverride"),
            1);
     iupSetObj(self->saveoverridecheck, ObjNone, self, self->ui);
     IupSetCallback(self->saveoverridecheck, "ACTION", (Icallback)saveovrchange);
 
-    self->saveoverrideusercheck = IupToggle(langGetC(self->ss, _S"options_saveoverride_user"), NULL);
+    self->saveoverrideusercheck = IupToggle(langGetC(self->ss, _S"settings_saveoverride_user"), NULL);
     setTip(self->saveoverrideusercheck,
-           langGet(self->ss, _S"options_saveoverride_user_tip"),
-           langGet(self->ss, _S"options_saveoverride_user"),
+           langGet(self->ss, _S"settings_saveoverride_user_tip"),
+           langGet(self->ss, _S"settings_saveoverride_user"),
            1);
     iupSetObj(self->saveoverrideusercheck, ObjNone, self, self->ui);
     IupSetCallback(self->saveoverrideusercheck, "ACTION", (Icallback)saveovruserchange);
     IupSetAttribute(self->saveoverrideusercheck, "FLOATING", "YES");
     IupSetAttribute(self->saveoverrideusercheck, "VISIBLE", "NO");
 
-    Ihandle* saveovrlabel  = IupLabel(langGetC(self->ss, _S"options_saveoverride_folder"));
+    Ihandle* saveovrlabel  = IupLabel(langGetC(self->ss, _S"settings_saveoverride_folder"));
     self->saveoverridetext = IupText(NULL);
     IupSetAttribute(self->saveoverridetext, "EXPAND", "HORIZONTAL");
     iupSetObj(self->saveoverridetext, ObjNone, self, self->ui);
     IupSetCallback(self->saveoverridetext, "ACTION", (Icallback)saveovrtextchange);
 
-    Ihandle* saveovrbrowse = IupButton(langGetC(self->ss, _S"options_saveoverride_browse"), NULL);
+    Ihandle* saveovrbrowse = IupButton(langGetC(self->ss, _S"settings_saveoverride_browse"), NULL);
     IupSetAttribute(saveovrbrowse, "CPADDING", "6x1");
     iupSetObj(saveovrbrowse, ObjNone, self, self->ui);
     IupSetCallback(saveovrbrowse, "ACTION", (Icallback)browseforsaveovr);
@@ -362,7 +362,7 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     Ihandle* featuressep = IupLabel("");
     IupSetAttribute(featuressep, "SEPARATOR", "HORIZONTAL");
 
-    Ihandle* featuresexplain = IupLabel(langGetC(self->ss, _S"options_features_explainer"));
+    Ihandle* featuresexplain = IupLabel(langGetC(self->ss, _S"settings_features_explainer"));
     IupSetAttribute(featuresexplain, "SIZE", "1x1");
     IupSetAttribute(featuresexplain, "EXPAND", "YES");
     IupSetAttribute(featuresexplain, "WORDWRAP", "YES");
@@ -418,8 +418,8 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     return parent_make(list);
 }
 
-extern bool OptionsPage_update(_In_ OptionsPage* self);   // parent
-#define parent_update() OptionsPage_update((OptionsPage*)(self))
+extern bool SettingsPage_update(_In_ SettingsPage* self);   // parent
+#define parent_update() SettingsPage_update((SettingsPage*)(self))
 bool SetupPage_update(_In_ SetupPage* self)
 {
     for (int i = 0; i < saSize(self->langids); i++) {
@@ -455,7 +455,7 @@ bool SetupPage_update(_In_ SetupPage* self)
             } else {
                 IupSetAttribute(self->ftlver,
                                 "TITLE",
-                                langGetC(self->ss, _S"options_ftl_ver_unknown"));
+                                langGetC(self->ss, _S"settings_ftl_ver_unknown"));
                 strDestroy(&self->verstr);
             }
 
@@ -492,10 +492,10 @@ bool SetupPage_update(_In_ SetupPage* self)
                 self->vpending = false;
             }
         } else if (state == GI_Failed) {
-            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, _S"options_ftl_ver_unknown"));
+            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, _S"settings_ftl_ver_unknown"));
             setCompatState(self, _S"incompat");
         } else if (state == GI_Exited) {
-            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, _S"options_ftl_ver_unknown"));
+            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, _S"settings_ftl_ver_unknown"));
             setCompatState(self, _S"unknown");
             objRelease(&self->validateinst);
         }
@@ -510,7 +510,7 @@ bool SetupPage_update(_In_ SetupPage* self)
         if (ssdStringOut(self->ss->settings, _S"ftl/ver", &self->verstr)) {
             IupSetAttribute(self->ftlver, "TITLE", strC(self->verstr));
         } else {
-            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, _S"options_ftl_ver_unknown"));
+            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, _S"settings_ftl_ver_unknown"));
         }
         string compat = 0;
         if (ssdStringOut(self->ss->settings, _S"ftl/compat", &compat)) {
@@ -571,5 +571,5 @@ void SetupPage_destroy(_In_ SetupPage* self)
 }
 
 // Autogen begins -----
-#include "optionssetup.auto.inc"
+#include "setuppage.auto.inc"
 // Autogen ends -------

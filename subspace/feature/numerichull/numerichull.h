@@ -5,8 +5,8 @@
 #include <cx/obj.h>
 #include "feature/feature.h"
 
-typedef struct OptionsPage OptionsPage;
-typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
+typedef struct SettingsPage SettingsPage;
+typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct NumericHull NumericHull;
 typedef struct NumericHull_WeakRef NumericHull_WeakRef;
 saDeclarePtr(NumericHull);
@@ -17,7 +17,8 @@ typedef struct NumericHull_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
-    OptionsPage* (*getOptions)(_In_ void* self);
+    SettingsPage* (*getSettingsPage)(_In_ void* self);
+    void (*enable)(_In_ void* self, bool enabled);
 } NumericHull_ClassIf;
 extern NumericHull_ClassIf NumericHull_ClassIf_tmpl;
 
@@ -38,6 +39,7 @@ typedef struct NumericHull {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    hashtable settings;        // Settings that are synchronized with the game client
 } NumericHull;
 extern ObjClassInfo NumericHull_clsinfo;
 #define NumericHull(inst) ((NumericHull*)(unused_noeval((inst) && &((inst)->_is_NumericHull)), (inst)))
@@ -59,6 +61,8 @@ _objfactory_guaranteed NumericHull* NumericHull_create(Subspace* ss);
 // NumericHull* numerichullCreate(Subspace* ss);
 #define numerichullCreate(ss) NumericHull_create(ss)
 
-// OptionsPage* numerichullGetOptions(NumericHull* self);
-#define numerichullGetOptions(self) (self)->_->getOptions(NumericHull(self))
+// SettingsPage* numerichullGetSettingsPage(NumericHull* self);
+#define numerichullGetSettingsPage(self) (self)->_->getSettingsPage(NumericHull(self))
+// void numerichullEnable(NumericHull* self, bool enabled);
+#define numerichullEnable(self, enabled) (self)->_->enable(NumericHull(self), enabled)
 

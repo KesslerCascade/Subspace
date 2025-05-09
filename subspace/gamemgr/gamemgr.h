@@ -7,6 +7,8 @@
 #include "process.h"
 #include <cx/math.h>
 
+typedef struct SettingsPage SettingsPage;
+typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct GameMgr GameMgr;
 typedef struct GameMgr_WeakRef GameMgr_WeakRef;
 typedef struct ControlClient ControlClient;

@@ -18,7 +18,7 @@
 #include "panel/welcome/welcomepanel.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
-#include "optionswin.h"
+#include "settingswin.h"
 #include "subspaceui.h"
 
 #define REGISTERPANEL(mprefix)         \
@@ -76,13 +76,13 @@ _objinit_guaranteed bool MainWin_init(_In_ MainWin* self)
     // Autogen ends -------
 }
 
-static int optionsbtn_action(Ihandle* ih)
+static int settingsbtn_action(Ihandle* ih)
 {
     SubspaceUI* ui = iupGetUI(ih);
     if (!ui)
         return IUP_IGNORE;
 
-    optionswinShow(ui->options);
+    settingswinShow(ui->settingsw);
     return IUP_DEFAULT;
 }
 
@@ -134,17 +134,17 @@ bool MainWin_make(_In_ MainWin* self)
     iupLoadImage(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", self->menubtn);
     iupLoadImage(self->ss, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
 
-    Ihandle* options = IupFlatButton(NULL);
-    IupSetAttribute(options, "IMAGE", "IMAGE_OPTIONS");
-    IupSetAttribute(options, "IMAGEHIGHLIGHT", "IMAGE_OPTIONS_HOVER");
-    IupSetAttribute(options, "HLCOLOR", NULL);
-    IupSetAttribute(options, "PSCOLOR", NULL);
-    IupSetAttribute(options, "BORDERWIDTH", "0");
-    IupSetAttribute(options, "TIP", langGetC(self->ss, _S"options_tip"));
-    iupSetObj(options, ObjNone, self, self->ui);
-    IupSetCallback(options, "FLAT_ACTION", optionsbtn_action);
-    iupLoadImage(self->ss, _S"IMAGE_OPTIONS", _S"svg", _S"subspace:/options.svg", options);
-    iupLoadImage(self->ss, _S"IMAGE_OPTIONS_HOVER", _S"svg", _S"subspace:/options-hover.svg", NULL);
+    Ihandle* settings = IupFlatButton(NULL);
+    IupSetAttribute(settings, "IMAGE", "IMAGE_SETTINGS");
+    IupSetAttribute(settings, "IMAGEHIGHLIGHT", "IMAGE_SETTINGS_HOVER");
+    IupSetAttribute(settings, "HLCOLOR", NULL);
+    IupSetAttribute(settings, "PSCOLOR", NULL);
+    IupSetAttribute(settings, "BORDERWIDTH", "0");
+    IupSetAttribute(settings, "TIP", langGetC(self->ss, _S"settings_tip"));
+    iupSetObj(settings, ObjNone, self, self->ui);
+    IupSetCallback(settings, "FLAT_ACTION", settingsbtn_action);
+    iupLoadImage(self->ss, _S"IMAGE_SETTINGS", _S"svg", _S"subspace:/settings.svg", settings);
+    iupLoadImage(self->ss, _S"IMAGE_SETTINGS_HOVER", _S"svg", _S"subspace:/settings-hover.svg", NULL);
 
     self->playbtn = IupFlatButton(NULL);
     IupSetAttribute(self->playbtn, "IMAGE", "IMAGE_PLAY");
@@ -164,7 +164,7 @@ bool MainWin_make(_In_ MainWin* self)
                  _S"subspace:/play-disabled.svg",
                  self->playbtn);
 
-    self->sidebar = IupVbox(self->menubtn, self->playbtn, options, NULL);
+    self->sidebar = IupVbox(self->menubtn, self->playbtn, settings, NULL);
     IupSetAttribute(self->sidebar, "CGAP", "2");
     IupSetAttribute(self->sidebar, "NCMARGIN", "2x2");
 

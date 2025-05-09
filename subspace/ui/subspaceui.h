@@ -21,8 +21,8 @@ typedef struct ComplexTaskQueue ComplexTaskQueue;
 typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
 typedef struct MainWin MainWin;
 typedef struct MainWin_WeakRef MainWin_WeakRef;
-typedef struct OptionsWin OptionsWin;
-typedef struct OptionsWin_WeakRef OptionsWin_WeakRef;
+typedef struct SettingsWin SettingsWin;
+typedef struct SettingsWin_WeakRef SettingsWin_WeakRef;
 typedef struct TaskControl TaskControl;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
@@ -40,7 +40,7 @@ typedef struct SubspaceUI_ClassIf {
     void (*stop)(_In_ void* self);
     void (*update)(_In_ void* self);
     void (*updateMain)(_In_ void* self, _In_opt_ strref panel);
-    void (*updateOptions)(_In_ void* self, _In_opt_ strref page);
+    void (*updateSettings)(_In_ void* self, _In_opt_ strref page);
 } SubspaceUI_ClassIf;
 extern SubspaceUI_ClassIf SubspaceUI_ClassIf_tmpl;
 
@@ -57,8 +57,8 @@ typedef struct SubspaceUI {
     Subspace* ss;
     TaskQueue* uiq;
     bool started;
-    MainWin* main;
-    OptionsWin* options;
+    MainWin* mainw;
+    SettingsWin* settingsw;
 } SubspaceUI;
 extern ObjClassInfo SubspaceUI_clsinfo;
 #define SubspaceUI(inst) ((SubspaceUI*)(unused_noeval((inst) && &((inst)->_is_SubspaceUI)), (inst)))
@@ -91,6 +91,6 @@ _objfactory_guaranteed SubspaceUI* SubspaceUI_create(Subspace* subspace);
 #define ssuiUpdate(self) (self)->_->update(SubspaceUI(self))
 // void ssuiUpdateMain(SubspaceUI* self, strref panel);
 #define ssuiUpdateMain(self, panel) (self)->_->updateMain(SubspaceUI(self), panel)
-// void ssuiUpdateOptions(SubspaceUI* self, strref page);
-#define ssuiUpdateOptions(self, page) (self)->_->updateOptions(SubspaceUI(self), page)
+// void ssuiUpdateSettings(SubspaceUI* self, strref page);
+#define ssuiUpdateSettings(self, page) (self)->_->updateSettings(SubspaceUI(self), page)
 

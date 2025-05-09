@@ -5,8 +5,8 @@
 #include <cx/obj.h>
 #include "subspace.h"
 
-typedef struct OptionsPage OptionsPage;
-typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
+typedef struct SettingsPage SettingsPage;
+typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct SubspaceFeature SubspaceFeature;
 typedef struct SubspaceFeature_WeakRef SubspaceFeature_WeakRef;
 typedef struct ClientFeature ClientFeature;
@@ -21,7 +21,7 @@ typedef struct SubspaceFeature_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
-    OptionsPage* (*getOptions)(_In_ void* self);
+    SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
 } SubspaceFeature_ClassIf;
 extern SubspaceFeature_ClassIf SubspaceFeature_ClassIf_tmpl;
@@ -42,6 +42,7 @@ typedef struct SubspaceFeature {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    hashtable settings;        // Settings that are synchronized with the game client
 } SubspaceFeature;
 extern ObjClassInfo SubspaceFeature_clsinfo;
 #define SubspaceFeature(inst) ((SubspaceFeature*)(unused_noeval((inst) && &((inst)->_is_SubspaceFeature)), (inst)))
@@ -58,8 +59,8 @@ typedef struct SubspaceFeature_WeakRef {
 } SubspaceFeature_WeakRef;
 #define SubspaceFeature_WeakRef(inst) ((SubspaceFeature_WeakRef*)(unused_noeval((inst) && &((inst)->_is_SubspaceFeature_WeakRef)), (inst)))
 
-// OptionsPage* featureGetOptions(SubspaceFeature* self);
-#define featureGetOptions(self) (self)->_->getOptions(SubspaceFeature(self))
+// SettingsPage* featureGetSettingsPage(SubspaceFeature* self);
+#define featureGetSettingsPage(self) (self)->_->getSettingsPage(SubspaceFeature(self))
 // void featureEnable(SubspaceFeature* self, bool enabled);
 #define featureEnable(self, enabled) (self)->_->enable(SubspaceFeature(self), enabled)
 

@@ -3,7 +3,7 @@
 // Do not modify the contents of this section; any changes will be lost!
 FeaturesPage_ClassIf FeaturesPage_ClassIf_tmpl = {
     ._size = sizeof(FeaturesPage_ClassIf),
-    ._parent = (ObjIface*)&OptionsPage_ClassIf_tmpl,
+    ._parent = (ObjIface*)&SettingsPage_ClassIf_tmpl,
 };
 
 static FeaturesPage_ClassIf _impl_FeaturesPage_FeaturesPage_ClassIf = {
@@ -20,7 +20,7 @@ static ObjIface* _ifimpl_FeaturesPage[] = {
 ObjClassInfo FeaturesPage_clsinfo = {
     .instsize = sizeof(FeaturesPage),
     .classif = (ObjIface*)&FeaturesPage_ClassIf_tmpl,
-    .parent = &OptionsPage_clsinfo,
+    .parent = &SettingsPage_clsinfo,
     .ifimpl = _ifimpl_FeaturesPage,
 };
 

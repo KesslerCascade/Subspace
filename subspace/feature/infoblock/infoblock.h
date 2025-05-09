@@ -5,8 +5,8 @@
 #include <cx/obj.h>
 #include "feature/feature.h"
 
-typedef struct OptionsPage OptionsPage;
-typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
+typedef struct SettingsPage SettingsPage;
+typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct InfoBlock InfoBlock;
 typedef struct InfoBlock_WeakRef InfoBlock_WeakRef;
 saDeclarePtr(InfoBlock);
@@ -17,7 +17,8 @@ typedef struct InfoBlock_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
-    OptionsPage* (*getOptions)(_In_ void* self);
+    SettingsPage* (*getSettingsPage)(_In_ void* self);
+    void (*enable)(_In_ void* self, bool enabled);
 } InfoBlock_ClassIf;
 extern InfoBlock_ClassIf InfoBlock_ClassIf_tmpl;
 
@@ -38,6 +39,7 @@ typedef struct InfoBlock {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    hashtable settings;        // Settings that are synchronized with the game client
 } InfoBlock;
 extern ObjClassInfo InfoBlock_clsinfo;
 #define InfoBlock(inst) ((InfoBlock*)(unused_noeval((inst) && &((inst)->_is_InfoBlock)), (inst)))
@@ -59,6 +61,8 @@ _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss);
 // InfoBlock* infoblockCreate(Subspace* ss);
 #define infoblockCreate(ss) InfoBlock_create(ss)
 
-// OptionsPage* infoblockGetOptions(InfoBlock* self);
-#define infoblockGetOptions(self) (self)->_->getOptions(InfoBlock(self))
+// SettingsPage* infoblockGetSettingsPage(InfoBlock* self);
+#define infoblockGetSettingsPage(self) (self)->_->getSettingsPage(InfoBlock(self))
+// void infoblockEnable(InfoBlock* self, bool enabled);
+#define infoblockEnable(self, enabled) (self)->_->enable(InfoBlock(self), enabled)
 

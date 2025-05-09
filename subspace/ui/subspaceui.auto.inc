@@ -14,7 +14,7 @@ static SubspaceUI_ClassIf _impl_SubspaceUI_SubspaceUI_ClassIf = {
     .stop = (void (*)(void*))SubspaceUI_stop,
     .update = (void (*)(void*))SubspaceUI_update,
     .updateMain = (void (*)(void*, strref))SubspaceUI_updateMain,
-    .updateOptions = (void (*)(void*, strref))SubspaceUI_updateOptions,
+    .updateSettings = (void (*)(void*, strref))SubspaceUI_updateSettings,
 };
 
 static ObjIface* _ifimpl_SubspaceUI[] = {

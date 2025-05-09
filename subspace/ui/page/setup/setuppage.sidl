@@ -1,7 +1,7 @@
-#include "ui/page/optionspage.sidl"
+#include "ui/page/settingspage.sidl"
 #include "gamemgr/gameinst.sidl"
 
-class SetupPage extends OptionsPage {
+class SetupPage extends SettingsPage {
     sarray:string langids;
     [sorted] sarray:string langnames;
 

@@ -9,7 +9,7 @@
 #include "welcomepanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "ui/optionswin.h"
+#include "ui/settingswin.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
@@ -27,13 +27,13 @@ _objfactory_guaranteed WelcomePanel* WelcomePanel_create(SubspaceUI* ui)
     return self;
 }
 
-static int optionsbtn_action(Ihandle* ih)
+static int settingsbtn_action(Ihandle* ih)
 {
     SubspaceUI* ui = iupGetUI(ih);
     if (!ui)
         return IUP_IGNORE;
 
-    optionswinShow(ui->options);
+    settingswinShow(ui->settingsw);
     return IUP_DEFAULT;
 }
 
@@ -100,22 +100,22 @@ bool WelcomePanel_make(_In_ WelcomePanel* self)
         saPush(&welcomeopt2, ptr, lbl);
     }
 
-    Ihandle* optbtn = IupFlatButton(langGetC(self->ss, _S"options"));
-    IupSetAttribute(optbtn, "BGCOLOR", "85 44 92");
-    IupSetAttribute(optbtn, "HLCOLOR", "139 73 131");
-    IupSetAttribute(optbtn, "PSCOLOR", "48 25 52");
-    IupSetAttribute(optbtn, "BORDERCOLOR", "139 73 131");
-    IupSetAttribute(optbtn, "BORDERHLCOLOR", "174 101 165");
-    IupSetAttribute(optbtn, "BORDERPSCOLOR", "85 44 92");
-    IupSetAttribute(optbtn, "FGCOLOR", "255 255 255");
-    IupSetAttribute(optbtn, "IMAGE", "IMAGE_WRENCH_SMALL");
-    IupSetAttribute(optbtn, "FONT", "Helvetica, 10");
-    IupSetAttribute(optbtn, "CPADDING", "4x1");
-    IupSetAttribute(optbtn, "CSPACING", "3");
-    IupSetAttribute(optbtn, "FOCUSFEEDBACK", "No");
-    iupLoadImage(self->ss, _S"IMAGE_WRENCH_SMALL", _S"svg", _S"subspace:/wrench-small.svg", optbtn);
-    iupSetObj(optbtn, ObjNone, self, self->ui);
-    IupSetCallback(optbtn, "FLAT_ACTION", optionsbtn_action);
+    Ihandle* setbtn = IupFlatButton(langGetC(self->ss, _S"settings"));
+    IupSetAttribute(setbtn, "BGCOLOR", "85 44 92");
+    IupSetAttribute(setbtn, "HLCOLOR", "139 73 131");
+    IupSetAttribute(setbtn, "PSCOLOR", "48 25 52");
+    IupSetAttribute(setbtn, "BORDERCOLOR", "139 73 131");
+    IupSetAttribute(setbtn, "BORDERHLCOLOR", "174 101 165");
+    IupSetAttribute(setbtn, "BORDERPSCOLOR", "85 44 92");
+    IupSetAttribute(setbtn, "FGCOLOR", "255 255 255");
+    IupSetAttribute(setbtn, "IMAGE", "IMAGE_WRENCH_SMALL");
+    IupSetAttribute(setbtn, "FONT", "Helvetica, 10");
+    IupSetAttribute(setbtn, "CPADDING", "4x1");
+    IupSetAttribute(setbtn, "CSPACING", "3");
+    IupSetAttribute(setbtn, "FOCUSFEEDBACK", "No");
+    iupLoadImage(self->ss, _S"IMAGE_WRENCH_SMALL", _S"svg", _S"subspace:/wrench-small.svg", setbtn);
+    iupSetObj(setbtn, ObjNone, self, self->ui);
+    IupSetCallback(setbtn, "FLAT_ACTION", settingsbtn_action);
 
     Ihandle* multibox = IupMultiBox(NULL);
     IupSetAttribute(multibox, "CGAPHORIZ", "2");
@@ -144,7 +144,7 @@ bool WelcomePanel_make(_In_ WelcomePanel* self)
     for (int i = 0; i < saSize(welcomeopt1); i++) {
         IupAppend(multibox, welcomeopt1.a[i]);
     }
-    IupAppend(multibox, optbtn);
+    IupAppend(multibox, setbtn);
     for (int i = 0; i < saSize(welcomeopt2); i++) {
         IupAppend(multibox, welcomeopt2.a[i]);
     }

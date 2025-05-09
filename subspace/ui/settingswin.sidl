@@ -1,12 +1,12 @@
 #include <iup.h>
 #include "subspace.h"
-#include "ui/page/optionspage.sidl"
+#include "ui/page/settingspage.sidl"
 
-#define OPTIONSWIN_WIDTH 500
-#define OPTIONSWIN_HEIGHT 400
+#define SETTINGSWIN_WIDTH 500
+#define SETTINGSWIN_HEIGHT 400
 
 class SubspaceUI;
-class OptionsWin {
+class SettingsWin {
     Subspace *ss;
     SubspaceUI *ui;
 
@@ -14,7 +14,7 @@ class OptionsWin {
     Ihandle *pagelist;
     Ihandle *pagezbox;
 
-    sarray:object:OptionsPage pages;
+    sarray:object:SettingsPage pages;
     sarray:int32 zboxmap;
     void showPage(int num);
     void showPageByList(int listid);

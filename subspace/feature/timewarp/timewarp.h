@@ -5,8 +5,8 @@
 #include <cx/obj.h>
 #include "feature/feature.h"
 
-typedef struct OptionsPage OptionsPage;
-typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
+typedef struct SettingsPage SettingsPage;
+typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct TimeWarp TimeWarp;
 typedef struct TimeWarp_WeakRef TimeWarp_WeakRef;
 saDeclarePtr(TimeWarp);
@@ -17,7 +17,8 @@ typedef struct TimeWarp_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
-    OptionsPage* (*getOptions)(_In_ void* self);
+    SettingsPage* (*getSettingsPage)(_In_ void* self);
+    void (*enable)(_In_ void* self, bool enabled);
 } TimeWarp_ClassIf;
 extern TimeWarp_ClassIf TimeWarp_ClassIf_tmpl;
 
@@ -38,6 +39,7 @@ typedef struct TimeWarp {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    hashtable settings;        // Settings that are synchronized with the game client
 } TimeWarp;
 extern ObjClassInfo TimeWarp_clsinfo;
 #define TimeWarp(inst) ((TimeWarp*)(unused_noeval((inst) && &((inst)->_is_TimeWarp)), (inst)))
@@ -59,6 +61,8 @@ _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss);
 // TimeWarp* timewarpCreate(Subspace* ss);
 #define timewarpCreate(ss) TimeWarp_create(ss)
 
-// OptionsPage* timewarpGetOptions(TimeWarp* self);
-#define timewarpGetOptions(self) (self)->_->getOptions(TimeWarp(self))
+// SettingsPage* timewarpGetSettingsPage(TimeWarp* self);
+#define timewarpGetSettingsPage(self) (self)->_->getSettingsPage(TimeWarp(self))
+// void timewarpEnable(TimeWarp* self, bool enabled);
+#define timewarpEnable(self, enabled) (self)->_->enable(TimeWarp(self), enabled)
 

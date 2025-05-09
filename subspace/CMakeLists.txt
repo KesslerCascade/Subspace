@@ -43,14 +43,14 @@ set(SUBSPACE_SIDL
     gamemgr/gamemgr.sidl
     lang/langdb.sidl
     ui/mainwin.sidl
-    ui/optionswin.sidl
+    ui/settingswin.sidl
     ui/subspaceui.sidl
     ui/image/image.sidl
     ui/image/imageload.sidl
     ui/image/imageresample.sidl
-    ui/page/optionspage.sidl
-    ui/page/features/optionsfeatures.sidl
-    ui/page/setup/optionssetup.sidl
+    ui/page/settingspage.sidl
+    ui/page/features/featurespage.sidl
+    ui/page/setup/setuppage.sidl
     ui/panel/panel.sidl
     ui/panel/gameinfo/gameinfopanel.sidl
     ui/panel/notableevent/notableeventpanel.sidl
@@ -94,7 +94,7 @@ add_executable(subspace
     ui/mainwin.c
     ui/mainwinlayout.c
     ui/mainwinmenu.c
-    ui/optionswin.c
+    ui/settingswin.c
     ui/subspaceui.c
     ui/image/image.c
     ui/image/imageload.c
@@ -102,9 +102,9 @@ add_executable(subspace
     ui/image/resample.c
     ui/image/drivers/imagepng.c
     ui/image/drivers/imagesvg.c
-    ui/page/optionspage.c
-    ui/page/features/optionsfeatures.c
-    ui/page/setup/optionssetup.c
+    ui/page/settingspage.c
+    ui/page/features/featurespage.c
+    ui/page/setup/setuppage.c
     ui/panel/panel.c
     ui/panel/gameinfo/gameinfopanel.c
     ui/panel/notableevent/notableeventpanel.c

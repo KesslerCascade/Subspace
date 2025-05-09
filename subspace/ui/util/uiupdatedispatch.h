@@ -20,8 +20,8 @@ typedef struct ComplexTaskQueue ComplexTaskQueue;
 typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
 typedef struct MainWin MainWin;
 typedef struct MainWin_WeakRef MainWin_WeakRef;
-typedef struct OptionsWin OptionsWin;
-typedef struct OptionsWin_WeakRef OptionsWin_WeakRef;
+typedef struct SettingsWin SettingsWin;
+typedef struct SettingsWin_WeakRef SettingsWin_WeakRef;
 typedef struct TaskControl TaskControl;
 typedef struct UIUpdateDispatch UIUpdateDispatch;
 typedef struct UIUpdateDispatch_WeakRef UIUpdateDispatch_WeakRef;
@@ -59,7 +59,7 @@ typedef struct UIUpdateDispatch {
     cchain oncomplete;        // functions that are called when this task has completed
     SubspaceUI* ui;
     string panelname;
-    bool options;
+    bool settings;
     bool all;
 } UIUpdateDispatch;
 extern ObjClassInfo UIUpdateDispatch_clsinfo;
@@ -87,9 +87,9 @@ _objfactory_guaranteed UIUpdateDispatch* UIUpdateDispatch_all(SubspaceUI* ui);
 // UIUpdateDispatch* uiupdatedispatchAll(SubspaceUI* ui);
 #define uiupdatedispatchAll(ui) UIUpdateDispatch_all(SubspaceUI(ui))
 
-_objfactory_guaranteed UIUpdateDispatch* UIUpdateDispatch_options(SubspaceUI* ui, _In_opt_ strref pagename);
-// UIUpdateDispatch* uiupdatedispatchOptions(SubspaceUI* ui, strref pagename);
-#define uiupdatedispatchOptions(ui, pagename) UIUpdateDispatch_options(SubspaceUI(ui), pagename)
+_objfactory_guaranteed UIUpdateDispatch* UIUpdateDispatch_settings(SubspaceUI* ui, _In_opt_ strref pagename);
+// UIUpdateDispatch* uiupdatedispatchSettings(SubspaceUI* ui, strref pagename);
+#define uiupdatedispatchSettings(ui, pagename) UIUpdateDispatch_settings(SubspaceUI(ui), pagename)
 
 // bool uiupdatedispatch_setState(UIUpdateDispatch* self, uint32 newstate);
 #define uiupdatedispatch_setState(self, newstate) BasicTask__setState(BasicTask(self), newstate)

@@ -3,13 +3,13 @@
 // Do not make changes to this file or they will be overwritten.
 // clang-format off
 #include <cx/obj.h>
-#include "ui/page/optionspage.h"
+#include "ui/page/settingspage.h"
 #include "gamemgr/gameinst.h"
 
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
-typedef struct OptionsPage OptionsPage;
-typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
+typedef struct SettingsPage SettingsPage;
+typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct GameMgr GameMgr;
 typedef struct GameMgr_WeakRef GameMgr_WeakRef;
 typedef struct ControlClient ControlClient;
@@ -33,7 +33,7 @@ typedef struct SetupPage {
     union {
         SetupPage_ClassIf* _;
         void* _is_SetupPage;
-        void* _is_OptionsPage;
+        void* _is_SettingsPage;
         void* _is_ObjInst;
     };
     ObjClassInfo* _clsinfo;
@@ -48,7 +48,6 @@ typedef struct SetupPage {
     string imgname;
     string title;
     bool visible;
-    string featurereq;        // requires this feature to be enabled to be visible
     sa_string langids;
     sa_string langnames;
     string compatimg;
@@ -74,7 +73,7 @@ typedef struct SetupPage_WeakRef {
     union {
         ObjInst* _inst;
         void* _is_SetupPage_WeakRef;
-        void* _is_OptionsPage_WeakRef;
+        void* _is_SettingsPage_WeakRef;
         void* _is_ObjInst_WeakRef;
     };
     atomic(uintptr) _ref;

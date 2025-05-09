@@ -10,7 +10,7 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/mainwin.h"
-#include "ui/optionswin.h"
+#include "ui/settingswin.h"
 
 _objfactory_guaranteed UIUpdateDispatch*
 UIUpdateDispatch_mainWin(SubspaceUI* ui, _In_opt_ strref panelname)
@@ -40,13 +40,13 @@ _objfactory_guaranteed UIUpdateDispatch* UIUpdateDispatch_all(SubspaceUI* ui)
 }
 
 _objfactory_guaranteed UIUpdateDispatch*
-UIUpdateDispatch_options(SubspaceUI* ui, _In_opt_ strref pagename)
+UIUpdateDispatch_settings(SubspaceUI* ui, _In_opt_ strref pagename)
 {
     UIUpdateDispatch* self;
     self = objInstCreate(UIUpdateDispatch);
 
     self->ui      = objAcquire(ui);
-    self->options = true;
+    self->settings = true;
     strDup(&self->panelname, pagename);
 
     self->name = _S"UIUpdateDispatch";
@@ -57,22 +57,22 @@ UIUpdateDispatch_options(SubspaceUI* ui, _In_opt_ strref pagename)
 uint32 UIUpdateDispatch_run(_In_ UIUpdateDispatch* self, _In_ TaskQueue* tq, _In_ TQWorker* worker,
                             _Inout_ TaskControl* tcon)
 {
-    if (!self->ui->main || !self->ui->options)   // make sure we aren't shutting down
+    if (!self->ui->mainw || !self->ui->settingsw)   // make sure we aren't shutting down
         return TASK_Result_Failure;
 
-    if (self->options) {
-        optionswinUpdatePage(self->ui->options, self->panelname);
+    if (self->settings) {
+        settingswinUpdatePage(self->ui->settingsw, self->panelname);
         return TASK_Result_Success;
     } else if (self->all) {
-        mainwinUpdateAll(self->ui->main);
-        optionswinUpdateAll(self->ui->options);
+        mainwinUpdateAll(self->ui->mainw);
+        settingswinUpdateAll(self->ui->settingsw);
         return TASK_Result_Success;
     }
 
     if (strEmpty(self->panelname))
-        mainwinUpdate(self->ui->main);
+        mainwinUpdate(self->ui->mainw);
     else
-        mainwinUpdatePanel(self->ui->main, self->panelname);
+        mainwinUpdatePanel(self->ui->mainw, self->panelname);
 
     return TASK_Result_Success;
 }

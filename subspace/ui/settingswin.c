@@ -6,39 +6,39 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "optionswin.h"
+#include "settingswin.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
-#include "ui/page/features/optionsfeatures.h"
-#include "ui/page/setup/optionssetup.h"
+#include "ui/page/features/featurespage.h"
+#include "ui/page/setup/setuppage.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iupsetobj.h"
 
-static void OoptionsWin_registerPages(OptionsWin* self, SubspaceUI* ui)
+static void SettingsWin_registerPages(SettingsWin* self, SubspaceUI* ui)
 {
-    OptionsPage* p;
+    SettingsPage* p;
 
-    p = OptionsPage(setuppageCreate(ui));
+    p = SettingsPage(setuppageCreate(ui));
     saPushC(&self->pages, object, &p);
-    p = OptionsPage(featurespageCreate(ui));
+    p = SettingsPage(featurespageCreate(ui));
     saPushC(&self->pages, object, &p);
 }
 
-_objfactory_guaranteed OptionsWin* OptionsWin_create(SubspaceUI* ui)
+_objfactory_guaranteed SettingsWin* SettingsWin_create(SubspaceUI* ui)
 {
-    OptionsWin* self;
-    self = objInstCreate(OptionsWin);
+    SettingsWin* self;
+    self = objInstCreate(SettingsWin);
 
     self->ss = ui->ss;
     self->ui = ui;
 
     objInstInit(self);
-    OoptionsWin_registerPages(self, ui);
+    SettingsWin_registerPages(self, ui);
     return self;
 }
 
-_objinit_guaranteed bool OptionsWin_init(_In_ OptionsWin* self)
+_objinit_guaranteed bool SettingsWin_init(_In_ SettingsWin* self)
 {
     // Autogen begins -----
     saInit(&self->pages, object, 1);
@@ -49,23 +49,23 @@ _objinit_guaranteed bool OptionsWin_init(_In_ OptionsWin* self)
 
 static int closebtn_action(Ihandle* ih)
 {
-    OptionsWin* win = iupGetParentObj(OptionsWin, ih);
+    SettingsWin* win = iupGetParentObj(SettingsWin, ih);
     if (win) {
-        optionswinOnClose(win->win);
+        settingswinOnClose(win->win);
     }
     return IUP_DEFAULT;
 }
 
 static int pagelist_change(Ihandle* ih, char* text, int item, int state)
 {
-    OptionsWin* win = iupGetParentObj(OptionsWin, ih);
+    SettingsWin* win = iupGetParentObj(SettingsWin, ih);
     if (win) {
-        optionswinShowPageByList(win, item);
+        settingswinShowPageByList(win, item);
     }
     return IUP_DEFAULT;
 }
 
-bool OptionsWin_make(_In_ OptionsWin* self)
+bool SettingsWin_make(_In_ SettingsWin* self)
 {
     if (self->win)
         return true;
@@ -78,7 +78,7 @@ bool OptionsWin_make(_In_ OptionsWin* self)
     iupSetObj(self->pagelist, ObjNone, self, self->ui);
     IupSetCallback(self->pagelist, "FLAT_ACTION", (Icallback)pagelist_change);
 
-    Ihandle* closebtn = IupButton(langGetC(self->ss, _S"options_close"), NULL);
+    Ihandle* closebtn = IupButton(langGetC(self->ss, _S"settings_close"), NULL);
     IupSetAttribute(closebtn, "CPADDING", "6x3");
     IupSetCallback(closebtn, "ACTION", (Icallback)closebtn_action);
     iupSetObj(closebtn, ObjNone, self, self->ui);
@@ -90,7 +90,7 @@ bool OptionsWin_make(_In_ OptionsWin* self)
 
     // set up pages
     for (int i = 0; i < saSize(self->pages); i++) {
-        optionspageMake(self->pages.a[i], self->pagelist);
+        settingspageMake(self->pages.a[i], self->pagelist);
         IupAppend(self->pagezbox, self->pages.a[i]->h);
     }
 
@@ -102,66 +102,66 @@ bool OptionsWin_make(_In_ OptionsWin* self)
 
     self->win  = IupDialog(dlglayout);
     string tmp = 0;
-    strFormat(&tmp, _S"${int}x${int}", stvar(int32, OPTIONSWIN_WIDTH), stvar(int32, OPTIONSWIN_HEIGHT));
+    strFormat(&tmp, _S"${int}x${int}", stvar(int32, SETTINGSWIN_WIDTH), stvar(int32, SETTINGSWIN_HEIGHT));
     IupSetAttribute(self->win, "SIZE", strC(tmp));
     IupSetAttribute(self->win, "RESIZE", "NO");
-    IupSetAttribute(self->win, "TITLE", langGetC(self->ss, _S"options_title"));
+    IupSetAttribute(self->win, "TITLE", langGetC(self->ss, _S"settings_title"));
     iupSetObj(self->win, self, ObjNone, self->ui);
     IupSetAttribute(self->win, "PARENTDIALOG", "SUBSPACE_MAINWIN");
 
-    IupSetCallback(self->win, "CLOSE_CB", (Icallback)OptionsWin_onClose);
+    IupSetCallback(self->win, "CLOSE_CB", (Icallback)SettingsWin_onClose);
 
     strDestroy(&tmp);
     return true;
 }
 
-void OptionsWin_show(_In_ OptionsWin* self)
+void SettingsWin_show(_In_ SettingsWin* self)
 {
-    optionswinMake(self);
+    settingswinMake(self);
 
     IupMap(self->win);
-    optionswinUpdateList(self);
-    optionswinUpdateAll(self);
+    settingswinUpdateList(self);
+    settingswinUpdateAll(self);
 
     IupShowXY(self->win, IUP_CENTER, IUP_CENTER);
     IupSetAttribute(self->win, "SIMULATEMODAL", "YES");
 
-    optionswinShowPage(self, 0);
+    settingswinShowPage(self, 0);
 }
 
-bool OptionsWin_updatePage(_In_ OptionsWin* self, _In_opt_ strref name)
+bool SettingsWin_updatePage(_In_ SettingsWin* self, _In_opt_ strref name)
 {
-    foreach (sarray, idx, OptionsPage*, page, self->pages) {
+    foreach (sarray, idx, SettingsPage*, page, self->pages) {
         if (strEq(name, page->name)) {
-            return optionspageUpdate(page);
+            return settingspageUpdate(page);
         }
     }
 
     return false;
 }
 
-void OptionsWin_updateAll(_In_ OptionsWin* self)
+void SettingsWin_updateAll(_In_ SettingsWin* self)
 {
-    foreach (sarray, idx, OptionsPage*, page, self->pages) {
-        optionspageUpdate(page);
+    foreach (sarray, idx, SettingsPage*, page, self->pages) {
+        settingspageUpdate(page);
     }
 }
 
-int OptionsWin_onClose(Ihandle* ih)
+int SettingsWin_onClose(Ihandle* ih)
 {
     IupSetAttribute(ih, "SIMULATEMODAL", "NO");
     IupHide(ih);
     return IUP_DEFAULT;
 }
 
-void OptionsWin_finish(_In_ OptionsWin* self)
+void SettingsWin_finish(_In_ SettingsWin* self)
 {
     if (self->win)
         IupDestroy(self->win);
     self->win = NULL;
 }
 
-void OptionsWin_showPage(_In_ OptionsWin* self, int num)
+void SettingsWin_showPage(_In_ SettingsWin* self, int num)
 {
     if (num < 0 || num >= saSize(self->pages))
         return;
@@ -175,7 +175,7 @@ void OptionsWin_showPage(_In_ OptionsWin* self, int num)
     IupSetAttributeHandle(self->pagezbox, "VALUE", self->pages.a[num]->h);
 }
 
-void OptionsWin_showPageByList(_In_ OptionsWin* self, int listid)
+void SettingsWin_showPageByList(_In_ SettingsWin* self, int listid)
 {
     if (listid < 1 || listid > saSize(self->zboxmap))
         return;
@@ -184,7 +184,7 @@ void OptionsWin_showPageByList(_In_ OptionsWin* self, int listid)
     IupSetAttributeHandle(self->pagezbox, "VALUE", self->pages.a[self->zboxmap.a[listid - 1]]->h);
 }
 
-void OptionsWin_updateList(_In_ OptionsWin* self)
+void SettingsWin_updateList(_In_ SettingsWin* self)
 {
     int curval           = IupGetInt(self->pagelist, "VALUE");
     const char* curtitle = (curval > 0) ? IupGetAttributeId(self->pagelist, "", curval) : NULL;
@@ -196,7 +196,7 @@ void OptionsWin_updateList(_In_ OptionsWin* self)
     // build out the list
     int listid = 1;
     for (int i = 0; i < saSize(self->pages); i++) {
-        OptionsPage* page = self->pages.a[i];
+        SettingsPage* page = self->pages.a[i];
         if (page->visible) {
             IupSetAttributeId(self->pagelist, "", listid, strC(page->title));
 
@@ -214,9 +214,9 @@ void OptionsWin_updateList(_In_ OptionsWin* self)
     }
 }
 
-void OptionsWin_destroy(_In_ OptionsWin* self)
+void SettingsWin_destroy(_In_ SettingsWin* self)
 {
-    OptionsWin_finish(self);
+    SettingsWin_finish(self);
     // Autogen begins -----
     saDestroy(&self->pages);
     saDestroy(&self->zboxmap);
@@ -224,5 +224,5 @@ void OptionsWin_destroy(_In_ OptionsWin* self)
 }
 
 // Autogen begins -----
-#include "optionswin.auto.inc"
+#include "settingswin.auto.inc"
 // Autogen ends -------

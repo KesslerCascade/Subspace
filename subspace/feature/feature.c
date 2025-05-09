@@ -14,6 +14,7 @@ _objinit_guaranteed bool SubspaceFeature_init(_In_ SubspaceFeature* self)
 {
     // Autogen begins -----
     rwlockInit(&self->lock);
+    htInit(&self->settings, string, stvar, 16);
     return true;
     // Autogen ends -------
 }
@@ -23,6 +24,7 @@ void SubspaceFeature_destroy(_In_ SubspaceFeature* self)
     // Autogen begins -----
     rwlockDestroy(&self->lock);
     strDestroy(&self->name);
+    htDestroy(&self->settings);
     // Autogen ends -------
 }
 
@@ -37,7 +39,7 @@ _objfactory_guaranteed ClientFeature* ClientFeature_create(_In_opt_ strref name)
     return self;
 }
 
-OptionsPage* SubspaceFeature_getOptions(_In_ SubspaceFeature* self)
+SettingsPage* SubspaceFeature_getSettingsPage(_In_ SubspaceFeature* self)
 {
     return NULL;
 }

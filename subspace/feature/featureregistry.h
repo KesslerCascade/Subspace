@@ -6,6 +6,8 @@
 #include "feature.h"
 #include "subspace.h"
 
+typedef struct SettingsPage SettingsPage;
+typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct FeatureRegistry FeatureRegistry;
 typedef struct FeatureRegistry_WeakRef FeatureRegistry_WeakRef;
 saDeclarePtr(FeatureRegistry);

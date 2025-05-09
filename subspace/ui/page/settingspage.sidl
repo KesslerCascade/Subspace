@@ -3,7 +3,7 @@
 #include "lang/lang.h"
 
 class SubspaceUI;
-class OptionsPage {
+class SettingsPage {
     Subspace *ss;
     SubspaceUI *ui;
 

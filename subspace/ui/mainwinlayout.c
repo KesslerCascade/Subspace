@@ -59,7 +59,7 @@ static int tab_rightclick(Ihandle* ih, int pos)
     if (ui && tab) {
         int mx, my;
         IupGetIntInt(NULL, "CURSORPOS", &mx, &my);
-        mainwinShowLayoutMenu(ui->main, ih, tab, mx, my);
+        mainwinShowLayoutMenu(ui->mainw, ih, tab, mx, my);
     }
 
     return IUP_DEFAULT;
@@ -71,7 +71,7 @@ static int placeholder_buttoncb(Ihandle* ih, int button, int pressed, int x, int
     if (ui && button == IUP_BUTTON3 && pressed == 0) {
         int mx, my;
         IupGetIntInt(NULL, "CURSORPOS", &mx, &my);
-        mainwinShowLayoutMenu(ui->main, NULL, ih, mx, my);
+        mainwinShowLayoutMenu(ui->mainw, NULL, ih, mx, my);
     }
 
     return IUP_DEFAULT;

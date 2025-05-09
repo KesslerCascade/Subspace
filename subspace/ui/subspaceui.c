@@ -12,7 +12,7 @@
 
 #include "ui/util/uiupdatedispatch.h"
 #include "mainwin.h"
-#include "optionswin.h"
+#include "settingswin.h"
 
 #include <cd.h>
 #include <iup.h>
@@ -124,11 +124,11 @@ static bool uiStartFunc(TaskQueue* tq, void* data)
     if (!ui)
         return false;
 
-    ui->main = mainwinCreate(ui);
-    if (!mainwinMake(ui->main))
+    ui->mainw = mainwinCreate(ui);
+    if (!mainwinMake(ui->mainw))
         return false;
-    ui->options = optionswinCreate(ui);
-    mainwinShow(ui->main);
+    ui->settingsw = settingswinCreate(ui);
+    mainwinShow(ui->mainw);
 
     return true;
 }
@@ -157,10 +157,10 @@ static bool uiStopFunc(TaskQueue* tq, void* data)
     if (!ui)
         return false;
 
-    optionswinFinish(ui->options);
-    mainwinFinish(ui->main);
-    objRelease(&ui->options);
-    objRelease(&ui->main);
+    settingswinFinish(ui->settingsw);
+    mainwinFinish(ui->mainw);
+    objRelease(&ui->settingsw);
+    objRelease(&ui->mainw);
 
     return true;
 }
@@ -182,8 +182,8 @@ void SubspaceUI_destroy(_In_ SubspaceUI* self)
 {
     // Autogen begins -----
     objRelease(&self->uiq);
-    objRelease(&self->main);
-    objRelease(&self->options);
+    objRelease(&self->mainw);
+    objRelease(&self->settingsw);
     // Autogen ends -------
 }
 
@@ -199,9 +199,9 @@ void SubspaceUI_updateMain(_In_ SubspaceUI* self, _In_opt_ strref panel)
     tqRun(self->uiq, &disp);
 }
 
-void SubspaceUI_updateOptions(_In_ SubspaceUI* self, _In_opt_ strref page)
+void SubspaceUI_updateSettings(_In_ SubspaceUI* self, _In_opt_ strref page)
 {
-    UIUpdateDispatch* disp = uiupdatedispatchOptions(self, page);
+    UIUpdateDispatch* disp = uiupdatedispatchSettings(self, page);
     tqRun(self->uiq, &disp);
 }
 

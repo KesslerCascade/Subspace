@@ -6,12 +6,12 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "optionspage.h"
+#include "settingspage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/util/iupsetobj.h"
 
-bool OptionsPage_make(_In_ OptionsPage* self, Ihandle* list)
+bool SettingsPage_make(_In_ SettingsPage* self, Ihandle* list)
 {
     if (self->h) {
         iupSetObj(self->h, self, ObjNone, self->ui);
@@ -19,12 +19,12 @@ bool OptionsPage_make(_In_ OptionsPage* self, Ihandle* list)
     return true;
 }
 
-bool OptionsPage_update(_In_ OptionsPage* self)
+bool SettingsPage_update(_In_ SettingsPage* self)
 {
     return true;
 }
 
-void OptionsPage_destroy(_In_ OptionsPage* self)
+void SettingsPage_destroy(_In_ SettingsPage* self)
 {
     // Autogen begins -----
     strDestroy(&self->imgname);
@@ -33,5 +33,5 @@ void OptionsPage_destroy(_In_ OptionsPage* self)
 }
 
 // Autogen begins -----
-#include "optionspage.auto.inc"
+#include "settingspage.auto.inc"
 // Autogen ends -------

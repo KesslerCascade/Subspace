@@ -3,14 +3,14 @@
 #include "lang/lang.h"
 
 class MainWin;
-class OptionsWin;
+class SettingsWin;
 [methodprefix ssui] class SubspaceUI {
     Subspace *ss;
     object:TaskQueue uiq;
     bool started;
 
-    object:MainWin main;
-    object:OptionsWin options;
+    object:MainWin mainw;
+    object:SettingsWin settingsw;
 
     factory create(Subspace *subspace);
     bool init();
@@ -21,5 +21,5 @@ class OptionsWin;
 
     void update();
     void updateMain(strref panel);
-    void updateOptions(strref page);
+    void updateSettings(strref page);
 }

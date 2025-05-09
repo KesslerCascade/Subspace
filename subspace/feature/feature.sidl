@@ -1,6 +1,6 @@
 #include "subspace.h"
 
-class OptionsPage;
+class SettingsPage;
 [methodprefix feature] abstract class SubspaceFeature {
     Subspace *ss;
     RWLock lock;
@@ -10,7 +10,9 @@ class OptionsPage;
     bool enabled;
     bool optional;   // Features that are expected to be unavailable, e.g. version-specific
 
-    OptionsPage *getOptions();
+    hashtable:string:stvar settings;    // Settings that are synchronized with the game client
+
+    SettingsPage *getSettingsPage();
     void enable(bool enabled);
 }
 
