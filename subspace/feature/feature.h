@@ -5,6 +5,8 @@
 #include <cx/obj.h>
 #include "subspace.h"
 
+typedef struct OptionsPage OptionsPage;
+typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
 typedef struct SubspaceFeature SubspaceFeature;
 typedef struct SubspaceFeature_WeakRef SubspaceFeature_WeakRef;
 typedef struct ClientFeature ClientFeature;
@@ -14,9 +16,19 @@ saDeclarePtr(SubspaceFeature_WeakRef);
 saDeclarePtr(ClientFeature);
 saDeclarePtr(ClientFeature_WeakRef);
 
+typedef struct SubspaceFeature_ClassIf {
+    ObjIface* _implements;
+    ObjIface* _parent;
+    size_t _size;
+
+    OptionsPage* (*getOptions)(_In_ void* self);
+    void (*enable)(_In_ void* self, bool enabled);
+} SubspaceFeature_ClassIf;
+extern SubspaceFeature_ClassIf SubspaceFeature_ClassIf_tmpl;
+
 typedef struct SubspaceFeature {
     union {
-        ObjIface* _;
+        SubspaceFeature_ClassIf* _;
         void* _is_SubspaceFeature;
         void* _is_ObjInst;
     };
@@ -46,6 +58,10 @@ typedef struct SubspaceFeature_WeakRef {
 } SubspaceFeature_WeakRef;
 #define SubspaceFeature_WeakRef(inst) ((SubspaceFeature_WeakRef*)(unused_noeval((inst) && &((inst)->_is_SubspaceFeature_WeakRef)), (inst)))
 
+// OptionsPage* featureGetOptions(SubspaceFeature* self);
+#define featureGetOptions(self) (self)->_->getOptions(SubspaceFeature(self))
+// void featureEnable(SubspaceFeature* self, bool enabled);
+#define featureEnable(self, enabled) (self)->_->enable(SubspaceFeature(self), enabled)
 
 typedef struct ClientFeature {
     union {

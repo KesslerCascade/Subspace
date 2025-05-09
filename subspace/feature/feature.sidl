@@ -1,5 +1,6 @@
 #include "subspace.h"
 
+class OptionsPage;
 [methodprefix feature] abstract class SubspaceFeature {
     Subspace *ss;
     RWLock lock;
@@ -8,6 +9,9 @@
     bool available;
     bool enabled;
     bool optional;   // Features that are expected to be unavailable, e.g. version-specific
+
+    OptionsPage *getOptions();
+    void enable(bool enabled);
 }
 
 class ClientFeature {

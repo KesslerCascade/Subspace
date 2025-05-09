@@ -37,11 +37,21 @@ _objfactory_guaranteed ClientFeature* ClientFeature_create(_In_opt_ strref name)
     return self;
 }
 
+OptionsPage* SubspaceFeature_getOptions(_In_ SubspaceFeature* self)
+{
+    return NULL;
+}
+
 void ClientFeature_destroy(_In_ ClientFeature* self)
 {
     // Autogen begins -----
     strDestroy(&self->name);
     // Autogen ends -------
+}
+
+void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled)
+{
+    return;
 }
 
 // Autogen begins -----

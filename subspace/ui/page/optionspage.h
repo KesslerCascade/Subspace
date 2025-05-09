@@ -41,6 +41,7 @@ typedef struct OptionsPage {
     strref name;
     string imgname;
     string title;
+    bool visible;
 } OptionsPage;
 extern ObjClassInfo OptionsPage_clsinfo;
 #define OptionsPage(inst) ((OptionsPage*)(unused_noeval((inst) && &((inst)->_is_OptionsPage)), (inst)))

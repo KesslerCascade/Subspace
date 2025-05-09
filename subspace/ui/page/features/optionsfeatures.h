@@ -8,6 +8,8 @@
 
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
+typedef struct OptionsPage OptionsPage;
+typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
 typedef struct GameMgr GameMgr;
 typedef struct GameMgr_WeakRef GameMgr_WeakRef;
 typedef struct ControlClient ControlClient;
@@ -45,6 +47,8 @@ typedef struct FeaturesPage {
     strref name;
     string imgname;
     string title;
+    bool visible;
+    string featurereq;        // requires this feature to be enabled to be visible
 } FeaturesPage;
 extern ObjClassInfo FeaturesPage_clsinfo;
 #define FeaturesPage(inst) ((FeaturesPage*)(unused_noeval((inst) && &((inst)->_is_FeaturesPage)), (inst)))

@@ -12,6 +12,8 @@ class OptionsPage {
     strref name;
     string imgname;
     string title;
+    bool visible;
+
     bool make(Ihandle *list);
     bool update();
 }

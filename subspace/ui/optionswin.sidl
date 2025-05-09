@@ -15,10 +15,13 @@ class OptionsWin {
     Ihandle *pagezbox;
 
     sarray:object:OptionsPage pages;
+    sarray:int32 zboxmap;
     void showPage(int num);
+    void showPageByList(int listid);
 
     bool make();
     void show();
+    void updateList();
     bool updatePage(strref name);
     void updateAll();
     void finish();

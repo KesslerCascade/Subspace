@@ -5,14 +5,25 @@
 #include <cx/obj.h>
 #include "feature/feature.h"
 
+typedef struct OptionsPage OptionsPage;
+typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
 typedef struct InfoBlock InfoBlock;
 typedef struct InfoBlock_WeakRef InfoBlock_WeakRef;
 saDeclarePtr(InfoBlock);
 saDeclarePtr(InfoBlock_WeakRef);
 
+typedef struct InfoBlock_ClassIf {
+    ObjIface* _implements;
+    ObjIface* _parent;
+    size_t _size;
+
+    OptionsPage* (*getOptions)(_In_ void* self);
+} InfoBlock_ClassIf;
+extern InfoBlock_ClassIf InfoBlock_ClassIf_tmpl;
+
 typedef struct InfoBlock {
     union {
-        ObjIface* _;
+        InfoBlock_ClassIf* _;
         void* _is_InfoBlock;
         void* _is_SubspaceFeature;
         void* _is_ObjInst;
@@ -48,4 +59,6 @@ _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss);
 // InfoBlock* infoblockCreate(Subspace* ss);
 #define infoblockCreate(ss) InfoBlock_create(ss)
 
+// OptionsPage* infoblockGetOptions(InfoBlock* self);
+#define infoblockGetOptions(self) (self)->_->getOptions(InfoBlock(self))
 

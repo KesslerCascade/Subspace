@@ -5,14 +5,25 @@
 #include <cx/obj.h>
 #include "feature/feature.h"
 
+typedef struct OptionsPage OptionsPage;
+typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
 typedef struct NumericHull NumericHull;
 typedef struct NumericHull_WeakRef NumericHull_WeakRef;
 saDeclarePtr(NumericHull);
 saDeclarePtr(NumericHull_WeakRef);
 
+typedef struct NumericHull_ClassIf {
+    ObjIface* _implements;
+    ObjIface* _parent;
+    size_t _size;
+
+    OptionsPage* (*getOptions)(_In_ void* self);
+} NumericHull_ClassIf;
+extern NumericHull_ClassIf NumericHull_ClassIf_tmpl;
+
 typedef struct NumericHull {
     union {
-        ObjIface* _;
+        NumericHull_ClassIf* _;
         void* _is_NumericHull;
         void* _is_SubspaceFeature;
         void* _is_ObjInst;
@@ -48,4 +59,6 @@ _objfactory_guaranteed NumericHull* NumericHull_create(Subspace* ss);
 // NumericHull* numerichullCreate(Subspace* ss);
 #define numerichullCreate(ss) NumericHull_create(ss)
 
+// OptionsPage* numerichullGetOptions(NumericHull* self);
+#define numerichullGetOptions(self) (self)->_->getOptions(NumericHull(self))
 

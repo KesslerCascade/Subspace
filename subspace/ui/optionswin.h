@@ -25,8 +25,10 @@ typedef struct OptionsWin_ClassIf {
     size_t _size;
 
     void (*showPage)(_In_ void* self, int num);
+    void (*showPageByList)(_In_ void* self, int listid);
     bool (*make)(_In_ void* self);
     void (*show)(_In_ void* self);
+    void (*updateList)(_In_ void* self);
     bool (*updatePage)(_In_ void* self, _In_opt_ strref name);
     void (*updateAll)(_In_ void* self);
     void (*finish)(_In_ void* self);
@@ -49,6 +51,7 @@ typedef struct OptionsWin {
     Ihandle* pagelist;
     Ihandle* pagezbox;
     sa_OptionsPage pages;
+    sa_int32 zboxmap;
 } OptionsWin;
 extern ObjClassInfo OptionsWin_clsinfo;
 #define OptionsWin(inst) ((OptionsWin*)(unused_noeval((inst) && &((inst)->_is_OptionsWin)), (inst)))
@@ -75,10 +78,14 @@ int OptionsWin_onClose(Ihandle* ih);
 
 // void optionswinShowPage(OptionsWin* self, int num);
 #define optionswinShowPage(self, num) (self)->_->showPage(OptionsWin(self), num)
+// void optionswinShowPageByList(OptionsWin* self, int listid);
+#define optionswinShowPageByList(self, listid) (self)->_->showPageByList(OptionsWin(self), listid)
 // bool optionswinMake(OptionsWin* self);
 #define optionswinMake(self) (self)->_->make(OptionsWin(self))
 // void optionswinShow(OptionsWin* self);
 #define optionswinShow(self) (self)->_->show(OptionsWin(self))
+// void optionswinUpdateList(OptionsWin* self);
+#define optionswinUpdateList(self) (self)->_->updateList(OptionsWin(self))
 // bool optionswinUpdatePage(OptionsWin* self, strref name);
 #define optionswinUpdatePage(self, name) (self)->_->updatePage(OptionsWin(self), name)
 // void optionswinUpdateAll(OptionsWin* self);

@@ -5,14 +5,25 @@
 #include <cx/obj.h>
 #include "feature/feature.h"
 
+typedef struct OptionsPage OptionsPage;
+typedef struct OptionsPage_WeakRef OptionsPage_WeakRef;
 typedef struct TimeWarp TimeWarp;
 typedef struct TimeWarp_WeakRef TimeWarp_WeakRef;
 saDeclarePtr(TimeWarp);
 saDeclarePtr(TimeWarp_WeakRef);
 
+typedef struct TimeWarp_ClassIf {
+    ObjIface* _implements;
+    ObjIface* _parent;
+    size_t _size;
+
+    OptionsPage* (*getOptions)(_In_ void* self);
+} TimeWarp_ClassIf;
+extern TimeWarp_ClassIf TimeWarp_ClassIf_tmpl;
+
 typedef struct TimeWarp {
     union {
-        ObjIface* _;
+        TimeWarp_ClassIf* _;
         void* _is_TimeWarp;
         void* _is_SubspaceFeature;
         void* _is_ObjInst;
@@ -48,4 +59,6 @@ _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss);
 // TimeWarp* timewarpCreate(Subspace* ss);
 #define timewarpCreate(ss) TimeWarp_create(ss)
 
+// OptionsPage* timewarpGetOptions(TimeWarp* self);
+#define timewarpGetOptions(self) (self)->_->getOptions(TimeWarp(self))
 

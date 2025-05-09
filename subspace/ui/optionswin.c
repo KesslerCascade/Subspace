@@ -42,6 +42,7 @@ _objinit_guaranteed bool OptionsWin_init(_In_ OptionsWin* self)
 {
     // Autogen begins -----
     saInit(&self->pages, object, 1);
+    saInit(&self->zboxmap, int32, 1);
     return true;
     // Autogen ends -------
 }
@@ -51,6 +52,15 @@ static int closebtn_action(Ihandle* ih)
     OptionsWin* win = iupGetParentObj(OptionsWin, ih);
     if (win) {
         optionswinOnClose(win->win);
+    }
+    return IUP_DEFAULT;
+}
+
+static int pagelist_change(Ihandle* ih, char* text, int item, int state)
+{
+    OptionsWin* win = iupGetParentObj(OptionsWin, ih);
+    if (win) {
+        optionswinShowPageByList(win, item);
     }
     return IUP_DEFAULT;
 }
@@ -65,6 +75,8 @@ bool OptionsWin_make(_In_ OptionsWin* self)
     IupSetAttribute(self->pagelist, "EXPAND", "VERTICAL");
     IupSetAttribute(self->pagelist, "FLATSCROLLBAR", "VERTICAL");
     IupSetAttribute(self->pagelist, "ICONSPACING", "4");
+    iupSetObj(self->pagelist, ObjNone, self, self->ui);
+    IupSetCallback(self->pagelist, "FLAT_ACTION", (Icallback)pagelist_change);
 
     Ihandle* closebtn = IupButton(langGetC(self->ss, _S"options_close"), NULL);
     IupSetAttribute(closebtn, "CPADDING", "6x3");
@@ -74,16 +86,13 @@ bool OptionsWin_make(_In_ OptionsWin* self)
     self->pagezbox = IupZbox(NULL);
     IupSetAttribute(self->pagezbox, "CHILDSIZEALL", "NO");
 
+    Ihandle* pageframe = IupFrame(self->pagezbox);
+
     // set up pages
     for (int i = 0; i < saSize(self->pages); i++) {
         optionspageMake(self->pages.a[i], self->pagelist);
         IupAppend(self->pagezbox, self->pages.a[i]->h);
-        IupSetAttributeId(self->pagelist, "", i + 1, strC(self->pages.a[i]->title));
-        if (!strEmpty(self->pages.a[i]->imgname))
-            IupSetAttributeId(self->pagelist, "IMAGE", i + 1, strC(self->pages.a[i]->imgname));
     }
-
-    Ihandle* pageframe = IupFrame(self->pagezbox);
 
     Ihandle* dlglayout = IupVbox(IupHbox(self->pagelist, pageframe, NULL),
                                  IupHbox(IupFill(), closebtn, NULL),
@@ -111,6 +120,7 @@ void OptionsWin_show(_In_ OptionsWin* self)
     optionswinMake(self);
 
     IupMap(self->win);
+    optionswinUpdateList(self);
     optionswinUpdateAll(self);
 
     IupShowXY(self->win, IUP_CENTER, IUP_CENTER);
@@ -156,8 +166,52 @@ void OptionsWin_showPage(_In_ OptionsWin* self, int num)
     if (num < 0 || num >= saSize(self->pages))
         return;
 
-    IupSetInt(self->pagelist, "VALUE", num + 1);
+    for (int i = 0; i < saSize(self->zboxmap); i++) {
+        if (num == self->zboxmap.a[i]) {
+            IupSetInt(self->pagelist, "VALUE", i + 1);
+            break;
+        }
+    }
     IupSetAttributeHandle(self->pagezbox, "VALUE", self->pages.a[num]->h);
+}
+
+void OptionsWin_showPageByList(_In_ OptionsWin* self, int listid)
+{
+    if (listid < 1 || listid > saSize(self->zboxmap))
+        return;
+
+    IupSetInt(self->pagelist, "VALUE", listid);
+    IupSetAttributeHandle(self->pagezbox, "VALUE", self->pages.a[self->zboxmap.a[listid - 1]]->h);
+}
+
+void OptionsWin_updateList(_In_ OptionsWin* self)
+{
+    int curval           = IupGetInt(self->pagelist, "VALUE");
+    const char* curtitle = (curval > 0) ? IupGetAttributeId(self->pagelist, "", curval) : NULL;
+
+    // clear list
+    IupSetAttribute(self->pagelist, "1", NULL);
+    saClear(&self->zboxmap);
+
+    // build out the list
+    int listid = 1;
+    for (int i = 0; i < saSize(self->pages); i++) {
+        OptionsPage* page = self->pages.a[i];
+        if (page->visible) {
+            IupSetAttributeId(self->pagelist, "", listid, strC(page->title));
+
+            if (curtitle && strEq((strref)curtitle, page->title))
+                IupSetInt(self->pagelist, "VALUE", listid);   // restore current selection
+
+            if (!strEmpty(page->imgname))
+                IupSetAttributeId(self->pagelist, "IMAGE", listid, strC(page->imgname));
+
+            // fill out array of actual page indices in list ID order
+            saPush(&self->zboxmap, int32, i);
+
+            listid++;
+        }
+    }
 }
 
 void OptionsWin_destroy(_In_ OptionsWin* self)
@@ -165,6 +219,7 @@ void OptionsWin_destroy(_In_ OptionsWin* self)
     OptionsWin_finish(self);
     // Autogen begins -----
     saDestroy(&self->pages);
+    saDestroy(&self->zboxmap);
     // Autogen ends -------
 }
 

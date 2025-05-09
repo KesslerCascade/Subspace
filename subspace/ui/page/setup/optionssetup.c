@@ -24,6 +24,7 @@ _objfactory_guaranteed SetupPage* SetupPage_create(SubspaceUI* ui)
 
     self->ui = ui;
     self->ss = ui->ss;
+    self->visible = true;
 
     self->name = _S"setup";
     strDup(&self->title, langGet(self->ss, _S"options_setup"));
@@ -355,8 +356,17 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     Ihandle* spacer2 = IupSpace();
     IupSetAttribute(spacer2, "SIZE", "1x4");
 
-    Ihandle* septemp = IupLabel("");
-    IupSetAttribute(septemp, "SEPARATOR", "HORIZONTAL");
+    Ihandle* spacer3 = IupSpace();
+    IupSetAttribute(spacer3, "SIZE", "1x8");
+
+    Ihandle* featuressep = IupLabel("");
+    IupSetAttribute(featuressep, "SEPARATOR", "HORIZONTAL");
+
+    Ihandle* featuresexplain = IupLabel(langGetC(self->ss, _S"options_features_explainer"));
+    IupSetAttribute(featuresexplain, "SIZE", "1x1");
+    IupSetAttribute(featuresexplain, "EXPAND", "YES");
+    IupSetAttribute(featuresexplain, "WORDWRAP", "YES");
+    IupSetAttribute(featuresexplain, "ALIGNMENT", "ALEFT:ATOP");
 
     Ihandle* thevbox = IupVbox(langhbox,
                                spacer1,
@@ -369,13 +379,16 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
                                self->saveoverridecheck,
                                self->saveoverrideusercheck,
                                self->saveoverridehbox,
-                               septemp,
+                               spacer3,
+                               featuressep,
+                               featuresexplain,
                                IupFill(),
                                NULL);
     IupSetAttribute(thevbox, "CMARGIN", "0x0");
-    self->h = IupVbox(thevbox, NULL);
-    IupSetAttribute(self->h, "CMARGIN", "6x6");
-    IupSetAttribute(self->h, "CGAP", "4");
+    IupSetAttribute(thevbox, "CGAP", "4");
+    Ihandle* vboxwrapper = IupVbox(thevbox, NULL);
+    IupSetAttribute(vboxwrapper, "CMARGIN", "6x6");
+    self->h = IupBackgroundBox(vboxwrapper);
 
     iupLoadImage(self->ss,
                  _S"IMAGE_WRENCH_SMALL_BLACK",
