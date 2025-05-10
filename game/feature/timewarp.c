@@ -114,7 +114,7 @@ bool timeWarpIncrease()
 bool timeWarpDecrease()
 {
     TimeWarpSettings* settings = TimeWarp_feature.settings;
-    if (!settings->allowslowmo && (!gs.timeWarpActive || gs.warpFactor / 2 < 1)) {
+    if (!settings->allowslowmo && (!gs.timeWarpActive || gs.warpFactor / 2 < 0.99)) {
         return false;
     }
 
