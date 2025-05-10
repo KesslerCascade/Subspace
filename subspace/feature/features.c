@@ -9,6 +9,8 @@ static void _registerFeature(FeatureRegistry* reg, SubspaceFeature* feat)
     ssdCopyOut(reg->ss->settings, epath, bool, &feat->enabled);
     strDestroy(&epath);
 
+    featureLoadSettings(feat);
+
     htInsertC(&reg->features, string, feat->name, object, &feat);
 }
 #define registerFeature(reg, feat) _registerFeature(reg, SubspaceFeature(feat))

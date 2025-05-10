@@ -22,6 +22,20 @@ _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss)
     return self;
 }
 
+extern void SubspaceFeature_loadSettings(_In_ SubspaceFeature* self);   // parent
+#define parent_loadSettings() SubspaceFeature_loadSettings((SubspaceFeature*)(self))
+void InfoBlock_loadSettings(_In_ InfoBlock* self)
+{
+    int32 val;
+
+    val = ssdVal(int32, self->ss->settings, _S"feature/InfoBlock/ssver", 0);
+    htInsert(&self->settings, string, _S"ssver", stvar, stvar(int32, val));
+    val = ssdVal(int32, self->ss->settings, _S"feature/InfoBlock/ftlver", 1);
+    htInsert(&self->settings, string, _S"ftlver", stvar, stvar(int32, val));
+    val = ssdVal(int32, self->ss->settings, _S"feature/InfoBlock/fps", 2);
+    htInsert(&self->settings, string, _S"fps", stvar, stvar(int32, val));
+}
+
 // Autogen begins -----
 #include "infoblock.auto.inc"
 // Autogen ends -------

@@ -66,10 +66,11 @@ bool patchFeature(SubspaceFeature* feat, PatchState* ps)
         return false;
 
     // allocate needed space for settings
-    if (feat->settingsSize > 0) {
-        feat->settings = smalloc(feat->settingsSize(feat));
+    if (feat->settingsspec && feat->settingsspec->size > 0) {
+        feat->settings = smalloc(feat->settingsspec->size);
         if (!feat->settings)
             return false;
+        memset(feat->settings, 0, feat->settingsspec->size);
     } else {
         feat->settings = NULL;
     }

@@ -7,6 +7,8 @@
 
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
+typedef struct ControlClient ControlClient;
+typedef struct ControlClient_WeakRef ControlClient_WeakRef;
 typedef struct SubspaceFeature SubspaceFeature;
 typedef struct SubspaceFeature_WeakRef SubspaceFeature_WeakRef;
 typedef struct ClientFeature ClientFeature;
@@ -23,6 +25,9 @@ typedef struct SubspaceFeature_ClassIf {
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
+    void (*loadSettings)(_In_ void* self);
+    void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
+    void (*sendAllSettings)(_In_ void* self, ControlClient* client);
 } SubspaceFeature_ClassIf;
 extern SubspaceFeature_ClassIf SubspaceFeature_ClassIf_tmpl;
 
@@ -63,6 +68,12 @@ typedef struct SubspaceFeature_WeakRef {
 #define featureGetSettingsPage(self) (self)->_->getSettingsPage(SubspaceFeature(self))
 // void featureEnable(SubspaceFeature* self, bool enabled);
 #define featureEnable(self, enabled) (self)->_->enable(SubspaceFeature(self), enabled)
+// void featureLoadSettings(SubspaceFeature* self);
+#define featureLoadSettings(self) (self)->_->loadSettings(SubspaceFeature(self))
+// void featureSendSetting(SubspaceFeature* self, ControlClient* client, strref name);
+#define featureSendSetting(self, client, name) (self)->_->sendSetting(SubspaceFeature(self), ControlClient(client), name)
+// void featureSendAllSettings(SubspaceFeature* self, ControlClient* client);
+#define featureSendAllSettings(self, client) (self)->_->sendAllSettings(SubspaceFeature(self), ControlClient(client))
 
 typedef struct ClientFeature {
     union {

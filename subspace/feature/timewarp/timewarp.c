@@ -22,6 +22,20 @@ _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss)
     return self;
 }
 
+extern void SubspaceFeature_loadSettings(_In_ SubspaceFeature* self);   // parent
+#define parent_loadSettings() SubspaceFeature_loadSettings((SubspaceFeature*)(self))
+void TimeWarp_loadSettings(_In_ TimeWarp* self)
+{
+    int32 val;
+
+    val = ssdVal(int32, self->ss->settings, _S"feature/TimeWarp/maxwarp", 32);
+    htInsert(&self->settings, string, _S"maxwarp", stvar, stvar(int32, val));
+    val = ssdVal(int32, self->ss->settings, _S"feature/TimeWarp/doubletap", 0);
+    htInsert(&self->settings, string, _S"doubletap", stvar, stvar(int32, val));
+    bool bval = ssdVal(bool, self->ss->settings, _S"feature/TimeWarp/allowslowmo", false);
+    htInsert(&self->settings, string, _S"allowslowmo", stvar, stvar(bool, bval));
+}
+
 // Autogen begins -----
 #include "timewarp.auto.inc"
 // Autogen ends -------

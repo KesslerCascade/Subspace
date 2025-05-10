@@ -10,6 +10,9 @@ static SubspaceFeature_ClassIf _impl_SubspaceFeature_SubspaceFeature_ClassIf = {
     ._implements = (ObjIface*)&SubspaceFeature_ClassIf_tmpl,
     .getSettingsPage = (SettingsPage* (*)(void*))SubspaceFeature_getSettingsPage,
     .enable = (void (*)(void*, bool))SubspaceFeature_enable,
+    .loadSettings = (void (*)(void*))SubspaceFeature_loadSettings,
+    .sendSetting = (void (*)(void*, ControlClient*, strref))SubspaceFeature_sendSetting,
+    .sendAllSettings = (void (*)(void*, ControlClient*))SubspaceFeature_sendAllSettings,
 };
 
 static ObjIface* _ifimpl_SubspaceFeature[] = {

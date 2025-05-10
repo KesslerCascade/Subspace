@@ -7,6 +7,8 @@
 
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
+typedef struct ControlClient ControlClient;
+typedef struct ControlClient_WeakRef ControlClient_WeakRef;
 typedef struct TimeWarp TimeWarp;
 typedef struct TimeWarp_WeakRef TimeWarp_WeakRef;
 saDeclarePtr(TimeWarp);
@@ -19,6 +21,9 @@ typedef struct TimeWarp_ClassIf {
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
+    void (*loadSettings)(_In_ void* self);
+    void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
+    void (*sendAllSettings)(_In_ void* self, ControlClient* client);
 } TimeWarp_ClassIf;
 extern TimeWarp_ClassIf TimeWarp_ClassIf_tmpl;
 
@@ -65,4 +70,10 @@ _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss);
 #define timewarpGetSettingsPage(self) (self)->_->getSettingsPage(TimeWarp(self))
 // void timewarpEnable(TimeWarp* self, bool enabled);
 #define timewarpEnable(self, enabled) (self)->_->enable(TimeWarp(self), enabled)
+// void timewarpLoadSettings(TimeWarp* self);
+#define timewarpLoadSettings(self) (self)->_->loadSettings(TimeWarp(self))
+// void timewarpSendSetting(TimeWarp* self, ControlClient* client, strref name);
+#define timewarpSendSetting(self, client, name) (self)->_->sendSetting(TimeWarp(self), ControlClient(client), name)
+// void timewarpSendAllSettings(TimeWarp* self, ControlClient* client);
+#define timewarpSendAllSettings(self, client) (self)->_->sendAllSettings(TimeWarp(self), ControlClient(client))
 

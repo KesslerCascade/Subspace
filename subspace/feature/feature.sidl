@@ -1,6 +1,7 @@
 #include "subspace.h"
 
 class SettingsPage;
+class ControlClient;
 [methodprefix feature] abstract class SubspaceFeature {
     Subspace *ss;
     RWLock lock;
@@ -14,6 +15,9 @@ class SettingsPage;
 
     SettingsPage *getSettingsPage();
     void enable(bool enabled);
+    void loadSettings();
+    void sendSetting(ControlClient *client, strref name);
+    void sendAllSettings(ControlClient *client);
 }
 
 class ClientFeature {

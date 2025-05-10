@@ -7,6 +7,8 @@
 
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
+typedef struct ControlClient ControlClient;
+typedef struct ControlClient_WeakRef ControlClient_WeakRef;
 typedef struct InfoBlock InfoBlock;
 typedef struct InfoBlock_WeakRef InfoBlock_WeakRef;
 saDeclarePtr(InfoBlock);
@@ -19,6 +21,9 @@ typedef struct InfoBlock_ClassIf {
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
+    void (*loadSettings)(_In_ void* self);
+    void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
+    void (*sendAllSettings)(_In_ void* self, ControlClient* client);
 } InfoBlock_ClassIf;
 extern InfoBlock_ClassIf InfoBlock_ClassIf_tmpl;
 
@@ -65,4 +70,10 @@ _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss);
 #define infoblockGetSettingsPage(self) (self)->_->getSettingsPage(InfoBlock(self))
 // void infoblockEnable(InfoBlock* self, bool enabled);
 #define infoblockEnable(self, enabled) (self)->_->enable(InfoBlock(self), enabled)
+// void infoblockLoadSettings(InfoBlock* self);
+#define infoblockLoadSettings(self) (self)->_->loadSettings(InfoBlock(self))
+// void infoblockSendSetting(InfoBlock* self, ControlClient* client, strref name);
+#define infoblockSendSetting(self, client, name) (self)->_->sendSetting(InfoBlock(self), ControlClient(client), name)
+// void infoblockSendAllSettings(InfoBlock* self, ControlClient* client);
+#define infoblockSendAllSettings(self, client) (self)->_->sendAllSettings(InfoBlock(self), ControlClient(client))
 

@@ -3,6 +3,12 @@
 #include "feature.h"
 #include "subspacegame.h"
 
+typedef struct TimeWarpSettings {
+    int maxwarp;
+    bool allowslowmo;
+    int doubletap;
+} TimeWarpSettings;
+
 bool timeWarpBegin();
 bool timeWarpIncrease();
 bool timeWarpDecrease();

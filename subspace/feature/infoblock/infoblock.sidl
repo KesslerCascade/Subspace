@@ -2,4 +2,5 @@
 
 class InfoBlock extends SubspaceFeature {
     factory create(Subspace *ss);
+    override loadSettings;
 }

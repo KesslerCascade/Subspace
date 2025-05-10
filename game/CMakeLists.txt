@@ -82,6 +82,7 @@ add_executable(subspacegame
     control/cmds.c
     control/cmds/cmdcleartostart.c
     control/cmds/cmdenablefeature.c
+    control/cmds/cmdfeaturesettings.c
     feature/feature.c
     feature/frameadv.c
     feature/infoblock.c

@@ -9,6 +9,7 @@ TimeWarp_ClassIf TimeWarp_ClassIf_tmpl = {
 static TimeWarp_ClassIf _impl_TimeWarp_TimeWarp_ClassIf = {
     ._size = sizeof(TimeWarp_ClassIf),
     ._implements = (ObjIface*)&TimeWarp_ClassIf_tmpl,
+    .loadSettings = (void (*)(void*))TimeWarp_loadSettings,
 };
 
 static ObjIface* _ifimpl_TimeWarp[] = {

@@ -168,6 +168,10 @@ void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
     // reconcile feature state with the connected client
     foreach (hashtable, hti, ss->freg->features) {
         SubspaceFeature* feat = (SubspaceFeature*)htiVal(object, hti);
+
+        // send settings for all features, whether they're enabled or not
+        featureSendAllSettings(feat, client);
+
         withWriteLock (&feat->lock) {
             ClientFeature* cfeat = NULL;
             if (htFind(self->features, string, feat->name, object, &cfeat)) {

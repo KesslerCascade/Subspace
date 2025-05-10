@@ -7,6 +7,8 @@
 
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
+typedef struct ControlClient ControlClient;
+typedef struct ControlClient_WeakRef ControlClient_WeakRef;
 typedef struct FrameAdv FrameAdv;
 typedef struct FrameAdv_WeakRef FrameAdv_WeakRef;
 saDeclarePtr(FrameAdv);
@@ -19,6 +21,9 @@ typedef struct FrameAdv_ClassIf {
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
+    void (*loadSettings)(_In_ void* self);
+    void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
+    void (*sendAllSettings)(_In_ void* self, ControlClient* client);
 } FrameAdv_ClassIf;
 extern FrameAdv_ClassIf FrameAdv_ClassIf_tmpl;
 
@@ -65,4 +70,10 @@ _objfactory_guaranteed FrameAdv* FrameAdv_create(Subspace* ss);
 #define frameadvGetSettingsPage(self) (self)->_->getSettingsPage(FrameAdv(self))
 // void frameadvEnable(FrameAdv* self, bool enabled);
 #define frameadvEnable(self, enabled) (self)->_->enable(FrameAdv(self), enabled)
+// void frameadvLoadSettings(FrameAdv* self);
+#define frameadvLoadSettings(self) (self)->_->loadSettings(FrameAdv(self))
+// void frameadvSendSetting(FrameAdv* self, ControlClient* client, strref name);
+#define frameadvSendSetting(self, client, name) (self)->_->sendSetting(FrameAdv(self), ControlClient(client), name)
+// void frameadvSendAllSettings(FrameAdv* self, ControlClient* client);
+#define frameadvSendAllSettings(self, client) (self)->_->sendAllSettings(FrameAdv(self), ControlClient(client))
 

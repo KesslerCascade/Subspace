@@ -1,3 +1,5 @@
+#include "control.h"
+
 #include "ftl/stdlib.h"
 
 #include "timewarp.h"
@@ -24,6 +26,8 @@ static float animationTimer = 0;
 static float fadeTimer      = 16;
 
 static char savedFrameLimit;   // whether frame limiter was on or off when time warp began
+
+static bool firstTap = false;
 
 static const GL_Color warpTextColors[2] = {
     { 1, 0.715, 0, 1   },
@@ -76,11 +80,19 @@ bool timeWarpBegin()
 
 bool timeWarpIncrease()
 {
+    TimeWarpSettings* settings = TimeWarp_feature.settings;
     if (!timeWarpBegin())
         return false;
 
+    if (settings->doubletap != 0 && gs.warpFactor * 2 + 0.01 >= settings->doubletap && !firstTap) {
+        firstTap = true;
+        return false;
+    }
+
+    firstTap = false;
+
     float oldfactor = gs.warpFactor;
-    gs.warpFactor   = MIN(gs.warpFactor * 2, MAX_WARP_FACTOR);
+    gs.warpFactor   = MIN(MIN(gs.warpFactor * 2, MAX_WARP_FACTOR), settings->maxwarp);
     doTheTimeWarpAgain();
 
     if (gs.warpFactor > 0.99 && gs.warpFactor < 1.01)
@@ -101,8 +113,15 @@ bool timeWarpIncrease()
 
 bool timeWarpDecrease()
 {
+    TimeWarpSettings* settings = TimeWarp_feature.settings;
+    if (!settings->allowslowmo && (!gs.timeWarpActive || gs.warpFactor / 2 < 1)) {
+        return false;
+    }
+
     if (!timeWarpBegin())
         return false;
+
+    firstTap = false;
 
     float oldfactor = gs.warpFactor;
     gs.warpFactor   = MAX(gs.warpFactor / 2, MIN_WARP_FACTOR);
@@ -129,6 +148,7 @@ void timeWarpEnd()
     gs.warpFactorActual = 1;
     g_TargetFrameTimeMS = baseFrameTime;   // restore frame time for FPS limiter
     fadeTimer           = 0;
+    firstTap            = false;
 }
 
 // ---- Warp implementation ----------------
@@ -295,10 +315,21 @@ Patch* TimeWarp_patches[] = { &patch_CFPS_OnLoop,           &patch_CFPS_TargetFr
                               &patch_CommandGui_OnLoop,     &patch_ShipStatus_OnRender,
                               &patch_CApp_OnRender,         0 };
 
+FeatureSettingsSpec TimeWarp_spec = {
+    .size = sizeof(TimeWarpSettings),
+    .ent  = { { .name = "maxwarp", .type = CF_INT, .off = offsetof(TimeWarpSettings, maxwarp) },
+             { .name = "allowslowmo",
+                .type = CF_BOOL,
+                .off  = offsetof(TimeWarpSettings, allowslowmo) },
+             { .name = "doubletap", .type = CF_INT, .off = offsetof(TimeWarpSettings, doubletap) },
+             { 0 } }
+};
+
 SubspaceFeature TimeWarp_feature = {
     .name            = "TimeWarp",
     .patch           = timeWarp_Patch,
     .enable          = timeWarp_Enable,
+    .settingsspec    = &TimeWarp_spec,
     .requiredPatches = TimeWarp_patches,
     .requiredSymbols = { &SYM(CFPS_FPSControl),
                         &SYM(CFPS_GetTime),

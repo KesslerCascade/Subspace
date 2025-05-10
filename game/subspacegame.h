@@ -11,8 +11,6 @@ typedef struct PatchState PatchState;
 typedef struct Patch Patch;
 typedef Patch* PatchSequence[];
 typedef struct Symbol Symbol;
-// Return how much space is needed for any feature-specific settings
-typedef size_t (*featureSettingsSize_t)(SubspaceFeature* feat);
 
 // Any extra validation that is needed for the feature
 typedef bool (*featureValidate_t)(SubspaceFeature* feat, PatchState* ps);
@@ -28,20 +26,31 @@ extern const int subspace_version_min;
 extern const char* subspace_version_series;
 extern const char* subspace_version_str;
 
+typedef struct FeatureSettingsEnt {
+    const char* name;
+    int type;   // same as control message types
+    size_t off;
+} FeatureSettingsEnt;
+
+typedef struct FeatureSettingsSpec {
+    size_t size;   // how much space is required for feature-specific settings (should use a sizeof)
+    FeatureSettingsEnt ent[];   // null name terminated list of settings
+} FeatureSettingsSpec;
+
 typedef struct SubspaceFeature {
     bool valid;   // has this feature been validated -- all required symbols and patches available
     bool available;   // is this feature available -- i.e. did all the necessary patches apply?
     bool enabled;   // is the feature enabled? Doesn't mean that it's active right now, just enabled
 
     const char* name;   // name of the feature
-    featureSettingsSize_t settingsSize;
     featureValidate_t validate;
     featurePatch_t patch;
     featureEnable_t enable;
 
-    void* settings;              // memory allocated for a feature-specific struct
+    FeatureSettingsSpec* settingsspec;   // structure definiting which settings are to be received
+    void* settings;                      // memory allocated for a feature-specific struct
 
-    Patch** requiredPatches;     // patches needed for this feature to function
+    Patch** requiredPatches;             // patches needed for this feature to function
     Symbol* requiredSymbols[];   // other required symbols that aren't checked for during patch
                                  // sequence validation
 } SubspaceFeature;
