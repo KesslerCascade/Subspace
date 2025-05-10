@@ -56,14 +56,14 @@ void ClientFeature_destroy(_In_ ClientFeature* self)
 void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled)
 {
     withWriteLock (&self->lock) {
-        self->enabled = true;
+        self->enabled = enabled;
     }
 
     // send feature state and config (if enabled) to any connected clients
     GameMgr* gmgr = self->ss->gmgr;
     withReadLock (&gmgr->gmgrlock) {
         foreach (hashtable, hti, gmgr->insts) {
-            GameInst* inst        = (GameInst*)htiKey(object, hti);
+            GameInst* inst        = (GameInst*)htiVal(object, hti);
             ControlClient* client = objAcquireFromWeak(ControlClient, inst->client);
             if (!client)
                 continue;

@@ -61,7 +61,10 @@ uint32 UIUpdateDispatch_run(_In_ UIUpdateDispatch* self, _In_ TaskQueue* tq, _In
         return TASK_Result_Failure;
 
     if (self->settings) {
-        settingswinUpdatePage(self->ui->settingsw, self->panelname);
+        if (strEmpty(self->panelname))
+            settingswinUpdateList(self->ui->settingsw);
+        else
+            settingswinUpdatePage(self->ui->settingsw, self->panelname);
         return TASK_Result_Success;
     } else if (self->all) {
         mainwinUpdateAll(self->ui->mainw);

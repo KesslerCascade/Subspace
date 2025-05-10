@@ -5,11 +5,14 @@
 #include <cx/obj.h>
 #include "ui/page/settingspage.h"
 #include "gamemgr/gameinst.h"
+#include "ui/util/iupsetobj.h"
 
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
+typedef struct ControlClient ControlClient;
+typedef struct ControlClient_WeakRef ControlClient_WeakRef;
 typedef struct GameMgr GameMgr;
 typedef struct GameMgr_WeakRef GameMgr_WeakRef;
 typedef struct ControlClient ControlClient;
@@ -48,6 +51,7 @@ typedef struct FeaturesPage {
     string imgname;
     string title;
     bool visible;
+    sa_Ihandle featpanels;
 } FeaturesPage;
 extern ObjClassInfo FeaturesPage_clsinfo;
 #define FeaturesPage(inst) ((FeaturesPage*)(unused_noeval((inst) && &((inst)->_is_FeaturesPage)), (inst)))

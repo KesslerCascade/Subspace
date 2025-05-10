@@ -1,7 +1,12 @@
 #include "ui/page/settingspage.sidl"
 #include "gamemgr/gameinst.sidl"
+#include "ui/util/iupsetobj.h"
 
 class FeaturesPage extends SettingsPage {
+    [noinit] sarray:Ihandle featpanels;
+
     factory create(SubspaceUI *ui);
     override make;
+    override update;
+    init();
 }

@@ -489,6 +489,34 @@ bool SetupPage_update(_In_ SetupPage* self)
                 ssdSet(self->ss->settings, _S"ftl/ver", true, stvar(string, self->verstr));
                 subspaceUpdateUI(self->ss);
 
+                GameInst* curinst = objAcquireFromWeak(GameInst, self->ss->curinst);
+                int rinststate    = curinst ? ginstGetState(curinst) : GI_Init;
+
+                // cache feature availability
+                foreach (hashtable, hti, self->ss->freg->features) {
+                    SubspaceFeature* feat = (SubspaceFeature*)htiVal(object, hti);
+                    ClientFeature* cfeat  = NULL;
+                    bool avail            = false;
+                    if (htFind(inst->features, string, feat->name, object, &cfeat)) {
+                        avail = cfeat->available;
+                        objRelease(&cfeat);
+                    }
+
+                    // don't update live feature availability if another instance is focused
+                    if (rinststate == GI_Init || rinststate == GI_Exited) {
+                        withWriteLock (&feat->lock) {
+                            feat->available = avail;
+                        }
+                    }
+
+                    string epath = 0;
+                    strNConcat(&epath, _S"feature/", feat->name, _S"/available");
+                    ssdSet(self->ss->settings, epath, true, stvar(bool, avail));
+                    strDestroy(&epath);
+                }
+
+                objRelease(&curinst);
+
                 self->vpending = false;
             }
         } else if (state == GI_Failed) {

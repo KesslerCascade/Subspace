@@ -176,6 +176,7 @@ void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
             ClientFeature* cfeat = NULL;
             if (htFind(self->features, string, feat->name, object, &cfeat)) {
                 feat->available = cfeat->available;
+
                 if (feat->enabled) {
                     ControlMsg* msg = controlNewMsg("EnableFeature", 2);
                     controlMsgStr(msg, 0, "feature", feat->name);
@@ -187,6 +188,12 @@ void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
             } else {
                 feat->available = false;
             }
+
+            // cache available state
+            string epath = 0;
+            strNConcat(&epath, _S"feature/", feat->name, _S"/available");
+            ssdSet(self->ss->settings, epath, true, stvar(bool, feat->available));
+            strDestroy(&epath);
         }
     }
 

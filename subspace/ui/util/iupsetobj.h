@@ -8,6 +8,8 @@
 #define ObjNone ((ObjInst*)NULL)
 #endif
 
+saDeclarePtr(Ihandle);
+
 _meta_inline void _iupSetObj(Ihandle* ih, ObjInst* obj, ObjInst* parent, SubspaceUI* ui)
 {
     if (obj)

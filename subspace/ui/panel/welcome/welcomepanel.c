@@ -14,8 +14,6 @@
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
 
-saDeclarePtr(Ihandle);
-
 _objfactory_guaranteed WelcomePanel* WelcomePanel_create(SubspaceUI* ui)
 {
     WelcomePanel* self;

@@ -7,6 +7,8 @@ static void _registerFeature(FeatureRegistry* reg, SubspaceFeature* feat)
     string epath = 0;
     strNConcat(&epath, _S"feature/", feat->name, _S"/enabled");
     ssdCopyOut(reg->ss->settings, epath, bool, &feat->enabled);
+    strNConcat(&epath, _S"feature/", feat->name, _S"/available");
+    ssdCopyOut(reg->ss->settings, epath, bool, &feat->available);
     strDestroy(&epath);
 
     featureLoadSettings(feat);
