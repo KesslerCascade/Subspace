@@ -216,9 +216,9 @@ void* srealloc_heap(sm_heap_t* heap, void* ptr, unsigned int sz)
 char* sstrdup_heap(sm_heap_t* heap, const char* src)
 {
     size_t sz  = strlen(src);
-    void* dest = smalloc_heap(heap, sz);
+    void* dest = smalloc_heap(heap, sz + 1);
     if (dest) {
-        memcpy(dest, src, sz);
+        memcpy(dest, src, sz + 1);
     }
     return dest;
 }
