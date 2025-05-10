@@ -175,7 +175,7 @@ void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
                 if (feat->enabled) {
                     ControlMsg* msg = controlNewMsg("EnableFeature", 2);
                     controlMsgStr(msg, 0, "feature", feat->name);
-                    controlMsgInt(msg, 1, "enabled", 1);
+                    controlMsgBool(msg, 1, "enabled", true);
                     cclientQueue(client, msg);
                 }
                 // cfeat->enabled will be set when the client sends a FeatureState update

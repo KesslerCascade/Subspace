@@ -122,7 +122,7 @@ void sscmain2(void)
     sendAllFeatureState();
 
     ControlMsg* msg = controlNewMsg("GameReady", 1);
-    controlMsgInt(msg, 0, "start", 1);
+    controlMsgBool(msg, 0, "start", 1);
     controlClientQueue(msg);
 
     // loop until we get the all-clear

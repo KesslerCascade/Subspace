@@ -139,7 +139,7 @@ void controlSendValidate(ControlState* cs, bool success, int failreason)
     msg = controlAllocMsg(3, CF_ALLOC_SALLOC);
 
     strcpy(msg->hdr.cmd, "Validate");
-    controlMsgInt(msg, 0, "result", success ? 1 : 0);
+    controlMsgBool(msg, 0, "result", success);
 
     if (success) {
         ControlField* verf = msg->fields[1];

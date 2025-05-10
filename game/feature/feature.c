@@ -138,8 +138,8 @@ void sendFeatureState(SubspaceFeature* feat, int replyto)
     ControlMsg* msg  = controlNewMsg("FeatureState", 3);
     msg->hdr.replyid = replyto;
     controlMsgStr(msg, 0, "feature", feat->name);
-    controlMsgInt(msg, 1, "available", feat->available);
-    controlMsgInt(msg, 2, "enabled", feat->enabled);
+    controlMsgBool(msg, 1, "available", feat->available);
+    controlMsgBool(msg, 2, "enabled", feat->enabled);
     controlClientQueue(msg);
 }
 

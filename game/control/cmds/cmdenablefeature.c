@@ -13,7 +13,7 @@ void cmdEnableFeature(ControlMsg* msg)
         return;
 
     ControlField* fenabled = controlMsgFindField(msg, "enabled");
-    if (fenabled && fenabled->h.ftype == CF_INT) {
-        enableFeature(feat, fenabled->d.cfd_int != 0);
+    if (fenabled && fenabled->h.ftype == CF_BOOL) {
+        enableFeature(feat, fenabled->d.cfd_bool);
     }
 }

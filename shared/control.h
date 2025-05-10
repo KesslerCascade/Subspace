@@ -50,8 +50,9 @@ enum CFTYPE_ENUM {
     CF_INT,
     CF_FLOAT32,
     CF_FLOAT64,
+    CF_BOOL,
     CF_STRING,
-    CF_RAW      // incompatible with CF_ARRAY
+    CF_RAW   // incompatible with CF_ARRAY
 };
 
 enum CFFLAG_ENUM {
@@ -78,6 +79,8 @@ typedef struct ControlField {
         float* cfd_float32_arr;
         double cfd_float64;
         double* cfd_float64_arr;
+        bool cfd_bool;
+        bool* cfd_bool_arr;
 #ifdef SUBSPACE_GAME
         char* cfd_str;
         char** cfd_str_arr;
@@ -147,6 +150,7 @@ void controlMsgInt(ControlMsg* msg, int nfield, const char* name, int val);
 void controlMsgUInt(ControlMsg* msg, int nfield, const char* name, unsigned int val);
 void controlMsgFloat32(ControlMsg* msg, int nfield, const char* name, float val);
 void controlMsgFloat64(ControlMsg* msg, int nfield, const char* name, double val);
+void controlMsgBool(ControlMsg* msg, int nfield, const char* name, bool val);
 #ifdef SUBSPACE_GAME
 void controlMsgStr(ControlMsg* msg, int nfield, const char* name, const char* val);
 #else

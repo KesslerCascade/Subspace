@@ -70,6 +70,10 @@ uint32 ControlTask_run(_In_ ControlTask* self, _In_ TaskQueue* tq, _In_ TQWorker
                 val.type            = stType(float64);
                 val.data.st_float64 = f->d.cfd_float64;
                 break;
+            case CF_BOOL:
+                val.type         = stType(bool);
+                val.data.st_bool = f->d.cfd_bool;
+                break;
             case CF_STRING:
                 val.type = stType(string);
                 strDup(&val.data.st_string, f->d.cfd_str);
@@ -96,6 +100,11 @@ uint32 ControlTask_run(_In_ ControlTask* self, _In_ TaskQueue* tq, _In_ TQWorker
                 saInit(&val.data.st_sarray, float64, f->count);
                 saSetSize(&val.data.st_sarray, f->count);
                 memcpy(val.data.st_sarray.a, f->d.cfd_float64_arr, f->count * sizeof(float64));
+                break;
+            case CF_BOOL:
+                saInit(&val.data.st_sarray, bool, f->count);
+                saSetSize(&val.data.st_sarray, f->count);
+                memcpy(val.data.st_sarray.a, f->d.cfd_bool_arr, f->count * sizeof(bool));
                 break;
             case CF_STRING:
                 saClone(&val.data.st_sarray, f->d.cfd_str_arr);
