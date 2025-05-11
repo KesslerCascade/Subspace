@@ -21,9 +21,11 @@ typedef struct FrameAdv_ClassIf {
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
-    void (*loadSettings)(_In_ void* self);
+    void (*applyDefaultSettings)(_In_ void* self);
     void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
+    // update curinst when a settings changes
+    void (*sendSettingCur)(_In_ void* self, _In_opt_ strref name);
 } FrameAdv_ClassIf;
 extern FrameAdv_ClassIf FrameAdv_ClassIf_tmpl;
 
@@ -44,7 +46,7 @@ typedef struct FrameAdv {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
-    hashtable settings;        // Settings that are synchronized with the game client
+    SSDNode* settings;        // Settings that are synchronized with the game client
 } FrameAdv;
 extern ObjClassInfo FrameAdv_clsinfo;
 #define FrameAdv(inst) ((FrameAdv*)(unused_noeval((inst) && &((inst)->_is_FrameAdv)), (inst)))
@@ -70,10 +72,14 @@ _objfactory_guaranteed FrameAdv* FrameAdv_create(Subspace* ss);
 #define frameadvGetSettingsPage(self) (self)->_->getSettingsPage(FrameAdv(self))
 // void frameadvEnable(FrameAdv* self, bool enabled);
 #define frameadvEnable(self, enabled) (self)->_->enable(FrameAdv(self), enabled)
-// void frameadvLoadSettings(FrameAdv* self);
-#define frameadvLoadSettings(self) (self)->_->loadSettings(FrameAdv(self))
+// void frameadvApplyDefaultSettings(FrameAdv* self);
+#define frameadvApplyDefaultSettings(self) (self)->_->applyDefaultSettings(FrameAdv(self))
 // void frameadvSendSetting(FrameAdv* self, ControlClient* client, strref name);
 #define frameadvSendSetting(self, client, name) (self)->_->sendSetting(FrameAdv(self), ControlClient(client), name)
 // void frameadvSendAllSettings(FrameAdv* self, ControlClient* client);
 #define frameadvSendAllSettings(self, client) (self)->_->sendAllSettings(FrameAdv(self), ControlClient(client))
+// void frameadvSendSettingCur(FrameAdv* self, strref name);
+//
+// update curinst when a settings changes
+#define frameadvSendSettingCur(self, name) (self)->_->sendSettingCur(FrameAdv(self), name)
 

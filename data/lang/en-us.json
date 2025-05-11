@@ -72,5 +72,13 @@
     "feature_timewarp": "Time Warp",
     "feature_timewarp_desc": "Speed up time to skip over the boring parts.",
     "feature_tweaks": "Miscellaneous Tweaks",
-    "feature_tweaks_desc": "A catch-all feature for one-off tweaks that do not fit in any other category."
+    "feature_tweaks_desc": "A catch-all feature for one-off tweaks that do not fit in any other category.",
+    "settings_keybinds": "Key Bindings",
+    "timewarp_maxwarp": "Maximum Warp Factor:",
+    "timewarp_maxwarp_tip": "Limits the maximum time acceleration that can be set using the key bindings.",
+    "timewarp_doubletap": "Double Tap Required:",
+    "timewarp_doubletap_tip": "When enabled, requires pressing the 'increase warp factor' key binding twice to increase to this factor or higher. This helps prevent accidentally accelerating time too fast to control.",
+    "timewarp_doubletap_off": "Off",
+    "timewarp_allowslowmo": "Allow Slow Motion",
+    "timewarp_allowslowmo_tip": "Allows the warp factor to be set to values less than 1x, effectively running the game in slow motion."
 }

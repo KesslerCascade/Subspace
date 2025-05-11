@@ -39,6 +39,7 @@ set(SUBSPACE_SIDL
     feature/infoblock/infoblock.sidl
     feature/numerichull/numerichull.sidl
     feature/timewarp/timewarp.sidl
+    feature/timewarp/timewarppage.sidl
     gamemgr/gameinst.sidl
     gamemgr/gamemgr.sidl
     lang/langdb.sidl
@@ -87,6 +88,7 @@ add_executable(subspace
     feature/infoblock/infoblock.c
     feature/numerichull/numerichull.c
     feature/timewarp/timewarp.c
+    feature/timewarp/timewarppage.c
     gamemgr/gameinst.c
     gamemgr/gamemgr.c
     lang/lang.c
@@ -115,6 +117,7 @@ add_executable(subspace
     ui/util/iuploadimage.c
     ui/util/iuprefreshdispatch.c
     ui/util/iupsetimagedispatch.c
+    ui/util/settip.c
     ui/util/uiupdatedispatch.c
     win32/process.c
     win32/subspace.manifest

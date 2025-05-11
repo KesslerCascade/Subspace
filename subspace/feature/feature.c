@@ -11,12 +11,16 @@
 // ==================== Auto-generated section ends ======================
 #include "control/controlclient.h"
 #include "gamemgr/gamemgr.h"
+#include "ui/page/settingspage.h"
 
 _objinit_guaranteed bool SubspaceFeature_init(_In_ SubspaceFeature* self)
 {
+    string spath = 0;
+    strNConcat(&spath, _S"feature/", self->name, _S"/settings");
+    self->settings = ssdSubtree(self->ss->settings, spath, SSD_Create_Hashtable);
+    strDestroy(&spath);
     // Autogen begins -----
     rwlockInit(&self->lock);
-    htInit(&self->settings, string, stvar, 16);
     return true;
     // Autogen ends -------
 }
@@ -26,7 +30,7 @@ void SubspaceFeature_destroy(_In_ SubspaceFeature* self)
     // Autogen begins -----
     rwlockDestroy(&self->lock);
     strDestroy(&self->name);
-    htDestroy(&self->settings);
+    objRelease(&self->settings);
     // Autogen ends -------
 }
 
@@ -86,6 +90,10 @@ void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled)
     ssdSet(self->ss->settings, epath, true, stvar(bool, enabled));
     strDestroy(&epath);
 
+    SettingsPage* page = featureGetSettingsPage(self);
+    if (page)
+        page->visible = enabled;
+
     // update entire UI when feature state changes
     subspaceUpdateUI(self->ss);
     return;
@@ -96,6 +104,16 @@ static bool sendSettingVal(ControlMsg* msg, int field, const char* fname, stvar*
     switch (stGetId(val->type)) {
     case STypeId_bool:
         controlMsgBool(msg, field, fname, val->data.st_bool);
+        return true;
+    case STypeId_int64:
+        // parsed from json... have to figure out whether it's signed or unsigned
+        if (val->data.st_int64 < 0)
+            controlMsgInt(msg, field, fname, (int32)val->data.st_int64);
+        else if (val->data.st_int64 > 0x7fffffffULL)
+            controlMsgUInt(msg, field, fname, (uint32)val->data.st_int64);
+        else
+            controlMsgInt(msg, field, fname, (int32)val->data.st_int64);
+
         return true;
     case STypeId_int32:
         controlMsgInt(msg, field, fname, val->data.st_int32);
@@ -121,13 +139,8 @@ void SubspaceFeature_sendSetting(_In_ SubspaceFeature* self, ControlClient* clie
                                  _In_opt_ strref name)
 {
     stvar val;
-    bool found;
 
-    withReadLock (&self->lock) {
-        found = htFind(self->settings, strref, name, stvar, &val);
-    }
-
-    if (!found)
+    if (!ssdGet(self->settings, name, &val))
         return;
 
     ControlMsg* msg = controlNewMsg("FeatureSettings", 2);
@@ -139,26 +152,44 @@ void SubspaceFeature_sendSetting(_In_ SubspaceFeature* self, ControlClient* clie
 
 void SubspaceFeature_sendAllSettings(_In_ SubspaceFeature* self, ControlClient* client)
 {
-    if (htSize(self->settings) < 1)
-        return;
+    ControlMsg* msg = NULL;
+    ssdLockedTransaction(self->settings)
+    {
+        int count = ssdCount(self->settings, NULL, false);
+        if (count < 1)
+            break;
 
-    ControlMsg* msg = controlNewMsg("FeatureSettings", htSize(self->settings) + 1);
+        msg = controlNewMsg("FeatureSettings", count + 1);
 
-    int n = 1;
-    controlMsgStr(msg, 0, "feature", self->name);
-    withReadLock (&self->lock) {
-        foreach (hashtable, hti, self->settings) {
-            strref name = htiKey(strref, hti);
-            stvar* val  = htiValPtr(stvar, hti);
+        int n = 1;
+        controlMsgStr(msg, 0, "feature", self->name);
+        foreach (ssd, iter, idx, name, val, self->settings) {
             sendSettingVal(msg, n++, strC(name), val);
         }
     }
-    cclientQueue(client, msg);
+
+    if (msg)
+        cclientQueue(client, msg);
 }
 
-void SubspaceFeature_loadSettings(_In_ SubspaceFeature* self)
+void SubspaceFeature_applyDefaultSettings(_In_ SubspaceFeature* self)
 {
     return;
+}
+
+void SubspaceFeature_sendSettingCur(_In_ SubspaceFeature* self, _In_opt_ strref name)
+{
+    GameInst* cur = objAcquireFromWeak(GameInst, self->ss->curinst);
+    if (!cur)
+        return;
+
+    ControlClient* client = objAcquireFromWeak(ControlClient, cur->client);
+    if (client) {
+        featureSendSetting(self, client, name);
+        objRelease(&client);
+    }
+
+    objRelease(&cur);
 }
 
 // Autogen begins -----

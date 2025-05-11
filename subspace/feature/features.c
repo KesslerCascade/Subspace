@@ -11,7 +11,7 @@ static void _registerFeature(FeatureRegistry* reg, SubspaceFeature* feat)
     ssdCopyOut(reg->ss->settings, epath, bool, &feat->available);
     strDestroy(&epath);
 
-    featureLoadSettings(feat);
+    featureApplyDefaultSettings(feat);
 
     htInsertC(&reg->features, string, feat->name, object, &feat);
 }

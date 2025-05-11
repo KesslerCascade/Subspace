@@ -21,9 +21,11 @@ typedef struct NumericHull_ClassIf {
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
-    void (*loadSettings)(_In_ void* self);
+    void (*applyDefaultSettings)(_In_ void* self);
     void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
+    // update curinst when a settings changes
+    void (*sendSettingCur)(_In_ void* self, _In_opt_ strref name);
 } NumericHull_ClassIf;
 extern NumericHull_ClassIf NumericHull_ClassIf_tmpl;
 
@@ -44,7 +46,7 @@ typedef struct NumericHull {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
-    hashtable settings;        // Settings that are synchronized with the game client
+    SSDNode* settings;        // Settings that are synchronized with the game client
 } NumericHull;
 extern ObjClassInfo NumericHull_clsinfo;
 #define NumericHull(inst) ((NumericHull*)(unused_noeval((inst) && &((inst)->_is_NumericHull)), (inst)))
@@ -70,10 +72,14 @@ _objfactory_guaranteed NumericHull* NumericHull_create(Subspace* ss);
 #define numerichullGetSettingsPage(self) (self)->_->getSettingsPage(NumericHull(self))
 // void numerichullEnable(NumericHull* self, bool enabled);
 #define numerichullEnable(self, enabled) (self)->_->enable(NumericHull(self), enabled)
-// void numerichullLoadSettings(NumericHull* self);
-#define numerichullLoadSettings(self) (self)->_->loadSettings(NumericHull(self))
+// void numerichullApplyDefaultSettings(NumericHull* self);
+#define numerichullApplyDefaultSettings(self) (self)->_->applyDefaultSettings(NumericHull(self))
 // void numerichullSendSetting(NumericHull* self, ControlClient* client, strref name);
 #define numerichullSendSetting(self, client, name) (self)->_->sendSetting(NumericHull(self), ControlClient(client), name)
 // void numerichullSendAllSettings(NumericHull* self, ControlClient* client);
 #define numerichullSendAllSettings(self, client) (self)->_->sendAllSettings(NumericHull(self), ControlClient(client))
+// void numerichullSendSettingCur(NumericHull* self, strref name);
+//
+// update curinst when a settings changes
+#define numerichullSendSettingCur(self, name) (self)->_->sendSettingCur(NumericHull(self), name)
 

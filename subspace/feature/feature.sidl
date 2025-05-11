@@ -1,3 +1,4 @@
+#include <cx/ssdtree/node/ssdnode.sidl>
 #include "subspace.h"
 
 class SettingsPage;
@@ -11,13 +12,14 @@ class ControlClient;
     bool enabled;
     bool optional;   // Features that are expected to be unavailable, e.g. version-specific
 
-    hashtable:string:stvar settings;    // Settings that are synchronized with the game client
+    object:SSDNode settings;    // Settings that are synchronized with the game client
 
     SettingsPage *getSettingsPage();
     void enable(bool enabled);
-    void loadSettings();
+    void applyDefaultSettings();
     void sendSetting(ControlClient *client, strref name);
     void sendAllSettings(ControlClient *client);
+    void sendSettingCur(strref name);   // update curinst when a settings changes
 }
 
 class ClientFeature {

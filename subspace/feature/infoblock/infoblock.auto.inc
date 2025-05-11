@@ -9,7 +9,7 @@ InfoBlock_ClassIf InfoBlock_ClassIf_tmpl = {
 static InfoBlock_ClassIf _impl_InfoBlock_InfoBlock_ClassIf = {
     ._size = sizeof(InfoBlock_ClassIf),
     ._implements = (ObjIface*)&InfoBlock_ClassIf_tmpl,
-    .loadSettings = (void (*)(void*))InfoBlock_loadSettings,
+    .applyDefaultSettings = (void (*)(void*))InfoBlock_applyDefaultSettings,
 };
 
 static ObjIface* _ifimpl_InfoBlock[] = {

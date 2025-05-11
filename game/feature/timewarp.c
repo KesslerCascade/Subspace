@@ -81,6 +81,13 @@ bool timeWarpBegin()
 bool timeWarpIncrease()
 {
     TimeWarpSettings* settings = TimeWarp_feature.settings;
+
+    // special case: double tap set to 2x means we have to check before initiating the warp
+    if (settings->doubletap == 2 && !gs.timeWarpActive && !firstTap) {
+        firstTap = true;
+        return false;
+    }
+
     if (!timeWarpBegin())
         return false;
 

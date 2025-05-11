@@ -8,12 +8,14 @@
 
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
+typedef struct ControlClient ControlClient;
+typedef struct ControlClient_WeakRef ControlClient_WeakRef;
 typedef struct FeatureRegistry FeatureRegistry;
 typedef struct FeatureRegistry_WeakRef FeatureRegistry_WeakRef;
 saDeclarePtr(FeatureRegistry);
 saDeclarePtr(FeatureRegistry_WeakRef);
 
-#define fregGet(fname, registry) objDynCast(fname, fregFind(registry, #fname))
+#define fregGet(fname, registry) objDynCast(fname, fregFind(registry, _S #fname))
 
 typedef struct FeatureRegistry_ClassIf {
     ObjIface* _implements;

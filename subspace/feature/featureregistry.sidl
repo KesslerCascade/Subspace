@@ -1,7 +1,7 @@
 #include "feature.sidl"
 #include "subspace.h"
 
-#define fregGet(fname, registry) objDynCast(fname, fregFind(registry, #fname))
+#define fregGet(fname, registry) objDynCast(fname, fregFind(registry, _S #fname))
 
 [methodprefix freg] class FeatureRegistry {
     Subspace *ss;

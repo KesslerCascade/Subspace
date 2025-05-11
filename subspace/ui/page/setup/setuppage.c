@@ -15,7 +15,6 @@
 #include "ui/settingswin.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
-#include "ui/util/iupsetobj.h"
 
 _objfactory_guaranteed SetupPage* SetupPage_create(SubspaceUI* ui)
 {
@@ -31,19 +30,6 @@ _objfactory_guaranteed SetupPage* SetupPage_create(SubspaceUI* ui)
     strDup(&self->imgname, _S"IMAGE_WRENCH_SMALL_BLACK");
     objInstInit(self);
     return self;
-}
-
-static void setTip(Ihandle* ih, strref tip, strref title, int icon)
-{
-    bool useballoon = !osIsWine();   // balloon tooltips don't work well on wine
-
-    IupSetAttribute(ih, "TIP", strC(tip));
-    if (!strEmpty(title)) {
-        IupSetAttribute(ih, "TIPBALLOON", useballoon ? "YES" : "NO");
-        IupSetAttribute(ih, "TIPBALLOONTITLE", strC(title));
-        IupSetInt(ih, "TIPBALLOONTITLEICON", icon);
-    }
-    IupSetInt(ih, "TIPDELAY", 30000);
 }
 
 static void setCompatState(SetupPage* gp, strref state)

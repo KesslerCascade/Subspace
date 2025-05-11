@@ -6,6 +6,8 @@
 #include <iup.h>
 #include "subspace.h"
 #include "lang/lang.h"
+#include "ui/util/iupsetobj.h"
+#include "ui/util/settip.h"
 
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;

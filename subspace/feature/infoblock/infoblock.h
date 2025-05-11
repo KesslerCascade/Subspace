@@ -21,9 +21,11 @@ typedef struct InfoBlock_ClassIf {
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
-    void (*loadSettings)(_In_ void* self);
+    void (*applyDefaultSettings)(_In_ void* self);
     void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
+    // update curinst when a settings changes
+    void (*sendSettingCur)(_In_ void* self, _In_opt_ strref name);
 } InfoBlock_ClassIf;
 extern InfoBlock_ClassIf InfoBlock_ClassIf_tmpl;
 
@@ -44,7 +46,7 @@ typedef struct InfoBlock {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
-    hashtable settings;        // Settings that are synchronized with the game client
+    SSDNode* settings;        // Settings that are synchronized with the game client
 } InfoBlock;
 extern ObjClassInfo InfoBlock_clsinfo;
 #define InfoBlock(inst) ((InfoBlock*)(unused_noeval((inst) && &((inst)->_is_InfoBlock)), (inst)))
@@ -70,10 +72,14 @@ _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss);
 #define infoblockGetSettingsPage(self) (self)->_->getSettingsPage(InfoBlock(self))
 // void infoblockEnable(InfoBlock* self, bool enabled);
 #define infoblockEnable(self, enabled) (self)->_->enable(InfoBlock(self), enabled)
-// void infoblockLoadSettings(InfoBlock* self);
-#define infoblockLoadSettings(self) (self)->_->loadSettings(InfoBlock(self))
+// void infoblockApplyDefaultSettings(InfoBlock* self);
+#define infoblockApplyDefaultSettings(self) (self)->_->applyDefaultSettings(InfoBlock(self))
 // void infoblockSendSetting(InfoBlock* self, ControlClient* client, strref name);
 #define infoblockSendSetting(self, client, name) (self)->_->sendSetting(InfoBlock(self), ControlClient(client), name)
 // void infoblockSendAllSettings(InfoBlock* self, ControlClient* client);
 #define infoblockSendAllSettings(self, client) (self)->_->sendAllSettings(InfoBlock(self), ControlClient(client))
+// void infoblockSendSettingCur(InfoBlock* self, strref name);
+//
+// update curinst when a settings changes
+#define infoblockSendSettingCur(self, name) (self)->_->sendSettingCur(InfoBlock(self), name)
 

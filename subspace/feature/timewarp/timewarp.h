@@ -4,11 +4,20 @@
 // clang-format off
 #include <cx/obj.h>
 #include "feature/feature.h"
+#include "timewarppage.h"
 
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
+typedef struct SubspaceUI SubspaceUI;
+typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
+typedef struct GameMgr GameMgr;
+typedef struct GameMgr_WeakRef GameMgr_WeakRef;
+typedef struct ControlClient ControlClient;
+typedef struct ControlClient_WeakRef ControlClient_WeakRef;
+typedef struct TimeWarp TimeWarp;
+typedef struct TimeWarp_WeakRef TimeWarp_WeakRef;
 typedef struct TimeWarp TimeWarp;
 typedef struct TimeWarp_WeakRef TimeWarp_WeakRef;
 saDeclarePtr(TimeWarp);
@@ -21,9 +30,11 @@ typedef struct TimeWarp_ClassIf {
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
-    void (*loadSettings)(_In_ void* self);
+    void (*applyDefaultSettings)(_In_ void* self);
     void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
+    // update curinst when a settings changes
+    void (*sendSettingCur)(_In_ void* self, _In_opt_ strref name);
 } TimeWarp_ClassIf;
 extern TimeWarp_ClassIf TimeWarp_ClassIf_tmpl;
 
@@ -44,7 +55,8 @@ typedef struct TimeWarp {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
-    hashtable settings;        // Settings that are synchronized with the game client
+    SSDNode* settings;        // Settings that are synchronized with the game client
+    TimeWarpPage* page;
 } TimeWarp;
 extern ObjClassInfo TimeWarp_clsinfo;
 #define TimeWarp(inst) ((TimeWarp*)(unused_noeval((inst) && &((inst)->_is_TimeWarp)), (inst)))
@@ -70,10 +82,14 @@ _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss);
 #define timewarpGetSettingsPage(self) (self)->_->getSettingsPage(TimeWarp(self))
 // void timewarpEnable(TimeWarp* self, bool enabled);
 #define timewarpEnable(self, enabled) (self)->_->enable(TimeWarp(self), enabled)
-// void timewarpLoadSettings(TimeWarp* self);
-#define timewarpLoadSettings(self) (self)->_->loadSettings(TimeWarp(self))
+// void timewarpApplyDefaultSettings(TimeWarp* self);
+#define timewarpApplyDefaultSettings(self) (self)->_->applyDefaultSettings(TimeWarp(self))
 // void timewarpSendSetting(TimeWarp* self, ControlClient* client, strref name);
 #define timewarpSendSetting(self, client, name) (self)->_->sendSetting(TimeWarp(self), ControlClient(client), name)
 // void timewarpSendAllSettings(TimeWarp* self, ControlClient* client);
 #define timewarpSendAllSettings(self, client) (self)->_->sendAllSettings(TimeWarp(self), ControlClient(client))
+// void timewarpSendSettingCur(TimeWarp* self, strref name);
+//
+// update curinst when a settings changes
+#define timewarpSendSettingCur(self, name) (self)->_->sendSettingCur(TimeWarp(self), name)
 

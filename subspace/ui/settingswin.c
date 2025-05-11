@@ -10,6 +10,7 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
+#include "feature/featureregistry.h"
 #include "ui/page/features/featurespage.h"
 #include "ui/page/setup/setuppage.h"
 #include "ui/subspaceui.h"
@@ -23,6 +24,15 @@ static void SettingsWin_registerPages(SettingsWin* self, SubspaceUI* ui)
     saPushC(&self->pages, object, &p);
     p = SettingsPage(featurespageCreate(ui));
     saPushC(&self->pages, object, &p);
+
+    // register pages that belong to features
+    foreach (hashtable, hti, self->ss->freg->features) {
+        SubspaceFeature* feat = (SubspaceFeature*)htiVal(object, hti);
+        SettingsPage* page    = featureGetSettingsPage(feat);
+        if (page) {
+            saPush(&self->pages, object, page);
+        }
+    }
 }
 
 _objfactory_guaranteed SettingsWin* SettingsWin_create(SubspaceUI* ui)
@@ -127,6 +137,10 @@ void SettingsWin_show(_In_ SettingsWin* self)
     IupSetAttribute(self->win, "SIMULATEMODAL", "YES");
 
     settingswinShowPage(self, 0);
+
+    // queue up a redraw after the window is shown; this fixes a 1 pixel shift when it's first
+    // updated
+    ssuiUpdateSettings(self->ui, NULL);
 }
 
 bool SettingsWin_updatePage(_In_ SettingsWin* self, _In_opt_ strref name)
@@ -142,6 +156,7 @@ bool SettingsWin_updatePage(_In_ SettingsWin* self, _In_opt_ strref name)
 
 void SettingsWin_updateAll(_In_ SettingsWin* self)
 {
+    settingswinUpdateList(self);
     foreach (sarray, idx, SettingsPage*, page, self->pages) {
         settingspageUpdate(page);
     }
@@ -187,7 +202,10 @@ void SettingsWin_showPageByList(_In_ SettingsWin* self, int listid)
 void SettingsWin_updateList(_In_ SettingsWin* self)
 {
     int curval           = IupGetInt(self->pagelist, "VALUE");
-    const char* curtitle = (curval > 0) ? IupGetAttributeId(self->pagelist, "", curval) : NULL;
+    string curtitle      = 0;
+
+    if (curval > 0)
+        strDup(&curtitle, (strref)IupGetAttributeId(self->pagelist, "", curval));
 
     // clear list
     IupSetAttribute(self->pagelist, "1", NULL);
@@ -200,7 +218,7 @@ void SettingsWin_updateList(_In_ SettingsWin* self)
         if (page->visible) {
             IupSetAttributeId(self->pagelist, "", listid, strC(page->title));
 
-            if (curtitle && strEq((strref)curtitle, page->title))
+            if (curtitle && strEq(curtitle, page->title))
                 IupSetInt(self->pagelist, "VALUE", listid);   // restore current selection
 
             if (!strEmpty(page->imgname))
@@ -212,6 +230,8 @@ void SettingsWin_updateList(_In_ SettingsWin* self)
             listid++;
         }
     }
+
+    strDestroy(&curtitle);
 }
 
 void SettingsWin_destroy(_In_ SettingsWin* self)

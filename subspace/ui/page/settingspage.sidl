@@ -1,6 +1,8 @@
 #include <iup.h>
 #include "subspace.h"
 #include "lang/lang.h"
+#include "ui/util/iupsetobj.h"
+#include "ui/util/settip.h"
 
 class SubspaceUI;
 class SettingsPage {

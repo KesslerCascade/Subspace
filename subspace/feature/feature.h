@@ -3,6 +3,7 @@
 // Do not make changes to this file or they will be overwritten.
 // clang-format off
 #include <cx/obj.h>
+#include <cx/ssdtree/node/ssdnode.h>
 #include "subspace.h"
 
 typedef struct SettingsPage SettingsPage;
@@ -25,9 +26,11 @@ typedef struct SubspaceFeature_ClassIf {
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
-    void (*loadSettings)(_In_ void* self);
+    void (*applyDefaultSettings)(_In_ void* self);
     void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
+    // update curinst when a settings changes
+    void (*sendSettingCur)(_In_ void* self, _In_opt_ strref name);
 } SubspaceFeature_ClassIf;
 extern SubspaceFeature_ClassIf SubspaceFeature_ClassIf_tmpl;
 
@@ -47,7 +50,7 @@ typedef struct SubspaceFeature {
     bool available;
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
-    hashtable settings;        // Settings that are synchronized with the game client
+    SSDNode* settings;        // Settings that are synchronized with the game client
 } SubspaceFeature;
 extern ObjClassInfo SubspaceFeature_clsinfo;
 #define SubspaceFeature(inst) ((SubspaceFeature*)(unused_noeval((inst) && &((inst)->_is_SubspaceFeature)), (inst)))
@@ -68,12 +71,16 @@ typedef struct SubspaceFeature_WeakRef {
 #define featureGetSettingsPage(self) (self)->_->getSettingsPage(SubspaceFeature(self))
 // void featureEnable(SubspaceFeature* self, bool enabled);
 #define featureEnable(self, enabled) (self)->_->enable(SubspaceFeature(self), enabled)
-// void featureLoadSettings(SubspaceFeature* self);
-#define featureLoadSettings(self) (self)->_->loadSettings(SubspaceFeature(self))
+// void featureApplyDefaultSettings(SubspaceFeature* self);
+#define featureApplyDefaultSettings(self) (self)->_->applyDefaultSettings(SubspaceFeature(self))
 // void featureSendSetting(SubspaceFeature* self, ControlClient* client, strref name);
 #define featureSendSetting(self, client, name) (self)->_->sendSetting(SubspaceFeature(self), ControlClient(client), name)
 // void featureSendAllSettings(SubspaceFeature* self, ControlClient* client);
 #define featureSendAllSettings(self, client) (self)->_->sendAllSettings(SubspaceFeature(self), ControlClient(client))
+// void featureSendSettingCur(SubspaceFeature* self, strref name);
+//
+// update curinst when a settings changes
+#define featureSendSettingCur(self, name) (self)->_->sendSettingCur(SubspaceFeature(self), name)
 
 typedef struct ClientFeature {
     union {

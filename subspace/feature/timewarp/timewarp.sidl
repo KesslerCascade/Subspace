@@ -1,6 +1,10 @@
 #include "feature/feature.sidl"
+#include "timewarppage.sidl"
 
 class TimeWarp extends SubspaceFeature {
+    object:TimeWarpPage page;
+
     factory create(Subspace *ss);
-    override loadSettings;
+    override getSettingsPage;
+    override applyDefaultSettings;
 }

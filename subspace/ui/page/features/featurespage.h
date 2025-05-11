@@ -5,7 +5,6 @@
 #include <cx/obj.h>
 #include "ui/page/settingspage.h"
 #include "gamemgr/gameinst.h"
-#include "ui/util/iupsetobj.h"
 
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;

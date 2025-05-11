@@ -22,18 +22,19 @@ _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss)
     return self;
 }
 
-extern void SubspaceFeature_loadSettings(_In_ SubspaceFeature* self);   // parent
-#define parent_loadSettings() SubspaceFeature_loadSettings((SubspaceFeature*)(self))
-void InfoBlock_loadSettings(_In_ InfoBlock* self)
+extern void SubspaceFeature_applyDefaultSettings(_In_ SubspaceFeature* self);   // parent
+#define parent_applyDefaultSettings() SubspaceFeature_applyDefaultSettings((SubspaceFeature*)(self))
+void InfoBlock_applyDefaultSettings(_In_ InfoBlock* self)
 {
-    int32 val;
-
-    val = ssdVal(int32, self->ss->settings, _S"feature/InfoBlock/ssver", 0);
-    htInsert(&self->settings, string, _S"ssver", stvar, stvar(int32, val));
-    val = ssdVal(int32, self->ss->settings, _S"feature/InfoBlock/ftlver", 1);
-    htInsert(&self->settings, string, _S"ftlver", stvar, stvar(int32, val));
-    val = ssdVal(int32, self->ss->settings, _S"feature/InfoBlock/fps", 2);
-    htInsert(&self->settings, string, _S"fps", stvar, stvar(int32, val));
+    ssdLockedTransaction(self->settings)
+    {
+        if (!ssdPtr(self->settings, _S"ssvar"))
+            ssdSet(self->settings, _S"ssver", false, stvar(int32, 0));
+        if (!ssdPtr(self->settings, _S"ftlver"))
+            ssdSet(self->settings, _S"ftlver", false, stvar(int32, 1));
+        if (!ssdPtr(self->settings, _S"fps"))
+            ssdSet(self->settings, _S"fps", false, stvar(int32, 2));
+    }
 }
 
 // Autogen begins -----

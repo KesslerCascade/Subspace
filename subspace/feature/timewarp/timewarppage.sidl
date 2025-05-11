@@ -1,0 +1,20 @@
+#include "ui/page/settingspage.sidl"
+#include "gamemgr/gameinst.sidl"
+
+class TimeWarp;
+class TimeWarpPage extends SettingsPage {
+    TimeWarp *feature;
+
+    Ihandle* maxwarp_val_num;
+    Ihandle *maxwarp_val;
+    Ihandle* doubletap_val_num;
+    Ihandle *doubletap_val;
+    Ihandle* allowslowmo;
+
+    string maxwarptext;
+    string doubletaptext;
+
+    factory create(TimeWarp *feature, SubspaceUI *ui);
+    override make;
+    override update;
+}

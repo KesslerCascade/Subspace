@@ -22,18 +22,50 @@ _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss)
     return self;
 }
 
-extern void SubspaceFeature_loadSettings(_In_ SubspaceFeature* self);   // parent
-#define parent_loadSettings() SubspaceFeature_loadSettings((SubspaceFeature*)(self))
-void TimeWarp_loadSettings(_In_ TimeWarp* self)
+extern void SubspaceFeature_applyDefaultSettings(_In_ SubspaceFeature* self);   // parent
+#define parent_applyDefaultSettings() SubspaceFeature_applyDefaultSettings((SubspaceFeature*)(self))
+void TimeWarp_applyDefaultSettings(_In_ TimeWarp* self)
 {
     int32 val;
 
-    val = ssdVal(int32, self->ss->settings, _S"feature/TimeWarp/maxwarp", 32);
-    htInsert(&self->settings, string, _S"maxwarp", stvar, stvar(int32, val));
-    val = ssdVal(int32, self->ss->settings, _S"feature/TimeWarp/doubletap", 0);
-    htInsert(&self->settings, string, _S"doubletap", stvar, stvar(int32, val));
-    bool bval = ssdVal(bool, self->ss->settings, _S"feature/TimeWarp/allowslowmo", false);
-    htInsert(&self->settings, string, _S"allowslowmo", stvar, stvar(bool, bval));
+    ssdLockedTransaction(self->settings)
+    {
+        if (!ssdPtr(self->settings, _S"maxwarp"))
+            ssdSet(self->settings, _S"maxwarp", false, stvar(int32, 32));
+        if (!ssdPtr(self->settings, _S"doubletap"))
+            ssdSet(self->settings, _S"doubletap", false, stvar(int32, 0));
+        if (!ssdPtr(self->settings, _S"allowslowmo"))
+            ssdSet(self->settings, _S"allowslowmo", false, stvar(bool, false));
+    }
+}
+
+extern SettingsPage* SubspaceFeature_getSettingsPage(_In_ SubspaceFeature* self);   // parent
+#define parent_getSettingsPage() SubspaceFeature_getSettingsPage((SubspaceFeature*)(self))
+SettingsPage* TimeWarp_getSettingsPage(_In_ TimeWarp* self)
+{
+    SettingsPage* ret = NULL;
+    withReadLock (&self->lock) {
+        ret = SettingsPage(self->page);
+    }
+
+    if (!ret) {
+        withWriteLock (&self->lock) {
+            if (!self->page) {
+                self->page          = timewarppageCreate(self, self->ss->ui);
+                self->page->visible = self->enabled;
+            }
+            ret = SettingsPage(self->page);
+        }
+    }
+
+    return ret;
+}
+
+void TimeWarp_destroy(_In_ TimeWarp* self)
+{
+    // Autogen begins -----
+    objRelease(&self->page);
+    // Autogen ends -------
 }
 
 // Autogen begins -----
