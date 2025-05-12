@@ -19,10 +19,11 @@ typedef enum DisasmOpType {
 } DisasmOpType;
 
 typedef enum DisasmArgOp {
-    ARG_IGNORE,   // don't care what's in this argument
-    ARG_MATCH,    // must exactly match what's in the args
-    ARG_REG,      // match register only, ignoring disp
-    ARG_ADDR,     // match addr / disp value only
+    ARG_IGNORE,    // don't care what's in this argument
+    ARG_MATCH,     // must exactly match what's in the args
+    ARG_REG,       // match register only, ignoring disp
+    ARG_ADDR,      // match addr / disp value only
+    ARG_PTRSIZE,   // match pointer size only
 } DisasmArgOp;
 
 typedef enum DisasmOutput {

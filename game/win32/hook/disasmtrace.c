@@ -161,6 +161,10 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                             // check address (same as disp) only
                             if (disasm.arg[i].addr != comp.addr)
                                 match = false;
+                        } else if (dts.op->argf[i] == ARG_PTRSIZE) {
+                            // check pointer size only
+                            if (disasm.arg[i].ptrsize != comp.ptrsize)
+                                match = false;
                         }
                     }
                 }
@@ -200,8 +204,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     if (dts.op->inst != I_NONE) {
                         instmatch = (dts.op->inst == disasm.inst);
                     } else {
-                        // use command type to avoid having to check every jump instruction -- we
-                        // want both regular and conditional jumps
+                        // use command type to avoid having to check every jump instruction --
+                        // we want both regular and conditional jumps
                         uchar cmdtype = disasm.command->type & C_TYPEMASK;
                         instmatch     = (cmdtype == C_JMP || cmdtype == C_JMC);
                     }
@@ -212,8 +216,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     // save unwind state before branching
                     pushUnwind(&dts, unwind, &nunwind, isize);
 
-                    // follow the first argument, which we've verified is a destination within the
-                    // same module
+                    // follow the first argument, which we've verified is a destination within
+                    // the same module
                     dts.p       = disasm.arg[0].addr;
                     dts.skipmax = 0;   // stop any skip in progress
                     isize       = 0;   // don't advance pointer
@@ -234,8 +238,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     // save unwind state before branching
                     pushUnwind(&dts, unwind, &nunwind, isize);
 
-                    // follow the first argument, which we've verified is a destination within the
-                    // same module
+                    // follow the first argument, which we've verified is a destination within
+                    // the same module
                     dts.p       = *(uint32_t*)destptr;
                     dts.skipmax = 0;   // stop any skip in progress
                     isize       = 0;   // don't advance pointer
@@ -268,8 +272,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                 // Do NOT reset skip, because we're following along during a skip.
 
                 if (dts.flow == DT_FLOW_JMP_BOTH) {
-                    // if we're following both branches, create an unwind point which will resume
-                    // right after this jump
+                    // if we're following both branches, create an unwind point which will
+                    // resume right after this jump
                     pushUnwind(&dts, unwind, &nunwind, isize);
                 }
 
