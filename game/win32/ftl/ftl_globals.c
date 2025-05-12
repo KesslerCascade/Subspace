@@ -4,21 +4,39 @@
 #include "hook/disasmtrace.h"
 
 // Move to Settings module if we ever hook it
-DisasmTrace Settings_SaveSettings_trace = {
+DisasmTrace Settings_SaveSettings_trace_1 = {
     .c    = DTRACE_STRREFS,
     .cstr = "framelimit=",
     .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 4 },
              { I_CALL },
              { I_MOVZX,
-                .argf   = { ARG_REG },
-                .args   = { { REG_EAX } },
+                .argf   = { ARG_IGNORE, ARG_PTRSIZE },
+                .args   = { { 0 }, { .ptrsize = 1 } },
                 .argout = { 0, DT_OUT_SYM1 } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(opt_framelimit) }
 };
 
+// some versions order the instructions a little differently
+DisasmTrace Settings_SaveSettings_trace_2 = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "vsync=",
+    .ops  = { { DT_OP(SKIP), .imin = 9, .imax = 14 },
+             { I_CALL },
+             { I_MOVZX,
+                .argf   = { ARG_IGNORE, ARG_PTRSIZE },
+                .args   = { { 0 }, { .ptrsize = 1 } },
+                .argout = { 0, DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_MOV, .argf = { 0, ARG_MATCH }, .argstr = { 0, "framelimit=" } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(opt_framelimit) }
+};
+
 Symbol SYM(opt_framelimit) = {
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Settings_SaveSettings_trace }, { 0 } }
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Settings_SaveSettings_trace_1 },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &Settings_SaveSettings_trace_2 },
+             { 0 } }
 };
 
 Symbol SYM(Globals_Library) = {
