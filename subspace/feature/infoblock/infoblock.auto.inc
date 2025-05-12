@@ -9,6 +9,7 @@ InfoBlock_ClassIf InfoBlock_ClassIf_tmpl = {
 static InfoBlock_ClassIf _impl_InfoBlock_InfoBlock_ClassIf = {
     ._size = sizeof(InfoBlock_ClassIf),
     ._implements = (ObjIface*)&InfoBlock_ClassIf_tmpl,
+    .createSettingsPage = (SettingsPage* (*)(void*, SubspaceUI*))InfoBlock_createSettingsPage,
     .applyDefaultSettings = (void (*)(void*))InfoBlock_applyDefaultSettings,
 };
 

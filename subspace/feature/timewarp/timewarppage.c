@@ -50,7 +50,7 @@ _objfactory_guaranteed TimeWarpPage* TimeWarpPage_create(TimeWarp* feature, Subs
     self->visible = true;
 
     self->name = _S"timewarp";
-    strDup(&self->title, langGet(self->ss, _S"settings_timewarp"));
+    strDup(&self->title, langGet(self->ss, _S"feature_timewarp"));
     strDup(&self->imgname, _S"IMAGE_TIMEWARP");
 
     objInstInit(self);

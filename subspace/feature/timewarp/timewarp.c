@@ -9,6 +9,7 @@
 #include "timewarp.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include "timewarppage.h"
 
 _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss)
 {
@@ -39,33 +40,13 @@ void TimeWarp_applyDefaultSettings(_In_ TimeWarp* self)
     }
 }
 
-extern SettingsPage* SubspaceFeature_getSettingsPage(_In_ SubspaceFeature* self);   // parent
-#define parent_getSettingsPage() SubspaceFeature_getSettingsPage((SubspaceFeature*)(self))
-SettingsPage* TimeWarp_getSettingsPage(_In_ TimeWarp* self)
+extern SettingsPage*
+SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
+extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
+#define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
+SettingsPage* TimeWarp_createSettingsPage(_In_ TimeWarp* self, SubspaceUI* ui)
 {
-    SettingsPage* ret = NULL;
-    withReadLock (&self->lock) {
-        ret = SettingsPage(self->page);
-    }
-
-    if (!ret) {
-        withWriteLock (&self->lock) {
-            if (!self->page) {
-                self->page          = timewarppageCreate(self, self->ss->ui);
-                self->page->visible = self->enabled;
-            }
-            ret = SettingsPage(self->page);
-        }
-    }
-
-    return ret;
-}
-
-void TimeWarp_destroy(_In_ TimeWarp* self)
-{
-    // Autogen begins -----
-    objRelease(&self->page);
-    // Autogen ends -------
+    return SettingsPage(timewarppageCreate(self, ui));
 }
 
 // Autogen begins -----

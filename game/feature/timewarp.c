@@ -349,6 +349,7 @@ SubspaceFeature TimeWarp_feature = {
                         &SYM(CommandGui_IsPaused),
                         &SYM(CommandGui_SetPaused),
                         &SYM(CApp_gui_offset),
+                        &SYM(opt_framelimit),
                         &SYM(msvcrt_sin),
                         &SYM(msvcrt_snprintf),
                         0 }

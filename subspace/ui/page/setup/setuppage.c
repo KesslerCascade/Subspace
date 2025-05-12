@@ -490,9 +490,7 @@ bool SetupPage_update(_In_ SetupPage* self)
 
                     // don't update live feature availability if another instance is focused
                     if (rinststate == GI_Init || rinststate == GI_Exited) {
-                        withWriteLock (&feat->lock) {
-                            feat->available = avail;
-                        }
+                        featureSetAvailable(feat, avail);
                     }
 
                     string epath = 0;

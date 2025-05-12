@@ -9,6 +9,7 @@
 #include "infoblock.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include "infoblockpage.h"
 
 _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss)
 {
@@ -35,6 +36,15 @@ void InfoBlock_applyDefaultSettings(_In_ InfoBlock* self)
         if (!ssdPtr(self->settings, _S"fps"))
             ssdSet(self->settings, _S"fps", false, stvar(int32, 2));
     }
+}
+
+extern SettingsPage*
+SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
+extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
+#define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
+SettingsPage* InfoBlock_createSettingsPage(_In_ InfoBlock* self, SubspaceUI* ui)
+{
+    return SettingsPage(infoblockpageCreate(self, ui));
 }
 
 // Autogen begins -----

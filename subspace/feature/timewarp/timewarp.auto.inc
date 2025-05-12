@@ -9,7 +9,7 @@ TimeWarp_ClassIf TimeWarp_ClassIf_tmpl = {
 static TimeWarp_ClassIf _impl_TimeWarp_TimeWarp_ClassIf = {
     ._size = sizeof(TimeWarp_ClassIf),
     ._implements = (ObjIface*)&TimeWarp_ClassIf_tmpl,
-    .getSettingsPage = (SettingsPage* (*)(void*))TimeWarp_getSettingsPage,
+    .createSettingsPage = (SettingsPage* (*)(void*, SubspaceUI*))TimeWarp_createSettingsPage,
     .applyDefaultSettings = (void (*)(void*))TimeWarp_applyDefaultSettings,
 };
 
@@ -22,7 +22,6 @@ ObjClassInfo TimeWarp_clsinfo = {
     .instsize = sizeof(TimeWarp),
     .classif = (ObjIface*)&TimeWarp_ClassIf_tmpl,
     .parent = &SubspaceFeature_clsinfo,
-    .destroy = (void(*)(void*))TimeWarp_destroy,
     .ifimpl = _ifimpl_TimeWarp,
 };
 

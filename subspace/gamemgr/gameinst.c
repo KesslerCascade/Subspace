@@ -172,29 +172,27 @@ void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
         // send settings for all features, whether they're enabled or not
         featureSendAllSettings(feat, client);
 
-        withWriteLock (&feat->lock) {
-            ClientFeature* cfeat = NULL;
-            if (htFind(self->features, string, feat->name, object, &cfeat)) {
-                feat->available = cfeat->available;
+        ClientFeature* cfeat = NULL;
+        if (htFind(self->features, string, feat->name, object, &cfeat)) {
+            featureSetAvailable(feat, cfeat->available);
 
-                if (feat->enabled) {
-                    ControlMsg* msg = controlNewMsg("EnableFeature", 2);
-                    controlMsgStr(msg, 0, "feature", feat->name);
-                    controlMsgBool(msg, 1, "enabled", true);
-                    cclientQueue(client, msg);
-                }
-                // cfeat->enabled will be set when the client sends a FeatureState update
-                objRelease(&cfeat);
-            } else {
-                feat->available = false;
+            if (featureIsEnabled(feat)) {
+                ControlMsg* msg = controlNewMsg("EnableFeature", 2);
+                controlMsgStr(msg, 0, "feature", feat->name);
+                controlMsgBool(msg, 1, "enabled", true);
+                cclientQueue(client, msg);
             }
-
-            // cache available state
-            string epath = 0;
-            strNConcat(&epath, _S"feature/", feat->name, _S"/available");
-            ssdSet(self->ss->settings, epath, true, stvar(bool, feat->available));
-            strDestroy(&epath);
+            // cfeat->enabled will be set when the client sends a FeatureState update
+            objRelease(&cfeat);
+        } else {
+            featureSetAvailable(feat, false);
         }
+
+        // cache available state
+        string epath = 0;
+        strNConcat(&epath, _S"feature/", feat->name, _S"/available");
+        ssdSet(self->ss->settings, epath, true, stvar(bool, feat->available));
+        strDestroy(&epath);
     }
 
     // give it the clear to start

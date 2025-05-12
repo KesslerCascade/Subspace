@@ -31,6 +31,7 @@ void SubspaceFeature_destroy(_In_ SubspaceFeature* self)
     rwlockDestroy(&self->lock);
     strDestroy(&self->name);
     objRelease(&self->settings);
+    objRelease(&self->page);
     // Autogen ends -------
 }
 
@@ -47,6 +48,30 @@ _objfactory_guaranteed ClientFeature* ClientFeature_create(_In_opt_ strref name)
 
 SettingsPage* SubspaceFeature_getSettingsPage(_In_ SubspaceFeature* self)
 {
+    SettingsPage* ret = NULL;
+    rwlockAcquireRead(&self->lock);
+    if (self->pagecreated) {
+        ret = self->page;
+        rwlockReleaseRead(&self->lock);
+        return ret;
+    }
+    rwlockReleaseRead(&self->lock);
+
+    withWriteLock (&self->lock) {
+        if (!self->page) {
+            ret = featureCreateSettingsPage(self, self->ss->ui);
+            if (ret)
+                ret->visible = self->enabled && self->available;
+        }
+        self->page        = ret;
+        self->pagecreated = true;   // success or not, don't try again
+    }
+
+    return ret;
+}
+
+SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui)
+{
     return NULL;
 }
 
@@ -61,6 +86,8 @@ void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled)
 {
     withWriteLock (&self->lock) {
         self->enabled = enabled;
+        if (self->page)
+            self->page->visible = self->enabled && self->available;
     }
 
     // send feature state and config (if enabled) to any connected clients
@@ -90,13 +117,27 @@ void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled)
     ssdSet(self->ss->settings, epath, true, stvar(bool, enabled));
     strDestroy(&epath);
 
-    SettingsPage* page = featureGetSettingsPage(self);
-    if (page)
-        page->visible = enabled;
-
     // update entire UI when feature state changes
     subspaceUpdateUI(self->ss);
     return;
+}
+
+void SubspaceFeature_setAvailable(_In_ SubspaceFeature* self, bool available)
+{
+    withWriteLock (&self->lock) {
+        self->available = available;
+        if (self->page)
+            self->page->visible = self->enabled && self->available;
+    }
+
+    // save state in settings
+    string epath = 0;
+    strNConcat(&epath, _S"feature/", self->name, _S"/available");
+    ssdSet(self->ss->settings, epath, true, stvar(bool, available));
+    strDestroy(&epath);
+
+    // update entire UI when feature state changes
+    subspaceUpdateUI(self->ss);
 }
 
 static bool sendSettingVal(ControlMsg* msg, int field, const char* fname, stvar* val)
@@ -190,6 +231,24 @@ void SubspaceFeature_sendSettingCur(_In_ SubspaceFeature* self, _In_opt_ strref 
     }
 
     objRelease(&cur);
+}
+
+bool SubspaceFeature_isEnabled(_In_ SubspaceFeature* self)
+{
+    bool ret = false;
+    withReadLock (&self->lock) {
+        ret = self->enabled && self->available;
+    }
+    return ret;
+}
+
+bool SubspaceFeature_isAvailable(_In_ SubspaceFeature* self)
+{
+    bool ret = false;
+    withReadLock (&self->lock) {
+        ret = self->available;
+    }
+    return ret;
 }
 
 // Autogen begins -----

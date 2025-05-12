@@ -9,6 +9,8 @@ typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
+typedef struct SubspaceUI SubspaceUI;
+typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct FrameAdv FrameAdv;
 typedef struct FrameAdv_WeakRef FrameAdv_WeakRef;
 saDeclarePtr(FrameAdv);
@@ -20,7 +22,11 @@ typedef struct FrameAdv_ClassIf {
     size_t _size;
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
+    SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
+    bool (*isEnabled)(_In_ void* self);
+    bool (*isAvailable)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
+    void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
     void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
@@ -47,6 +53,8 @@ typedef struct FrameAdv {
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     SSDNode* settings;        // Settings that are synchronized with the game client
+    SettingsPage* page;
+    bool pagecreated;
 } FrameAdv;
 extern ObjClassInfo FrameAdv_clsinfo;
 #define FrameAdv(inst) ((FrameAdv*)(unused_noeval((inst) && &((inst)->_is_FrameAdv)), (inst)))
@@ -70,8 +78,16 @@ _objfactory_guaranteed FrameAdv* FrameAdv_create(Subspace* ss);
 
 // SettingsPage* frameadvGetSettingsPage(FrameAdv* self);
 #define frameadvGetSettingsPage(self) (self)->_->getSettingsPage(FrameAdv(self))
+// SettingsPage* frameadvCreateSettingsPage(FrameAdv* self, SubspaceUI* ui);
+#define frameadvCreateSettingsPage(self, ui) (self)->_->createSettingsPage(FrameAdv(self), SubspaceUI(ui))
+// bool frameadvIsEnabled(FrameAdv* self);
+#define frameadvIsEnabled(self) (self)->_->isEnabled(FrameAdv(self))
+// bool frameadvIsAvailable(FrameAdv* self);
+#define frameadvIsAvailable(self) (self)->_->isAvailable(FrameAdv(self))
 // void frameadvEnable(FrameAdv* self, bool enabled);
 #define frameadvEnable(self, enabled) (self)->_->enable(FrameAdv(self), enabled)
+// void frameadvSetAvailable(FrameAdv* self, bool available);
+#define frameadvSetAvailable(self, available) (self)->_->setAvailable(FrameAdv(self), available)
 // void frameadvApplyDefaultSettings(FrameAdv* self);
 #define frameadvApplyDefaultSettings(self) (self)->_->applyDefaultSettings(FrameAdv(self))
 // void frameadvSendSetting(FrameAdv* self, ControlClient* client, strref name);

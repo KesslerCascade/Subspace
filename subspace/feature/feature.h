@@ -10,6 +10,8 @@ typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
+typedef struct SubspaceUI SubspaceUI;
+typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct SubspaceFeature SubspaceFeature;
 typedef struct SubspaceFeature_WeakRef SubspaceFeature_WeakRef;
 typedef struct ClientFeature ClientFeature;
@@ -25,7 +27,11 @@ typedef struct SubspaceFeature_ClassIf {
     size_t _size;
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
+    SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
+    bool (*isEnabled)(_In_ void* self);
+    bool (*isAvailable)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
+    void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
     void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
@@ -51,6 +57,8 @@ typedef struct SubspaceFeature {
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     SSDNode* settings;        // Settings that are synchronized with the game client
+    SettingsPage* page;
+    bool pagecreated;
 } SubspaceFeature;
 extern ObjClassInfo SubspaceFeature_clsinfo;
 #define SubspaceFeature(inst) ((SubspaceFeature*)(unused_noeval((inst) && &((inst)->_is_SubspaceFeature)), (inst)))
@@ -69,8 +77,16 @@ typedef struct SubspaceFeature_WeakRef {
 
 // SettingsPage* featureGetSettingsPage(SubspaceFeature* self);
 #define featureGetSettingsPage(self) (self)->_->getSettingsPage(SubspaceFeature(self))
+// SettingsPage* featureCreateSettingsPage(SubspaceFeature* self, SubspaceUI* ui);
+#define featureCreateSettingsPage(self, ui) (self)->_->createSettingsPage(SubspaceFeature(self), SubspaceUI(ui))
+// bool featureIsEnabled(SubspaceFeature* self);
+#define featureIsEnabled(self) (self)->_->isEnabled(SubspaceFeature(self))
+// bool featureIsAvailable(SubspaceFeature* self);
+#define featureIsAvailable(self) (self)->_->isAvailable(SubspaceFeature(self))
 // void featureEnable(SubspaceFeature* self, bool enabled);
 #define featureEnable(self, enabled) (self)->_->enable(SubspaceFeature(self), enabled)
+// void featureSetAvailable(SubspaceFeature* self, bool available);
+#define featureSetAvailable(self, available) (self)->_->setAvailable(SubspaceFeature(self), available)
 // void featureApplyDefaultSettings(SubspaceFeature* self);
 #define featureApplyDefaultSettings(self) (self)->_->applyDefaultSettings(SubspaceFeature(self))
 // void featureSendSetting(SubspaceFeature* self, ControlClient* client, strref name);

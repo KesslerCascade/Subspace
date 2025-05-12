@@ -9,6 +9,8 @@ typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
+typedef struct SubspaceUI SubspaceUI;
+typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct NumericHull NumericHull;
 typedef struct NumericHull_WeakRef NumericHull_WeakRef;
 saDeclarePtr(NumericHull);
@@ -20,7 +22,11 @@ typedef struct NumericHull_ClassIf {
     size_t _size;
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
+    SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
+    bool (*isEnabled)(_In_ void* self);
+    bool (*isAvailable)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
+    void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
     void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
@@ -47,6 +53,8 @@ typedef struct NumericHull {
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     SSDNode* settings;        // Settings that are synchronized with the game client
+    SettingsPage* page;
+    bool pagecreated;
 } NumericHull;
 extern ObjClassInfo NumericHull_clsinfo;
 #define NumericHull(inst) ((NumericHull*)(unused_noeval((inst) && &((inst)->_is_NumericHull)), (inst)))
@@ -70,8 +78,16 @@ _objfactory_guaranteed NumericHull* NumericHull_create(Subspace* ss);
 
 // SettingsPage* numerichullGetSettingsPage(NumericHull* self);
 #define numerichullGetSettingsPage(self) (self)->_->getSettingsPage(NumericHull(self))
+// SettingsPage* numerichullCreateSettingsPage(NumericHull* self, SubspaceUI* ui);
+#define numerichullCreateSettingsPage(self, ui) (self)->_->createSettingsPage(NumericHull(self), SubspaceUI(ui))
+// bool numerichullIsEnabled(NumericHull* self);
+#define numerichullIsEnabled(self) (self)->_->isEnabled(NumericHull(self))
+// bool numerichullIsAvailable(NumericHull* self);
+#define numerichullIsAvailable(self) (self)->_->isAvailable(NumericHull(self))
 // void numerichullEnable(NumericHull* self, bool enabled);
 #define numerichullEnable(self, enabled) (self)->_->enable(NumericHull(self), enabled)
+// void numerichullSetAvailable(NumericHull* self, bool available);
+#define numerichullSetAvailable(self, available) (self)->_->setAvailable(NumericHull(self), available)
 // void numerichullApplyDefaultSettings(NumericHull* self);
 #define numerichullApplyDefaultSettings(self) (self)->_->applyDefaultSettings(NumericHull(self))
 // void numerichullSendSetting(NumericHull* self, ControlClient* client, strref name);

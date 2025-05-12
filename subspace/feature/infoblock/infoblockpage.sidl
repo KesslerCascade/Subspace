@@ -1,0 +1,11 @@
+#include "ui/page/settingspage.sidl"
+#include "gamemgr/gameinst.sidl"
+
+class InfoBlock;
+class InfoBlockPage extends SettingsPage {
+    InfoBlock *feature;
+
+    factory create(InfoBlock *feature, SubspaceUI *ui);
+    override make;
+    override update;
+}

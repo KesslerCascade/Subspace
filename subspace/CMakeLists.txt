@@ -37,6 +37,7 @@ set(SUBSPACE_SIDL
     feature/featureregistry.sidl
     feature/frameadv/frameadv.sidl
     feature/infoblock/infoblock.sidl
+    feature/infoblock/infoblockpage.sidl
     feature/numerichull/numerichull.sidl
     feature/timewarp/timewarp.sidl
     feature/timewarp/timewarppage.sidl
@@ -86,6 +87,7 @@ add_executable(subspace
     feature/featureregistry.c
     feature/frameadv/frameadv.c
     feature/infoblock/infoblock.c
+    feature/infoblock/infoblockpage.c
     feature/numerichull/numerichull.c
     feature/timewarp/timewarp.c
     feature/timewarp/timewarppage.c

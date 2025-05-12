@@ -9,6 +9,8 @@ typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
+typedef struct SubspaceUI SubspaceUI;
+typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct InfoBlock InfoBlock;
 typedef struct InfoBlock_WeakRef InfoBlock_WeakRef;
 saDeclarePtr(InfoBlock);
@@ -20,7 +22,11 @@ typedef struct InfoBlock_ClassIf {
     size_t _size;
 
     SettingsPage* (*getSettingsPage)(_In_ void* self);
+    SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
+    bool (*isEnabled)(_In_ void* self);
+    bool (*isAvailable)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
+    void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
     void (*sendSetting)(_In_ void* self, ControlClient* client, _In_opt_ strref name);
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
@@ -47,6 +53,8 @@ typedef struct InfoBlock {
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     SSDNode* settings;        // Settings that are synchronized with the game client
+    SettingsPage* page;
+    bool pagecreated;
 } InfoBlock;
 extern ObjClassInfo InfoBlock_clsinfo;
 #define InfoBlock(inst) ((InfoBlock*)(unused_noeval((inst) && &((inst)->_is_InfoBlock)), (inst)))
@@ -70,8 +78,16 @@ _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss);
 
 // SettingsPage* infoblockGetSettingsPage(InfoBlock* self);
 #define infoblockGetSettingsPage(self) (self)->_->getSettingsPage(InfoBlock(self))
+// SettingsPage* infoblockCreateSettingsPage(InfoBlock* self, SubspaceUI* ui);
+#define infoblockCreateSettingsPage(self, ui) (self)->_->createSettingsPage(InfoBlock(self), SubspaceUI(ui))
+// bool infoblockIsEnabled(InfoBlock* self);
+#define infoblockIsEnabled(self) (self)->_->isEnabled(InfoBlock(self))
+// bool infoblockIsAvailable(InfoBlock* self);
+#define infoblockIsAvailable(self) (self)->_->isAvailable(InfoBlock(self))
 // void infoblockEnable(InfoBlock* self, bool enabled);
 #define infoblockEnable(self, enabled) (self)->_->enable(InfoBlock(self), enabled)
+// void infoblockSetAvailable(InfoBlock* self, bool available);
+#define infoblockSetAvailable(self, available) (self)->_->setAvailable(InfoBlock(self), available)
 // void infoblockApplyDefaultSettings(InfoBlock* self);
 #define infoblockApplyDefaultSettings(self) (self)->_->applyDefaultSettings(InfoBlock(self))
 // void infoblockSendSetting(InfoBlock* self, ControlClient* client, strref name);
