@@ -1,6 +1,7 @@
 #include "feature.h"
 #include "control/controlclient.h"
 #include "hook/symbol.h"
+#include "input/keybinds.h"
 #include "log/log.h"
 #include "patch/patch.h"
 #include "subspacegame.h"
@@ -14,6 +15,13 @@ void registerFeature(SubspaceFeature* feature)
     }
 
     hashtbl_add(&feathash, feature->name, feature);
+
+    // register the feature's keybinds
+    KeyBind* bind = feature->keybinds;
+    while (bind && bind->name) {
+        kbRegisterBind(feature, bind);
+        ++bind;
+    }
 }
 
 SubspaceFeature* getFeature(const char* name)

@@ -1,0 +1,14 @@
+#include "ui/page/settingspage.sidl"
+#include "gamemgr/gameinst.sidl"
+
+class KeybindsPage extends SettingsPage {
+    Ihandle *kbgrid;
+    Ihandle *tip;
+
+    factory create(SubspaceUI *ui);
+    unbound void populateGrid();
+
+    override make;
+    override update;
+    init();
+}

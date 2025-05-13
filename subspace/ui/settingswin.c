@@ -12,6 +12,7 @@
 #include <cx/format.h>
 #include "feature/featureregistry.h"
 #include "ui/page/features/featurespage.h"
+#include "ui/page/keybinds/keybindspage.h"
 #include "ui/page/setup/setuppage.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iupsetobj.h"
@@ -23,6 +24,8 @@ static void SettingsWin_registerPages(SettingsWin* self, SubspaceUI* ui)
     p = SettingsPage(setuppageCreate(ui));
     saPushC(&self->pages, object, &p);
     p = SettingsPage(featurespageCreate(ui));
+    saPushC(&self->pages, object, &p);
+    p = SettingsPage(keybindspageCreate(ui));
     saPushC(&self->pages, object, &p);
 
     // register pages that belong to features

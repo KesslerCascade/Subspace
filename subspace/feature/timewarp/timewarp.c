@@ -9,6 +9,8 @@
 #include "timewarp.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include <iupkey.h>
+#include "kbmgr/kbmgr.h"
 #include "timewarppage.h"
 
 _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss)
@@ -18,6 +20,10 @@ _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss)
 
     self->ss = ss;
     strDup(&self->name, _S"TimeWarp");
+
+    kbmgrReg(ss->kbmgr, self, _S"timewarp_increase", K_bracketright);
+    kbmgrReg(ss->kbmgr, self, _S"timewarp_decrease", K_bracketleft);
+    kbmgrReg(ss->kbmgr, self, _S"timewarp_cancel", K_backslash);
 
     objInstInit(self);
     return self;

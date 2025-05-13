@@ -1,0 +1,12 @@
+#include "feature/feature.sidl"
+#include "control/controlclient.h"
+
+class KeyBind {
+    weak:SubspaceFeature owner;
+    string name;
+    int iupkey;
+    int ftlkey;
+
+    factory create(SubspaceFeature *owner, strref name);
+    void send(ControlClient *client);
+}

@@ -13,6 +13,7 @@
 #include "control/controlclient.h"
 #include "control/controlserver.h"
 #include "feature/featureregistry.h"
+#include "kbmgr/kbmgr.h"
 #include "ui/subspaceui.h"
 #include "gamemgr.h"
 #include "process.h"
@@ -171,6 +172,9 @@ void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
 
         // send settings for all features, whether they're enabled or not
         featureSendAllSettings(feat, client);
+
+        // send all key bindings
+        kbmgrSendAll(ss->kbmgr, client);
 
         ClientFeature* cfeat = NULL;
         if (htFind(self->features, string, feat->name, object, &cfeat)) {

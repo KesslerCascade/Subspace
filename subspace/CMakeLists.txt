@@ -43,6 +43,8 @@ set(SUBSPACE_SIDL
     feature/timewarp/timewarppage.sidl
     gamemgr/gameinst.sidl
     gamemgr/gamemgr.sidl
+    kbmgr/kbmgr.sidl
+    kbmgr/keybind.sidl
     lang/langdb.sidl
     ui/mainwin.sidl
     ui/settingswin.sidl
@@ -52,6 +54,7 @@ set(SUBSPACE_SIDL
     ui/image/imageresample.sidl
     ui/page/settingspage.sidl
     ui/page/features/featurespage.sidl
+    ui/page/keybinds/keybindspage.sidl
     ui/page/setup/setuppage.sidl
     ui/panel/panel.sidl
     ui/panel/gameinfo/gameinfopanel.sidl
@@ -93,6 +96,9 @@ add_executable(subspace
     feature/timewarp/timewarppage.c
     gamemgr/gameinst.c
     gamemgr/gamemgr.c
+    kbmgr/kbmgr.c
+    kbmgr/keybind.c
+    kbmgr/keymap.c
     lang/lang.c
     lang/langdb.c
     ui/mainwin.c
@@ -108,6 +114,7 @@ add_executable(subspace
     ui/image/drivers/imagesvg.c
     ui/page/settingspage.c
     ui/page/features/featurespage.c
+    ui/page/keybinds/keybindspage.c
     ui/page/setup/setuppage.c
     ui/panel/panel.c
     ui/panel/gameinfo/gameinfopanel.c

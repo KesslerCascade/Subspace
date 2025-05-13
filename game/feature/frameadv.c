@@ -1,6 +1,8 @@
 #include "frameadv.h"
 #include "feature/feature.h"
 #include "ftl/commandgui.h"
+#include "ftl/globals.h"
+#include "input/keybinds.h"
 #include "patch/patchlist.h"
 
 void frameAdvStep(CommandGui* gui)
@@ -18,6 +20,21 @@ void frameAdvEndFrame(CommandGui* gui)
     }
 }
 
+// ---- Keybinds ----------------
+
+static void frameadv_key_advance_cb(int key, int flags)
+{
+    frameAdvStep(CApp_gui(theApp));
+}
+
+static KeyBind FrameAdv_keybinds[] = {
+    { .name      = "frameadv_advance",
+     .context   = KB_CTX_GAME,
+     .flags_exc = KB_JUMPING,
+     .func      = frameadv_key_advance_cb },
+    { 0 }
+};
+
 // ---- Patching ----------------
 
 static bool frameAdv_Enable(SubspaceFeature* feat, void* settings, bool enabled)
@@ -33,6 +50,7 @@ Patch* FrameAdv_patches[] = { &patch_CommandGui_KeyDown, &patch_CommandGui_OnLoo
 SubspaceFeature FrameAdv_feature = {
     .name            = "FrameAdv",
     .enable          = frameAdv_Enable,
+    .keybinds        = FrameAdv_keybinds,
     .requiredPatches = FrameAdv_patches,
-    .requiredSymbols = { &SYM(CommandGui_SetPaused), 0 }
+    .requiredSymbols = { &SYM(CommandGui_SetPaused), &SYM(CApp_gui_offset), 0 }
 };

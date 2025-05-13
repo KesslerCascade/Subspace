@@ -1,0 +1,14 @@
+#include "keybind.sidl"
+#include "control/controlclient.h"
+
+class KBMgr {
+    Subspace *ss;
+
+    RWLock kbmgrlock;
+    hashtable:string:object binds;
+
+    factory create(Subspace *subspace);
+    bool bind(strref name, int key);
+    void reg(SubspaceFeature *owner, strref name, int default_key);
+    void sendAll(ControlClient *client);
+}

@@ -6,6 +6,7 @@
 DECLCMD(ClearToStart);
 DECLCMD(EnableFeature);
 DECLCMD(FeatureSettings);
+DECLCMD(BindKey);
 
 #define REGCMD(cmdname) controlClientRegister(#cmdname, cmd##cmdname)
 
@@ -14,4 +15,5 @@ void registerCmds()
     REGCMD(ClearToStart);
     REGCMD(EnableFeature);
     REGCMD(FeatureSettings);
+    REGCMD(BindKey);
 }

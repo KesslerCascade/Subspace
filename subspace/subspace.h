@@ -26,6 +26,7 @@ extern LogCategory* gamecat;
 
 typedef struct ControlServer ControlServer;
 typedef struct GameMgr GameMgr;
+typedef struct KBMgr KBMgr;
 typedef struct FeatureRegistry FeatureRegistry;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct LanguageDB LanguageDB;
@@ -46,6 +47,7 @@ typedef struct Subspace {
     ControlServer* svr;
     SubspaceUI* ui;
     GameMgr* gmgr;
+    KBMgr* kbmgr;
     FeatureRegistry* freg;
     LanguageDB* lang;
     string langid;

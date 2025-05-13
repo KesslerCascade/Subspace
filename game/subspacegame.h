@@ -37,6 +37,8 @@ typedef struct FeatureSettingsSpec {
     FeatureSettingsEnt ent[];   // null name terminated list of settings
 } FeatureSettingsSpec;
 
+typedef struct KeyBind KeyBind;
+
 typedef struct SubspaceFeature {
     bool valid;   // has this feature been validated -- all required symbols and patches available
     bool available;   // is this feature available -- i.e. did all the necessary patches apply?
@@ -46,6 +48,8 @@ typedef struct SubspaceFeature {
     featureValidate_t validate;
     featurePatch_t patch;
     featureEnable_t enable;
+
+    KeyBind* keybinds;                   // NULL terminated list of keybinds to register
 
     FeatureSettingsSpec* settingsspec;   // structure definiting which settings are to be received
     void* settings;                      // memory allocated for a feature-specific struct

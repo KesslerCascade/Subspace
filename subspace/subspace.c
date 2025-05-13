@@ -4,6 +4,7 @@
 #include "control/controlserver.h"
 #include "feature/featureregistry.h"
 #include "gamemgr/gamemgr.h"
+#include "kbmgr/kbmgr.h"
 #include "lang/lang.h"
 #include "ui/subspaceui.h"
 
@@ -86,13 +87,16 @@ static void subspaceStartup(LogDest** pdeferredlogs)
     if (subspace.devmode)
         logStr(Notice, _S"Developer mode engaged. Good luck and have fun!");
 
-    // 06 -------- Feature registry
+    // 06 -------- Keybind manager
+    subspace.kbmgr = kbmgrCreate(&subspace);
+
+    // 07 -------- Feature registry
     subspace.freg = fregCreate(&subspace);
 
-    // 07 -------- GameMgr setup
+    // 08 -------- GameMgr
     subspace.gmgr = gmgrCreate(&subspace);
 
-    // 08 -------- Task queue setup
+    // 09 -------- Task queue setup
     int ncores   = osPhysicalCPUs();
     int nthreads = osLogicalCPUs();
     TaskQueueConfig conf;
@@ -108,13 +112,13 @@ static void subspaceStartup(LogDest** pdeferredlogs)
     if (subspace.workq)
         ret &= tqStart(subspace.workq);
 
-    // 09 -------- UI setup
+    // 10 -------- UI setup
     subspace.ui = ssuiCreate(&subspace);
     if (!ssuiInit(subspace.ui)) {
         fatalError(_S"Failed to initialize UI.", false);
     }
 
-    // 10 -------- Control Server setup
+    // 11 -------- Control Server setup
     subspace.svr = cserverCreate(&subspace);
     if (!cserverStart(subspace.svr)) {
         fatalError(_S"Failed to start control server.", false);
@@ -123,20 +127,23 @@ static void subspaceStartup(LogDest** pdeferredlogs)
 
 static void subspaceShutdown()
 {
-    // 10 -------- Control Server shutdown
+    // 11 -------- Control Server shutdown
     cserverStop(subspace.svr);
 
-    // 09 -------- UI teardown
+    // 10 -------- UI teardown
     ssuiShutdown(subspace.ui);
 
-    // 08 -------- Task queue shutdown
+    // 09 -------- Task queue shutdown
     tqShutdown(subspace.workq, true);
 
     // 08 -------- Game manager
     objRelease(&subspace.gmgr);
 
-    // 06 -------- Feature registry
+    // 07 -------- Feature registry
     objRelease(&subspace.freg);
+
+    // 06 -------- Keybind manager
+    objRelease(&subspace.kbmgr);
 
     // 05 -------- Log file
     logClose();

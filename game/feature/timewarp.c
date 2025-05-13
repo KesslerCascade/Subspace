@@ -1,5 +1,3 @@
-#include "control.h"
-
 #include "ftl/stdlib.h"
 
 #include "timewarp.h"
@@ -10,7 +8,9 @@
 #include "ftl/globals.h"
 #include "ftl/graphics/csurface.h"
 #include "ftl/graphics/freetype.h"
+#include "input/keybinds.h"
 #include "patch/patchlist.h"
+#include "control.h"
 #include "subspacegame.h"
 
 static double baseFrameTime;
@@ -301,6 +301,39 @@ void timeWarpRender()
     }
 }
 
+// ---- Keybinds ----------------
+
+static void timewarp_key_increase_cb(int key, int flags)
+{
+    timeWarpIncrease();
+}
+
+static void timewarp_key_decrease_cb(int key, int flags)
+{
+    timeWarpDecrease();
+}
+
+static void timewarp_key_cancel_cb(int key, int flags)
+{
+    timeWarpEnd();
+}
+
+static KeyBind TimeWarp_keybinds[] = {
+    { .name      = "timewarp_increase",
+     .context   = KB_CTX_GAME,
+     .flags_exc = KB_JUMPING,
+     .func      = timewarp_key_increase_cb },
+    { .name      = "timewarp_decrease",
+     .context   = KB_CTX_GAME,
+     .flags_exc = KB_JUMPING,
+     .func      = timewarp_key_decrease_cb },
+    { .name      = "timewarp_cancel",
+     .context   = KB_CTX_GAME,
+     .flags_exc = KB_JUMPING | KB_PAUSED,
+     .func      = timewarp_key_cancel_cb },
+    { 0 }
+};
+
 // ---- Patching ----------------
 
 static bool timeWarp_Patch(SubspaceFeature* feat, void* settings, PatchState* ps)
@@ -336,6 +369,7 @@ SubspaceFeature TimeWarp_feature = {
     .name            = "TimeWarp",
     .patch           = timeWarp_Patch,
     .enable          = timeWarp_Enable,
+    .keybinds        = TimeWarp_keybinds,
     .settingsspec    = &TimeWarp_spec,
     .requiredPatches = TimeWarp_patches,
     .requiredSymbols = { &SYM(CFPS_FPSControl),

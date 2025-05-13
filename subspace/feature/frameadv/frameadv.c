@@ -9,6 +9,8 @@
 #include "frameadv.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include <iupkey.h>
+#include "kbmgr/kbmgr.h"
 
 _objfactory_guaranteed FrameAdv* FrameAdv_create(Subspace* ss)
 {
@@ -17,6 +19,8 @@ _objfactory_guaranteed FrameAdv* FrameAdv_create(Subspace* ss)
 
     self->ss = ss;
     strDup(&self->name, _S"FrameAdv");
+
+    kbmgrReg(ss->kbmgr, self, _S"frameadv_advance", K_grave);
 
     objInstInit(self);
     return self;

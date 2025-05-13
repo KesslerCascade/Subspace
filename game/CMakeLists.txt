@@ -80,6 +80,7 @@ add_executable(subspacegame
     control/controlconnect.c
     control/messagequeue.c
     control/cmds.c
+    control/cmds/cmdbindkey.c
     control/cmds/cmdcleartostart.c
     control/cmds/cmdenablefeature.c
     control/cmds/cmdfeaturesettings.c
@@ -111,6 +112,7 @@ add_executable(subspacegame
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
     hook/textlibrary/textlibrary_gettext.c
+    input/keybinds.c
     input/keyboard.c
     log/log.c
     patch/patch.c
