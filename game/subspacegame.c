@@ -1,8 +1,8 @@
+#include "netsocket.h"
+
 #include "subspacegame.h"
 // NOTE: the entry point (i.e. "main" equivalent) is not located here, but is instead in entry.c in
 // one of the playform-specific subdirectories
-
-#include "net.h"
 
 #include "control/cmds.h"
 #include "control/controlclient.h"

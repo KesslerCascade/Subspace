@@ -1,7 +1,8 @@
-#include "controlconnect.h"
+#include "netsocket.h"
+
 #include "feature/feature.h"
 #include "ftl/misc.h"
-#include "net.h"
+#include "controlconnect.h"
 #include "subspacegame.h"
 
 #include "minicrt.h"

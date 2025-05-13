@@ -9,8 +9,9 @@
 #include "controlserver.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include <cx/math.h>
+#include "netsocket.h"
 
+#include <cx/math.h>
 #include "cmds.h"
 
 _objfactory_guaranteed ControlServer* ControlServer_create(Subspace* subspace)

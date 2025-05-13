@@ -4,11 +4,8 @@
 #include <stdint.h>
 
 #ifdef WIN32
-#include <winsock2.h>
-#include <windows.h>
-typedef SOCKET socket_t;
+typedef uintptr_t socket_t;
 #else
-#include <sys/socket.h>
 typedef int socket_t;
 #define closesocket close
 #endif

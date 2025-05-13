@@ -1,4 +1,4 @@
-#include "net.h"
+#include "netsocket.h"
 
 #ifdef WIN32
 
