@@ -6,12 +6,12 @@
 #include "ui/page/settingspage.h"
 #include "gamemgr/gameinst.h"
 
-typedef struct SubspaceUI SubspaceUI;
-typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
+typedef struct SubspaceUI SubspaceUI;
+typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct GameMgr GameMgr;
@@ -48,13 +48,21 @@ typedef struct InfoBlockPage {
 
     Subspace* ss;
     SubspaceUI* ui;
+    Weak(SubspaceFeature)* owner;
     Ihandle* h;
     Ihandle* parent;
     strref name;
     string imgname;
     string title;
-    bool visible;
     InfoBlock* feature;
+    sa_string order;
+    sa_string orderdisabled;
+    Ihandle* enabledlist;
+    Ihandle* disabledlist;
+    Ihandle* addbtn;
+    Ihandle* upbtn;
+    Ihandle* downbtn;
+    Ihandle* removebtn;
 } InfoBlockPage;
 extern ObjClassInfo InfoBlockPage_clsinfo;
 #define InfoBlockPage(inst) ((InfoBlockPage*)(unused_noeval((inst) && &((inst)->_is_InfoBlockPage)), (inst)))
@@ -75,6 +83,10 @@ typedef struct InfoBlockPage_WeakRef {
 _objfactory_guaranteed InfoBlockPage* InfoBlockPage_create(InfoBlock* feature, SubspaceUI* ui);
 // InfoBlockPage* infoblockpageCreate(InfoBlock* feature, SubspaceUI* ui);
 #define infoblockpageCreate(feature, ui) InfoBlockPage_create(InfoBlock(feature), SubspaceUI(ui))
+
+void InfoBlockPage_save(_In_ InfoBlockPage* self);
+// void infoblockpageSave(InfoBlockPage* self);
+#define infoblockpageSave(self) InfoBlockPage_save(InfoBlockPage(self))
 
 // bool infoblockpageMake(InfoBlockPage* self, Ihandle* list);
 #define infoblockpageMake(self, list) (self)->_->make(InfoBlockPage(self), list)

@@ -23,7 +23,6 @@ _objfactory_guaranteed SetupPage* SetupPage_create(SubspaceUI* ui)
 
     self->ui = ui;
     self->ss = ui->ss;
-    self->visible = true;
 
     self->name = _S"setup";
     strDup(&self->title, langGet(self->ss, _S"settings_setup"));

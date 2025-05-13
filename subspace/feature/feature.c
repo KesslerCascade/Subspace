@@ -58,11 +58,9 @@ SettingsPage* SubspaceFeature_getSettingsPage(_In_ SubspaceFeature* self)
     rwlockReleaseRead(&self->lock);
 
     withWriteLock (&self->lock) {
-        if (!self->page) {
+        if (!self->page)
             ret = featureCreateSettingsPage(self, self->ss->ui);
-            if (ret)
-                ret->visible = self->enabled && self->available;
-        }
+
         self->page        = ret;
         self->pagecreated = true;   // success or not, don't try again
     }
@@ -86,8 +84,6 @@ void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled)
 {
     withWriteLock (&self->lock) {
         self->enabled = enabled;
-        if (self->page)
-            self->page->visible = self->enabled && self->available;
     }
 
     // send feature state and config (if enabled) to any connected clients
@@ -126,8 +122,6 @@ void SubspaceFeature_setAvailable(_In_ SubspaceFeature* self, bool available)
 {
     withWriteLock (&self->lock) {
         self->available = available;
-        if (self->page)
-            self->page->visible = self->enabled && self->available;
     }
 
     // save state in settings

@@ -29,7 +29,7 @@ void InfoBlock_applyDefaultSettings(_In_ InfoBlock* self)
 {
     ssdLockedTransaction(self->settings)
     {
-        if (!ssdPtr(self->settings, _S"ssvar"))
+        if (!ssdPtr(self->settings, _S"ssver"))
             ssdSet(self->settings, _S"ssver", false, stvar(int32, 0));
         if (!ssdPtr(self->settings, _S"ftlver"))
             ssdSet(self->settings, _S"ftlver", false, stvar(int32, 1));

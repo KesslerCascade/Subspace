@@ -45,9 +45,9 @@ _objfactory_guaranteed TimeWarpPage* TimeWarpPage_create(TimeWarp* feature, Subs
     self = objInstCreate(TimeWarpPage);
 
     self->feature = feature;
+    self->owner   = objGetWeak(SubspaceFeature, feature);
     self->ui      = ui;
     self->ss      = ui->ss;
-    self->visible = true;
 
     self->name = _S"timewarp";
     strDup(&self->title, langGet(self->ss, _S"feature_timewarp"));

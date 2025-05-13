@@ -6,12 +6,12 @@
 #include "ui/page/settingspage.h"
 #include "gamemgr/gameinst.h"
 
-typedef struct SubspaceUI SubspaceUI;
-typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
 typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
+typedef struct SubspaceUI SubspaceUI;
+typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct GameMgr GameMgr;
@@ -48,12 +48,12 @@ typedef struct TimeWarpPage {
 
     Subspace* ss;
     SubspaceUI* ui;
+    Weak(SubspaceFeature)* owner;
     Ihandle* h;
     Ihandle* parent;
     strref name;
     string imgname;
     string title;
-    bool visible;
     TimeWarp* feature;
     Ihandle* maxwarp_val_num;
     Ihandle* maxwarp_val;

@@ -215,7 +215,16 @@ void SettingsWin_updateList(_In_ SettingsWin* self)
     int listid = 1;
     for (int i = 0; i < saSize(self->pages); i++) {
         SettingsPage* page = self->pages.a[i];
-        if (page->visible) {
+        bool visible       = true;
+
+        // if this page is linked to a feature, it must be enabled tobe visible
+        SubspaceFeature* feat = objAcquireFromWeak(SubspaceFeature, page->owner);
+        if (feat)
+            visible &= featureIsEnabled(feat);
+
+        objRelease(&feat);
+
+        if (visible) {
             IupSetAttributeId(self->pagelist, "", listid, strC(page->title));
 
             if (curtitle && strEq(curtitle, page->title))

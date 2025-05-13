@@ -5,6 +5,18 @@ class InfoBlock;
 class InfoBlockPage extends SettingsPage {
     InfoBlock *feature;
 
+    sa_string order;
+    sa_string orderdisabled;
+
+    Ihandle *enabledlist;
+    Ihandle *disabledlist;
+    Ihandle *addbtn;
+    Ihandle *upbtn;
+    Ihandle *downbtn;
+    Ihandle *removebtn;
+
+    unbound void save();
+
     factory create(InfoBlock *feature, SubspaceUI *ui);
     override make;
     override update;

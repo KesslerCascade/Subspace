@@ -42,8 +42,10 @@ void TimeWarp_applyDefaultSettings(_In_ TimeWarp* self)
 
 extern SettingsPage*
 SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
-extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
-#define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
+extern SettingsPage*
+SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
+#define parent_createSettingsPage(ui) \
+    SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
 SettingsPage* TimeWarp_createSettingsPage(_In_ TimeWarp* self, SubspaceUI* ui)
 {
     return SettingsPage(timewarppageCreate(self, ui));

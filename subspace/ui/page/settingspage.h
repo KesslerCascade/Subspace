@@ -5,10 +5,17 @@
 #include <cx/obj.h>
 #include <iup.h>
 #include "subspace.h"
+#include "feature/feature.h"
 #include "lang/lang.h"
 #include "ui/util/iupsetobj.h"
 #include "ui/util/settip.h"
 
+typedef struct SettingsPage SettingsPage;
+typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
+typedef struct ControlClient ControlClient;
+typedef struct ControlClient_WeakRef ControlClient_WeakRef;
+typedef struct SubspaceUI SubspaceUI;
+typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct SettingsPage SettingsPage;
@@ -38,12 +45,12 @@ typedef struct SettingsPage {
 
     Subspace* ss;
     SubspaceUI* ui;
+    Weak(SubspaceFeature)* owner;
     Ihandle* h;
     Ihandle* parent;
     strref name;
     string imgname;
     string title;
-    bool visible;
 } SettingsPage;
 extern ObjClassInfo SettingsPage_clsinfo;
 #define SettingsPage(inst) ((SettingsPage*)(unused_noeval((inst) && &((inst)->_is_SettingsPage)), (inst)))

@@ -27,6 +27,7 @@ bool SettingsPage_update(_In_ SettingsPage* self)
 void SettingsPage_destroy(_In_ SettingsPage* self)
 {
     // Autogen begins -----
+    objDestroyWeak(&self->owner);
     strDestroy(&self->imgname);
     strDestroy(&self->title);
     // Autogen ends -------

@@ -1,5 +1,6 @@
 #include <iup.h>
 #include "subspace.h"
+#include "feature/feature.sidl"
 #include "lang/lang.h"
 #include "ui/util/iupsetobj.h"
 #include "ui/util/settip.h"
@@ -9,12 +10,13 @@ class SettingsPage {
     Subspace *ss;
     SubspaceUI *ui;
 
+    weak:SubspaceFeature owner;
+
     Ihandle *h;
     Ihandle *parent;
     strref name;
     string imgname;
     string title;
-    bool visible;
 
     bool make(Ihandle *list);
     bool update();

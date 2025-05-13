@@ -28,7 +28,6 @@ _objfactory_guaranteed FeaturesPage* FeaturesPage_create(SubspaceUI* ui)
 
     self->ui      = ui;
     self->ss      = ui->ss;
-    self->visible = true;
 
     self->name = _S"features";
     strDup(&self->title, langGet(self->ss, _S"settings_features"));
