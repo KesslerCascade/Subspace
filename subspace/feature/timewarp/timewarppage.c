@@ -182,7 +182,7 @@ bool TimeWarpPage_make(_In_ TimeWarpPage* self, Ihandle* list)
            1);
 
     Ihandle* thevbox = IupVbox(gbox, sep1, self->allowslowmo, IupFill(), NULL);
-    IupSetAttribute(thevbox, "CMARGIN", "4x4");
+    IupSetAttribute(thevbox, "CMARGIN", "6x6");
     IupSetAttribute(thevbox, "CGAP", "6");
     self->h = IupBackgroundBox(thevbox);
 

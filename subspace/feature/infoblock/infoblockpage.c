@@ -241,6 +241,7 @@ bool InfoBlockPage_make(_In_ InfoBlockPage* self, Ihandle* list)
     IupSetAttribute(dhbox, "ALIGNMENT", "ATOP");
 
     self->h = IupVbox(instrlabel, espc, elabel, ehbox, dspc, dlabel, dhbox, IupFill(), NULL);
+    IupSetAttribute(self->h, "CMARGIN", "6x6");
 
     iupLoadImage(self->ss, _S"IMAGE_INFOBLOCK", _S"svg", _S"subspace:/infoblock.svg", list);
 
