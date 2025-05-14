@@ -80,14 +80,14 @@ bool stConvert_bool(stype destst, _stCopyDest_Anno_(destst) stgeneric *dest, sty
     v.u = (uint64)src.st_##type;                      \
     break
 
-#define stConvertSIntOutput(type, vmin, vmax) case stTypeId(type):      \
-    if (!norange && (v.s < vmin || ((srcunsigned ? v.u : v.s) > vmax)))   \
-        return false;                                                   \
-    dest->st_##type = (stTypeDef(type))v.s;                             \
+#define stConvertSIntOutput(type, vmin, vmax) case stTypeId(type):               \
+    if (!norange && (v.s < vmin || (srcunsigned ? (v.u > vmax) : (v.s > vmax)))) \
+        return false;                                                            \
+    dest->st_##type = (stTypeDef(type))v.s;                                      \
     return true 
 
 #define stConvertUIntOutput(type, vmax) case stTypeId(type):            \
-    if (!norange && v.u > vmax)                                           \
+    if (!norange && v.u > vmax)                                         \
         return false;                                                   \
     dest->st_##type = (stTypeDef(type))v.u;                             \
     return true 
