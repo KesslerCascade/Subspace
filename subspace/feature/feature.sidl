@@ -14,10 +14,7 @@ class SubspaceUI;
     bool optional;   // Features that are expected to be unavailable, e.g. version-specific
 
     object:SSDNode settings;    // Settings that are synchronized with the game client
-    object:SettingsPage page;
-    bool pagecreated;
 
-    SettingsPage *getSettingsPage();
     SettingsPage *createSettingsPage(SubspaceUI *ui);
     bool isEnabled();
     bool isAvailable();

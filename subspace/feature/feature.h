@@ -26,7 +26,6 @@ typedef struct SubspaceFeature_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
-    SettingsPage* (*getSettingsPage)(_In_ void* self);
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
@@ -57,8 +56,6 @@ typedef struct SubspaceFeature {
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     SSDNode* settings;        // Settings that are synchronized with the game client
-    SettingsPage* page;
-    bool pagecreated;
 } SubspaceFeature;
 extern ObjClassInfo SubspaceFeature_clsinfo;
 #define SubspaceFeature(inst) ((SubspaceFeature*)(unused_noeval((inst) && &((inst)->_is_SubspaceFeature)), (inst)))
@@ -75,8 +72,6 @@ typedef struct SubspaceFeature_WeakRef {
 } SubspaceFeature_WeakRef;
 #define SubspaceFeature_WeakRef(inst) ((SubspaceFeature_WeakRef*)(unused_noeval((inst) && &((inst)->_is_SubspaceFeature_WeakRef)), (inst)))
 
-// SettingsPage* featureGetSettingsPage(SubspaceFeature* self);
-#define featureGetSettingsPage(self) (self)->_->getSettingsPage(SubspaceFeature(self))
 // SettingsPage* featureCreateSettingsPage(SubspaceFeature* self, SubspaceUI* ui);
 #define featureCreateSettingsPage(self, ui) (self)->_->createSettingsPage(SubspaceFeature(self), SubspaceUI(ui))
 // bool featureIsEnabled(SubspaceFeature* self);

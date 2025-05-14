@@ -8,7 +8,6 @@ SubspaceFeature_ClassIf SubspaceFeature_ClassIf_tmpl = {
 static SubspaceFeature_ClassIf _impl_SubspaceFeature_SubspaceFeature_ClassIf = {
     ._size = sizeof(SubspaceFeature_ClassIf),
     ._implements = (ObjIface*)&SubspaceFeature_ClassIf_tmpl,
-    .getSettingsPage = (SettingsPage* (*)(void*))SubspaceFeature_getSettingsPage,
     .createSettingsPage = (SettingsPage* (*)(void*, SubspaceUI*))SubspaceFeature_createSettingsPage,
     .isEnabled = (bool (*)(void*))SubspaceFeature_isEnabled,
     .isAvailable = (bool (*)(void*))SubspaceFeature_isAvailable,

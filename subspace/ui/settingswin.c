@@ -31,7 +31,7 @@ static void SettingsWin_registerPages(SettingsWin* self, SubspaceUI* ui)
     // register pages that belong to features
     foreach (hashtable, hti, self->ss->freg->features) {
         SubspaceFeature* feat = (SubspaceFeature*)htiVal(object, hti);
-        SettingsPage* page    = featureGetSettingsPage(feat);
+        SettingsPage* page    = featureCreateSettingsPage(feat, ui);
         if (page) {
             saPush(&self->pages, object, page);
         }
@@ -220,7 +220,7 @@ void SettingsWin_updateList(_In_ SettingsWin* self)
         SettingsPage* page = self->pages.a[i];
         bool visible       = true;
 
-        // if this page is linked to a feature, it must be enabled tobe visible
+        // if this page is linked to a feature, it must be enabled to be visible
         SubspaceFeature* feat = objAcquireFromWeak(SubspaceFeature, page->owner);
         if (feat)
             visible &= featureIsEnabled(feat);

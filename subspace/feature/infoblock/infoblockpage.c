@@ -183,6 +183,10 @@ extern bool SettingsPage_make(_In_ SettingsPage* self, Ihandle* list);   // pare
 bool InfoBlockPage_make(_In_ InfoBlockPage* self, Ihandle* list)
 {
     Ihandle* instrlabel = IupLabel(langGetC(self->ss, _S"infoblock_instructions"));
+    IupSetAttribute(instrlabel, "SIZE", "1x18");
+    IupSetAttribute(instrlabel, "WORDWRAP", "YES");
+    IupSetAttribute(instrlabel, "EXPAND", "HORIZONTAL");
+    IupSetAttribute(instrlabel, "ALIGNMENT", "ALEFT:ATOP");
 
     Ihandle* elabel   = IupLabel(langGetC(self->ss, _S"infoblock_enabled"));
     self->enabledlist = IupList(NULL);

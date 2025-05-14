@@ -21,7 +21,6 @@ typedef struct TimeWarp_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
-    SettingsPage* (*getSettingsPage)(_In_ void* self);
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
@@ -53,8 +52,6 @@ typedef struct TimeWarp {
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     SSDNode* settings;        // Settings that are synchronized with the game client
-    SettingsPage* page;
-    bool pagecreated;
 } TimeWarp;
 extern ObjClassInfo TimeWarp_clsinfo;
 #define TimeWarp(inst) ((TimeWarp*)(unused_noeval((inst) && &((inst)->_is_TimeWarp)), (inst)))
@@ -76,8 +73,6 @@ _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss);
 // TimeWarp* timewarpCreate(Subspace* ss);
 #define timewarpCreate(ss) TimeWarp_create(ss)
 
-// SettingsPage* timewarpGetSettingsPage(TimeWarp* self);
-#define timewarpGetSettingsPage(self) (self)->_->getSettingsPage(TimeWarp(self))
 // SettingsPage* timewarpCreateSettingsPage(TimeWarp* self, SubspaceUI* ui);
 #define timewarpCreateSettingsPage(self, ui) (self)->_->createSettingsPage(TimeWarp(self), SubspaceUI(ui))
 // bool timewarpIsEnabled(TimeWarp* self);

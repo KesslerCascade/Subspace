@@ -66,7 +66,7 @@
     "feature_frameadv": "Frame Advance",
     "feature_frameadv_desc": "Use a key to advance the game state by a single frame while paused, for convenience as well to assist players who find micropausing physically difficult.",
     "feature_infoblock": "Info Block",
-    "feature_infoblock_desc": "Display a customziable block of information in the top-right corner of the screen, such as game version or FPS.",
+    "feature_infoblock_desc": "Display a customizable block of information in the top-right corner of the screen, such as game version or FPS.",
     "feature_numerichull": "Numeric Hull",
     "feature_numerichull_desc": "Show remaining hull integrity in numeric form, without having to count the bars by hand.",
     "feature_timewarp": "Time Warp",

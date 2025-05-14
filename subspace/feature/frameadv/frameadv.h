@@ -21,7 +21,6 @@ typedef struct FrameAdv_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
-    SettingsPage* (*getSettingsPage)(_In_ void* self);
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
@@ -53,8 +52,6 @@ typedef struct FrameAdv {
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     SSDNode* settings;        // Settings that are synchronized with the game client
-    SettingsPage* page;
-    bool pagecreated;
 } FrameAdv;
 extern ObjClassInfo FrameAdv_clsinfo;
 #define FrameAdv(inst) ((FrameAdv*)(unused_noeval((inst) && &((inst)->_is_FrameAdv)), (inst)))
@@ -76,8 +73,6 @@ _objfactory_guaranteed FrameAdv* FrameAdv_create(Subspace* ss);
 // FrameAdv* frameadvCreate(Subspace* ss);
 #define frameadvCreate(ss) FrameAdv_create(ss)
 
-// SettingsPage* frameadvGetSettingsPage(FrameAdv* self);
-#define frameadvGetSettingsPage(self) (self)->_->getSettingsPage(FrameAdv(self))
 // SettingsPage* frameadvCreateSettingsPage(FrameAdv* self, SubspaceUI* ui);
 #define frameadvCreateSettingsPage(self, ui) (self)->_->createSettingsPage(FrameAdv(self), SubspaceUI(ui))
 // bool frameadvIsEnabled(FrameAdv* self);

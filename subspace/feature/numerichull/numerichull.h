@@ -21,7 +21,6 @@ typedef struct NumericHull_ClassIf {
     ObjIface* _parent;
     size_t _size;
 
-    SettingsPage* (*getSettingsPage)(_In_ void* self);
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
@@ -53,8 +52,6 @@ typedef struct NumericHull {
     bool enabled;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     SSDNode* settings;        // Settings that are synchronized with the game client
-    SettingsPage* page;
-    bool pagecreated;
 } NumericHull;
 extern ObjClassInfo NumericHull_clsinfo;
 #define NumericHull(inst) ((NumericHull*)(unused_noeval((inst) && &((inst)->_is_NumericHull)), (inst)))
@@ -76,8 +73,6 @@ _objfactory_guaranteed NumericHull* NumericHull_create(Subspace* ss);
 // NumericHull* numerichullCreate(Subspace* ss);
 #define numerichullCreate(ss) NumericHull_create(ss)
 
-// SettingsPage* numerichullGetSettingsPage(NumericHull* self);
-#define numerichullGetSettingsPage(self) (self)->_->getSettingsPage(NumericHull(self))
 // SettingsPage* numerichullCreateSettingsPage(NumericHull* self, SubspaceUI* ui);
 #define numerichullCreateSettingsPage(self, ui) (self)->_->createSettingsPage(NumericHull(self), SubspaceUI(ui))
 // bool numerichullIsEnabled(NumericHull* self);

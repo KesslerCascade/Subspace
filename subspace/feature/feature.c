@@ -31,7 +31,6 @@ void SubspaceFeature_destroy(_In_ SubspaceFeature* self)
     rwlockDestroy(&self->lock);
     strDestroy(&self->name);
     objRelease(&self->settings);
-    objRelease(&self->page);
     // Autogen ends -------
 }
 
@@ -44,28 +43,6 @@ _objfactory_guaranteed ClientFeature* ClientFeature_create(_In_opt_ strref name)
 
     objInstInit(self);
     return self;
-}
-
-SettingsPage* SubspaceFeature_getSettingsPage(_In_ SubspaceFeature* self)
-{
-    SettingsPage* ret = NULL;
-    rwlockAcquireRead(&self->lock);
-    if (self->pagecreated) {
-        ret = self->page;
-        rwlockReleaseRead(&self->lock);
-        return ret;
-    }
-    rwlockReleaseRead(&self->lock);
-
-    withWriteLock (&self->lock) {
-        if (!self->page)
-            ret = featureCreateSettingsPage(self, self->ss->ui);
-
-        self->page        = ret;
-        self->pagecreated = true;   // success or not, don't try again
-    }
-
-    return ret;
 }
 
 SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui)
