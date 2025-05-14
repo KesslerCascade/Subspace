@@ -36,13 +36,16 @@ static int32 loadKeyBind(Subspace* ss, strref name)
 {
     keymapInit();
 
-    int32 ret = 0;
+    int32 ret = -1;
 
     string kpath = 0;
     strConcat(&kpath, _S"keybinds/", name);
     string kname = 0;
     if (ssdStringOut(ss->settings, kpath, &kname)) {
-        htFind(keymap_strtoiup, string, kname, int32, &ret);
+        if (strEmpty(kname))
+            ret = 0;
+        else
+            htFind(keymap_strtoiup, string, kname, int32, &ret);
     }
     strDestroy(&kname);
     strDestroy(&kpath);
@@ -59,7 +62,9 @@ static void saveKeyBind(Subspace* ss, strref name, int32 iupkey)
     string kpath = 0;
     strConcat(&kpath, _S"keybinds/", name);
     string kname = 0;
-    if (htFind(keymap_iuptostr, int32, iupkey, string, &kname)) {
+    if (iupkey == 0) {
+        ssdSet(ss->settings, kpath, true, stvar(string, _S""));
+    } else if (htFind(keymap_iuptostr, int32, iupkey, string, &kname)) {
         ssdSet(ss->settings, kpath, true, stvar(string, kname));
     }
     strDestroy(&kname);
@@ -72,7 +77,7 @@ void KBMgr_reg(_In_ KBMgr* self, SubspaceFeature* owner, _In_opt_ strref name, i
 
     // try to load saved setting
     kb->iupkey = loadKeyBind(self->ss, name);
-    if (!kb->iupkey)
+    if (kb->iupkey == -1)
         kb->iupkey = default_key;
 
     htFind(keymap_iuptoftl, int32, kb->iupkey, int32, &kb->ftlkey);
@@ -87,10 +92,19 @@ bool KBMgr_bind(_In_ KBMgr* self, _In_opt_ strref name, int key)
     bool ret = false;
     KeyBind* bind;
 
+    // ensure that this is a valid key we know how to map to FTL
+    if (key != 0 &&
+        (!htHasKey(keymap_iuptoftl, int32, key) || !htHasKey(keymap_iuptodisplay, int32, key) ||
+         !htHasKey(keymap_iuptostr, int32, key)))
+        return false;
+
     rwlockAcquireWrite(&self->kbmgrlock);
     if (htFind(self->binds, strref, name, object, &bind)) {
         bind->iupkey = key;
-        htFind(keymap_iuptoftl, int32, bind->iupkey, int32, &bind->ftlkey);
+        if (key == 0)
+            bind->ftlkey = 0;
+        else
+            htFind(keymap_iuptoftl, int32, bind->iupkey, int32, &bind->ftlkey);
         rwlockReleaseWrite(&self->kbmgrlock);
         ret = true;
 

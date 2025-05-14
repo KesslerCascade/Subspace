@@ -23,6 +23,7 @@ ObjClassInfo KeybindsPage_clsinfo = {
     .classif = (ObjIface*)&KeybindsPage_ClassIf_tmpl,
     .parent = &SettingsPage_clsinfo,
     .init = (bool(*)(void*))KeybindsPage_init,
+    .destroy = (void(*)(void*))KeybindsPage_destroy,
     .ifimpl = _ifimpl_KeybindsPage,
 };
 

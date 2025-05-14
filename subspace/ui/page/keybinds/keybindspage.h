@@ -5,6 +5,7 @@
 #include <cx/obj.h>
 #include "ui/page/settingspage.h"
 #include "gamemgr/gameinst.h"
+#include "kbmgr/keybind.h"
 
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
@@ -54,6 +55,10 @@ typedef struct KeybindsPage {
     string title;
     Ihandle* kbgrid;
     Ihandle* tip;
+    int hoverrow;
+    int bindrow;
+    bool binding;
+    sa_KeyBind binds;
 } KeybindsPage;
 extern ObjClassInfo KeybindsPage_clsinfo;
 #define KeybindsPage(inst) ((KeybindsPage*)(unused_noeval((inst) && &((inst)->_is_KeybindsPage)), (inst)))
@@ -78,6 +83,30 @@ _objfactory_guaranteed KeybindsPage* KeybindsPage_create(SubspaceUI* ui);
 void KeybindsPage_populateGrid(_In_ KeybindsPage* self);
 // void keybindspagePopulateGrid(KeybindsPage* self);
 #define keybindspagePopulateGrid(self) KeybindsPage_populateGrid(KeybindsPage(self))
+
+void KeybindsPage_setHover(_In_ KeybindsPage* self, int row);
+// void keybindspageSetHover(KeybindsPage* self, int row);
+#define keybindspageSetHover(self, row) KeybindsPage_setHover(KeybindsPage(self), row)
+
+void KeybindsPage_clearHover(_In_ KeybindsPage* self);
+// void keybindspageClearHover(KeybindsPage* self);
+#define keybindspageClearHover(self) KeybindsPage_clearHover(KeybindsPage(self))
+
+void KeybindsPage_startBind(_In_ KeybindsPage* self, int row);
+// void keybindspageStartBind(KeybindsPage* self, int row);
+#define keybindspageStartBind(self, row) KeybindsPage_startBind(KeybindsPage(self), row)
+
+void KeybindsPage_cancelBind(_In_ KeybindsPage* self);
+// void keybindspageCancelBind(KeybindsPage* self);
+#define keybindspageCancelBind(self) KeybindsPage_cancelBind(KeybindsPage(self))
+
+void KeybindsPage_setBindRow(_In_ KeybindsPage* self, int row);
+// void keybindspageSetBindRow(KeybindsPage* self, int row);
+#define keybindspageSetBindRow(self, row) KeybindsPage_setBindRow(KeybindsPage(self), row)
+
+void KeybindsPage_clearBindRow(_In_ KeybindsPage* self);
+// void keybindspageClearBindRow(KeybindsPage* self);
+#define keybindspageClearBindRow(self) KeybindsPage_clearBindRow(KeybindsPage(self))
 
 // bool keybindspageMake(KeybindsPage* self, Ihandle* list);
 #define keybindspageMake(self, list) (self)->_->make(KeybindsPage(self), list)

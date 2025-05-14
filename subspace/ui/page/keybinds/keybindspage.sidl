@@ -1,12 +1,26 @@
 #include "ui/page/settingspage.sidl"
 #include "gamemgr/gameinst.sidl"
+#include "kbmgr/keybind.sidl"
 
 class KeybindsPage extends SettingsPage {
     Ihandle *kbgrid;
     Ihandle *tip;
 
+    int hoverrow;
+    int bindrow;
+    bool binding;
+
+    sarray:object:KeyBind binds;
+
     factory create(SubspaceUI *ui);
     unbound void populateGrid();
+
+    unbound void setHover(int row);
+    unbound void clearHover();
+    unbound void startBind(int row);
+    unbound void cancelBind();
+    unbound void setBindRow(int row);
+    unbound void clearBindRow();
 
     override make;
     override update;
