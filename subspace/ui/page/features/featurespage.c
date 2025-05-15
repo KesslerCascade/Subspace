@@ -119,7 +119,7 @@ static int panel_draw(Ihandle* ih, float posx, float posy)
     bool enabled           = IupGetInt(ih, "PANEL_ENABLED");
     bool focus             = IupGetInt(ih, "PANEL_FOCUS");
     bool hover             = IupGetInt(ih, "PANEL_HOVER");
-    bool drawhover         = focus || hover;
+    bool drawhover         = avail && (focus || hover);
     const char* paneltitle = IupGetAttribute(ih, "PANEL_TITLE");
     const char* paneldesc  = IupGetAttribute(ih, "PANEL_DESC");
     int w, h, charw, charh;
