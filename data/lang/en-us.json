@@ -1,6 +1,12 @@
 {
     "subspace_title": "Subspace",
     "ftl": "Faster Than Light",
+    "subspace_about": "About Subspace",
+    "version": "Version: ",
+    "copyright": "Copyright (C) 2025 KesslerCascade",
+    "contact": "Contact: @kesslercascade on Discord",
+    "license": "This program is licensed under the terms of the GNU General Public License, Version 3.\n\nSee the COPYING file in the source distribution for full details.",
+    "ok": "OK",
     "welcome": "Welcome to Subspace!",
     "welcomesubheader": "A quality-of-life and data tracking framework for the game Faster Than Light.",
     "welcomefirst": "First, we need to find where your game is located.",

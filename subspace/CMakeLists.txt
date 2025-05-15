@@ -106,6 +106,7 @@ add_executable(subspace
     kbmgr/keymap.c
     lang/lang.c
     lang/langdb.c
+    ui/about.c
     ui/mainwin.c
     ui/mainwinlayout.c
     ui/mainwinmenu.c

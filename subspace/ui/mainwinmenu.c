@@ -1,5 +1,6 @@
 #include <cx/container.h>
 #include "ui/util/iupsetobj.h"
+#include "about.h"
 #include "mainwin.h"
 
 static int menu_exit(Ihandle* ih)
@@ -14,6 +15,9 @@ static int menu_exit(Ihandle* ih)
 
 static int menu_about(Ihandle* ih)
 {
+    Subspace* ss = iupGetSubspace(ih);
+    if (ss)
+        showAbout(ss);
     return IUP_DEFAULT;
 }
 

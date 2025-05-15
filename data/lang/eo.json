@@ -1,6 +1,12 @@
 {
     "subspace_title": "Subspaco",
     "ftl": "Pli Rapide Ol Lumo",
+    "subspace_about": "Pri Subspaco",
+    "version": "Versio: ",
+    "copyright": "Kopirajto (C) 2025 KesslerCascade",
+    "contact": "Kontakto: @kesslercascade ĉe Discord",
+    "license": "Ĉi tiu programo estas licencita laŭ la kondiĉoj de la Ĝenerala Publika Permesilo GNU, Versio 3.\n\nVidu la dosieron COPYING en la fontdistribuaĵo por plenaj detaloj.",
+    "ok": "Bone",
     "welcome": "Bonvenon al Subspaco!",
     "welcomesubheader": "Kadro por vivkvalito kaj datumspurado por la ludo Faster Than Light.",
     "welcomefirst": "Unue, ni bezonas trovi kie via ludo troviĝas.",
