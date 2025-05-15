@@ -13,6 +13,8 @@
 #include <cx/settings.h>
 #include <cx/sys.h>
 
+#include <pkgfile/pkgfile.h>
+
 DEFINE_ENTRY_POINT
 
 VFS* filesys;

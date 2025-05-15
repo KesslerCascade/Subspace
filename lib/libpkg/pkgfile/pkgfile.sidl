@@ -1,0 +1,27 @@
+#include <cx/fs.h>
+#include <cx/thread.h>
+#include "pkgstruct.h"
+
+class PkgDirEnt {
+    string name;
+    uint32 off;
+    uint32 csize;
+    uint32 size;
+    bool compressed;
+
+    factory create(strref name, uint32 off, uint32 csize, uint32 size);
+}
+
+class PkgFile {
+    Mutex filelock;     // I/O lock
+    VFSFile *pkgfile;
+    init();
+
+    [caseinsensitive] hashtable:string:object files;
+    [caseinsensitive] hashtable:string:sarray dircache;
+
+    bool load();
+    void close();
+
+    [canfail] factory open(VFSFile *f);    // create for reading
+}

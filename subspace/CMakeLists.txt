@@ -14,6 +14,7 @@ enable_language(CXX)
 include_directories(${SHARED_SOURCE_DIR})
 
 add_subdirectory(../lib lib)
+add_subdirectory(../tools tools)
 
 include (../lib/cx/cmake/werror.cmake)
 
@@ -139,7 +140,7 @@ add_executable(subspace
     ${SHARED_SOURCE_DIR}/control.c
     ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_SIDL})
-target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast)
+target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast libpkg)
 target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 if(WIN32)

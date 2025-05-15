@@ -1,5 +1,6 @@
 #include <cx/fs.h>
 #include <cx/string.h>
+#include <pkgfs/pkgfs.h>
 #include "subspace.h"
 
 bool subspaceCheckBaseDir(VFS* vfs, strref path)
@@ -95,13 +96,25 @@ bool subspaceFindBaseDir(Subspace* ss, VFS* vfs)
     return ret;
 }
 
-bool subspaceMount(Subspace *ss)
+bool subspaceMount(Subspace* ss)
 {
-    // TODO: mount subspace.dat file
+    if (vfsIsFile(ss->fs, DAT_FILENAME)) {
+        VFSFile* pkgfile = vfsOpen(ss->fs, DAT_FILENAME, FS_Read);
+        if (pkgfile) {
+            PkgFile* pkg = pkgfileOpen(pkgfile);
+            if (pkg) {
+                PkgFS* pkgfs = pkgfsCreate(pkg);
+                vfsMountProvider(ss->fs, pkgfs, SSNS);
+                objRelease(&pkg);
+            }
+        }
+    }
 
     if (vfsIsDir(ss->fs, DATADIR_FILENAME)) {
         if (!vfsMountVFS(ss->fs, SSNS, ss->fs, DATADIR_FILENAME, VFS_ReadOnly)) {
-            logFmt(Error, _S"Failed to open data directory ${string}", stvar(strref, DATADIR_FILENAME));
+            logFmt(Error,
+                   _S"Failed to open data directory ${string}",
+                   stvar(strref, DATADIR_FILENAME));
         }
     }
     return true;

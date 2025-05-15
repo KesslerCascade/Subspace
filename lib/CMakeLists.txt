@@ -40,6 +40,8 @@ else()
     target_compile_definitions(nanosvgrast PRIVATE XALLOC_REMAP_MALLOC)
 
     add_subdirectory(sqlite)
+
+    add_subdirectory(libpkg)
 endif()
 
 organize_targets(CLEAR_FOLDER PREPEND lib)

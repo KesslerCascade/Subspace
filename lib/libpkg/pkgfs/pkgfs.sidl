@@ -1,0 +1,9 @@
+#include <cx/fs/vfsprovider.sidl>
+#include <cx/fs/vfsobj.sidl>
+#include "pkgfile/pkgfile.sidl"
+
+class PkgFS implements VFSProvider {
+    object:PkgFile pkg;
+ 
+    factory create(PkgFile *pkgf);
+}
