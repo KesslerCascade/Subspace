@@ -3,12 +3,14 @@
 #include "minicrt.h"
 #include "osdep.h"
 
+#ifdef _DEBUG
 void osWriteDbg(const char* str)
 {
     HANDLE hstdout = GetStdHandle(STD_OUTPUT_HANDLE);
     DWORD written  = 0;
     WriteConsoleA(hstdout, (void*)str, strlen(str), &written, NULL);
 }
+#endif
 
 void osSetCurrentDir(const char* dir)
 {
