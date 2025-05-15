@@ -25,4 +25,5 @@ void registerAllFeatures(FeatureRegistry *reg)
     registerFeature(reg, infoblockCreate(ss));
     registerFeature(reg, numerichullCreate(ss));
     registerFeature(reg, timewarpCreate(ss));
+    registerFeature(reg, tweaksCreate(ss));
 }

@@ -13,7 +13,7 @@
 #include "control.h"
 #include "subspacegame.h"
 
-static double baseFrameTime;
+static double baseFrameTime = 16.66666666666667;
 static double lastTime;
 static int warpFrames;
 
@@ -71,6 +71,7 @@ bool timeWarpBegin()
 
     savedFrameLimit = g_opt_framelimit;   // save frame limiter state in case we need to change it
 
+    baseFrameTime     = g_TargetFrameTimeMS;   // capture current frame time (i.e. from tweaks)
     gs.timeWarpActive = true;
     gs.warpFactor     = 1;
     fadeTimer         = 0;
@@ -338,7 +339,6 @@ static KeyBind TimeWarp_keybinds[] = {
 
 static bool timeWarp_Patch(SubspaceFeature* feat, void* settings, PatchState* ps)
 {
-    baseFrameTime = g_TargetFrameTimeMS;
     return true;
 }
 

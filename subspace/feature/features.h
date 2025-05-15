@@ -6,5 +6,6 @@
 #include "infoblock/infoblock.h"
 #include "numerichull/numerichull.h"
 #include "timewarp/timewarp.h"
+#include "tweaks/tweaks.h"
 
 void registerAllFeatures(FeatureRegistry *reg);

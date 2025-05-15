@@ -1,0 +1,19 @@
+#include "ui/page/settingspage.sidl"
+#include "gamemgr/gameinst.sidl"
+
+class Tweaks;
+class TweaksPage extends SettingsPage {
+    Tweaks* feature;
+
+    string fpscustomtext;
+    Ihandle* fpsradio;
+    Ihandle* fps30;
+    Ihandle* fps60;
+    Ihandle* fps120;
+    Ihandle* fpscustom;
+    Ihandle* fpscustomval;
+
+    factory create(Tweaks* feature, SubspaceUI* ui);
+    override make;
+    override update;
+}

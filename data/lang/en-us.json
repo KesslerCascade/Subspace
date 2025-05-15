@@ -72,7 +72,7 @@
     "feature_timewarp": "Time Warp",
     "feature_timewarp_desc": "Speed up time to skip over the boring parts.",
     "feature_tweaks": "Tweaks",
-    "feature_tweaks_desc": "A catch-all feature for one-off tweaks that do not fit in any other category.",
+    "feature_tweaks_desc": "A catch-all feature for one-off tweaks that do not fit into any other category.",
     "settings_keybinds": "Key Bindings",
     "timewarp_maxwarp": "Maximum Warp Factor:",
     "timewarp_maxwarp_tip": "Limits the maximum time warp factor.",
@@ -96,5 +96,11 @@
     "timewarp_cancel": "Cancel Time Warp",
     "timewarp_cancel_tip": "Exits time warp mode and returns the flow of time to normal.",
     "keybind_instructions": "To bind a key, click on the command button below, then press the desired key. Clicking elsewhere will cancel. Pressing Escape will unbind the key.",
-    "keybind_note": "NOTE: These key bindings will override FTL's in-game key bindings if there is a conflict!"
+    "keybind_note": "NOTE: These key bindings will override FTL's in-game key bindings if there is a conflict!",
+    "tweaks_targetfps": "Target FPS",
+    "tweaks_targetfps_desc": "Changes the target framerate when the frame limiter is ON.\nNOTE: This may have no effect if vertical sync is enabled in your graphics driver settings.",
+    "tweaks_30fps": "30 FPS",
+    "tweaks_60fps": "60 FPS",
+    "tweaks_120fps": "120 FPS",
+    "tweaks_custom": "Custom:"
 }

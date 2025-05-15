@@ -42,6 +42,8 @@ set(SUBSPACE_SIDL
     feature/numerichull/numerichull.sidl
     feature/timewarp/timewarp.sidl
     feature/timewarp/timewarppage.sidl
+    feature/tweaks/tweaks.sidl
+    feature/tweaks/tweakspage.sidl
     gamemgr/gameinst.sidl
     gamemgr/gamemgr.sidl
     kbmgr/kbmgr.sidl
@@ -95,6 +97,8 @@ add_executable(subspace
     feature/numerichull/numerichull.c
     feature/timewarp/timewarp.c
     feature/timewarp/timewarppage.c
+    feature/tweaks/tweaks.c
+    feature/tweaks/tweakspage.c
     gamemgr/gameinst.c
     gamemgr/gamemgr.c
     kbmgr/kbmgr.c

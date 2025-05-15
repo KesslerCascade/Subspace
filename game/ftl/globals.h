@@ -16,6 +16,7 @@ DECLSYM(Globals_Library_currentLanguage);
 
 DECLSYM(TargetFrameTimeMS);
 double g_TargetFrameTimeMS;   // relocated out of read-only memory
+double g_DefaultFrameTimeMS;   // saved copy of the default frame time
 
 DECLSYM(ResourceControl_GlobalResources);
 #define g_ResourceControl_GlobalResources \

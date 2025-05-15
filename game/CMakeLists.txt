@@ -89,6 +89,7 @@ add_executable(subspacegame
     feature/infoblock.c
     feature/numerichull.c
     feature/timewarp.c
+    feature/tweaks.c
     ftl/graphics/colors.c
     ftl/ftl.c
     ftl/struct.c

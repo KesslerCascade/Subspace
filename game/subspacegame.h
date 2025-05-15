@@ -94,6 +94,9 @@ typedef struct GameGlobalState {
 
     int lastFrame1s;    // number of frames processed in the previous second
     int lastRender1s;   // number of frames rendered in the previous second
+
+    // Tweaks
+    bool tweaksOverrideFPS;
 } GameGlobalState;
 
 extern SubspaceGameSettings settings;

@@ -4,6 +4,7 @@ extern SubspaceFeature FrameAdv_feature;
 extern SubspaceFeature InfoBlock_feature;
 extern SubspaceFeature NumericHull_feature;
 extern SubspaceFeature TimeWarp_feature;
+extern SubspaceFeature Tweaks_feature;
 typedef struct ControlField ControlField;
 
 void registerFeature(SubspaceFeature* feature);

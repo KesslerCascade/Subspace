@@ -14,6 +14,7 @@ static bool apply(addr_t base, Patch* p, PatchState* ps)
     // Relocate the global variable out of rdata into writable memory
     // Copy value first
     g_TargetFrameTimeMS = *(double*)symAddr(base, TargetFrameTimeMS);
+    g_DefaultFrameTimeMS = g_TargetFrameTimeMS;
     return replaceVariable(base, symAddr(base, TargetFrameTimeMS), &g_TargetFrameTimeMS);
 }
 

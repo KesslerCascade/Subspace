@@ -96,5 +96,11 @@
     "timewarp_cancel": "Nuligi Tempodistordon",
     "timewarp_cancel_tip": "Forlasas tempodistordan reĝimon kaj redonas la fluon de tempo al normaleco.",
     "keybind_instructions": "Por ligi klavon, alklaku la komandbutonon sube, poste premu la deziratan klavon. Alklako aliloke nuligos. Premo de Eskapo malligos la klavon.",
-    "keybind_note": "RIMARKO: Ĉi tiuj klavokombinoj anstataŭigos la enludajn klavokombinojn de FTL se estas konflikto!"
+    "keybind_note": "RIMARKO: Ĉi tiuj klavokombinoj anstataŭigos la enludajn klavokombinojn de FTL se estas konflikto!",
+    "tweaks_targetfps": "Cela FPS",
+    "tweaks_targetfps_desc": "Ŝanĝas la celan bildfrekvencon kiam la bildlimigilo estas ŜALTITA.\nRIMARKO: Ĉi tio eble ne efikos se vertikala sinkronigo estas ebligita en viaj grafikaj pelilaj agordoj.",
+    "tweaks_30fps": "30 FPS",
+    "tweaks_60fps": "60 FPS",
+    "tweaks_120fps": "120 FPS",
+    "tweaks_custom": "Kutimo:"
 }

@@ -75,6 +75,7 @@ int sscmain(int argc, char* argv[])
     registerFeature(&TimeWarp_feature);
     registerFeature(&FrameAdv_feature);
     registerFeature(&NumericHull_feature);
+    registerFeature(&Tweaks_feature);
 
     PatchState ps;
     if (!patchBegin(&ps, ftlbase)) {

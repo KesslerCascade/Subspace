@@ -72,7 +72,7 @@
     "feature_timewarp": "Imetay Arpway",
     "feature_timewarp_desc": "Eedspay upway imetay otay ipskay overway ethay oringbay artspay.",
     "feature_tweaks": "Eakstway",
-    "feature_tweaks_desc": "Away atchcay-allway eaturefay orfay oneway-offway eakstway atthay oday otnay itfay inway anyway otherway ategorycay.",
+    "feature_tweaks_desc": "Away atchcay-allway eaturefay orfay oneway-offway eakstway atthay oday otnay itfay intoway anyway otherway ategorycay.",
     "settings_keybinds": "Eykay Indingsbay",
     "timewarp_maxwarp": "Aximummay Arpway Actorfay:",
     "timewarp_maxwarp_tip": "Imitslay ethay aximummay imetay arpway actorfay.",
@@ -96,5 +96,11 @@
     "timewarp_cancel": "Ancelcay Imetay Arpway",
     "timewarp_cancel_tip": "Exitsway imetay arpway odemay andway eturnsray ethay owflay ofway imetay otay ormalnay.",
     "keybind_instructions": "Otay indbay away eykay, ickclay onway ethay ommandcay uttonbay elowbay, enthay esspray ethay esiredday eykay. Ickingclay elsewhereway illway ancelcay. Essingpray Escapeway illway unbindway ethay eykay.",
-    "keybind_note": "OTEnay: Esethay eykay indingsbay illway overrideway Ftlay'say inway-amegay eykay indingsbay ifway erethay isway away onflictcay!"
+    "keybind_note": "OTEnay: Esethay eykay indingsbay illway overrideway Ftlay'say inway-amegay eykay indingsbay ifway erethay isway away onflictcay!",
+    "tweaks_targetfps": "Argettay FPSay",
+    "tweaks_targetfps_desc": "Angeschay ethay argettay ameratefray enwhay ethay amefray imiterlay isway ONway.\nOTEnay: Isthay aymay avehay onay effectway ifway erticalvay yncsay isway enabledway inway ouryay aphicsgray iverdray ettingssay.",
+    "tweaks_30fps": "30 FPSay",
+    "tweaks_60fps": "60 FPSay",
+    "tweaks_120fps": "120 FPSay",
+    "tweaks_custom": "Ustomcay:"
   }
