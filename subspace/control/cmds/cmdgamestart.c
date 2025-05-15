@@ -19,6 +19,9 @@ void cmdGameStart(GameInst* inst, ControlClient* client, ControlMsg* msg, hashta
         // use the default FTL executable for it
         ssdStringOut(ss->settings, _S"ftl/exe", &inst->exepath);
         gmgrReg(ss->gmgr, inst);
+
+        objDestroyWeak(&ss->curinst);
+        ss->curinst = objGetWeak(GameInst, inst);
     }
 
     if (inst) {
