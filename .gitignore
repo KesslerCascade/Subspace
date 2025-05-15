@@ -2,3 +2,7 @@
 .vscode
 build
 log
+subspace.json
+subspace.dat
+subspace.db
+*.swp
