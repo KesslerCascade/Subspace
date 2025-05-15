@@ -1,4 +1,5 @@
 #include "feature/timewarp.h"
+#include "feature/tweaks.h"
 #include "ftl/cfps.h"
 #include "hook/hook.h"
 #include "patch/patchlist.h"
@@ -13,6 +14,13 @@ void subspace_CFPS_OnLoop_post(CFPS* self)
 
     if (TimeWarp_feature.enabled && gs.timeWarpActive) {
         CFPS_SpeedFactor(self) = timeWarpAdjustSpeedFactor(CFPS_SpeedFactor(self));
+    }
+
+    if (gs.frameAdvStep) {
+        // If we're frame stepping, override speed factor to get a consistent step regardless of
+        // actual FPS. This speed factor is equivalent to 1 frame of the game running at a perfect
+        // 60fps.
+        CFPS_SpeedFactor(FPSControl) = 16. / 60.;
     }
 }
 

@@ -1,5 +1,6 @@
 #include "frameadv.h"
 #include "feature/feature.h"
+#include "ftl/cfps.h"
 #include "ftl/commandgui.h"
 #include "ftl/globals.h"
 #include "input/keybinds.h"
@@ -45,12 +46,19 @@ static bool frameAdv_Enable(SubspaceFeature* feat, void* settings, bool enabled)
     return enabled;
 }
 
-Patch* FrameAdv_patches[] = { &patch_CommandGui_KeyDown, &patch_CommandGui_OnLoop, 0 };
+Patch* FrameAdv_patches[] = { &patch_CommandGui_KeyDown,
+                              &patch_CommandGui_OnLoop,
+                              &patch_CFPS_OnLoop,
+                              0 };
 
 SubspaceFeature FrameAdv_feature = {
     .name            = "FrameAdv",
     .enable          = frameAdv_Enable,
     .keybinds        = FrameAdv_keybinds,
     .requiredPatches = FrameAdv_patches,
-    .requiredSymbols = { &SYM(CommandGui_SetPaused), &SYM(CApp_gui_offset), 0 }
+    .requiredSymbols = { &SYM(CommandGui_SetPaused),
+                        &SYM(CApp_gui_offset),
+                        &SYM(CFPS_FPSControl),
+                        &SYM(CFPS_SpeedFactor_offset),
+                        0 }
 };
