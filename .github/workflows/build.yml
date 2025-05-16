@@ -27,7 +27,7 @@ jobs:
         run: cmake --build --preset subspace-win32-release
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: subspace-win32-exe
           path: build/subspace-win32/Release/*
@@ -51,7 +51,7 @@ jobs:
         run: cmake --build --preset subspace-win64-release
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: subspace-win64-exe
           path: build/subspace-win64/Release/*
@@ -75,7 +75,7 @@ jobs:
         run: cmake --build --preset game-win32-release
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: game-win32-exe
           path: build/game-win32/Release/*
@@ -102,7 +102,7 @@ jobs:
         run: build/subspace-win64/tools/Release/makedat subspace.dat data
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: subspace-dat
           path: subspace.dat
@@ -112,7 +112,7 @@ jobs:
     needs: [subspace-win32, game-win32, subspace-makedat]
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Move necessary files to package directory
         run: |
@@ -125,7 +125,7 @@ jobs:
         run: powershell Compress-Archive -Path package/* -DestinationPath subspace-win32.zip
 
       - name: Upload final zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: subspace-win32
           path: subspace-win32.zip
@@ -135,7 +135,7 @@ jobs:
     needs: [subspace-win64, game-win32, subspace-makedat]
     steps:
       - name: Download all artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
 
       - name: Move necessary files to package directory
         run: |
@@ -148,7 +148,7 @@ jobs:
         run: powershell Compress-Archive -Path package/* -DestinationPath subspace-win64.zip
 
       - name: Upload final zip
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: subspace-win64
           path: subspace-win64.zip
