@@ -125,8 +125,8 @@ jobs:
       - name: Move necessary files to package directory
         run: |
           mkdir package
-          mv subspace-win32/subspace.exe package/
-          mv game-win32/subspacegame.exe package/
+          mv subspace-win32-exe/subspace.exe package/
+          mv game-win32-exe/subspacegame.exe package/
           mv subspace-dat/subspace.dat package/
 
       - name: Create zip file
@@ -147,10 +147,9 @@ jobs:
 
       - name: Move necessary files to package directory
         run: |
-          cmd /c "dir /s"
           mkdir package
-          mv subspace-win64/subspace.exe package/
-          mv game-win32/subspacegame.exe package/
+          mv subspace-win64-exe/subspace.exe package/
+          mv game-win32-exe/subspacegame.exe package/
           mv subspace-dat/subspace.dat package/
 
       - name: Create zip file
