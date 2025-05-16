@@ -1,4 +1,5 @@
 #include "windows.h"
+#include "version.h"
 
 LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 #pragma code_page(1252)
@@ -6,8 +7,8 @@ LANGUAGE LANG_ENGLISH, SUBLANG_ENGLISH_US
 SUBSPACEGAME_ICON   ICON    "subspacegame.ico"
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 0, 0, 6, 0
- PRODUCTVERSION 0, 0, 6, 0
+ FILEVERSION 0, SUBSPACE_MAJOR, SUBSPACE_MINOR, 0
+ PRODUCTVERSION 0, SUBSPACE_MAJOR, SUBSPACE_MINOR, 0
  FILEFLAGSMASK 0x03fL
 #ifdef _DEBUG
  FILEFLAGS 0x1L
@@ -24,12 +25,12 @@ BEGIN
         BEGIN
             VALUE "CompanyName", "The Cascade Arcade"
             VALUE "FileDescription", "Subspace Game Client"
-            VALUE "FileVersion", "0.0.6.0"
+            VALUE "FileVersion", SUBSPACE_WINVER
             VALUE "InternalName", "subspace.exe"
             VALUE "LegalCopyright", "Copyright (C) 2025 KesslerCascade"
             VALUE "OriginalFilename", "subspace.exe"
             VALUE "ProductName", "Subspace"
-            VALUE "ProductVersion", "0.0.6.0"
+            VALUE "ProductVersion", SUBSPACE_WINVER
         END
     END
     BLOCK "VarFileInfo"
