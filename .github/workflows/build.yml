@@ -1,0 +1,154 @@
+name: Subspace
+
+on:
+  push:
+    branches: [ "main" ]
+    tags: [ "v*" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  subspace-win32:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Setup Visual Studio environment (x86)
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+        
+      - name: Configure CMake
+        working-directory: subspace
+        run: cmake --preset subspace-win32
+        
+      - name: Build
+        working-directory: subspace
+        run: cmake --build --preset subspace-win32-release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: subspace-win32-exe
+          path: build/subspace-win32/Release/*
+
+  subspace-win64:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Setup Visual Studio environment (x64)
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        
+      - name: Configure CMake
+        working-directory: subspace
+        run: cmake --preset subspace-win64
+        
+      - name: Build
+        working-directory: subspace
+        run: cmake --build --preset subspace-win64-release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: subspace-win64-exe
+          path: build/subspace-win64/Release/*
+
+  game-win32:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Setup Visual Studio environment (x86)
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+        
+      - name: Configure CMake
+        working-directory: game
+        run: cmake --preset game-win32
+        
+      - name: Build
+        working-directory: game
+        run: cmake --build --preset game-win32-release
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: subspacegame-win32-exe
+          path: build/game-win32/Release/*
+
+  subspace-makedat:
+    runs-on: windows-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
+      - name: Setup Visual Studio environment (x64)
+        run: |
+          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
+        
+      - name: Configure CMake
+        working-directory: subspace
+        run: cmake --preset subspace-win64
+        
+      - name: Build Makedat
+        working-directory: subspace
+        run: cmake --build --preset subspace-win64-release --target makedat
+        
+      - name: Run Makedat on data directory
+        run: build/subspace-win64/tools/Release/makedat subspace.dat data
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: subspace-dat
+          path: subspace.dat
+
+  package-artifacts-win32:
+    runs-on: windows-latest
+    needs: [subspace-win32, subspacegame-win32, subspace-makedat]
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Move necessary files to package directory
+        run: |
+          mkdir package
+          mv subspace-win32/subspace.exe package/
+          mv subspacegame-win32/subspacegame.exe package/
+          mv subspace-dat/subspace.dat package/
+
+      - name: Create zip file
+        run: powershell Compress-Archive -Path package/* -DestinationPath subspace-win32.zip
+
+      - name: Upload final zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: subspace-win32
+          path: subspace-win32.zip
+
+  package-artifacts-win64:
+    runs-on: windows-latest
+    needs: [subspace-win64, subspacegame-win32, subspace-makedat]
+    steps:
+      - name: Download all artifacts
+        uses: actions/download-artifact@v3
+
+      - name: Move necessary files to package directory
+        run: |
+          mkdir package
+          mv subspace-win64/subspace.exe package/
+          mv subspacegame-win32/subspacegame.exe package/
+          mv subspace-dat/subspace.dat package/
+
+      - name: Create zip file
+        run: powershell Compress-Archive -Path package/* -DestinationPath subspace-win64.zip
+
+      - name: Upload final zip
+        uses: actions/upload-artifact@v3
+        with:
+          name: subspace-win64
+          path: subspace-win64.zip
