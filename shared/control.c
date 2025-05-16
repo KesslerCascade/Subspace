@@ -3,6 +3,7 @@
 #endif
 
 #include "control.h"
+#include "netsocket.h"
 
 #ifdef SUBSPACE_GAME
 #include "ftl/stdlib.h"
