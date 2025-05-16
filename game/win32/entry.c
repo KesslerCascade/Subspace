@@ -37,10 +37,6 @@ static char* nextp(char* p)
 
 int __stdcall entry()
 {
-    //    settings.gameDir     = smalloc(MAX_PATH);
-    //    settings.gameProgram = smalloc(MAX_PATH);
-    //    settings.gamePath    = smalloc(MAX_PATH);
-
     const char* wincmdline = GetCommandLineA();
     char* cmdline          = sstrdup(wincmdline);
     bool q                 = false;
@@ -90,50 +86,7 @@ int __stdcall entry()
         }
     }
 
-#if 0
-    strcpy(settings.gameDir, "M:\\Dev\\FTL1.6.3");
-    strcpy(settings.gameProgram, "FTLGame.exe");
-    strcpy(settings.gamePath, "M:\\Dev\\FTL1.6.3\\FTLGame.exe");
-#elif 0
-    strcpy(settings.gameDir, "M:\\Dev\\FTLGoG1.6.13b");
-    strcpy(settings.gameProgram, "FTLGame.exe");
-    strcpy(settings.gamePath, "M:\\Dev\\FTLGoG1.6.13b\\FTLGame.exe");
-#elif 0
-    strcpy(settings.gameDir, "M:\\Dev\\FTLSteam1.6.8");
-    strcpy(settings.gameProgram, "FTLGame.exe");
-    strcpy(settings.gamePath, "M:\\Dev\\FTLSteam1.6.8\\FTLGame.exe");
-#elif 0
-    strcpy(settings.gameDir, "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light");
-    strcpy(settings.gameProgram, "FTLGame.exe");
-    strcpy(settings.gamePath,
-           "M:\\games\\Steam\\steamapps\\common\\FTL Faster Than Light\\FTLGame.exe");
-#elif 0
-    strcpy(settings.gameDir, "M:\\Games\\FTL");
-    strcpy(settings.gameProgram, "FTLGame.exe");
-    strcpy(settings.gamePath, "M:\\Games\\FTL\\FTLGame.exe");
-#endif
-
-    //    SetCurrentDirectoryA(settings.gameDir);
-    //    SetEnvironmentVariableA("USERPROFILE", settings.gameDir);
-
-#ifdef _DEBUG
-    // AllocConsole();
-#endif
-    // if (AllocConsole()) {
-    //  FILE* temp;
-    //  freopen_s(&temp, "CONIN$", "r", stdin);
-    //  freopen_s(&temp, "CONOUT$", "w", stdout);
-    //  freopen_s(&temp, "CONOUT$", "w", stderr);
-    //}
-
-    //    setvbuf(stdout, NULL, _IONBF, 0);
-    // setvbuf(stderr, NULL, _IONBF, 0);
-
     int ret = sscmain(nargs, argv);
-
-    // if (settings.testMode) {
-    // Sleep(3000);
-    //}
 
     // probably will never reach this, but just in case
     ExitProcess(ret);
