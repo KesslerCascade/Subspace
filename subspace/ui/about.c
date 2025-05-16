@@ -51,6 +51,7 @@ void showAbout(Subspace *ss)
     IupSetAttributeHandle(okbutton, "ABOUTWIN", dlg);
     IupSetAttribute(dlg, "PARENTDIALOG", "SUBSPACE_MAINWIN");
     IupSetAttribute(dlg, "TITLE", langGetC(ss, _S"subspace_about"));
+    IupSetAttribute(dlg, "ICON", "SUBSPACE_ICON");
     IupSetAttribute(dlg, "RESIZE", "NO");
     IupPopup(dlg, IUP_CENTERPARENT, IUP_CENTERPARENT);
 }

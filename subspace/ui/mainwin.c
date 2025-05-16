@@ -188,6 +188,7 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(self->win, "SIZE", strC(tmp));
     IupSetAttribute(self->win, "SHRINK", "Yes");
     IupSetAttribute(self->win, "TITLE", langGetC(self->ss, _S"subspace_title"));
+    IupSetAttribute(self->win, "ICON", "SUBSPACE_ICON");
     iupSetObj(self->win, self, ObjNone, self->ui);
 
     IupSetHandle("SUBSPACE_MAINWIN", self->win);

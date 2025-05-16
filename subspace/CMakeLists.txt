@@ -136,6 +136,7 @@ add_executable(subspace
     ui/util/uiupdatedispatch.c
     win32/process.c
     win32/subspace.manifest
+    win32/subspace.rc
     win32/win32.c
     filesys.c
     log.c

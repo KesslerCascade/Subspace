@@ -15,7 +15,7 @@ include_directories(${SHARED_SOURCE_DIR})
 
 if (WIN32)
     # Disable compiler features that depend on the standard library
-    add_definitions(/GS-) # no buffer security check
+    add_compile_options(/GS-) # no buffer security check
     STRING (REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}") # no runtime checks
     add_compile_definitions(_WIN32_WINNT=0x0501)
 endif()
@@ -68,6 +68,7 @@ if(WIN32)
         win32/patch/patch_osdep.c
         win32/entry.c
         win32/kernel32_overrides.c
+        win32/subspacegame.rc
         win32/osdep.c
         win32/thread.c
         win32/winerror.c

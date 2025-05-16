@@ -119,6 +119,7 @@ bool SettingsWin_make(_In_ SettingsWin* self)
     IupSetAttribute(self->win, "SIZE", strC(tmp));
     IupSetAttribute(self->win, "RESIZE", "NO");
     IupSetAttribute(self->win, "TITLE", langGetC(self->ss, _S"settings_title"));
+    IupSetAttribute(self->win, "ICON", "SUBSPACE_ICON");
     iupSetObj(self->win, self, ObjNone, self->ui);
     IupSetAttribute(self->win, "PARENTDIALOG", "SUBSPACE_MAINWIN");
 
