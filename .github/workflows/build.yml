@@ -25,6 +25,7 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+          dir /s zlib.h
           cd subspace
           cmake --build --preset subspace-win32-release
 
@@ -70,7 +71,10 @@ jobs:
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
+          dir
           cd game
+          dir
+          dir log\
           cmake --preset game-win32
         
       - name: Build
@@ -100,7 +104,7 @@ jobs:
           cmake --preset subspace-win64
         
       - name: Build mkdat
-        working-directory: subspace
+        shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd subspace
