@@ -358,7 +358,7 @@ else()
   message(STATUS "Could not find an AWK-compatible program")
 endif()
 
-if(NOT AWK OR (ANDROID OR IOS))
+if(TRUE)
   # No awk available to generate sources; use pre-built pnglibconf.h
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/scripts/pnglibconf.h.prebuilt
                  ${CMAKE_CURRENT_BINARY_DIR}/pnglibconf.h)
