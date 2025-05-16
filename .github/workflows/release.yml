@@ -2,9 +2,7 @@ name: Subspace
 
 on:
   push:
-    branches: [ "main" ]
-  pull_request:
-    branches: [ "main" ]
+    tags: [ "v*" ]
 
 jobs:
   subspace-win32:
@@ -114,7 +112,7 @@ jobs:
           name: subspace-dat
           path: subspace.dat
 
-  package:
+  release:
     runs-on: windows-latest
     needs: [subspace-win32, subspace-win64, game-win32, subspace-mkdat]
     steps:
@@ -135,14 +133,40 @@ jobs:
           cp game-win32-exe/subspacegame.exe package64/
           cp subspace-dat/subspace.dat package64/
 
-      - name: Upload 32-bit package
-        uses: actions/upload-artifact@v4
-        with:
-          name: subspace-win32
-          path: package32/*
+      - name: Create subspace-win32.zip
+        run: Compress-Archive -Path package32/* -DestinationPath subspace-win32.zip
 
-      - name: Upload 64-bit package
-        uses: actions/upload-artifact@v4
+      - name: Create subspace-win64.zip
+        run: Compress-Archive -Path package64/* -DestinationPath subspace-win64.zip
+
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          name: subspace-win64
-          path: package64/*
+          tag_name: ${{ github.ref }}
+          release_name: ${{ github.ref }}
+          draft: true
+          prerelease: false
+         - name: Upload Release Asset
+      - name: Upload 64-bit package
+        id: upload-release-asset-64
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./subspace-win64.zip
+          asset_name: subspace-${{ github.ref }}-win64.zip
+          asset_content_type: application/zip
+      - name: Upload 32-bit package
+        id: upload-release-asset-32
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ steps.create_release.outputs.upload_url }}
+          asset_path: ./subspace-win32.zip
+          asset_name: subspace-${{ github.ref }}-win32.zip
+          asset_content_type: application/zip          
