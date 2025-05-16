@@ -1,8 +1,8 @@
-.vs
-.vscode
-build
-log
-subspace.json
-subspace.dat
-subspace.db
+/.vs
+/.vscode
+/build
+/log
+/subspace.json
+/subspace.dat
+/subspace.db
 *.swp
