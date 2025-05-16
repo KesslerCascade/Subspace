@@ -13,14 +13,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
-      - name: Setup Visual Studio environment (x86)
+
+      - name: Configure CMake
+        shell: cmd
+        working-directory: subspace
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
-        
-      - name: Configure CMake
-        working-directory: subspace
-        run: cmake --preset subspace-win32
+          cmake --preset subspace-win32
         
       - name: Build
         working-directory: subspace
@@ -37,14 +36,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
-        
-      - name: Setup Visual Studio environment (x64)
+               
+      - name: Configure CMake
+        shell: cmd
+        working-directory: subspace
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        
-      - name: Configure CMake
-        working-directory: subspace
-        run: cmake --preset subspace-win64
+          cmake --preset subspace-win64
         
       - name: Build
         working-directory: subspace
@@ -62,13 +60,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         
-      - name: Setup Visual Studio environment (x86)
+      - name: Configure CMake
+        shel: cmd
+        working-directory: game
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
-        
-      - name: Configure CMake
-        working-directory: game
-        run: cmake --preset game-win32
+          cmake --preset game-win32
         
       - name: Build
         working-directory: game
@@ -86,13 +83,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v3
         
-      - name: Setup Visual Studio environment (x64)
+      - name: Configure CMake
+        shell:cmd
+        working-directory: subspace
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-        
-      - name: Configure CMake
-        working-directory: subspace
-        run: cmake --preset subspace-win64
+          cmake --preset subspace-win64
         
       - name: Build Makedat
         working-directory: subspace
