@@ -19,11 +19,6 @@ add_subdirectory(../tools tools)
 include (../lib/cx/cmake/werror.cmake)
 
 if(WIN32)
-    add_executable(subspacedbg
-        win32/subspacedbg.c
-        )
-    target_compile_definitions(subspacedbg PRIVATE _UNICODE UNICODE)
-
     set(CMAKE_WIN32_EXECUTABLE true)
 endif()
 
