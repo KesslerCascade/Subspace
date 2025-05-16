@@ -77,7 +77,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v3
         with:
-          name: subspacegame-win32-exe
+          name: game-win32-exe
           path: build/game-win32/Release/*
 
   subspace-makedat:
@@ -109,7 +109,7 @@ jobs:
 
   package-artifacts-win32:
     runs-on: windows-latest
-    needs: [subspace-win32, subspacegame-win32, subspace-makedat]
+    needs: [subspace-win32, game-win32, subspace-makedat]
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v3
@@ -118,7 +118,7 @@ jobs:
         run: |
           mkdir package
           mv subspace-win32/subspace.exe package/
-          mv subspacegame-win32/subspacegame.exe package/
+          mv game-win32/subspacegame.exe package/
           mv subspace-dat/subspace.dat package/
 
       - name: Create zip file
@@ -132,7 +132,7 @@ jobs:
 
   package-artifacts-win64:
     runs-on: windows-latest
-    needs: [subspace-win64, subspacegame-win32, subspace-makedat]
+    needs: [subspace-win64, game-win32, subspace-makedat]
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v3
@@ -141,7 +141,7 @@ jobs:
         run: |
           mkdir package
           mv subspace-win64/subspace.exe package/
-          mv subspacegame-win32/subspacegame.exe package/
+          mv game-win32/subspacegame.exe package/
           mv subspace-dat/subspace.dat package/
 
       - name: Create zip file
