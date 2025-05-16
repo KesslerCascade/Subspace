@@ -147,6 +147,7 @@ jobs:
 
       - name: Move necessary files to package directory
         run: |
+          cmd /c "dir /s"
           mkdir package
           mv subspace-win64/subspace.exe package/
           mv game-win32/subspacegame.exe package/
