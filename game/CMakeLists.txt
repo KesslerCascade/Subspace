@@ -56,10 +56,8 @@ if(WIN32)
         win32/ftl/ftl_textlibrary.c
         win32/ftl/ftl_worldmanager.c
         win32/hook/analysis.c
-        win32/hook/disasmtrace.c
         win32/hook/export.c
         win32/hook/hook.c
-        win32/hook/string.c
         win32/hook/symbol.c
         win32/loader/loader.c
         win32/loader/rtld.c
@@ -93,7 +91,9 @@ add_executable(subspacegame
     ftl/graphics/colors.c
     ftl/ftl.c
     ftl/struct.c
+    hook/disasmtrace.c
     hook/module.c
+    hook/string.c
     hook/symbol.c
     hook/capp/capp_onexecute.c
     hook/capp/capp_onkeydown.c
