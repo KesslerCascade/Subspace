@@ -131,7 +131,6 @@ jobs:
           release_name: ${{ github.ref }}
           draft: true
           prerelease: false
-         - name: Upload Release Asset
       - name: Upload 64-bit package
         id: upload-release-asset-64
         uses: actions/upload-release-asset@v1
