@@ -47,6 +47,8 @@ jobs:
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd subspace
           cmake --build --preset subspace-win64-release
+          cd ..
+          copy "build\subspace-win64\tools\Release\mkdat.exe" "build\subspace-win64\Release\"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -78,23 +80,17 @@ jobs:
 
   subspace-mkdat:
     runs-on: windows-latest
+    needs: [subspace-win64]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      - name: Configure
-        shell: cmd
-        run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cd subspace
-          cmake --preset subspace-win64
-      - name: Build mkdat
-        shell: cmd
-        run: |
-          call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
-          cd subspace
-          cmake --build --preset subspace-win64-release --target mkdat
+      - name: Download win64 executables
+        uses: actions/download-artifact@v4
+        with:
+          name: subspace-win64-exe
       - name: Build subspace.dat
-        run: build/subspace-win64/tools/Release/mkdat.exe subspace.dat data
+        shell: cmd
+        run: mkdat subspace.dat data
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
