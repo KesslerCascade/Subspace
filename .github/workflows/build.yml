@@ -12,21 +12,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
       - name: Configure
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
           cd subspace
           cmake --preset subspace-win32
-        
       - name: Build
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
           cd subspace
           cmake --build --preset subspace-win32-release
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -38,21 +35,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-               
       - name: Configure
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd subspace
           cmake --preset subspace-win64
-        
       - name: Build
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd subspace
           cmake --build --preset subspace-win64-release
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -64,21 +58,18 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
       - name: Configure
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
           cd game
           cmake --preset game-win32
-        
       - name: Build
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
           cd game
           cmake --build --preset game-release
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -90,24 +81,20 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-        
       - name: Configure
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd subspace
           cmake --preset subspace-win64
-        
       - name: Build mkdat
         shell: cmd
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd subspace
           cmake --build --preset subspace-win64-release --target mkdat
-        
       - name: Build subspace.dat
         run: build/subspace-win64/tools/Release/mkdat.exe subspace.dat data
-
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -120,27 +107,23 @@ jobs:
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
-
       - name: Assemble 32-bit package
         run: |
           mkdir package32
           cp subspace-win32-exe/subspace.exe package32/
           cp game-win32-exe/subspacegame.exe package32/
           cp subspace-dat/subspace.dat package32/
-
       - name: Assemble 64-bit package
         run: |
           mkdir package64
           cp subspace-win64-exe/subspace.exe package64/
           cp game-win32-exe/subspacegame.exe package64/
           cp subspace-dat/subspace.dat package64/
-
       - name: Upload 32-bit package
         uses: actions/upload-artifact@v4
         with:
           name: subspace-win32
           path: package32/*
-
       - name: Upload 64-bit package
         uses: actions/upload-artifact@v4
         with:
