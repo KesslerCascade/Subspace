@@ -139,7 +139,7 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./subspace-win64.zip
-          asset_name: subspace-${{ github.ref }}-win64.zip
+          asset_name: subspace-${{ github.ref_name }}-win64.zip
           asset_content_type: application/zip
       - name: Upload 32-bit package
         id: upload-release-asset-32
@@ -149,5 +149,5 @@ jobs:
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ./subspace-win32.zip
-          asset_name: subspace-${{ github.ref }}-win32.zip
+          asset_name: subspace-${{ github.ref_name }}-win32.zip
           asset_content_type: application/zip          
