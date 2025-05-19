@@ -27,7 +27,7 @@ The game process hosts the FTL game. It is called `subspacegame.exe` and the sou
 - Open the FTL game executable and load it into memory. On Windows this is done with a custom re-implementation of the runtime linker that takes care of loading all of the dependencies and relocating the image.
 - Run code analysis to locate symbols and offsets, and validate patches.
 - Patch the code by hooking and/or replacing functions.
-- Hand off communication with the main Subspace process to a background thead.
+- Hand off communication with the main Subspace process to a background thread.
 - Jump to the FTL game code's entry point and transfer control.
 
 The game process effectively becomes the FTL executable, but with additional patches and hooks installed.
