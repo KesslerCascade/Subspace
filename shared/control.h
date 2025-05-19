@@ -26,9 +26,10 @@
 //    32-bit field size
 //    16 bytes field name (null terminated string)
 //    16-bit type ID
-//        1 = int (32 bit)
-//        2 = 32-bit float
-//        3 = 64-bit float
+//        0 = int (32 bit)
+//        1 = 32-bit float
+//        2 = 64-bit float
+//        3 = boolean (1 byte)
 //        4 = string
 //        65536 = raw data
 //    16-bit flags
