@@ -197,10 +197,10 @@ void* srealloc_heap(sm_heap_t* heap, void* ptr, unsigned int sz)
 
     sm_blk_t* blk = (sm_blk_t*)((uintptr_t)ptr - BLOCK_OFFSET);
 
-    // When shrinking, do a copy if we'd free up at least MIN_ALLOC_SZ bytes.
+    // When shrinking, do a copy if we'd free up at least MIN_ALLOC_SZ*2 bytes.
     // Always doing a copy isn't great but is actually the best case for a simple
     // freelist like this because it prevents excessive fragmentation.
-    if (sz <= blk->size && blk->size - sz < MIN_ALLOC_SZ)
+    if (sz <= blk->size && blk->size - sz < MIN_ALLOC_SZ*2)
         return ptr;
 
     // TODO: be less lazy and actually check the freelist for an adjacent block for expansion
