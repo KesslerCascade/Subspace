@@ -9,6 +9,7 @@
 #include "control/controlconnect.h"
 #include "feature/feature.h"
 #include "ftl/ftl.h"
+#include "hook/module.h"
 #include "loader/loader.h"
 #include "log/log.h"
 #include "patch/patch.h"
@@ -114,6 +115,14 @@ int sscmain(int argc, char* argv[])
     return 0;
 }
 
+int cleanupthread(void* unused)
+{
+    // do this in a background thread, because salloc is kind of slow when the freelist gets large.
+    // this ends up consolidating most of the fragmented freelists.
+    cleanupAnalysis();
+    return 0;
+}
+
 void sscmain2(void)
 {
     controlClientStart();
@@ -136,6 +145,9 @@ void sscmain2(void)
             osExit(1);
         }
     }
+
+    // start a background thead to clean up free analysis data
+    osStartThread(cleanupthread, NULL);
 
     return;
 }

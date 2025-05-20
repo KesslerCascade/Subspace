@@ -64,3 +64,54 @@ ModuleInfo* moduleInfo(addr_t base)
     lock_rel(&modulehash_lock);
     return mi;
 }
+
+static void importhash_clear(hashtbl* tbl)
+{
+    for (int j = 0; j < tbl->nslots; j++) {
+        hashtbl* imtbl = (hashtbl*)hashtbl_get_slot(tbl, j);
+        if (imtbl) {
+            hashtbl_destroy(imtbl);
+            sfree(imtbl);
+        }
+    }
+}
+
+static void addrlisthash_clear(hashtbl* tbl)
+{
+    for (int j = 0; j < tbl->nslots; j++) {
+        AddrList* l = (AddrList*)hashtbl_get_slot(tbl, j);
+        if (l)
+            addrListDestroy(l);
+    }
+}
+
+void cleanupAnalysis()
+{
+    lock_acq(&modulehash_lock);
+    for (int i = 0; i < modulehash.nslots; i++) {
+        ModuleInfo* mi = (ModuleInfo*)hashtbl_get_slot(&modulehash, i);
+        if (mi) {
+            hashtbl_destroy(&mi->exporthash);
+            importhash_clear(&mi->importhash);
+            hashtbl_destroy(&mi->importhash);
+            addrlisthash_clear(&mi->stringhash);
+            hashtbl_destroy(&mi->stringhash);
+            addrlisthash_clear(&mi->stringrefhash);
+            hashtbl_destroy(&mi->stringrefhash);
+            hashtbl_destroy(&mi->stringlochash);
+            hashtbl_destroy(&mi->relochash);
+            addrlisthash_clear(&mi->ptrhash);
+            hashtbl_destroy(&mi->ptrhash);
+            addrlisthash_clear(&mi->ptrrefhash);
+            hashtbl_destroy(&mi->ptrrefhash);
+            addrlisthash_clear(&mi->relcallhash);
+            hashtbl_destroy(&mi->relcallhash);
+            addrlisthash_clear(&mi->funccallhash);
+            hashtbl_destroy(&mi->funccallhash);
+            addrListDestroy(mi->funclist);
+            sfree(mi);
+            modulehash.ents[i].data = NULL;
+        }
+    }
+    lock_rel(&modulehash_lock);
+}
