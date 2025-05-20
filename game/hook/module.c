@@ -27,6 +27,34 @@ void addrListDestroy(AddrList* l)
     sfree(l);
 }
 
+uint32_t addrListSortedFind(AddrList* l, addr_t addr, addr_t* prev)
+{
+    int mid, low = 0, high = (int)l->num;
+    uint32_t best = 0;
+    addr_t* addrs = l->addrs;
+
+    while (low <= high) {
+        mid = low + ((high - low) >> 1);
+
+        if (addrs[mid] == addr) {
+            // oops, we didn't really expect to find it, but there's an exact match
+            if (prev)
+                *prev = addr;
+            return mid;
+        }
+
+        if (addrs[mid] < addr) {
+            best = mid;
+            low  = mid + 1;
+        } else
+            high = mid - 1;
+    }
+
+    if (prev)
+        *prev = addrs[best];
+    return best;
+}
+
 static void modulehash_init(void* dummy)
 {
     hashtbl_init(&modulehash, 8, 0);

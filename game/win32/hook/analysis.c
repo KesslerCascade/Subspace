@@ -192,9 +192,10 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers, hasht
             // We don't care about library calls anyway, and this helps filter out false positives.
             if (dest >= code.start && dest <= code.end) {
                 addPtr(&mi->relcallhash, dest, p + 1);
-                if (disasm.inst == I_CALL)   // for CALL only, record it as a function call
+                if (disasm.inst == I_CALL) {   // for CALL only, record it as a function call
                     addPtr(&mi->funccallhash, dest, p);
-                hashtbl_addint(functrackers, dest, 1);
+                    hashtbl_setint(functrackers, dest, 2);
+                }
             }
         } else if (disasm.inst == I_CALL) {
             // get absolute calls to addresses
@@ -202,7 +203,7 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers, hasht
             if (arg->base == REG_UNDEF && arg->idx == REG_UNDEF && arg->addr >= code.start &&
                 arg->addr <= code.end) {
                 addPtr(&mi->funccallhash, disasm.arg[0].addr, p);
-                hashtbl_addint(functrackers, disasm.arg[0].addr, 1);
+                hashtbl_setint(functrackers, disasm.arg[0].addr, 2);
             }
         } else if (disasm.inst == I_JMP &&
                    hashtbl_find(importtrackers, disasm.arg[0].addr) != HT_NOT_FOUND) {
@@ -233,6 +234,44 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers, hasht
     return true;
 }
 
+static void checkFunctions(addr_t base, hashtbl* trackers, AddrList* funcs)
+{
+    SegInfo code;
+    t_disasm disasm;
+
+    if (!getCodeSeg(base, &code))
+        return;
+
+    for (int i = 0; i < trackers->nslots; i++) {
+        uintptr_t typ;
+        addr_t addr;
+
+        if (!hashtbl_getint_slot(trackers, i, &typ))
+            continue;
+
+        addr = trackers->ents[i].key_int;
+
+        if (typ == 1) {
+            // 1 is from a pointer found in data, check if it's likely a function (could also be a
+            // jumptable target)
+
+            // disassemble the first instruction
+            ulong ilen = Disasm((char*)addr,
+                                MIN(MAXCMDSIZE, code.end - addr),
+                                addr,
+                                &disasm,
+                                DISASM_FILE);
+
+            // if it's a PUSH instruction it's very likely a function preamble
+            if (disasm.error == 0 && disasm.inst == I_PUSH)
+                addrListAdd(funcs, addr);
+        } else if (typ == 2) {
+            // 2 is a CALL target and is guaranteed to be a function
+            addrListAdd(funcs, addr);
+        }
+    }
+}
+
 bool analyzeModule(addr_t base, ModuleInfo* mi)
 {
     hashtbl importtrackers;
@@ -258,10 +297,7 @@ bool analyzeModule(addr_t base, ModuleInfo* mi)
     }
     hashtbl_destroy(&importtrackers);
 
-    for (int i = 0; i < functrackers.nslots; i++) {
-        if (hashtbl_get_slot(&functrackers, i))
-            addrListAdd(mi->funclist, functrackers.ents[i].key_int);
-    }
+    checkFunctions(base, &functrackers, mi->funclist);
     hashtbl_destroy(&functrackers);
 
     return true;

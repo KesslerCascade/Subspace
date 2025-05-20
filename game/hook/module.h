@@ -11,6 +11,7 @@ typedef struct AddrList {
 AddrList* addrListCreate(void);
 void addrListAdd(AddrList* l, addr_t addr);
 void addrListSort(AddrList* l);
+uint32_t addrListSortedFind(AddrList* l, addr_t addr, addr_t* prev);
 void addrListDestroy(AddrList* l);
 
 typedef struct ModuleInfo {

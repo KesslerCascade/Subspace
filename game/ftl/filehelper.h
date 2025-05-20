@@ -15,3 +15,6 @@ DECLFUNC(FileHelper_getUserFolder);
 typedef basic_string* (*FUNCTYPE(FileHelper_getSaveFile))(basic_string* out);
 DECLFUNC(FileHelper_getSaveFile);
 #define FileHelper_getSaveFile(out) FCALL(ftlbase, FileHelper_getSaveFile, out)
+
+typedef void (*FUNCTYPE(FileHelper_closeBinaryFile))(int fd);
+DECLFUNC(FileHelper_closeBinaryFile);

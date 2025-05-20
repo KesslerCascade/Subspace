@@ -46,6 +46,7 @@ if(WIN32)
         win32/ftl/ftl_mousecontrol.c
         win32/ftl/ftl_osdep.c
         win32/ftl/ftl_resourcecontrol.c
+        win32/ftl/ftl_scorekeeper.c
         win32/ftl/ftl_shipmanager.c
         win32/ftl/ftl_ship.c
         win32/ftl/ftl_shipmanager.c

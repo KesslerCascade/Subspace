@@ -338,7 +338,15 @@ bool disasmTrace(addr_t base, DisasmTrace* trace)
 
     if (al) {
         for (i = 0; i < al->num; i++) {
-            if (checkCandidate(base, trace, al->addrs[i]))
+            addr_t checkaddr = 0;
+            if (trace->mod == DTRACE_MOD_FUNCSTART) {
+                // this trace wants to look at the start of the function containing the reference
+                addrListSortedFind(mi->funclist, al->addrs[i], &checkaddr);
+            } else {
+                checkaddr = al->addrs[i];
+            }
+
+            if (checkaddr && checkCandidate(base, trace, checkaddr))
                 return true;
         }
     }

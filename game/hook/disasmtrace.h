@@ -119,10 +119,15 @@ typedef enum DisasmCandidateTraceType {
     DTRACE_CALLS,      // Check all function calls to a particular address
 } DisasmCandidateTraceType;
 
+typedef enum DisasmCandidateTraceModifier {
+    DTRACE_MOD_FUNCSTART = 0x0001,   // Start tracing at the beginning of the function
+} DisasmCandidateTraceModifier;
+
 typedef struct DisasmTrace {
-    DisasmCandidateTraceType c;   // How to find candidates for this trace
-    addr_t addr;                  // raw address for candidate search
-    const char* cstr;             // string for candidate search, takes precedence over addr
+    DisasmCandidateTraceType c;         // How to find candidates for this trace
+    DisasmCandidateTraceModifier mod;   // modifiers to candidate search
+    addr_t addr;                        // raw address for candidate search
+    const char* cstr;                   // string for candidate search, takes precedence over addr
     Symbol* csym;      // symbol for candidate search, takes precedence over cstr and addr
     Symbol* out[16];   // Up to 16 symbols can be output from the trace
     DisasmOp ops[];
