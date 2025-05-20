@@ -4,6 +4,7 @@
 
 INITWRAP(Ship_DamageHull);
 Symbol SYM(Ship_DamageHull) = {
+    SYMNAME("Ship::DamageHull"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DamageHull_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4Ship10DamageHullEi" },
              { 0 } }
@@ -36,5 +37,6 @@ DisasmTrace Ship_DamageHull_trace = {
 };
 
 Symbol SYM(Ship_hullIntegrity_offset) = {
+    SYMNAME("Ship->hullIntegrity"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Ship_DamageHull_trace }, { 0 } }
 };

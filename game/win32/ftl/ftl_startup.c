@@ -7,6 +7,7 @@
 
 INITWRAP(sil_main);
 Symbol SYM(sil_main) = {
+    SYMNAME("sil_main"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WinMain_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "sil_main" },
              { .type   = SYMBOL_FIND_DISASM,

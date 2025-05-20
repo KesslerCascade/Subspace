@@ -1,9 +1,13 @@
-#include "hook/function.h"
-#include "hook/string.h"
 #include "hook/symbol.h"
 #include "hook/disasmtrace.h"
+#include "hook/function.h"
+#include "hook/string.h"
 
-static void symFindVirtual(addr_t base, Symbol *sym, SymbolFind* find)
+#ifdef SYMBOL_DEBUG
+#include "log/log.h"
+#endif
+
+static void symFindVirtual(addr_t base, Symbol* sym, SymbolFind* find)
 {
     if (!(_symResolve(base, find->vtable) && _symResolve(base, find->offset)))
         return;
@@ -14,12 +18,12 @@ static void symFindVirtual(addr_t base, Symbol *sym, SymbolFind* find)
 
     addr_t ret = *(addr_t*)(find->vtable->addr + find->offset->addr);
     if (ret >= code.start && ret < code.end) {
-        sym->addr = ret;
+        sym->addr     = ret;
         sym->resolved = true;
     }
 }
 
-static bool symFindOne(addr_t base, Symbol *sym, SymbolFind* find)
+static bool symFindOne(addr_t base, Symbol* sym, SymbolFind* find)
 {
     addr_t addr;
     switch (find->type) {
@@ -29,17 +33,17 @@ static bool symFindOne(addr_t base, Symbol *sym, SymbolFind* find)
     case SYMBOL_FIND_EXPORT:
         addr = getExport(base, find->name);
         if (addr != 0) {
-            sym->addr = addr;
+            sym->addr     = addr;
             sym->resolved = true;
         }
         break;
     case SYMBOL_FIND_STRING:
-     addr = findString(base, find->str);
-     if (addr != 0) {
-        sym->addr = addr;
-        sym->resolved = true;
-    }
-    break;
+        addr = findString(base, find->str);
+        if (addr != 0) {
+            sym->addr     = addr;
+            sym->resolved = true;
+        }
+        break;
     case SYMBOL_FIND_DISASM:
         disasmTrace(base, find->disasm);
         break;
@@ -57,6 +61,13 @@ bool _symResolve(addr_t base, Symbol* sym)
     for (SymbolFind* find = sym->find; !sym->resolved && find->type != 0; ++find) {
         symFindOne(base, sym, find);
     }
+
+#ifdef SYMBOL_DEBUG
+    if (!sym->resolved && !sym->warned) {
+        log_fmt(LOG_Warn, "Failed to resolve symbol \"%s\"", sym->name);
+        sym->warned = true;
+    }
+#endif
 
     return sym->resolved;
 }

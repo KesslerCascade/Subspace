@@ -5,6 +5,7 @@
 
 INITWRAP(ShipStatus_RenderHealth);
 Symbol SYM(ShipStatus_RenderHealth) = {
+    SYMNAME("ShipStatus::RenderHealth"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RenderStatic_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10ShipStatus12RenderHealthEb" },
              { 0 } }
@@ -18,6 +19,7 @@ FuncInfo FUNCINFO(ShipStatus_RenderHealth) = {
 
 INITWRAP(ShipStatus_OnRender);
 Symbol SYM(ShipStatus_OnRender) = {
+    SYMNAME("ShipStatus::OnRender"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RenderStatic_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10ShipStatus8OnRenderEv" },
              { 0 } }
@@ -28,6 +30,7 @@ FuncInfo FUNCINFO(ShipStatus_OnRender) = { .nargs   = 1,
                                            .rettype = RET_VOID };
 
 Symbol SYM(ShipStatus_LinkShip) = {
+    SYMNAME("ShipStatus::LinkShip"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_Restart_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10ShipStatus8LinkShipEP11ShipManager" },
              { 0 } }
@@ -49,6 +52,7 @@ DisasmTrace ShipStatus_OnRender_trace = {
 };
 
 Symbol SYM(ShipStatus_RenderEvadeOxygen) = {
+    SYMNAME("ShipStatus::RenderEvadeOxygen"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_OnRender_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10ShipStatus17RenderEvadeOxygenEb" },
              { 0 } }
@@ -97,5 +101,6 @@ DisasmTrace ShipStatus_LinkShip_trace = {
 };
 
 Symbol SYM(ShipStatus_ship_offset) = {
+    SYMNAME("ShipStatus->ship"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace }, { 0 } }
 };

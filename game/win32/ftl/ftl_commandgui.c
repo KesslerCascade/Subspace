@@ -11,6 +11,7 @@
 
 INITWRAP(CommandGui_KeyDown);
 Symbol SYM(CommandGui_KeyDown) = {
+    SYMNAME("CommandGui::KeyDown"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnKeyDown_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui7KeyDownEib" },
              { 0 } }
@@ -23,6 +24,7 @@ FuncInfo FUNCINFO(CommandGui_KeyDown) = {
 
 INITWRAP(CommandGui_SetPaused);
 Symbol SYM(CommandGui_SetPaused) = {
+    SYMNAME("CommandGui::SetPaused"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_GenInputEvents_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui9SetPausedEbb" },
              { 0 } }
@@ -35,6 +37,7 @@ FuncInfo FUNCINFO(CommandGui_SetPaused) = {
 
 INITWRAP(CommandGui_RenderStatic);
 Symbol SYM(CommandGui_RenderStatic) = {
+    SYMNAME("CommandGui::RenderStatic"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui12RenderStaticEv" },
              { 0 } }
@@ -44,6 +47,7 @@ FuncInfo FUNCINFO(CommandGui_RenderStatic) = { .nargs   = 1,
                                                .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
 Symbol SYM(CommandGui_SpaceBar) = {
+    SYMNAME("CommandGui::SpaceBar"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnKeyDown_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui8SpaceBarEv" },
              { 0 } }
@@ -76,6 +80,7 @@ DisasmTrace CommandGui_SpaceBar_trace = {
 };
 
 Symbol SYM(CommandGui_shipComplete_offset) = {
+    SYMNAME("CommandGui->shipComplete"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SpaceBar_trace }, { 0 } }
 };
 
@@ -167,6 +172,7 @@ DisasmTrace CommandGui_RunCommand_DELETE_trace = {
 
 INITWRAP(CommandGui_IsPaused);
 Symbol SYM(CommandGui_IsPaused) = {
+    SYMNAME("CommandGui::IsPaused"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui8IsPausedEv" },
              { 0 } }
@@ -177,6 +183,7 @@ FuncInfo FUNCINFO(CommandGui_IsPaused) = { .nargs   = 1,
 
 INITWRAP(CommandGui_IsGameOver);
 Symbol SYM(CommandGui_IsGameOver) = {
+    SYMNAME("CommandGui::IsGameOver"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui10IsGameOverEv" },
              { 0 } }
@@ -187,6 +194,7 @@ FuncInfo FUNCINFO(CommandGui_IsGameOver) = { .nargs   = 1,
 
 INITWRAP(CommandGui_Restart);
 Symbol SYM(CommandGui_Restart) = {
+    SYMNAME("CommandGui::Restart"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui7RestartEv" },
              { 0 } }
@@ -216,6 +224,7 @@ DisasmTrace CommandGui_Restart_trace = {
 
 INITWRAP(CommandGui_OnLoop);
 Symbol SYM(CommandGui_OnLoop) = {
+    SYMNAME("CommandGui::OnLoop"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui6OnLoopEv" },
              { 0 } }

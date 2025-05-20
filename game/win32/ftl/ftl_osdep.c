@@ -5,6 +5,7 @@
 
 INITWRAP(WinMain);
 Symbol SYM(WinMain) = {
+    SYMNAME("WinMain"),
     .find = { { .type = SYMBOL_FIND_EXPORT, .name = "WinMain@16" }, { 0 } }
 };
 FuncInfo FUNCINFO(WinMain) = {

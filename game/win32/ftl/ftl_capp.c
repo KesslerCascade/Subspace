@@ -15,6 +15,7 @@
 
 INITWRAP(CApp_OnExecute);
 Symbol SYM(CApp_OnExecute) = {
+    SYMNAME("CApp::OnExecute"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &sil_main_CApp_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp9OnExecuteEv" },
              { 0 } }
@@ -50,6 +51,7 @@ DisasmTrace CApp_OnExecute_trace = {
 
 INITWRAP(CApp_OnInit);
 Symbol SYM(CApp_OnInit) = {
+    SYMNAME("CApp::OnInit"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp6OnInitEv" },
              { 0 } }
@@ -244,14 +246,17 @@ DisasmTrace CApp_OnExecute_audio_filehelper_trace = {
 };
 
 Symbol SYM(CApp_world_offset) = {
+    SYMNAME("CApp->world"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_worldgen_trace }, { 0 } }
 };
 
 Symbol SYM(CApp_gui_offset) = {
+    SYMNAME("CApp->gui"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_worldgen_trace }, { 0 } }
 };
 
 Symbol SYM(CApp_OnLoop) = {
+    SYMNAME("CApp::OnLoop"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_2 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp6OnLoopEv" },
@@ -263,14 +268,17 @@ FuncInfo FUNCINFO(CApp_OnLoop) = { .nargs   = 1,
                                    .rettype = RET_VOID };
 
 Symbol SYM(CApp_vtable) = {
+    SYMNAME("CApp[vtable]"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &sil_main_trace }, { 0 } }
 };
 
 Symbol SYM(CApp_vtable_OnKeyDown_offset) = {
+    SYMNAME("CApp->OnKeyDown"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CEvent_OnEvent_InputEvent_trace }, { 0 } }
 };
 
 Symbol(SYM(CApp_OnKeyDown)) = {
+    SYMNAME("CApp::OnKeyDown"),
     .find = { { .type   = SYMBOL_FIND_VIRTUAL,
                 .vtable = &SYM(CApp_vtable),
                 .offset = &SYM(CApp_vtable_OnKeyDown_offset) },
@@ -284,6 +292,7 @@ FuncInfo FUNCINFO(CApp_OnKeyDown) = {
 };
 
 Symbol(SYM(CApp_GenInputEvents)) = {
+    SYMNAME("CApp::GenInputEvents"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_2 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp14GenInputEventsEv" },
@@ -294,6 +303,7 @@ FuncInfo FUNCINFO(CApp_GenInputEvents) = { .nargs   = 1,
                                            .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
 Symbol SYM(CApp_OnRender) = {
+    SYMNAME("CApp::OnRender"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_2 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp8OnRenderEv" },

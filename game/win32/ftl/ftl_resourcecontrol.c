@@ -4,6 +4,7 @@
 
 INITWRAP(ResourceControl_RenderLoadingBar);
 Symbol SYM(ResourceControl_RenderLoadingBar) = {
+    SYMNAME("ResourceControl::RenderLoadingBar"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN15ResourceControl16RenderLoadingBarEff" },
              { 0 } }
@@ -37,10 +38,12 @@ DisasmTrace ResourceControl_RenderLoadingBar_trace = {
 };
 
 Symbol SYM(ResourceControl_preLoadProgress1_offset) = {
+    SYMNAME("ResourceControl->preLoadProgress[0]"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ResourceControl_RenderLoadingBar_trace },
              { 0 } }
 };
 Symbol SYM(ResourceControl_preLoadProgress2_offset) = {
+    SYMNAME("ResourceControl->preLoadProgress[1]"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ResourceControl_RenderLoadingBar_trace },
              { 0 } }
 };

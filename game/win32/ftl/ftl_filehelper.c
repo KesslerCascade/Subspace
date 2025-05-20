@@ -4,6 +4,7 @@
 
 INITWRAP(FileHelper_getUserFolder);
 Symbol SYM(FileHelper_getUserFolder) = {
+    SYMNAME("FileHelper::getUserFolder"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_audio_filehelper_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10FileHelper13getUserFolderB5cxx11Ev" },
              { 0 } }
@@ -14,6 +15,7 @@ FuncInfo FUNCINFO(FileHelper_getUserFolder) = { .nargs     = 1,
 
 INITWRAP(FileHelper_getSaveFile);
 Symbol SYM(FileHelper_getSaveFile) = {
+    SYMNAME("FileHelper::getSaveFile"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_audio_filehelper_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10FileHelper11getSaveFileB5cxx11Ev" },
              { 0 } }

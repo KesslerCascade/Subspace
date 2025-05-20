@@ -3,6 +3,11 @@
 #include "codegen/codegen.h"
 #include "loader/loader.h"
 
+// #ifdef _DEBUG
+// Enable symbol debug warnings in release builds for now
+#define SYMBOL_DEBUG
+// #endif
+
 enum SymbolFindEnum {
     SYMBOL_FIND_LIST_END      = 0,   // implicit end of the list
     SYNBOL_FIND_FIXED_ADDRESS = 1,   // never use this
@@ -31,7 +36,11 @@ typedef struct SymbolFind {
 } SymbolFind;
 
 typedef struct Symbol {
-    addr_t addr;         // address of this symbol if we've found it
+    addr_t addr;        // address of this symbol if we've found it
+#ifdef SYMBOL_DEBUG
+    const char* name;   // name for debugging purposes
+    bool warned;
+#endif
     bool resolved;       // has this symbol been successfully resolved
     SymbolFind find[];   // 0-terminated array of ways to find this symbol in preference order
 } Symbol;
@@ -41,6 +50,12 @@ typedef struct Symbol {
 #define SYMP(name)     _sym_p_##name
 #define DECLSYM(name)  extern Symbol SYM(name)
 #define DECLSYMP(name) extern Symbol* SYMP(name)
+
+#ifdef SYMBOL_DEBUG
+#define SYMNAME(str) .name = str
+#else
+#define SYMNAME(str) .addr = 0
+#endif
 
 #define SYMP_SELECT(pname, name)  \
     do {                          \

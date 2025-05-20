@@ -34,12 +34,14 @@ DisasmTrace Settings_SaveSettings_trace_2 = {
 };
 
 Symbol SYM(opt_framelimit) = {
+    SYMNAME("opt_framelimit"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Settings_SaveSettings_trace_1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &Settings_SaveSettings_trace_2 },
              { 0 } }
 };
 
 Symbol SYM(Globals_Library) = {
+    SYMNAME("Globals::Library"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v1_trace },
              { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v2_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7Globals7LibraryE" },
@@ -47,6 +49,7 @@ Symbol SYM(Globals_Library) = {
 };
 
 Symbol SYM(Globals_Library_currentLanguage) = {
+    SYMNAME("Globals::Library.currentLanguage"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v2_trace },
              { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v1_trace },
              { 0 } }
@@ -71,10 +74,12 @@ DisasmTrace TargetTickTime_trace = {
 };
 
 Symbol SYM(TargetFrameTimeMS) = {
+    SYMNAME("TargetFrameTimeMS"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &TargetTickTime_trace }, { 0 } }
 };
 
 Symbol SYM(ResourceControl_GlobalResources) = {
+    SYMNAME("ResourceControl::GlobalResources"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN15ResourceControl15GlobalResourcesE" },
              { 0 } }

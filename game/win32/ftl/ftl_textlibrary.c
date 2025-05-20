@@ -5,6 +5,7 @@
 INITWRAP(TextLibrary_GetText);
 Symbol* SYMP(TextLibrary_GetText);
 Symbol SYM(TextLibrary_GetText_2arg) = {
+    SYMNAME("TextLibrary::GetText(2)"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v1_trace },
              { .type = SYMBOL_FIND_EXPORT,
                 .name =
@@ -12,8 +13,8 @@ Symbol SYM(TextLibrary_GetText_2arg) = {
              { 0 } }
 };
 Symbol SYM(TextLibrary_GetText_3arg) = {
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v2_trace },
-             { 0 } }
+    SYMNAME("TextLibrary::GetText(3)"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnInit_v2_trace }, { 0 } }
 };
 
 FuncInfo* FUNCINFOP(TextLibrary_GetText);

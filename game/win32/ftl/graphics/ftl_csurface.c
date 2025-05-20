@@ -4,10 +4,9 @@
 
 INITWRAP(CSurface_GL_SetColor);
 Symbol SYM(CSurface_GL_SetColor) = {
+    SYMNAME("CSurface::GL_SetColor"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_RenderEvadeOxygen_trace },
-             { .type = SYMBOL_FIND_EXPORT,
-                .name =
-                    "_ZN8CSurface11GL_SetColorE8GL_Color" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN8CSurface11GL_SetColorE8GL_Color" },
              { 0 } }
 };
 FuncInfo FUNCINFO(CSurface_GL_SetColor) = {

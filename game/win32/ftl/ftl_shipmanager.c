@@ -5,6 +5,7 @@
 
 INITWRAP(ShipManager_DamageHull);
 Symbol SYM(ShipManager_DamageHull) = {
+    SYMNAME("ShipManager::DamageHull"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RunCommand_HULL_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager10DamageHullEib" },
              { 0 } }
@@ -17,6 +18,7 @@ FuncInfo FUNCINFO(ShipManager_DamageHull) = {
 
 INITWRAP(ShipManager_GetIsJumping);
 Symbol SYM(ShipManager_GetIsJumping) = {
+    SYMNAME("ShipManager::GetIsJumping"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SpaceBar_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager12GetIsJumpingEv" },
              { 0 } }
@@ -49,9 +51,11 @@ DisasmTrace ShipManager_DamageHull_trace = {
 };
 
 Symbol SYM(ShipManager_ship_offset) = {
+    SYMNAME("ShipManager->ship"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DamageHull_trace }, { 0 } }
 };
 
 Symbol SYM(ShipManager_current_target_offset) = {
+    SYMNAME("ShipManager->current_target"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SpaceBar_trace }, { 0 } }
 };

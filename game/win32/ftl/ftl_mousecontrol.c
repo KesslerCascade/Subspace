@@ -5,6 +5,7 @@
 
 INITWRAP(MouseControl_OnRender);
 Symbol SYM(MouseControl_OnRender) = {
+    SYMNAME("MouseControl::OnRender"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12MouseControl8OnRenderEv" },
              { 0 } }
@@ -15,6 +16,7 @@ FuncInfo FUNCINFO(MouseControl_OnRender) = { .nargs   = 1,
 
 INITWRAP(MouseControl_OnLoop);
 Symbol SYM(MouseControl_OnLoop) = {
+    SYMNAME("MouseControl::OnLoop"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12MouseControl6OnLoopEv" },
              { 0 } }

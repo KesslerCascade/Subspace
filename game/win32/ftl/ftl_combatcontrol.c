@@ -6,6 +6,7 @@
 
 INITWRAP(CombatControl_OnRenderCombat);
 Symbol SYM(CombatControl_OnRenderCombat) = {
+    SYMNAME("CombatControl::OnRenderCombat"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RenderStatic_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN13CombatControl14OnRenderCombatEv" },
              { 0 } }
@@ -27,6 +28,7 @@ DisasmTrace CombatControl_OnRenderCombat_trace = {
 
 INITWRAP(CombatControl_RenderTarget);
 Symbol SYM(CombatControl_RenderTarget) = {
+    SYMNAME("CombatControl::RenderTarget"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CombatControl_OnRenderCombat_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN13CombatControl12RenderTargetEv" },
              { 0 } }
@@ -40,6 +42,7 @@ FuncInfo FUNCINFO(CombatControl_RenderTarget) = {
 
 INITWRAP(CombatControl_GetCurrentTarget);
 Symbol SYM(CombatControl_GetCurrentTarget) = {
+    SYMNAME("CombatControl::GetCurrentTarget"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RunCommand_DELETE_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN13CombatControl16GetCurrentTargetEv" },
              { 0 } }

@@ -9,6 +9,7 @@
 // WorldManager construction is a convenient place to find the address of 'operator new' because
 // it's called immediately after a specific log message.
 Symbol SYM(CFPS_FPSControl) = {
+    SYMNAME("CFPS::FPSControl"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_2 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CFPS10FPSControlE" },
@@ -17,6 +18,7 @@ Symbol SYM(CFPS_FPSControl) = {
 
 INITWRAP(CFPS_GetTime);
 Symbol SYM(CFPS_GetTime) = {
+    SYMNAME("CFPS::GetTime"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_2 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CFPS7GetTimeEv" },
@@ -29,6 +31,7 @@ FuncInfo FUNCINFO(CFPS_GetTime) = { .nargs   = 1,
 
 INITWRAP(CFPS_OnLoop);
 Symbol SYM(CFPS_OnLoop) = {
+    SYMNAME("CFPS::OnLoop"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CFPS6OnLoopEv" },
              { 0 } }
@@ -41,6 +44,7 @@ FuncInfo FUNCINFO(CFPS_OnLoop) = { .nargs   = 1,
 
 INITWRAP(CFPS_GetSpeedFactor);
 Symbol SYM(CFPS_GetSpeedFactor) = {
+    SYMNAME("CFPS::GetSpeedFactor"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &MouseControl_OnLoop_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CFPS14GetSpeedFactorEv" },
              { 0 } }
@@ -91,9 +95,11 @@ DisasmTrace CFPS_OnLoop_trace = {
 };
 
 Symbol SYM(CFPS_SpeedFactor_offset) = {
+    SYMNAME("CFPS->SpeedFactor"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CFPS_GetSpeedFactor_trace }, { 0 } }
 };
 
 Symbol SYM(CFPS_fps_offset) = {
+    SYMNAME("CFPS->fps"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CFPS_OnLoop_trace }, { 0 } }
 };

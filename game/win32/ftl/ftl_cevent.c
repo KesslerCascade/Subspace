@@ -3,6 +3,7 @@
 #include "hook/disasmtrace.h"
 
 Symbol SYM(CEvent_callback) = {
+    SYMNAME("CEvent[callback]"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_2 },
              { 0 } }
@@ -20,6 +21,7 @@ DisasmTrace CEvent_callback_trace = {
 };
 
 Symbol SYM(CEvent_OnEvent_InputEvent) = {
+    SYMNAME("CEvent::OnEvent_InputEvent"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CEvent_callback_trace }, { 0 } }
 };
 FuncInfo FUNCINFO(CEvent_OnEvent_InputEvent) = {

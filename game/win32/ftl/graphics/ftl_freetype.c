@@ -5,6 +5,7 @@
 
 INITWRAP(freetype_easy_print);
 Symbol SYM(freetype_easy_print) = {
+    SYMNAME("freetype::easy_print"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_OnRender_sector_title_trace },
              { .type = SYMBOL_FIND_EXPORT,
                 .name =
@@ -23,6 +24,7 @@ FuncInfo FUNCINFO(freetype_easy_print) = {
 
 INITWRAP(freetype_easy_printRightAlign);
 Symbol SYM(freetype_easy_printRightAlign) = {
+    SYMNAME("freetype::easy_printRightAlign"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CombatControl_RenderTarget_trace },
              { .type = SYMBOL_FIND_EXPORT,
                 .name =
@@ -41,6 +43,7 @@ FuncInfo FUNCINFO(freetype_easy_printRightAlign) = {
 
 INITWRAP(freetype_easy_printCenter);
 Symbol SYM(freetype_easy_printCenter) = {
+    SYMNAME("freetype::easy_printCenter"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CombatControl_RenderTarget_trace },
              { .type = SYMBOL_FIND_EXPORT,
                 .name =
@@ -59,6 +62,7 @@ FuncInfo FUNCINFO(freetype_easy_printCenter) = {
 
 INITWRAP(freetype_easy_measurePrintLines);
 Symbol SYM(freetype_easy_measurePrintLines) = {
+    SYMNAME("freetype::measurePrintLines"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &MainMenu_OnRender_trace },
              { .type = SYMBOL_FIND_EXPORT,
                 .name =

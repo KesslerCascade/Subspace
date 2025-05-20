@@ -5,6 +5,7 @@
 #include "hook/disasmtrace.h"
 
 Symbol SYM(MainMenu_OnRender) = {
+    SYMNAME("MainMenu::OnRender"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN8MainMenu8OnRenderEv" },
              { 0 } }
@@ -37,6 +38,7 @@ DisasmTrace MainMenu_OnRender_trace = {
 
 INITWRAP(MainMenu_Open);
 Symbol SYM(MainMenu_Open) = {
+    SYMNAME("MainMenu::Open"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
              { .type = SYMBOL_FIND_IMPORT, .name = "_ZN8MainMenu4OpenEv" },
              { 0 } }
