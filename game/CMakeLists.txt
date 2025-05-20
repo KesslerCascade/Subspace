@@ -91,6 +91,7 @@ add_executable(subspacegame
     ftl/graphics/colors.c
     ftl/ftl.c
     ftl/struct.c
+    hook/addrsort.c
     hook/disasmtrace.c
     hook/module.c
     hook/string.c

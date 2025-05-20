@@ -7,21 +7,6 @@
 #include "hook/string.h"
 #include "loader/rtld.h"
 
-AddrList* addrListCreate(void)
-{
-    AddrList* l = smalloc(sizeof(AddrList));
-    l->num      = 0;
-    l->addrs    = smalloc(16 * sizeof(addr_t));
-    return l;
-}
-
-void addrListAdd(AddrList* l, addr_t addr)
-{
-    l->num++;
-    l->addrs             = srealloc(l->addrs, (((l->num + 15) >> 4) << 4) * sizeof(addr_t));
-    l->addrs[l->num - 1] = addr;
-}
-
 static int replacePointers(addr_t base, addr_t oldfunc, addr_t newfunc)
 {
     // Tricksy trick: The relocation table contains every address in the program that needs to

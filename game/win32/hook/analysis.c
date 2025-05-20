@@ -117,7 +117,7 @@ static void addPtr(hashtbl* tbl, addr_t ptr, addr_t loc)
     addrListAdd(fcl, loc);
 }
 
-static bool scanRelocs(addr_t base, ModuleInfo* mi)
+static bool scanRelocs(addr_t base, ModuleInfo* mi, hashtbl* functrackers)
 {
     IMAGE_BASE_RELOCATION* reloc = datadirptr(base,
                                               &datadir(base, IMAGE_DIRECTORY_ENTRY_BASERELOC),
@@ -125,7 +125,11 @@ static bool scanRelocs(addr_t base, ModuleInfo* mi)
     IMAGE_BASE_RELOCATION* end   = datadirend(base,
                                             &datadir(base, IMAGE_DIRECTORY_ENTRY_BASERELOC),
                                             IMAGE_BASE_RELOCATION);
+    SegInfo code;
     DWORD i;
+
+    if (!getCodeSeg(base, &code))
+        return false;
 
     while (reloc < end && reloc->SizeOfBlock) {
         for (i = sizeof(IMAGE_BASE_RELOCATION); i < reloc->SizeOfBlock; i += sizeof(WORD)) {
@@ -136,6 +140,11 @@ static bool scanRelocs(addr_t base, ModuleInfo* mi)
                 long* addr = dwprva(base, reloc->VirtualAddress + offset);
                 hashtbl_setint(&mi->relochash, addr, *addr);
                 addPtr(&mi->ptrhash, *addr, (addr_t)addr);
+
+                // if the pointer points to something in the code segment, it's probably a function
+                if (*addr >= code.size && *addr <= code.end) {
+                    hashtbl_addint(functrackers, *addr, 1);
+                }
             }
         }
         reloc = (IMAGE_BASE_RELOCATION*)((char*)reloc + reloc->SizeOfBlock);
@@ -156,7 +165,7 @@ static void addImport(hashtbl* tbl, const char* lib, const char* funcname, addr_
 }
 
 // basic code analysis via disassembly
-static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers)
+static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers, hashtbl* functrackers)
 {
     SegInfo code;
     SegInfo rdata;
@@ -185,6 +194,7 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers)
                 addPtr(&mi->relcallhash, dest, p + 1);
                 if (disasm.inst == I_CALL)   // for CALL only, record it as a function call
                     addPtr(&mi->funccallhash, dest, p);
+                hashtbl_addint(functrackers, dest, 1);
             }
         } else if (disasm.inst == I_CALL) {
             // get absolute calls to addresses
@@ -192,6 +202,7 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers)
             if (arg->base == REG_UNDEF && arg->idx == REG_UNDEF && arg->addr >= code.start &&
                 arg->addr <= code.end) {
                 addPtr(&mi->funccallhash, disasm.arg[0].addr, p);
+                hashtbl_addint(functrackers, disasm.arg[0].addr, 1);
             }
         } else if (disasm.inst == I_JMP &&
                    hashtbl_find(importtrackers, disasm.arg[0].addr) != HT_NOT_FOUND) {
@@ -226,6 +237,8 @@ bool analyzeModule(addr_t base, ModuleInfo* mi)
 {
     hashtbl importtrackers;
     hashtbl_init(&importtrackers, 64, 0);
+    hashtbl functrackers;
+    hashtbl_init(&functrackers, 64, 0);
 
     if (!scanImports(base, &importtrackers))
         return false;
@@ -233,16 +246,23 @@ bool analyzeModule(addr_t base, ModuleInfo* mi)
         return false;
     if (!scanStrings(base, mi))
         return false;
-    if (!scanRelocs(base, mi))
+    if (!scanRelocs(base, mi, &functrackers))
         return false;
-    if (!scanCode(base, mi, &importtrackers))
+    if (!scanCode(base, mi, &importtrackers, &functrackers))
         return false;
 
     for (int i = 0; i < importtrackers.nslots; i++) {
-        if (importtrackers.ents[i].data)
-            sfree(importtrackers.ents[i].data);
+        void* d = hashtbl_get_slot(&importtrackers, i);
+        if (d)
+            sfree(d);
     }
     hashtbl_destroy(&importtrackers);
+
+    for (int i = 0; i < functrackers.nslots; i++) {
+        if (hashtbl_get_slot(&functrackers, i))
+            addrListAdd(mi->funclist, functrackers.ents[i].key_int);
+    }
+    hashtbl_destroy(&functrackers);
 
     return true;
 }

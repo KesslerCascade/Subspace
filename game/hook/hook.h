@@ -3,14 +3,6 @@
 #include "hook/symbol.h"
 #include "loader/loader.h"
 
-typedef struct AddrList {
-    uint32_t num;
-    addr_t* addrs;
-} AddrList;
-
-AddrList* addrListCreate(void);
-void addrListAdd(AddrList* l, addr_t addr);
-
 // These should only be used when patching is in progress!
 
 int replaceString(addr_t base, const char* from, const char* to);

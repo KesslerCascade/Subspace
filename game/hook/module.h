@@ -1,5 +1,17 @@
+#pragma once
+
 #include "loader/loader.h"
 #include "minicrt.h"
+
+typedef struct AddrList {
+    uint32_t num;
+    addr_t* addrs;
+} AddrList;
+
+AddrList* addrListCreate(void);
+void addrListAdd(AddrList* l, addr_t addr);
+void addrListSort(AddrList* l);
+void addrListDestroy(AddrList* l);
 
 typedef struct ModuleInfo {
     // Hash table of exported function names to function addresses
@@ -40,6 +52,12 @@ typedef struct ModuleInfo {
     // Hash table of function addresses to address list of all instructions in the code section that
     // call it.
     hashtbl funccallhash;
+
+    // Sorted list of addresses of known/suspected functions. This includes functions that are the
+    // target of relative CALls, as well as addresses in the code section that are referenced by
+    // pointers in the data section, which are likely to be function pointers of vtables.
+    AddrList* funclist;
+
     bool init;
 } ModuleInfo;
 
