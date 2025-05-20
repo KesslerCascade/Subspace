@@ -21,15 +21,15 @@ DisasmTrace ResourceControl_RenderLoadingBar_trace = {
              { I_MOV,
                 .argf   = { 0, ARG_REG },
                 .args   = { { 0 }, { REG_ECX } },
-                .argcap = { CT_CAPTURE1 } },   // self ptr
+                .argcap = { DT_CAPTURE1 } },   // self ptr
               { DT_OP(SKIP), .imin = 8, .imax = 20 },
              { I_CVTSI2SS,
                 .argf   = { 0, ARG_REG },
-                .argcap = { 0, CT_MATCH1 },
+                .argcap = { 0, DT_MATCH1 },
                 .argout = { 0, DT_OUT_SYM1 } },
              { I_CVTSI2SS,
                 .argf   = { 0, ARG_REG },
-                .argcap = { 0, CT_MATCH1 },
+                .argcap = { 0, DT_MATCH1 },
                 .argout = { 0, DT_OUT_SYM2 } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(ResourceControl_preLoadProgress1_offset),

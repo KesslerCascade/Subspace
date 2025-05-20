@@ -145,8 +145,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                         t_arg comp = dts.op->args[i];   // arg to compare to
 
                         // check for comparing against a captured argument
-                        if (dts.op->argcap[i] & CT_MATCH)
-                            comp = dts.cap[dts.op->argcap[i] & CT_ARG_MASK];
+                        if (dts.op->argcap[i] & DT_MATCH)
+                            comp = dts.cap[dts.op->argcap[i] & DT_CAPTURE_ARG_MASK];
 
                         if (dts.op->argf[i] == ARG_MATCH) {
                             // just a basic register and displacement compare.
@@ -172,8 +172,8 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                 if (match) {
                     for (int i = 0; i < 3; i++) {
                         // capture any args from this match
-                        if (dts.op->argcap[i] & CT_CAPTURE)
-                            dts.cap[dts.op->argcap[i] & CT_ARG_MASK] = disasm.arg[i];
+                        if (dts.op->argcap[i] & DT_CAPTURE)
+                            dts.cap[dts.op->argcap[i] & DT_CAPTURE_ARG_MASK] = disasm.arg[i];
                         // and stage them for output if needed
                         if (dts.op->argout[i] > 0) {
                             dts.outaddr[dts.op->argout[i] - 1] = disasm.arg[i].addr;

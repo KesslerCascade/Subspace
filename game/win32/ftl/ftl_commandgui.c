@@ -56,16 +56,16 @@ DisasmTrace CommandGui_SpaceBar_trace = {
              { I_MOV,
                 .argf   = { 0, ARG_REG },
                 .args   = { { 0 }, { REG_ECX } },
-                .argcap = { CT_CAPTURE1 },
+                .argcap = { DT_CAPTURE1 },
                 .argout = { 0, DT_OUT_SYM1 } },
              { DT_OP(SKIP), .imin = 2, .imax = 5 },
              { I_MOV,
                 .argf   = { 0, ARG_REG },
-                .argcap = { CT_CAPTURE2, CT_MATCH1 },
+                .argcap = { DT_CAPTURE2, DT_MATCH1 },
                 .argout = { 0, DT_OUT_SYM2 } },
-             { I_MOV, .argf = { 0, ARG_REG }, .argcap = { CT_CAPTURE3, CT_MATCH2 } },
-             { I_MOV, .argf = { 0, ARG_REG }, .argcap = { CT_CAPTURE4, CT_MATCH3 } },
-             { I_CMP, .argf = { ARG_REG }, .argcap = { CT_MATCH4 }, .argout = { 0, DT_OUT_SYM3 } },
+             { I_MOV, .argf = { 0, ARG_REG }, .argcap = { DT_CAPTURE3, DT_MATCH2 } },
+             { I_MOV, .argf = { 0, ARG_REG }, .argcap = { DT_CAPTURE4, DT_MATCH3 } },
+             { I_CMP, .argf = { ARG_REG }, .argcap = { DT_MATCH4 }, .argout = { 0, DT_OUT_SYM3 } },
              { I_JNZ },
              { I_MOVZX, .argout = { 0, DT_OUT_SYM4 } },
              { DT_OP(FINISH) } },
@@ -138,12 +138,12 @@ DisasmTrace CommandGui_RunCommand_HULL_trace = {
     .c    = DTRACE_STRREFS,
     .cstr = "HULL ", // yes, with a space at the end
     .ops  = { { DT_OP(SKIP), .imin = 20, .imax = 28 },
-             { I_NEG, .argcap = { CT_CAPTURE1 } },
+             { I_NEG, .argcap = { DT_CAPTURE1 } },
              { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_REG },
                 .args   = { { REG_ESP } },
-                .argcap = { 0, CT_MATCH1 } },
+                .argcap = { 0, DT_MATCH1 } },
              { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // ShipManager::DamageHull
               { DT_OP(FINISH) } },
@@ -156,7 +156,7 @@ DisasmTrace CommandGui_RunCommand_DELETE_trace = {
     .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 7 },
              { I_JNZ },
              { DT_OP(SKIP), .imin = 2, .imax = 8 },
-             { I_CALL, .argcap = { CT_CAPTURE1 } },   // CALL CombatControl::GetCurrentTarget
+             { I_CALL, .argcap = { DT_CAPTURE1 } },   // CALL CombatControl::GetCurrentTarget
               { DT_OP(SKIP), .imin = 0, .imax = 6 },
              { I_JZ },
              { DT_OP(SKIP), .imin = 0, .imax = 6 },
@@ -202,12 +202,12 @@ DisasmTrace CommandGui_Restart_trace = {
              { I_MOV,
                 .argf   = { 0, ARG_REG },
                 .args   = { { 0 }, { REG_ECX } },
-                .argcap = { CT_CAPTURE1 } },   // remember which reg holds this
+                .argcap = { DT_CAPTURE1 } },   // remember which reg holds this
               { DT_OP(SKIP), .imin = 15, .imax = 30 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },      // somewhere it gets set back as
                 .args   = { { REG_ECX } },             // ECX for a CALL, because CommandGui
-                .argcap = { 0, CT_MATCH1 } },          // starts with embedded ShipManager
+                .argcap = { 0, DT_MATCH1 } },          // starts with embedded ShipManager
               { DT_OP(SKIP), .imin = 2, .imax = 5 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ShipStatus::LinkShipManager
               { DT_OP(FINISH) } },

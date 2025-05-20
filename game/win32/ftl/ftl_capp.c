@@ -70,7 +70,7 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
               { I_MOV,                                 // after calling new, the register that the
                 .argf   = { ARG_IGNORE, ARG_REG },     // WorldManager instance is copied from
                 .args   = { { 0 }, { REG_EAX } },      // to varies between game versions,
-                .argcap = { CT_CAPTURE1 } },           // so capture it to check later.
+                .argcap = { DT_CAPTURE1 } },           // so capture it to check later.
               { I_MOV,   // The result from ::new always goes into EAX because it's
                 .argf = { ARG_REG, ARG_REG },   // the return value, and must always be moved
                 .args = { { REG_ECX },          //  into ECX prior to world manager constructor,
@@ -79,7 +79,7 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV,
                 .argf   = { ARG_IGNORE, ARG_MATCH },
-                .argcap = { CT_CAPTURE2, CT_MATCH1 } },   // Capture the WorldManager offset in CApp
+                .argcap = { DT_CAPTURE2, DT_MATCH1 } },   // Capture the WorldManager offset in CApp
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV,
                 .argf   = { ARG_IGNORE, ARG_MATCH },
@@ -89,12 +89,12 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
               { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, CT_MATCH2 } },          // Match 1 is the WorldManager pointer
+                .argcap = { 0, DT_MATCH2 } },          // Match 1 is the WorldManager pointer
               { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL WorldManager::OnInit
               { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, CT_MATCH2 } },        // Match 1 is the WorldManager pointer
+                .argcap = { 0, DT_MATCH2 } },        // Match 1 is the WorldManager pointer
               { I_CALL },                            // CALL WorldManager::CreateCommandGui
               { I_MOV,                               // MOV [*+off], EAX
                 .argf   = { ARG_IGNORE, ARG_REG },   // this is the offset of capp->gui
@@ -317,7 +317,7 @@ DisasmTrace CApp_OnKeyDown_trace = {
                 .argf = { 0, ARG_ADDR },
                 .args = { { 0 }, { .addr = 0x69666f74 } } },   // tofi
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
-             { I_CALL, .argcap = { CT_CAPTURE1 } },           // CALL Settings::GetHotkey
+             { I_CALL, .argcap = { DT_CAPTURE1 } },           // CALL Settings::GetHotkey
               { DT_OP(SKIP), .imin = 8, .imax = 50 },
              { I_MOV,
                 .argf = { 0, ARG_ADDR },
@@ -325,7 +325,7 @@ DisasmTrace CApp_OnKeyDown_trace = {
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
              { I_CALL,
                 .argf   = { ARG_MATCH },
-                .argcap = { CT_MATCH1 } },   // CALL Settings::GetHotkey
+                .argcap = { DT_MATCH1 } },   // CALL Settings::GetHotkey
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
              { I_CMP, .argf = { ARG_REG }, .args = { { REG_ECX } } },
              { DT_OP(SKIP), .imin = 0, .imax = 3 },
@@ -351,12 +351,12 @@ DisasmTrace CApp_GenInputEvents_trace = {
     .csym = &SYM(CApp_GenInputEvents),
     .ops  = { { DT_OP(SKIP), .imin = 20, .imax = 25 },
              { I_CMP },
-             { I_MOV, .argf = { ARG_REG }, .args = { { REG_EAX } }, .argcap = { 0, CT_CAPTURE1 } },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_EAX } }, .argcap = { 0, DT_CAPTURE1 } },
              { DT_OP(SKIP), .imin = 0, .imax = 10 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_EAX } },
-                .argcap = { 0, CT_MATCH1 } },
+                .argcap = { 0, DT_MATCH1 } },
              { DT_OP(SKIP),
                 .imin = 3,
                 .imax = 10,
@@ -467,13 +467,13 @@ DisasmTrace CApp_OnLoop_trace = {
              { I_MOV,
                 .argf   = { ARG_REG },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, CT_CAPTURE2 } },   // MOV ECX, MouseControl::Mouse
+                .argcap = { 0, DT_CAPTURE2 } },   // MOV ECX, MouseControl::Mouse
               { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_CALL },                         // CALL MouseControl::Reset
               { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, CT_MATCH2 } },          // MOV ECX, MouseControl::Mouse
+                .argcap = { 0, DT_MATCH2 } },          // MOV ECX, MouseControl::Mouse
               { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL MouseControl::OnLoop
               { DT_OP(SKIP), .imin = 2, .imax = 10 },
              { I_CMP },
@@ -481,9 +481,9 @@ DisasmTrace CApp_OnLoop_trace = {
               { I_MOV,
                 .argf   = { ARG_REG },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, CT_CAPTURE3 } },   // store CommandGui offset
+                .argcap = { 0, DT_CAPTURE3 } },   // store CommandGui offset
               { I_CALL,
-                .argcap = { CT_CAPTURE1 },
+                .argcap = { DT_CAPTURE1 },
                 .argout = { DT_OUT_SYM1 } },   // CALL CommandGui::IsPaused
               { DT_OP(SKIP),
                 .imin = 7,
@@ -491,12 +491,12 @@ DisasmTrace CApp_OnLoop_trace = {
                 .flow = DT_FLOW_JMP_BOTH },   // JE/JNE branch ordering in different versions
               { I_CALL,
                 .argf   = { ARG_MATCH },
-                .argcap = { CT_MATCH1 } },   // CALL CommandGui::IsPaused
+                .argcap = { DT_MATCH1 } },   // CALL CommandGui::IsPaused
               { DT_OP(SKIP), .imin = 3, .imax = 10 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, CT_MATCH3 } },          // verify CommandGui object
+                .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
               { I_CALL, .argout = { DT_OUT_SYM6 } },   // CALL CommandGui::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 6 },
              { I_CMP },
@@ -510,7 +510,7 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argsym = { 0, &SYM(CApp_gui_offset) } },
              { I_CALL,
                 .argout = { DT_OUT_SYM2 },
-                .argcap = CT_CAPTURE4 },   // CommandGui_IsGameOver
+                .argcap = DT_CAPTURE4 },   // CommandGui_IsGameOver
               { DT_OP(SKIP), .imin = 2, .imax = 7 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
@@ -522,7 +522,7 @@ DisasmTrace CApp_OnLoop_trace = {
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CALL,
                 .argf   = { ARG_MATCH },
-                .argcap = { CT_MATCH4 } },   // CALL CommandGui_IsGameOver
+                .argcap = { DT_MATCH4 } },   // CALL CommandGui_IsGameOver
               { DT_OP(SKIP), .imin = 10, .imax = 20 },
              { I_LEA },
              { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL MainMenu::Open

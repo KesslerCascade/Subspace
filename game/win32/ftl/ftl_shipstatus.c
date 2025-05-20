@@ -79,18 +79,18 @@ DisasmTrace ShipStatus_LinkShip_trace = {
     .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_LEA,
                 .argf = { 0, ARG_REG },
-                .args = { { 0 }, { REG_ESP }, }, .argcap = { CT_CAPTURE1 } },
+                .args = { { 0 }, { REG_ESP }, }, .argcap = { DT_CAPTURE1 } },
              { DT_OP(SKIP), .imin = 6, .imax = 12 },
              { I_SUB, .argf = { ARG_REG }, .args = { { REG_ESP } } },
              { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV,
                 .argf   = { 0, ARG_REG },
-                .argcap = { CT_CAPTURE2, CT_MATCH1 } },   // get ShipManager pointer
+                .argcap = { DT_CAPTURE2, DT_MATCH1 } },   // get ShipManager pointer
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_REG },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, CT_MATCH2 },
+                .argcap = { 0, DT_MATCH2 },
                 .argout = { DT_OUT_SYM1 } },   // store it, this is our offset
               { DT_OP(FINISH) } },
     .out  = { &SYM(ShipStatus_ship_offset) }

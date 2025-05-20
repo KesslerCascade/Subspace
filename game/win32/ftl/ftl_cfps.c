@@ -70,21 +70,21 @@ DisasmTrace CFPS_OnLoop_trace = {
              { I_MOV,
                 .argf   = { 0, ARG_REG },
                 .args   = { { 0 }, { REG_ECX } },
-                .argcap = { CT_CAPTURE1 } },   // get reg 'this' ponter is stashed in
+                .argcap = { DT_CAPTURE1 } },   // get reg 'this' ponter is stashed in
               { DT_OP(SKIP), .imin = 17, .imax = 28 },
              { I_UCOMISD },
              { I_JA, DT_OP(JMP) },   // follow JA
               { DT_OP(SKIP), .imin = 3, .imax = 8 },
              { I_MOV,
-                .argcap = { CT_CAPTURE2, CT_CAPTURE3 } },   // sequence is retrieve frame counter,
+                .argcap = { DT_CAPTURE2, DT_CAPTURE3 } },   // sequence is retrieve frame counter,
               { DT_OP(SKIP), .imin = 0, .imax = 3 },
              { I_MOV,
                 .argf = { ARG_MATCH, ARG_MATCH },
                 .args = { { 0 }, { .base = REG_UNDEF, .idx = REG_UNDEF, .addr = 0, .ptrsize = 4 } },
-                .argcap = { CT_MATCH3 } },   // zero it
+                .argcap = { DT_MATCH3 } },   // zero it
               { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
-                .argcap = { CT_MATCH1, CT_MATCH2 },
+                .argcap = { DT_MATCH1, DT_MATCH2 },
                 .argout = { DT_OUT_SYM1 } },   // then store it relative to 'this'
               { DT_OP(FINISH) } },
     .out  = { &SYM(CFPS_fps_offset) }

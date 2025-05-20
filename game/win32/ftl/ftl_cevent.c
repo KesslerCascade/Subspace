@@ -40,11 +40,11 @@ DisasmTrace CEvent_OnEvent_InputEvent_trace = {
              { I_MOV,
                 .argf   = { 0, ARG_REG },
                 .args   = { { 0 }, { REG_ECX } },
-                .argcap = { CT_CAPTURE1 } },   // vtable being pulled out of instance pointer (ECX)
+                .argcap = { DT_CAPTURE1 } },   // vtable being pulled out of instance pointer (ECX)
               { DT_OP(SKIP), .imin = 0, .imax = 3 },
              { I_MOV,
                 .argf   = { 0, ARG_REG },
-                .argcap = { 0, CT_MATCH1 },       // match the register the vtable is in
+                .argcap = { 0, DT_MATCH1 },       // match the register the vtable is in
                 .argout = { 0, DT_OUT_SYM1 } },   // and output the offset
               { DT_OP(FINISH) } },
     .out  = { &SYM(CApp_vtable_OnKeyDown_offset) }

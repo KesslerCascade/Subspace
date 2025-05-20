@@ -32,7 +32,7 @@ DisasmTrace ShipManager_DamageHull_trace = {
              { I_MOV,
                 .argf   = { 0, ARG_REG },
                 .args   = { { 0 }, { REG_ECX } },
-                .argcap = { CT_CAPTURE1 } },   // capture reg this pointer is saved in
+                .argcap = { DT_CAPTURE1 } },   // capture reg this pointer is saved in
               { DT_OP(SKIP), .imin = 6, .imax = 12 },
              { I_MOVZX },
              { I_CMP },
@@ -40,7 +40,7 @@ DisasmTrace ShipManager_DamageHull_trace = {
               { I_LEA,
                 .argf   = { ARG_REG, ARG_REG },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, CT_MATCH1 },
+                .argcap = { 0, DT_MATCH1 },
                 .argout = { 0, DT_OUT_SYM1 } },   // offset of Ship within ShipManager
               { DT_OP(SKIP), .imin = 0, .imax = 6 },
              { I_CALL, .argout = { DT_OUT_SYM2 } },
