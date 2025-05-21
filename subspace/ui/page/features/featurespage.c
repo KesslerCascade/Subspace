@@ -203,28 +203,28 @@ static int panel_draw(Ihandle* ih, float posx, float posy)
 static int panel_getfocus(Ihandle* ih)
 {
     IupSetInt(ih, "PANEL_FOCUS", 1);
-    IupUpdate(ih);
+    IupRedraw(ih, 0);
     return IUP_DEFAULT;
 }
 
 static int panel_killfocus(Ihandle* ih)
 {
     IupSetInt(ih, "PANEL_FOCUS", 0);
-    IupUpdate(ih);
+    IupRedraw(ih, 0);
     return IUP_DEFAULT;
 }
 
 static int panel_enterwindow(Ihandle* ih)
 {
     IupSetInt(ih, "PANEL_HOVER", 1);
-    IupUpdate(ih);
+    IupRedraw(ih, 0);
     return IUP_DEFAULT;
 }
 
 static int panel_leavewindow(Ihandle* ih)
 {
     IupSetInt(ih, "PANEL_HOVER", 0);
-    IupUpdate(ih);
+    IupRedraw(ih, 0);
     return IUP_DEFAULT;
 }
 
