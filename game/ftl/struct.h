@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdbool.h>
+
 // Helper macro for getting members of structures where the offsets are found at runtime through
 // disassembly. This uses the symbol resolution system to automatically calculate and cache the
 // offset as a pseudo-symbol.
@@ -25,3 +27,8 @@ typedef struct basic_string {
 } basic_string;
 void basic_string_set(basic_string* str, const char* src);
 void basic_string_destroy(basic_string* str);
+
+typedef struct TextString {
+    basic_string data;
+    bool isLiteral;
+} TextString;

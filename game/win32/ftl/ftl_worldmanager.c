@@ -21,3 +21,16 @@ Symbol SYM(WorldManager_OnInit) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager6OnInitEv" },
              { 0 } }
 };
+
+INITWRAP(WorldManager_StartGame);
+Symbol SYM(WorldManager_StartGame) = {
+    SYMNAME("WorldManager::StartGame"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager9StartGameEP11ShipManager" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_StartGame) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } }
+};

@@ -10,6 +10,7 @@
 #include "ftl/resourcecontrol.h"
 #include "ftl/startup.h"
 #include "ftl/textlibrary.h"
+#include "ftl/tutorialmanager.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -537,12 +538,26 @@ DisasmTrace CApp_OnLoop_trace = {
              { I_LEA },
              { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL MainMenu::Open
               { I_JMP },
-             { DT_OP(FINISH) } },
-    .out  = { &SYM(CommandGui_IsPaused),     // DT_OUT_SYM1
-              &SYM(CommandGui_IsGameOver),   // DT_OUT_SYM2
-              &SYM(CommandGui_Restart),      // DT_OUT_SYM3
-              &SYM(CFPS_OnLoop),             // DT_OUT_SYM4
-              &SYM(MouseControl_OnLoop),     // DT_OUT_SYM5
-              &SYM(CommandGui_OnLoop),       // DT_OUT_SYM6
-              &SYM(MainMenu_Open) }
+             { DT_OP(GOTO), .val = 1 },               // go back to the switch statement
+              { DT_OP(JMPTBL), .val = 1 },             // switch(), case 1
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(TutorialManager_Tutorial) } },
+             { I_CALL },   // CALL TutorialManager::Start
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL },   // CALL MainMenu::GetTutorialShip
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ESP }, { REG_EAX } } },
+             { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL WorldManager::StartGame
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_IsPaused),               // DT_OUT_SYM1
+              &SYM(CommandGui_IsGameOver),             // DT_OUT_SYM2
+              &SYM(CommandGui_Restart),                // DT_OUT_SYM3
+              &SYM(CFPS_OnLoop),                       // DT_OUT_SYM4
+              &SYM(MouseControl_OnLoop),               // DT_OUT_SYM5
+              &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM6
+              &SYM(MainMenu_Open),                     // DT_OUT_SYM7
+              &SYM(WorldManager_StartGame) }
 };
