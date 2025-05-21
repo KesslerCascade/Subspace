@@ -1,6 +1,7 @@
 #include "ftl/capp.h"
 #include "ftl/cfps.h"
 #include "ftl/globals.h"
+#include "ftl/scorekeeper.h"
 #include "hook/disasmtrace.h"
 
 // Move to Settings module if we ever hook it
@@ -83,4 +84,9 @@ Symbol SYM(ResourceControl_GlobalResources) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_trace },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN15ResourceControl15GlobalResourcesE" },
              { 0 } }
+};
+
+Symbol SYM(Settings_difficulty) = {
+    SYMNAME("Settings::difficulty"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ScoreKeeper_Save_trace }, { 0 } }
 };

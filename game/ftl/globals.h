@@ -21,3 +21,6 @@ double g_DefaultFrameTimeMS;   // saved copy of the default frame time
 DECLSYM(ResourceControl_GlobalResources);
 #define g_ResourceControl_GlobalResources \
     ((basic_sResourceControltring*)symAddr(ftlbase, ResourceControl_GlobalResources))
+
+DECLSYM(Settings_difficulty);
+#define g_Settings_difficulty (*(int*)symAddr(ftlbase, Settings_difficulty))

@@ -1,5 +1,7 @@
 #include "ftl/capp.h"
+#include "ftl/globals.h"
 #include "ftl/scorekeeper.h"
+#include "ftl/tutorialmanager.h"
 #include "hook/disasmtrace.h"
 
 DisasmTrace ScoreKeeper_Save_trace = {
@@ -11,21 +13,18 @@ DisasmTrace ScoreKeeper_Save_trace = {
              { DT_OP(SKIP), .imin = 7, .imax = 14 },
              {
                  I_MOV,
-                  .argf = { ARG_REG },
-                  .args = { { REG_ECX } }
-                 //             .argout = { 0, DT_OUT_SYM2 }
-                 // TutorialManager::Tutorial
+                  .argf   = { ARG_REG },
+                  .args   = { { REG_ECX } },
+                  .argout = { 0, DT_OUT_SYM2 }   // TutorialManager::Tutorial
              }, { DT_OP(SKIP), .imin = 1, .imax = 5 },
              {
-                 I_CALL
-                 // .argout = { 0, DT_OUT_SYM3 }
-                 // TutorialManager::Running
+                 I_CALL,
+                  .argout = { 0, DT_OUT_SYM3 }   // TutorialManager::Running
              }, { DT_OP(SKIP), .imin = 1, .imax = 5 },
              {
                  I_MOV,
-                  .argcap = { DT_CAPTURE1 }
-                 //.argout = {DT_OUT_SYM4}
-                 // settings.difficulty
+                  .argcap = { DT_CAPTURE1 },
+                  .argout = { DT_OUT_SYM4 }   // settings.difficulty
              }, { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CMP,   // difficulty == 1
                 .argf   = { ARG_MATCH, ARG_ADDR },
@@ -37,7 +36,10 @@ DisasmTrace ScoreKeeper_Save_trace = {
                 .argcap = { DT_MATCH1 },
                 .args   = { { 0 }, { .addr = 2 } } },
              { DT_OP(FINISH) } },
-    .out  = { &SYM(ScoreKeeper_Save) }
+    .out  = { &SYM(ScoreKeeper_Save),           // SYM1
+              &SYM(TutorialManager_Tutorial),   // SYM2
+              &SYM(TutorialManager_Running),    // SYM3
+              &SYM(Settings_difficulty) }
 };
 
 INITWRAP(ScoreKeeper_Save);

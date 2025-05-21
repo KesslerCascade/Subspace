@@ -10,3 +10,5 @@ typedef struct ScoreKeeper ScoreKeeper;
 
 typedef void (*FUNCTYPE(ScoreKeeper_Save))(ScoreKeeper* self, bool newHighscore);
 DECLFUNC(ScoreKeeper_Save);
+
+extern DisasmTrace ScoreKeeper_Save_trace;
