@@ -17,16 +17,16 @@ basic_string* subspace_TextLibrary_GetText(TextLibrary* self, basic_string* text
 
 static bool validate(addr_t base, Patch* p, PatchState* ps)
 {
-    return symResolve(base, TextLibrary_GetText_2arg) || symResolve(base, TextLibrary_GetText_3arg);
+    return symResolve(base, TextLibrary_GetText_3arg) || symResolve(base, TextLibrary_GetText_2arg);
 }
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     // select which version of GetText to use
-    if (symResolve(base, TextLibrary_GetText_2arg))
-        FUNCP_SELECT(TextLibrary_GetText, TextLibrary_GetText_2arg);
-    else
+    if (symResolve(base, TextLibrary_GetText_3arg))
         FUNCP_SELECT(TextLibrary_GetText, TextLibrary_GetText_3arg);
+    else
+        FUNCP_SELECT(TextLibrary_GetText, TextLibrary_GetText_2arg);
     return replaceFunctionP(base, TextLibrary_GetText, subspace_TextLibrary_GetText);
 }
 
