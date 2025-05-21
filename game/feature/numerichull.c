@@ -37,10 +37,18 @@ void numericHullAfterRenderTarget(void)
 bool numericHullCheckText(TextLibrary* tlib, basic_string* text, basic_string* out)
 {
     if (gs.overrideHullText && text && !strcmp(text->buf, "status_hull")) {
-        char buf[32];
-        snprintf(buf, 32, "HULL: %d", gs.hull);
-        basic_string_set(out, buf);
-        return true;
+        basic_string hulltext;
+        basic_string_set(&hulltext, "");
+        GetText(text, &hulltext);
+
+        if (hulltext.len > 0 && hulltext.len < 27) {
+            char buf[32];
+            snprintf(buf, 31, "%s: %d", hulltext.buf, gs.hull);
+            basic_string_destroy(&hulltext);
+            basic_string_set(out, buf);
+            return true;
+        }
+        basic_string_destroy(&hulltext);
     }
     return false;
 }
