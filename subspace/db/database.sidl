@@ -1,13 +1,18 @@
 #include <cx/taskqueue/resource/trfifo.sidl>
 #include "subspace.h"
 
+struct sqlite3;
 class Database {
     Subspace *ss;
 
+    sqlite3 *db;
+
     bool open();
+    bool check();       // upgrade schema if necessary
     void close();
 
     object:TRFifo fifo;   // for database multi-threading
 
     factory create(Subspace *ss);
+    destroy();
 }

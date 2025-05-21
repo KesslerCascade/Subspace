@@ -83,6 +83,7 @@ add_executable(subspace
     control/cmds/cmdlog.c
     control/cmds/cmdvalidate.c
     db/database.c
+    db/schema.c
     feature/feature.c
     feature/features.c
     feature/featureregistry.c

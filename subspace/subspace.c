@@ -2,6 +2,7 @@
 #include "version.h"
 
 #include "control/controlserver.h"
+#include "db/database.h"
 #include "feature/featureregistry.h"
 #include "gamemgr/gamemgr.h"
 #include "kbmgr/kbmgr.h"
@@ -114,13 +115,19 @@ static void subspaceStartup(LogDest** pdeferredlogs)
     if (subspace.workq)
         ret &= tqStart(subspace.workq);
 
-    // 10 -------- UI setup
+    // 10 -------- Database
+    subspace.db = databaseCreate(&subspace);
+    if (!databaseOpen(subspace.db) || !databaseCheck(subspace.db)) {
+        fatalError(_S"Failed to open database.", false);
+    }
+
+    // 11 -------- UI setup
     subspace.ui = ssuiCreate(&subspace);
     if (!ssuiInit(subspace.ui)) {
         fatalError(_S"Failed to initialize UI.", false);
     }
 
-    // 11 -------- Control Server setup
+    // 12 -------- Control Server setup
     subspace.svr = cserverCreate(&subspace);
     if (!cserverStart(subspace.svr)) {
         fatalError(_S"Failed to start control server.", false);
@@ -129,11 +136,15 @@ static void subspaceStartup(LogDest** pdeferredlogs)
 
 static void subspaceShutdown()
 {
-    // 11 -------- Control Server shutdown
+    // 12 -------- Control Server shutdown
     cserverStop(subspace.svr);
 
-    // 10 -------- UI teardown
+    // 11 -------- UI teardown
     ssuiShutdown(subspace.ui);
+
+    // 10 -------- Database shutdown
+    databaseClose(subspace.db);
+    objRelease(&subspace.db);
 
     // 09 -------- Task queue shutdown
     tqShutdown(subspace.workq, true);

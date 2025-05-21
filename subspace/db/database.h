@@ -11,6 +11,7 @@ typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
 typedef struct ComplexTask ComplexTask;
 typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
 typedef struct TRFifoNode TRFifoNode;
+typedef struct sqlite3 sqlite3;
 typedef struct Database Database;
 typedef struct Database_WeakRef Database_WeakRef;
 saDeclarePtr(Database);
@@ -22,6 +23,8 @@ typedef struct Database_ClassIf {
     size_t _size;
 
     bool (*open)(_In_ void* self);
+    // upgrade schema if necessary
+    bool (*check)(_In_ void* self);
     void (*close)(_In_ void* self);
 } Database_ClassIf;
 extern Database_ClassIf Database_ClassIf_tmpl;
@@ -37,6 +40,7 @@ typedef struct Database {
     atomic(ptr) _weakref;
 
     Subspace* ss;
+    sqlite3* db;
     TRFifo* fifo;        // for database multi-threading
 } Database;
 extern ObjClassInfo Database_clsinfo;
@@ -60,6 +64,10 @@ _objfactory_guaranteed Database* Database_create(Subspace* ss);
 
 // bool databaseOpen(Database* self);
 #define databaseOpen(self) (self)->_->open(Database(self))
+// bool databaseCheck(Database* self);
+//
+// upgrade schema if necessary
+#define databaseCheck(self) (self)->_->check(Database(self))
 // void databaseClose(Database* self);
 #define databaseClose(self) (self)->_->close(Database(self))
 

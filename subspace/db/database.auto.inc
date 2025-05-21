@@ -9,6 +9,7 @@ static Database_ClassIf _impl_Database_Database_ClassIf = {
     ._size = sizeof(Database_ClassIf),
     ._implements = (ObjIface*)&Database_ClassIf_tmpl,
     .open = (bool (*)(void*))Database_open,
+    .check = (bool (*)(void*))Database_check,
     .close = (void (*)(void*))Database_close,
 };
 
