@@ -15,11 +15,14 @@ enum SymbolFindEnum {
     SYMBOL_FIND_IMPORT,              // imported from a DLL
     SYMBOL_FIND_STRING,              // find in string table
     SYMBOL_FIND_DISASM,              // use a dissaembly trace to find the symbol
-    SYMBOL_FIND_VIRTUAL,   // for C++ virtual functions, provide the vtable and offset symbols
+    SYMBOL_FIND_VIRTUAL,             // for C++, provide the vtable and offset symbols
+    SYMBOL_FIND_CUSTOM,              // run a custom function to resolve the name
 };
 
 typedef struct Symbol Symbol;
 typedef struct DisasmTrace DisasmTrace;
+typedef struct SymbolFind SymbolFind;
+typedef void (*custom_find_t)(addr_t base, Symbol* sym, SymbolFind* find);
 typedef struct SymbolFind {
     int type;           // from SymbolFindEnum
     const char* name;   // name as it appears in import/export table
@@ -33,6 +36,9 @@ typedef struct SymbolFind {
 
     // for SYMBOL_FIND_DISASM, the trace to run. It shoould be set to output to this symbol
     DisasmTrace* disasm;
+
+    // custom find function, can use any of the other fields for storage
+    custom_find_t func;
 } SymbolFind;
 
 typedef struct Symbol {

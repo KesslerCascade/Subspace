@@ -50,6 +50,9 @@ static bool symFindOne(addr_t base, Symbol* sym, SymbolFind* find)
     case SYMBOL_FIND_VIRTUAL:
         symFindVirtual(base, sym, find);
         break;
+    case SYMBOL_FIND_CUSTOM:
+        find->func(base, sym, find);
+        break;
     }
 
     return sym->resolved;
