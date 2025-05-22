@@ -176,6 +176,12 @@ static void keymap_init(void* unused)
     IUPKEY(K_CLEAR);
     IUPKEY(K_HELP);
 
+    IUPKEY(K_NP_MULTIPLY);
+    IUPKEY(K_NP_DIVIDE);
+    IUPKEY(K_NP_ADD);
+    IUPKEY(K_NP_SUBTRACT);
+    IUPKEY(K_NP_DECIMAL);
+
     string temp = 0;
     for (int i = K_exclam; i <= K_tilde; i++) {
         char* buf = strBuffer(&temp, 1);
@@ -194,7 +200,7 @@ static void keymap_init(void* unused)
     // some friendlier names for a few keys
     // TODO: translate?
     DISPLAYSP(K_SP, "Space");
-    DISPLAYSP(K_BS, "Backspace");
+    DISPLAYSP(K_BS, "BkSp");
     DISPLAYSP(K_TAB, "Tab");
     DISPLAYSP(K_CR, "Enter");
     DISPLAYSP(K_PAUSE, "Pause");
@@ -229,6 +235,12 @@ static void keymap_init(void* unused)
     DISPLAYSP(K_F18, "F18");
     DISPLAYSP(K_F19, "F19");
     DISPLAYSP(K_F20, "F20");
+
+    DISPLAYSP(K_NP_MULTIPLY, "NP *");
+    DISPLAYSP(K_NP_DIVIDE, "NP /");
+    DISPLAYSP(K_NP_ADD, "NP +");
+    DISPLAYSP(K_NP_SUBTRACT, "NP -");
+    DISPLAYSP(K_NP_DECIMAL, "NP .");
     strDestroy(&temp);
 
     // build IUP to FTL table
@@ -254,6 +266,11 @@ static void keymap_init(void* unused)
     }
 
     IUPFTLMAP(K_DEL, 127);
+    IUPFTLMAP(K_NP_DECIMAL, 266);
+    IUPFTLMAP(K_NP_DIVIDE, 267);
+    IUPFTLMAP(K_NP_MULTIPLY, 268);
+    IUPFTLMAP(K_NP_SUBTRACT, 269);
+    IUPFTLMAP(K_NP_ADD, 270);
     IUPFTLMAP(K_UP, 273);
     IUPFTLMAP(K_DOWN, 274);
     IUPFTLMAP(K_RIGHT, 275);

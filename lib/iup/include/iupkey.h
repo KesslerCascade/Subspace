@@ -166,6 +166,15 @@
 #define K_F19      0xFFD0
 #define K_F20      0xFFD1
 
+// Numeric keypad keys
+#define K_NP_ENTER    0xFF8D
+#define K_NP_MULTIPLY 0xFFAA
+#define K_NP_ADD      0xFFAB
+#define K_NP_EQUAL    0xFFBD
+#define K_NP_SUBTRACT 0xFFAD
+#define K_NP_DECIMAL  0xFFAE
+#define K_NP_DIVIDE   0xFFAF
+
 /* no Shift/Ctrl/Alt */
 #define K_LSHIFT   0xFFE1
 #define K_RSHIFT   0xFFE2

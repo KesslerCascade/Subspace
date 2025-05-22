@@ -107,12 +107,12 @@ static void winKeyInitXKey(Iwin2iupkey* map)
   map[VK_NUMPAD7].iupcode =   K_7;
   map[VK_NUMPAD8].iupcode =   K_8;
   map[VK_NUMPAD9].iupcode =   K_9;
-  map[VK_MULTIPLY].iupcode =  K_asterisk;
-  map[VK_ADD].iupcode =       K_plus;
-  map[VK_SUBTRACT].iupcode =  K_minus;
-  map[VK_DIVIDE].iupcode =    K_slash;
+  map[VK_MULTIPLY].iupcode =  K_NP_MULTIPLY;
+  map[VK_ADD].iupcode =       K_NP_ADD;
+  map[VK_SUBTRACT].iupcode =  K_NP_SUBTRACT;
+  map[VK_DIVIDE].iupcode =    K_NP_DIVIDE;
 
-  map[VK_DECIMAL].iupcode =   winMapVirtualKeyToChar(VK_DECIMAL);
+  map[VK_DECIMAL].iupcode =   K_NP_DECIMAL;
   map[VK_SEPARATOR].iupcode = winMapVirtualKeyToChar(VK_SEPARATOR);
 
   /* 
