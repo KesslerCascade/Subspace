@@ -1,6 +1,7 @@
 #include "ftl/commandgui.h"
 #include "ftl/ship.h"
 #include "ftl/shipmanager.h"
+#include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
 INITWRAP(ShipManager_DamageHull);
@@ -58,4 +59,32 @@ Symbol SYM(ShipManager_ship_offset) = {
 Symbol SYM(ShipManager_current_target_offset) = {
     SYMNAME("ShipManager->current_target"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SpaceBar_trace }, { 0 } }
+};
+
+Symbol SYM(ShipManager_OnInit) = {
+    SYMNAME("ShipManager::OnInit"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CompleteShip_OnInit_trace }, { 0 } }
+};
+
+DisasmTrace ShipManager_OnInit_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipManager_OnInit),
+    .ops  = { { DT_OP(SKIP), .imin = 5, .imax = 15 },
+             { I_LEA,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM1 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_myBlueprint_offset) }
+};
+
+Symbol SYM(ShipManager_myBlueprint_offset) = {
+    SYMNAME("ShipManager->myBlueprint"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_OnInit_trace }, { 0 } }
+};
+
+// offset within the embedded ShipBlueprint structure
+Symbol SYM(ShipManager_myBlueprint_name_offset) = {
+    SYMNAME("ShipManager->myBlueprint->name"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_StartGame_trace }, { 0 } }
 };
