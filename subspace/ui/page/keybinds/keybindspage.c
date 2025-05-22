@@ -128,7 +128,7 @@ bool KeybindsPage_make(_In_ KeybindsPage* self, Ihandle* list)
     IupSetCallback(kbinst, "BUTTON_CB", (Icallback)everythingelse_button);
 
     Ihandle* kbnote = IupLabel(langGetC(self->ss, _S"keybind_note"));
-    IupSetAttribute(kbnote, "SIZE", "1x24");
+    IupSetAttribute(kbnote, "SIZE", "1x48");
     IupSetAttribute(kbnote, "WORDWRAP", "YES");
     IupSetAttribute(kbnote, "EXPAND", "HORIZONTAL");
     IupSetAttribute(kbnote, "ALIGNMENT", "ALEFT:ATOP");

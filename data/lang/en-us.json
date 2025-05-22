@@ -102,7 +102,7 @@
     "timewarp_cancel": "Cancel Time Warp",
     "timewarp_cancel_tip": "Exits time warp mode and returns the flow of time to normal.",
     "keybind_instructions": "To bind a key, click on the command button below, then press the desired key. Clicking elsewhere will cancel. Pressing Escape will unbind the key.",
-    "keybind_note": "NOTE: These key bindings will override FTL's in-game key bindings if there is a conflict!",
+    "keybind_note": "Please note that only keys that are recognized by the FTL game itself can be bound. When using international layouts, many accented and special characters cannot be bound as a result. Keys that require a modifier to be pressed also will not function for the same reason. These key bindings will override FTL's in-game key bindings if there is a conflict!",
     "tweaks_targetfps": "Target FPS",
     "tweaks_targetfps_desc": "Changes the target framerate when the frame limiter is ON.\nNOTE: This may have no effect if vertical sync is enabled in your graphics driver settings.",
     "tweaks_30fps": "30 FPS",
