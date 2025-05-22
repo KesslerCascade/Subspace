@@ -24,6 +24,16 @@ void registerFeature(SubspaceFeature* feature)
     }
 }
 
+void registerAllFeatures()
+{
+    registerFeature(&Base_feature);
+    registerFeature(&InfoBlock_feature);
+    registerFeature(&TimeWarp_feature);
+    registerFeature(&FrameAdv_feature);
+    registerFeature(&NumericHull_feature);
+    registerFeature(&Tweaks_feature);
+}
+
 SubspaceFeature* getFeature(const char* name)
 {
     void* val = hashtbl_get(&feathash, name);

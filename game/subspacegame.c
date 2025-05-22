@@ -72,11 +72,7 @@ int sscmain(int argc, char* argv[])
         return 1;
     }
 
-    registerFeature(&InfoBlock_feature);
-    registerFeature(&TimeWarp_feature);
-    registerFeature(&FrameAdv_feature);
-    registerFeature(&NumericHull_feature);
-    registerFeature(&Tweaks_feature);
+    registerAllFeatures();
 
     PatchState ps;
     if (!patchBegin(&ps, ftlbase)) {
@@ -86,10 +82,9 @@ int sscmain(int argc, char* argv[])
     }
 
     patchValidateSeq(&ps, OSDepPatches);
-    patchValidateSeq(&ps, RequiredPatches);
     validateAllFeatures(&ps);
 
-    if (!patchApplySeq(&ps, OSDepPatches) || !patchApplySeq(&ps, RequiredPatches)) {
+    if (!patchApplySeq(&ps, OSDepPatches) || !patchFeature(&Base_feature, &ps)) {
         log_str(LOG_Error, "Required patches failed");
         controlSendLaunchFail(&control, LAUNCH_FAIL_REQPATCH);
         return 1;

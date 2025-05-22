@@ -86,6 +86,7 @@ add_executable(subspacegame
     control/cmds/cmdcleartostart.c
     control/cmds/cmdenablefeature.c
     control/cmds/cmdfeaturesettings.c
+    feature/base.c
     feature/feature.c
     feature/frameadv.c
     feature/infoblock.c
@@ -122,7 +123,6 @@ add_executable(subspacegame
     input/keyboard.c
     log/log.c
     patch/patch.c
-    patch/required.c
     subspacegame.c
     version.c
     ${SHARED_SOURCE_DIR}/control.c

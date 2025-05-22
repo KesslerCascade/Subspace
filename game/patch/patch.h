@@ -46,5 +46,4 @@ bool NoPatch(addr_t base, Patch* p, PatchState* ps);
 // Generic function that can be used for replacements
 int DoNothing();
 
-extern PatchSequence RequiredPatches;
 extern PatchSequence OSDepPatches;

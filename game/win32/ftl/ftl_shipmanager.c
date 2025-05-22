@@ -100,7 +100,9 @@ Symbol SYM(ShipManager_myBlueprint_name_offset) = {
 // offset within the embedded ShipBlueprint structure
 Symbol SYM(ShipManager_myBlueprint_blueprintName_offset) = {
     SYMNAME("ShipManager->myBlueprint->blueprintName"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_StartGame_trace }, { 0 } }
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v1 },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v2 },
+             { 0 } }
 };
 
 INITWRAP(ShipManager_GetDroneCount);
