@@ -39,7 +39,7 @@ DisasmTrace MainMenu_OnRender_trace = {
 INITWRAP(MainMenu_Open);
 Symbol SYM(MainMenu_Open) = {
     SYMNAME("MainMenu::Open"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace_s5 },
              { .type = SYMBOL_FIND_IMPORT, .name = "_ZN8MainMenu4OpenEv" },
              { 0 } }
 };

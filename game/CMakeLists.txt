@@ -57,6 +57,7 @@ if(WIN32)
         win32/ftl/ftl_stdlib.c
         win32/ftl/ftl_textlibrary.c
         win32/ftl/ftl_tutorialmanager.c
+        win32/ftl/ftl_waypoints.c
         win32/ftl/ftl_worldmanager.c
         win32/hook/analysis.c
         win32/hook/export.c

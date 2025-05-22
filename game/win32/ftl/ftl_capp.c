@@ -11,6 +11,7 @@
 #include "ftl/startup.h"
 #include "ftl/textlibrary.h"
 #include "ftl/tutorialmanager.h"
+#include "ftl/waypoints.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -473,7 +474,7 @@ DisasmTrace CApp_OnLoop_trace = {
     .ops  = { { DT_OP(SKIP), .imin = 8, .imax = 16 },
              { I_MOV, .argf = { 0, ARG_MATCH }, .argsym = { 0, &SYM(CFPS_FPSControl) } },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
-             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL CFPS::OnLoop
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL CFPS::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_MOV,
                 .argf   = { ARG_REG },
@@ -485,7 +486,7 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH2 } },          // MOV ECX, MouseControl::Mouse
-              { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL MouseControl::OnLoop
+              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MouseControl::OnLoop
               { DT_OP(SKIP), .imin = 2, .imax = 10 },
              { I_CMP },
              { DT_OP(JMP) },   // follow the JNE
@@ -495,7 +496,7 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argcap = { 0, DT_CAPTURE3 } },   // store CommandGui offset
               { I_CALL,
                 .argcap = { DT_CAPTURE1 },
-                .argout = { DT_OUT_SYM1 } },   // CALL CommandGui::IsPaused
+                .argout = { DT_OUT_SYM3 } },   // CALL CommandGui::IsPaused
               { DT_OP(SKIP),
                 .imin = 7,
                 .imax = 16,
@@ -508,38 +509,48 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
-              { I_CALL, .argout = { DT_OUT_SYM6 } },   // CALL CommandGui::OnLoop
+              { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL CommandGui::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 6 },
              { I_CMP },
              { I_JA },
-             { DT_OP(LABEL), .val = 1 },    // remember the switch statement
-              { DT_OP(JMPTBL), .val = 0 },   // switch(), case 0
+             { I_JMP, .outip = { DT_OUT_SYM5 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(CFPS_OnLoop),           // DT_OUT_SYM1
+              &SYM(MouseControl_OnLoop),   // DT_OUT_SYM2
+              &SYM(CommandGui_IsPaused),   // DT_OUT_SYM3
+              &SYM(CommandGui_OnLoop),     // DT_OUT_SYM4
+              &SYM(wp_CApp_OnLoop_GetCommand_switch) }
+};
+
+// switch() branches
+
+DisasmTrace CApp_OnLoop_trace_s0 = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(wp_CApp_OnLoop_GetCommand_switch),
+    .ops  = { { DT_OP(JMPTBL), .val = 0 },   // switch(), case 0
               { DT_OP(SKIP), .imin = 6, .imax = 14 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX } },
                 .argsym = { 0, &SYM(CApp_gui_offset) } },
-             { I_CALL,
-                .argout = { DT_OUT_SYM2 },
-                .argcap = DT_CAPTURE4 },   // CommandGui_IsGameOver
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CommandGui_IsGameOver
               { DT_OP(SKIP), .imin = 2, .imax = 7 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX } },
                 .argsym = { 0, &SYM(CApp_gui_offset) } },
-             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CommandGui_Restart
-              { DT_OP(GOTO), .val = 1 },               // go back to the switch statement
-              { DT_OP(JMPTBL), .val = 5 },             // switch(), case 5
-              { DT_OP(SKIP), .imin = 0, .imax = 4 },
-             { I_CALL,
-                .argf   = { ARG_MATCH },
-                .argcap = { DT_MATCH4 } },   // CALL CommandGui_IsGameOver
-              { DT_OP(SKIP), .imin = 10, .imax = 20 },
-             { I_LEA },
-             { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL MainMenu::Open
-              { I_JMP },
-             { DT_OP(GOTO), .val = 1 },               // go back to the switch statement
-              { DT_OP(JMPTBL), .val = 1 },             // switch(), case 1
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CommandGui_Restart
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_IsGameOver),             // DT_OUT_SYM1
+              &SYM(CommandGui_Restart)
+
+    }
+};
+
+DisasmTrace CApp_OnLoop_trace_s1 = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(wp_CApp_OnLoop_GetCommand_switch),
+    .ops  = { { DT_OP(JMPTBL), .val = 1 },   // switch(), case 1
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
@@ -550,14 +561,25 @@ DisasmTrace CApp_OnLoop_trace = {
              { I_CALL },   // CALL MainMenu::GetTutorialShip
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ESP }, { REG_EAX } } },
-             { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL WorldManager::StartGame
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL WorldManager::StartGame
               { DT_OP(FINISH) } },
-    .out  = { &SYM(CommandGui_IsPaused),               // DT_OUT_SYM1
-              &SYM(CommandGui_IsGameOver),             // DT_OUT_SYM2
-              &SYM(CommandGui_Restart),                // DT_OUT_SYM3
-              &SYM(CFPS_OnLoop),                       // DT_OUT_SYM4
-              &SYM(MouseControl_OnLoop),               // DT_OUT_SYM5
-              &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM6
-              &SYM(MainMenu_Open),                     // DT_OUT_SYM7
+    .out  = { 0,                                       // DT_OUT_SYM1
               &SYM(WorldManager_StartGame) }
+};
+
+DisasmTrace CApp_OnLoop_trace_s5 = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(wp_CApp_OnLoop_GetCommand_switch),
+    .ops  = { { DT_OP(JMPTBL), .val = 5 },   // switch(), case 5
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL,
+                .argf   = { ARG_MATCH },
+                .argsym = { &SYM(CommandGui_IsGameOver) } },   // CALL CommandGui_IsGameOver
+              { DT_OP(SKIP), .imin = 10, .imax = 20 },
+             { I_LEA },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL MainMenu::Open
+              { I_JMP },
+
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(MainMenu_Open) }
 };

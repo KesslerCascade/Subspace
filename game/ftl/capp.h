@@ -26,6 +26,9 @@ extern DisasmTrace CApp_OnKeyDown_trace;
 extern DisasmTrace CApp_GenInputEvents_trace;
 extern DisasmTrace CApp_OnRender_trace;
 extern DisasmTrace CApp_OnLoop_trace;
+extern DisasmTrace CApp_OnLoop_trace_s0;
+extern DisasmTrace CApp_OnLoop_trace_s1;
+extern DisasmTrace CApp_OnLoop_trace_s5;
 
 typedef int (*FUNCTYPE(CApp_OnInit))(CApp* self);
 DECLFUNC(CApp_OnInit);

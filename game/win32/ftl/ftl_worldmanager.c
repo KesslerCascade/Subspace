@@ -25,7 +25,7 @@ Symbol SYM(WorldManager_OnInit) = {
 INITWRAP(WorldManager_StartGame);
 Symbol SYM(WorldManager_StartGame) = {
     SYMNAME("WorldManager::StartGame"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace_s1 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager9StartGameEP11ShipManager" },
              { 0 } }
 };

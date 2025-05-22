@@ -184,7 +184,7 @@ FuncInfo FUNCINFO(CommandGui_IsPaused) = { .nargs   = 1,
 INITWRAP(CommandGui_IsGameOver);
 Symbol SYM(CommandGui_IsGameOver) = {
     SYMNAME("CommandGui::IsGameOver"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace_s0 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui10IsGameOverEv" },
              { 0 } }
 };
@@ -195,7 +195,7 @@ FuncInfo FUNCINFO(CommandGui_IsGameOver) = { .nargs   = 1,
 INITWRAP(CommandGui_Restart);
 Symbol SYM(CommandGui_Restart) = {
     SYMNAME("CommandGui::Restart"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace_s0 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui7RestartEv" },
              { 0 } }
 };
