@@ -23,3 +23,20 @@ Symbol SYM(ShipBlueprint_name_offset) = {
     SYMNAME("ShipBlueprint->name"),
     .find = { { .type = SYMBOL_FIND_CUSTOM, .func = ShipBlueprint_name_offset_find }, { 0 } }
 };
+
+static void ShipBlueprint_blueprintName_offset_find(addr_t addr, Symbol* sym, SymbolFind* find)
+{
+    // see comments in ShipBlueprint_name_offset_find
+    if (symResolve(addr, ShipManager_myBlueprint_offset) &&
+        symResolve(addr, ShipManager_myBlueprint_blueprintName_offset)) {
+        sym->addr = SYM(ShipManager_myBlueprint_blueprintName_offset).addr -
+            SYM(ShipManager_myBlueprint_offset).addr;
+        sym->resolved = true;
+    }
+}
+
+Symbol SYM(ShipBlueprint_blueprintName_offset) = {
+    SYMNAME("ShipBlueprint->blueprintName"),
+    .find = { { .type = SYMBOL_FIND_CUSTOM, .func = ShipBlueprint_blueprintName_offset_find },
+             { 0 } }
+};

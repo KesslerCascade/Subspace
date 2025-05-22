@@ -25,10 +25,20 @@ typedef bool (*FUNCTYPE(ShipManager_GetIsJumping))(ShipManager* ship);
 DECLFUNC(ShipManager_GetIsJumping);
 #define ShipManager_GetIsJumping(self) FCALL(ftlbase, ShipManager_GetIsJumping, self)
 
+typedef int (*FUNCTYPE(ShipManager_GetDroneCount))(ShipManager* ship);
+DECLFUNC(ShipManager_GetDroneCount);
+#define ShipManager_GetDroneCount(self) FCALL(ftlbase, ShipManager_GetDroneCount, self)
+
+typedef int (*FUNCTYPE(ShipManager_GetMissileCount))(ShipManager* ship);
+DECLFUNC(ShipManager_GetMissileCount);
+#define ShipManager_GetMissileCount(self) FCALL(ftlbase, ShipManager_GetMissileCount, self)
+
 DECLSYM(ShipManager_ship_offset);
 DECLSYM(ShipManager_current_target_offset);
+DECLSYM(ShipManager_currentScrap_offset);
 DECLSYM(ShipManager_myBlueprint_offset);
 DECLSYM(ShipManager_myBlueprint_name_offset);
+DECLSYM(ShipManager_myBlueprint_blueprintName_offset);
 
 #define ShipManager_ship(ship_manager) (&MEMBER(ftlbase, ShipManager, ship_manager, Ship, ship))
 #define ShipManager_current_target(ship_manager) \

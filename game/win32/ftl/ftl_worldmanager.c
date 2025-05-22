@@ -69,8 +69,12 @@ DisasmTrace WorldManager_CreateShip_trace = {
               { DT_OP(GOTO), .val = 1 },   // go back to main branch
               { DT_OP(SKIP), .imin = 20, .imax = 36 },
              { I_TEST },
-             { DT_OP(JMP) },
-             { DT_OP(SKIP), .imin = 14, .imax = 27 },
+             { DT_OP(SKIP),
+                .imin = 0,   // this could be a JNZ or JZ depending on branch
+                .imax = 1,   // ordering
+                .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV },
+             { DT_OP(SKIP), .imin = 14, .imax = 33 },
              { I_IMUL,
                 .argf = { 0, 0, ARG_ADDR },
                 .args = { { 0 }, { 0 }, { .disp = -0x55555555 } } },

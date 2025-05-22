@@ -1,6 +1,7 @@
 #include "ftl/commandgui.h"
 #include "ftl/ship.h"
 #include "ftl/shipmanager.h"
+#include "ftl/shipstatus.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -78,6 +79,13 @@ DisasmTrace ShipManager_OnInit_trace = {
     .out  = { &SYM(ShipManager_myBlueprint_offset) }
 };
 
+Symbol SYM(ShipManager_currentScrap_offset) = {
+    SYMNAME("ShipManager->currentScrap"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v1 },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v2 },
+             { 0 } }
+};
+
 Symbol SYM(ShipManager_myBlueprint_offset) = {
     SYMNAME("ShipManager->myBlueprint"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_OnInit_trace }, { 0 } }
@@ -88,3 +96,33 @@ Symbol SYM(ShipManager_myBlueprint_name_offset) = {
     SYMNAME("ShipManager->myBlueprint->name"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_StartGame_trace }, { 0 } }
 };
+
+// offset within the embedded ShipBlueprint structure
+Symbol SYM(ShipManager_myBlueprint_blueprintName_offset) = {
+    SYMNAME("ShipManager->myBlueprint->blueprintName"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_StartGame_trace }, { 0 } }
+};
+
+INITWRAP(ShipManager_GetDroneCount);
+Symbol SYM(ShipManager_GetDroneCount) = {
+    SYMNAME("ShipManager::GetDroneCount"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v1 },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v2 },
+             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager13GetDroneCountEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_GetDroneCount) = { .nargs   = 1,
+                                                 .stdcall = true,
+                                                 .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+INITWRAP(ShipManager_GetMissileCount);
+Symbol SYM(ShipManager_GetMissileCount) = {
+    SYMNAME("ShipManager::GetMissileCount"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v1 },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v2 },
+             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager15GetMissileCountEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_GetMissileCount) = { .nargs   = 1,
+                                                   .stdcall = true,
+                                                   .args    = { { 4, ARG_PTR, REG_ECX, false } } };
