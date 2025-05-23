@@ -3,9 +3,10 @@
 #include "hook/module.h"
 #include "hook/string.h"
 #include "hook/symbol.h"
+#include "log/log.h"
 #include "disasm.h"
 
-#define MAX_UNWIND 10
+#define MAX_UNWIND 16
 
 typedef struct DisasmTraceState {
     DisasmOp* op;
@@ -27,8 +28,13 @@ static void pushUnwind(DisasmTraceState* dts, DisasmTraceState* unwind, int* nun
     DisasmTraceState ndts = *dts;
 
     // if we can't skip anymore or are already maxed out on unwind points, just do nothing.
-    if (dts->skipmax < 1 || *nunwind >= MAX_UNWIND)
+    if (dts->skipmax < 1 || *nunwind >= MAX_UNWIND) {
+#ifdef _DEBUG
+        if (*nunwind >= MAX_UNWIND)
+            log_str(LOG_Verbose, "Unwind stack is full!");
+#endif
         return;
+    }
 
     // we want the unwound state to start on the instruction *after* the one we saved it on,
     // simulating a skip
