@@ -1,3 +1,4 @@
+#include "ftl/achievementtracker.h"
 #include "ftl/capp.h"
 #include "ftl/cevent.h"
 #include "ftl/cfps.h"
@@ -475,6 +476,7 @@ DisasmTrace CApp_OnLoop_trace = {
              { I_MOV, .argf = { 0, ARG_MATCH }, .argsym = { 0, &SYM(CFPS_FPSControl) } },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL CFPS::OnLoop
+              { I_CALL },                              // CALL CEvent::GetShiftState
               { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_MOV,
                 .argf   = { ARG_REG },
@@ -497,9 +499,22 @@ DisasmTrace CApp_OnLoop_trace = {
               { I_CALL,
                 .argcap = { DT_CAPTURE1 },
                 .argout = { DT_OUT_SYM3 } },   // CALL CommandGui::IsPaused
+              { DT_OP(SKIP), .imin = 3, .imax = 6 },
+             { I_CALL },                      // CALL SoundControl::OnLoop
+              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { 0, DT_OUT_SYM4 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL AchievementTracker::OnLoop
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_CMP,                                 // (this->menu).bOpen
+                .argf = { ARG_PTRSIZE, ARG_ADDR },
+                .args = { { .ptrsize = 1 }, { .addr = 0 } } },
+             { DT_OP(LABEL), .val = 1 },   // we want to trace both outcomes
+              { DT_OP(SKIP), .imin = 0, .imax = 2, .flow = DT_FLOW_JMP_BOTH },   // branch reordering
+              { I_LEA, .outip = DT_OUT_SYM6 },   // menu handler waypoint
+              { DT_OP(GOTO), .val = 1 },         // back to branch point
               { DT_OP(SKIP),
-                .imin = 7,
-                .imax = 16,
+                .imin = 1,
+                .imax = 6,
                 .flow = DT_FLOW_JMP_BOTH },   // JE/JNE branch ordering in different versions
               { I_CALL,
                 .argf   = { ARG_MATCH },
@@ -509,16 +524,19 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
-              { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL CommandGui::OnLoop
+              { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL CommandGui::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 6 },
              { I_CMP },
              { I_JA },
-             { I_JMP, .outip = { DT_OUT_SYM5 } },
-             { DT_OP(FINISH) } },
-    .out  = { &SYM(CFPS_OnLoop),           // DT_OUT_SYM1
-              &SYM(MouseControl_OnLoop),   // DT_OUT_SYM2
-              &SYM(CommandGui_IsPaused),   // DT_OUT_SYM3
-              &SYM(CommandGui_OnLoop),     // DT_OUT_SYM4
+             { I_JMP, .outip = { DT_OUT_SYM8 } },     // switch() waypoint
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CFPS_OnLoop),                       // DT_OUT_SYM1
+              &SYM(MouseControl_OnLoop),               // DT_OUT_SYM2
+              &SYM(CommandGui_IsPaused),               // DT_OUT_SYM3
+              &SYM(AchievementTracker_Tracker),        // DT_OUT_SYM4
+              &SYM(AchievementTracker_OnLoop),         // DT_OUT_SYM5
+              &SYM(wp_CApp_OnLoop_MenuMenu_handler),   // DT_OUT_SYM6
+              &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM7
               &SYM(wp_CApp_OnLoop_GetCommand_switch) }
 };
 
@@ -582,4 +600,33 @@ DisasmTrace CApp_OnLoop_trace_s5 = {
 
              { DT_OP(FINISH) } },
     .out  = { &SYM(MainMenu_Open) }
+};
+
+DisasmTrace CApp_OnLoop_menu = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(wp_CApp_OnLoop_MenuMenu_handler),
+    .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL MainMenu::OnLoop
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL,
+                .argout = { DT_OUT_SYM2 },
+                .argcap = { DT_CAPTURE1 } },   // CALL MainMenu::Choice
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = -1 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argf = { ARG_MATCH }, .argcap = { DT_MATCH1 } },   // CALL MainMenu::Choice
+              { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = 2 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4, .flow = DT_FLOW_JMP_BOTH },
+             { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = 9 } } },
+             { DT_OP(SKIP), .imin = 4, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(FileHelper_getSaveFile) } },
+             { DT_OP(SKIP), .imin = 7, .imax = 16 },
+             { I_TEST, .argf = { ARG_REG, ARG_REG }, .args = { { REG_AL }, { REG_AL } } },
+             { DT_OP(SKIP), .imin = 1, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(FileHelper_getSaveFile) } },
+             { DT_OP(SKIP), .imin = 1, .imax = 6 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL WorldManager::LoadGame
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(MainMenu_OnLoop), &SYM(MainMenu_Choice), &SYM(WorldManager_LoadGame) }
 };

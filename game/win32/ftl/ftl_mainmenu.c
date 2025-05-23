@@ -46,3 +46,25 @@ Symbol SYM(MainMenu_Open) = {
 FuncInfo FUNCINFO(MainMenu_Open) = { .nargs   = 1,
                                      .stdcall = true,
                                      .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+INITWRAP(MainMenu_OnLoop);
+Symbol SYM(MainMenu_OnLoop) = {
+    SYMNAME("MainMenu::OnLoop"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu },
+             { .type = SYMBOL_FIND_IMPORT, .name = "_ZN8MainMenu6OnLoopEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(MainMenu_OnLoop) = { .nargs   = 1,
+                                       .stdcall = true,
+                                       .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+INITWRAP(MainMenu_Choice);
+Symbol SYM(MainMenu_Choice) = {
+    SYMNAME("MainMenu::Choice"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu },
+             { .type = SYMBOL_FIND_IMPORT, .name = "_ZN8MainMenu6ChoiceEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(MainMenu_Choice) = { .nargs   = 1,
+                                       .stdcall = true,
+                                       .args    = { { 4, ARG_PTR, REG_ECX, false } } };

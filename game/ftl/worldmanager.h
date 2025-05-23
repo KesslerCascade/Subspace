@@ -24,6 +24,9 @@ DECLFUNC(WorldManager_OnInit);
 typedef void (*FUNCTYPE(WorldManager_StartGame))(WorldManager* self, ShipManager* newShip);
 DECLFUNC(WorldManager_StartGame);
 
+typedef void (*FUNCTYPE(WorldManager_LoadGame))(WorldManager* self, basic_string* file);
+DECLFUNC(WorldManager_LoadGame);
+
 typedef CompleteShip* (*FUNCTYPE(WorldManager_CreateShip))(WorldManager* self, ShipEvent* ship,
                                                            bool boss);
 DECLFUNC(WorldManager_CreateShip);

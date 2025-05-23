@@ -29,6 +29,7 @@ extern DisasmTrace CApp_OnLoop_trace;
 extern DisasmTrace CApp_OnLoop_trace_s0;
 extern DisasmTrace CApp_OnLoop_trace_s1;
 extern DisasmTrace CApp_OnLoop_trace_s5;
+extern DisasmTrace CApp_OnLoop_menu;
 
 typedef int (*FUNCTYPE(CApp_OnInit))(CApp* self);
 DECLFUNC(CApp_OnInit);

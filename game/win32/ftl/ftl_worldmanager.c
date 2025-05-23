@@ -38,6 +38,21 @@ FuncInfo FUNCINFO(WorldManager_StartGame) = {
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } }
 };
 
+INITWRAP(WorldManager_LoadGame);
+Symbol SYM(WorldManager_LoadGame) = {
+    SYMNAME("WorldManager::LoadGame"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name =
+                    "_ZN12WorldManager8LoadGameENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_LoadGame) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } }
+};
+
 DisasmTrace WorldManager_CreateShip_trace = {
     .c    = DTRACE_STRREFS,
     .cstr = "SHIPS_REBEL",

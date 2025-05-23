@@ -11,3 +11,9 @@ DECLSYM(MainMenu_OnRender);
 
 typedef void (*FUNCTYPE(MainMenu_Open))(MainMenu* self);
 DECLFUNC(MainMenu_Open);
+
+typedef void (*FUNCTYPE(MainMenu_OnLoop))(MainMenu* self);
+DECLFUNC(MainMenu_OnLoop);
+
+typedef int (*FUNCTYPE(MainMenu_Choice))(MainMenu* self);
+DECLFUNC(MainMenu_Choice);

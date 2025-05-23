@@ -32,6 +32,7 @@ if(WIN32)
         win32/codegen/wrapgen.c
         win32/ftl/graphics/ftl_csurface.c
         win32/ftl/graphics/ftl_freetype.c
+        win32/ftl/ftl_achievementtracker.c
         win32/ftl/ftl_blueprintmanager.c
         win32/ftl/ftl_capp.c
         win32/ftl/ftl_cevent.c
