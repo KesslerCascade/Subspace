@@ -103,6 +103,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     dts.p = addr;
             }
             ++dts.op;
+            continue;
         } else if (dts.op->op == DT_NOOP) {
             ++dts.op;
             continue;
