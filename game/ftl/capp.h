@@ -53,3 +53,4 @@ DECLSYM(CApp_vtable);
 DECLSYM(CApp_vtable_OnKeyDown_offset);
 
 #define CApp_gui(capp) MEMBER(ftlbase, CApp, capp, CommandGui*, gui)
+#define CApp_world(capp) MEMBER(ftlbase, CApp, capp, WorldManager*, world)

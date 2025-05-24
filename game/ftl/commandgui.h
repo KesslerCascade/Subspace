@@ -5,6 +5,7 @@
 #include "hook/function.h"
 
 typedef struct CommandGui CommandGui;
+typedef struct StarMap StarMap;
 
 int subspace_CommandGui_KeyDown_pre(CommandGui* self, int key, bool shiftHeld);
 int subspace_CommandGui_OnLoop_pre(CommandGui* self);
@@ -43,6 +44,12 @@ DECLFUNC(CommandGui_Restart);
 
 typedef void (*FUNCTYPE(CommandGui_OnLoop))(CommandGui* self);
 DECLFUNC(CommandGui_OnLoop);
+
+typedef void (*FUNCTYPE(CommandGui_OnInit))(CommandGui* self);
+DECLFUNC(CommandGui_OnInit);
+
+typedef void (*FUNCTYPE(CommandGui_LinkMap))(CommandGui* self, StarMap* map);
+DECLFUNC(CommandGui_LinkMap);
 
 DECLSYM(CommandGui_SpaceBar);
 DECLSYM(CommandGui_shipComplete_offset);

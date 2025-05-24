@@ -7,6 +7,7 @@
 #include "ftl/misc.h"
 #include "ftl/shipmanager.h"
 #include "ftl/shipstatus.h"
+#include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
 INITWRAP(CommandGui_KeyDown);
@@ -233,3 +234,29 @@ FuncInfo FUNCINFO(CommandGui_OnLoop) = { .nargs   = 1,
                                          .stdcall = true,
                                          .args    = { { 4, ARG_PTR, REG_ECX, false } },
                                          .rettype = RET_VOID };
+
+INITWRAP(CommandGui_OnInit);
+Symbol SYM(CommandGui_OnInit) = {
+    SYMNAME("CommandGui::OnInit"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_OnInit_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui6OnInitEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_OnInit) = { .nargs   = 1,
+                                         .stdcall = true,
+                                         .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                         .rettype = RET_VOID };
+
+INITWRAP(CommandGui_LinkMap);
+Symbol SYM(CommandGui_LinkMap) = {
+    SYMNAME("CommandGui::LinkMap"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_OnInit_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui7LinkMapEP7StarMap" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_LinkMap) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } },
+    .rettype = RET_VOID
+};

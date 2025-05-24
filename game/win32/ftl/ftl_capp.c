@@ -84,7 +84,9 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV,
                 .argf   = { ARG_IGNORE, ARG_MATCH },
-                .argcap = { DT_CAPTURE2, DT_MATCH1 } },   // Capture the WorldManager offset in CApp
+                .argcap = { DT_CAPTURE2, DT_MATCH1 },
+                .argout = { DT_OUT_SYM4 } },   // Capture the WorldManager offset in
+                                               // CApp
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV,
                 .argf   = { ARG_IGNORE, ARG_MATCH },
@@ -95,7 +97,7 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH2 } },          // Match 1 is the WorldManager pointer
-              { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL WorldManager::OnInit
+              { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL WorldManager::OnInit
               { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
@@ -104,14 +106,15 @@ DisasmTrace CApp_OnExecute_worldgen_trace = {
               { I_MOV,                               // MOV [*+off], EAX
                 .argf   = { ARG_IGNORE, ARG_REG },   // this is the offset of capp->gui
                 .args   = { { 0 }, { REG_EAX } },
-                .argout = { DT_OUT_SYM5 } },
+                .argout = { DT_OUT_SYM6 } },
              { DT_OP(SKIP), .imin = 3, .imax = 7 },
              { I_MOV, .argf = { ARG_IGNORE, ARG_MATCH }, .argstr = { 0, "Running Game!\n" } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(ftl_log),               // DT_OUT_SYM1
               &SYM(operator_new),          // DT_OUT_SYM2
               &SYM(WorldManager_ctor),     // DT_OUT_SYM3
-              &SYM(WorldManager_OnInit),   // DT_OUT_SYM4
+              &SYM(CApp_world_offset),     // DT_OUT_SYM4
+              &SYM(WorldManager_OnInit),   // DT_OUT_SYM5
               &SYM(CApp_gui_offset) }
 };
 
