@@ -38,7 +38,7 @@ bool numericHullCheckText(TextLibrary* tlib, basic_string* text, basic_string* o
 {
     if (gs.overrideHullText && text && !strcmp(text->buf, "status_hull")) {
         basic_string hulltext;
-        basic_string_set(&hulltext, "");
+        basic_string_reset(&hulltext);
         GetText(text, &hulltext);
 
         if (hulltext.len > 0 && hulltext.len < 27) {

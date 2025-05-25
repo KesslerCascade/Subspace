@@ -4,12 +4,16 @@
 
 #include "feature/feature.h"
 #include "feature/timewarp.h"
+#include "ftl/capp.h"
 #include "ftl/globals.h"
 #include "ftl/graphics/colors.h"
 #include "ftl/graphics/csurface.h"
 #include "ftl/graphics/freetype.h"
 #include "ftl/misc.h"
+#include "ftl/starmap.h"
 #include "ftl/struct.h"
+#include "ftl/textlibrary.h"
+#include "ftl/worldmanager.h"
 #include "patch/patchlist.h"
 #include "infoblock.h"
 
@@ -27,7 +31,7 @@ void infoBlockRender(void)
 
     CSurface_GL_SetColor(COLOR_WHITE);
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
         if (settings->ssver == i) {
 #ifdef _DEBUG
             snprintf(buf, sizeof(buf), "Subspace %s (DEBUG BUILD)", subspace_version_str);
@@ -66,6 +70,24 @@ void infoBlockRender(void)
             y  = sz.y;
             basic_string_destroy(&tmp);
         }
+
+        if (settings->sector == i) {
+            WorldManager* world = CApp_world(theApp);
+            int secnum          = WorldManager_worldLevel(world) + 1;
+            TextString* secname =
+                Sector_description_shortName(StarMap_currentSector(WorldManager_starMap(world)));
+
+            basic_string_reset(&tmp);
+            GetText(&secname->data, &tmp);
+
+            snprintf(buf, sizeof(buf), "%d - %s", secnum, tmp.buf);
+            basic_string_destroy(&tmp);
+
+            basic_string_set(&tmp, buf);
+            sz = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
+            y  = sz.y;
+            basic_string_destroy(&tmp);
+        }
     }
 }
 
@@ -81,6 +103,7 @@ FeatureSettingsSpec InfoBlock_spec = {
     .ent  = { { .name = "ssver", .type = CF_INT, .off = offsetof(InfoBlockSettings, ssver) },
              { .name = "ftlver", .type = CF_INT, .off = offsetof(InfoBlockSettings, ftlver) },
              { .name = "fps", .type = CF_INT, .off = offsetof(InfoBlockSettings, fps) },
+             { .name = "sector", .type = CF_INT, .off = offsetof(InfoBlockSettings, sector) },
              { 0 } },
 };
 
@@ -93,5 +116,10 @@ SubspaceFeature InfoBlock_feature = {
                         &SYM(version_major),
                         &SYM(version_minor),
                         &SYM(version_rev),
+                        &SYM(CApp_world_offset),
+                        &SYM(WorldManager_starMap_offset),
+                        &SYM(WorldManager_starMap_worldLevel_offset),
+                        &SYM(Sector_description_shortName_offset),
+                        &SYM(StarMap_currentSector_offset),
                         0 }
 };

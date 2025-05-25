@@ -1,6 +1,13 @@
 #include "struct.h"
 #include "ftl/stdlib.h"
 
+void basic_string_reset(basic_string* str)
+{
+    str->stackbuf[0] = 0;
+    str->buf         = str->stackbuf;
+    str->len         = 0;
+}
+
 void basic_string_set(basic_string* str, const char* src)
 {
     int len = strlen(src);

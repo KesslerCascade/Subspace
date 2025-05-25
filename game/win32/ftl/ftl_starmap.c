@@ -93,3 +93,55 @@ Symbol SYM(Sector_description_type_offset) = {
     SYMNAME("Sector->description.type"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Disasm_GenerateMap_Rock_Home_trace }, { 0 } }
 };
+
+// this one is kind of annoying to find, easiest way is to just check every call to
+// measurePrintLines for the right parameters
+DisasmTrace StarMap_RenderSectorName_trace = {
+    .c    = DTRACE_CALLS,
+    .csym = &SYM(freetype_easy_measurePrintLines),
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { DT_OP(NOOP), .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 10, .imax = 18 },
+             { I_CMP,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 1 }, { .addr = 0 } },
+                .argcap = { DT_CAPTURE1 } },   // if (sector->desc.shortName.isLiteral == false)
+              { DT_OP(SKIP), .imin = 1, .imax = 9, .flow = DT_FLOW_JMP_BOTH },
+             { I_LEA,
+                .argf   = { 0, ARG_REG },
+                .argcap = { 0, DT_MATCH1 },
+                .argout = { 0, DT_OUT_SYM2 } },   // &(sector->description).shortName
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_CALL },
+             { DT_OP(SKIP),
+                .imin = 200,
+                .imax = 500 },   // check the original measurePrintLines CALL
+              { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x00002710 } } },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x40400000 } } },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x40A00000 } } },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x00000007 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_CALL, .argf = { ARG_PTR }, .argsym = { &SYM(freetype_easy_measurePrintLines) } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(StarMap_RenderSectorName), &SYM(Sector_description_shortName_offset) }
+};
+
+Symbol SYM(StarMap_RenderSectorName) = {
+    SYMNAME("StarMap::RenderSectorName"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_RenderSectorName_trace },
+             { .type = SYMBOL_FIND_EXPORT, "_ZN7StarMap16RenderSectorNameEP6Sector8GL_Color" },
+             { 0 } }
+};
+
+Symbol SYM(Sector_description_shortName_offset) = {
+    SYMNAME("Sector->description.shortName"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_RenderSectorName_trace }, { 0 } }
+};

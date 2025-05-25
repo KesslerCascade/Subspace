@@ -11,8 +11,8 @@
 // ==================== Auto-generated section ends ======================
 #include "infoblock.h"
 
-static strref infoitems[]     = { _S"ssver", _S"ftlver", _S"fps" };
-static const int numinfoitems = 3;
+static strref infoitems[]     = { _S"ssver", _S"ftlver", _S"fps", _S"sector" };
+static const int numinfoitems = 4;
 
 _objfactory_guaranteed InfoBlockPage* InfoBlockPage_create(InfoBlock* feature, SubspaceUI* ui)
 {

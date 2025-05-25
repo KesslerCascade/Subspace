@@ -93,6 +93,7 @@
     "infoblock_ssver": "Subspace Version",
     "infoblock_ftlver": "FTL Version",
     "infoblock_fps": "Frames Per Second",
+    "infoblock_sector": "Current Sector",
     "frameadv_advance": "Frame Advance",
     "frameadv_advance_tip": "Steps time forward by a single frame, pausing the game if necessary.",
     "timewarp_increase": "Increase Warp Factor",

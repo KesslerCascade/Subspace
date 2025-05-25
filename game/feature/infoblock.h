@@ -7,6 +7,7 @@ typedef struct InfoBlockSettings {
     int ssver;
     int ftlver;
     int fps;
+    int sector;
 } InfoBlockSettings;
 
 void infoBlockRender(void);

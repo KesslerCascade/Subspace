@@ -25,6 +25,8 @@ typedef struct basic_string {
     unsigned long len;
     char stackbuf[15];
 } basic_string;
+
+void basic_string_reset(basic_string* str);
 void basic_string_set(basic_string* str, const char* src);
 void basic_string_destroy(basic_string* str);
 

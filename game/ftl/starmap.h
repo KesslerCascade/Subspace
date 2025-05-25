@@ -14,6 +14,9 @@ extern DisasmTrace StarMap_OnRender_sector_title_trace;
 typedef void (*FUNCTYPE(StarMap_StartSecretSector))(StarMap* self);
 DECLFUNC(StarMap_StartSecretSector);
 
+typedef void (*FUNCTYPE(StarMap_RenderSectorName))(StarMap* self, Sector* sector, GL_Color color);
+DECLFUNC(StarMap_RenderSectorName);
+
 DECLSYM(StarMap_bSecretSector_offset);
 DECLSYM(StarMap_currentSector_offset);
 DECLSYM(StarMap_secretSector_offset);
@@ -23,3 +26,7 @@ DECLSYM(StarMap_secretSector_offset);
 DECLSYM(Sector_description_type_offset);
 #define Sector_description_type(sector) \
     (&MEMBER(ftlbase, Sector, sector, basic_string, description_type))
+
+DECLSYM(Sector_description_shortName_offset);
+#define Sector_description_shortName(sector) \
+    (&MEMBER(ftlbase, Sector, sector, TextString, description_shortName))

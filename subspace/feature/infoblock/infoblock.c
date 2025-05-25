@@ -35,6 +35,8 @@ void InfoBlock_applyDefaultSettings(_In_ InfoBlock* self)
             ssdSet(self->settings, _S"ftlver", false, stvar(int32, 1));
         if (!ssdPtr(self->settings, _S"fps"))
             ssdSet(self->settings, _S"fps", false, stvar(int32, 2));
+        if (!ssdPtr(self->settings, _S"sector"))
+            ssdSet(self->settings, _S"sector", false, stvar(int32, -1));
     }
 }
 
