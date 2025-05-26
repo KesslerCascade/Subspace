@@ -138,7 +138,12 @@ void cleanupAnalysis()
             hashtbl_destroy(&mi->funccallhash);
             addrListDestroy(mi->funclist);
             sfree(mi);
+#ifdef _DEBUG
+            modulehash.ents[i].data = (void*)0xdeadc0de;   // crash if something tries to use the
+                                                           // module info after this point
+#else
             modulehash.ents[i].data = NULL;
+#endif
         }
     }
     lock_rel(&modulehash_lock);

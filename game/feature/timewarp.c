@@ -378,6 +378,7 @@ SubspaceFeature TimeWarp_feature = {
                         &SYM(CFPS_SpeedFactor_offset),
                         &SYM(TargetFrameTimeMS),
                         &SYM(CSurface_GL_SetColor),
+                        &SYM(freetype_easy_print),
                         &SYM(freetype_easy_printCenter),
                         &SYM(freetype_easy_measurePrintLines),
                         &SYM(CommandGui_IsPaused),
