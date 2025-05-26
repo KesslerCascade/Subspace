@@ -55,7 +55,7 @@
     "ftl_waitingforrun": "Waiting for run to begin",
     "ftl_newgame": "To start a run, begin a new game or continue a saved game in FTL.",
     "ftl_gopractice": "Alternatively, if the practice mode feature is enabled, you can load a practice save through the menu.",
-    "panel_notableevent": "Notable Events",
+    "panel_runsummary": "Run Summmary",
     "panel_scrapgraph": "Scrap per Sector",
     "panel_sectordetail": "Sector Detail",
     "settings_features": "Features",

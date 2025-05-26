@@ -6,20 +6,20 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "notableeventpanel.h"
+#include "runsummarypanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/subspaceui.h"
 
-_objfactory_guaranteed NotableEventPanel* NotableEventPanel_create(SubspaceUI* ui)
+_objfactory_guaranteed RunSummaryPanel* RunSummaryPanel_create(SubspaceUI* ui)
 {
-    NotableEventPanel* self;
-    self = objInstCreate(NotableEventPanel);
+    RunSummaryPanel* self;
+    self = objInstCreate(RunSummaryPanel);
 
     self->ss = ui->ss;
     self->ui = ui;
-    strDup(&self->title, langGet(self->ss, _S"panel_notableevent"));
-    self->name = _S"notableevent";
+    strDup(&self->title, langGet(self->ss, _S"panel_runsummary"));
+    self->name = _S"runsummary";
 
     objInstInit(self);
     return self;
@@ -27,7 +27,7 @@ _objfactory_guaranteed NotableEventPanel* NotableEventPanel_create(SubspaceUI* u
 
 extern bool Panel_make(_In_ Panel* self);   // parent
 #define parent_make() Panel_make((Panel*)(self))
-bool NotableEventPanel_make(_In_ NotableEventPanel* self)
+bool RunSummaryPanel_make(_In_ RunSummaryPanel* self)
 {
     self->h = IupBackgroundBox(IupVbox(IupHbox(IupFill(), NULL), IupFill(), NULL));
     IupSetAttribute(self->h, "BGCOLOR", panelbg);
@@ -36,5 +36,5 @@ bool NotableEventPanel_make(_In_ NotableEventPanel* self)
 }
 
 // Autogen begins -----
-#include "notableeventpanel.auto.inc"
+#include "runsummarypanel.auto.inc"
 // Autogen ends -------

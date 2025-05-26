@@ -240,6 +240,10 @@ static void loadLayoutNode(MainWin* self, SSDNode* node, Ihandle** out,
 
             foreach (sarray, idx, string, tabname, tabnames) {
                 Panel* panel;
+                // shim for compat with alpha versions
+                if (strEq(tabname, _S"notableevent"))
+                    tabname = _S"runsummary";
+
                 if (htFind(self->panels, string, tabname, object, &panel)) {
                     IupAppend(*out, panel->h);
                     objRelease(&panel);
@@ -293,21 +297,15 @@ void MainWin_loadLayout(_In_ MainWin* self)
     }
     IupAppend(left, tab);
 
-    Ihandle* right = mainwinCreateSplit(self, false);
-    IupSetAttribute(right, "VALUE", "750");
-
-    if (htFind(self->panels, string, _S"notableevent", object, &panel)) {
+    if (htFind(self->panels, string, _S"runsummary", object, &panel)) {
         tab = mainwinCreateTabs(self);
         IupAppend(tab, panel->h);
         objRelease(&panel);
     } else {
         tab = mainwinCreatePlaceholder(self);
     }
-    IupAppend(right, tab);
-    IupAppend(right, mainwinCreatePlaceholder(self));
-
     IupAppend(self->root, left);
-    IupAppend(self->root, right);
+    IupAppend(self->root, tab);
     IupSetAttribute(self->root, "VALUE", "633");
 }
 
