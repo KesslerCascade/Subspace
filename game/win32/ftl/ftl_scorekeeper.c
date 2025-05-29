@@ -2,7 +2,15 @@
 #include "ftl/globals.h"
 #include "ftl/scorekeeper.h"
 #include "ftl/tutorialmanager.h"
+#include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
+
+Symbol SYM(ScoreKeeper_Keeper) = {
+    SYMNAME("ScoreKeeper::Keeper"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_Restart_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ScoreKeeper6KeeperE" },
+             { 0 } }
+};
 
 DisasmTrace ScoreKeeper_Save_trace = {
     .c    = DTRACE_STRREFS,
@@ -19,7 +27,7 @@ DisasmTrace ScoreKeeper_Save_trace = {
              }, { DT_OP(SKIP), .imin = 1, .imax = 5 },
              {
                  I_CALL,
-                  .argout = { 0, DT_OUT_SYM3 }   // TutorialManager::Running
+                  .argout = { DT_OUT_SYM3 }   // TutorialManager::Running
              }, { DT_OP(SKIP), .imin = 1, .imax = 5 },
              {
                  I_MOV,
@@ -54,3 +62,40 @@ FuncInfo FUNCINFO(ScoreKeeper_Save) = {
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } }
 };
+
+INITWRAP(ScoreKeeper_SetVictory);
+Symbol SYM(ScoreKeeper_SetVictory) = {
+    SYMNAME("ScoreKeeper::SetVictory"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_Restart_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ScoreKeeper10SetVictoryEb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ScoreKeeper_SetVictory) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } }
+};
+
+INITWRAP(ScoreKeeper_SetSector);
+Symbol SYM(ScoreKeeper_SetSector) = {
+    SYMNAME("ScoreKeeper::SetSector"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_Restart_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ScoreKeeper9SetSectorEi" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ScoreKeeper_SetSector) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } }
+};
+
+INITWRAP(ScoreKeeper_Reset);
+Symbol SYM(ScoreKeeper_Reset) = {
+    SYMNAME("ScoreKeeper:Reset"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CreateNewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ScoreKeeper5ResetEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ScoreKeeper_Reset) = { .nargs   = 1,
+                                         .stdcall = true,
+                                         .args    = { { 4, ARG_PTR, REG_ECX, false } } };

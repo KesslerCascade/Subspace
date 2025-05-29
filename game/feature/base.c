@@ -1,4 +1,5 @@
 #include "ftl/blueprintmanager.h"
+#include "ftl/starmap.h"
 #include "patch/patchlist.h"
 #include "feature.h"
 
@@ -14,5 +15,6 @@ SubspaceFeature Base_feature = {
     .requiredPatches = Base_patches,
     .requiredSymbols = { &SYM(ShipBlueprint_blueprintName_offset),
                         &SYM(ShipBlueprint_name_offset),
+                        &SYM(StarMap_sectorMapSeed_offset),
                         0 }
 };

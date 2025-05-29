@@ -13,3 +13,6 @@ DECLSYM(AchievementTracker_Tracker);
 
 typedef void (*FUNCTYPE(AchievementTracker_OnLoop))(AchievementTracker* self);
 DECLFUNC(AchievementTracker_OnLoop);
+
+typedef void (*FUNCTYPE(AchievementTracker_ResetFlags))(AchievementTracker* self);
+DECLFUNC(AchievementTracker_ResetFlags);

@@ -2,6 +2,7 @@
 #include "ftl/graphics/freetype.h"
 #include "ftl/misc.h"
 #include "ftl/starmap.h"
+#include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
 DisasmTrace StarMap_OnRender_sector_title_trace = {
@@ -144,4 +145,73 @@ Symbol SYM(StarMap_RenderSectorName) = {
 Symbol SYM(Sector_description_shortName_offset) = {
     SYMNAME("Sector->description.shortName"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_RenderSectorName_trace }, { 0 } }
+};
+
+Symbol SYM(StarMap_NewGame) = {
+    SYMNAME("StarMap::NewGame"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CreateNewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap7NewGameEb" },
+             { 0 } }
+};
+FuncInfo FUNC(StarMap_NewGame) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_VOID
+};
+
+DisasmTrace StarMap_NewGame_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(StarMap_NewGame),
+    .ops  = { { DT_OP(SKIP), .imin = 6, .imax = 14 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // this pointer
+              { DT_OP(SKIP), .imin = 20, .imax = 34 },
+             { I_CMP, .argf = { ARG_ADDR }, .argsym = { &SYM(RNG_useSysRand) } },
+             { DT_OP(LABEL), .val = 1 },   // remember current position because we need to trace
+              { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { DT_OP(CALL) },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_IMUL,
+                .argf  = { 0, 0, ARG_ADDR },
+                .args  = { { 0 }, { 0 }, { .addr = 0x5851f42d } },   // magic LCG
+                .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_IMUL,
+                .argf = { 0, 0, ARG_ADDR },
+                .args = { { 0 }, { 0 }, { .addr = 0x4c957f2d } } },   // numbers
+              { DT_OP(GOTO), .val = 1 },                              // go back into NewGame
+              { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL },                                             // CALL random32()
+              { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_UNCOND },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_REG },
+                .argcap = { DT_MATCH1 },            // this [ +X ]
+                .args   = { { 0 }, { REG_EAX } },   // random32 output
+                .argout = { DT_OUT_SYM2 } },        // sectorMapSeed offset
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(random32),                       // DT_OUT_SYM1
+              &SYM(StarMap_sectorMapSeed_offset),   // DT_OUT_SYM2
+              &SYM(StarMap_GenerateSectorMap) }
+};
+
+Symbol SYM(StarMap_GenerateSectorMap) = {
+    SYMNAME("StarMap::GenerateSectorMap"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_NewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap17GenerateSectorMapEv" },
+             { 0 } }
+};
+FuncInfo FUNC(StarMap_GenerateSectorMap) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+Symbol SYM(StarMap_sectorMapSeed_offset) = {
+    SYMNAME("StarMap->sectorMapSeed"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_NewGame_trace }, { 0 } }
 };

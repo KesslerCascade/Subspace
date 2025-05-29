@@ -1,6 +1,7 @@
 #include "ftl/capp.h"
 #include "ftl/mainmenu.h"
 #include "ftl/misc.h"
+#include "ftl/starmap.h"
 #include "hook/disasmtrace.h"
 
 Symbol SYM(operator_new) = {
@@ -48,3 +49,12 @@ Symbol SYM(version_rev) = {
     SYMNAME("version_rev"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &MainMenu_OnRender_trace }, { 0 } }
 };
+
+INITWRAP(random32);
+Symbol SYM(random32) = {
+    SYMNAME("random32"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_NewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "random32" },
+             { 0 } }
+};
+FuncInfo FUNC(random32) = { .nargs = 0, .purecdecl = true, .rettype = RET_INT };

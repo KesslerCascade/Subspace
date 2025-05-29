@@ -1,7 +1,8 @@
 #include "ftl/misc.h"
 
-#include "ftl/capp.h"
 #include "ftl/achievementtracker.h"
+#include "ftl/capp.h"
+#include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
 Symbol SYM(AchievementTracker_Tracker) = {
@@ -24,3 +25,18 @@ FuncInfo FUNCINFO(AchievementTracker_OnLoop) = { .nargs   = 1,
                                    .stdcall = true,
                                    .args    = { { 4, ARG_PTR, REG_ECX, false } },
                                    .rettype = RET_VOID };
+
+INITWRAP(AchievementTracker_ResetFlags);
+Symbol SYM(AchievementTracker_ResetFlags) = {
+    SYMNAME("AchievementTracker::ResetFlags"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CreateNewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN18AchievementTracker10ResetFlagsEv" },
+             { 0 } }
+};
+DECLFUNC(AchievementTracker_ResetFlags);
+FuncInfo FUNCINFO(AchievementTracker_ResetFlags) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};

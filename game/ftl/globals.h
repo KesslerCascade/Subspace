@@ -24,3 +24,7 @@ DECLSYM(ResourceControl_GlobalResources);
 
 DECLSYM(Settings_difficulty);
 #define g_Settings_difficulty (*(int*)symAddr(ftlbase, Settings_difficulty))
+
+// This will always be set to 0, no need to define a macro to access it.
+// But it's useful to have the address because a lot of FTL code references it.
+DECLSYM(RNG_useSysRand);

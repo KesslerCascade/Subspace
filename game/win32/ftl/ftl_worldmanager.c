@@ -1,9 +1,13 @@
+#include "ftl/achievementtracker.h"
 #include "ftl/capp.h"
 #include "ftl/commandgui.h"
 #include "ftl/completeship.h"
 #include "ftl/globals.h"
 #include "ftl/misc.h"
+#include "ftl/scorekeeper.h"
 #include "ftl/shipmanager.h"
+#include "ftl/starmap.h"
+#include "ftl/tutorialmanager.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -166,4 +170,144 @@ Symbol SYM(WorldManager_starMap_offset) = {
 Symbol SYM(WorldManager_starMap_worldLevel_offset) = {
     SYMNAME("WorldManager->starMap.worldLevel"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CreateShip_trace }, { 0 } }
+};
+
+INITWRAP(WorldManager_Restart);
+Symbol SYM(WorldManager_Restart) = {
+    SYMNAME("WorldManager::Restart"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace_s0 },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager7RestartEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_Restart) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+DisasmTrace WorldManager_Restart_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(WorldManager_Restart),
+    .ops  = { { DT_OP(SKIP), .imin = 7, .imax = 16 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ClearLocation(this)
+              { DT_OP(SKIP), .imin = 11, .imax = 18 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_CAPTURE1 },
+                .argout = { 0, DT_OUT_SYM2 } },        // static ScoreKeeper instance
+              { I_MOV, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ESP }, { .addr = 0 } } },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL ScoreKeeper::SetVictory
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH1 } },          // static ScoreKeeper instance
+              { I_MOV, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ESP }, { .addr = 1 } } },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL ScoreKeeper::SetSector
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .args = { ARG_ADDR }, .argsym = { &SYM(CommandGui_Restart) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL CreateNewGame(this)
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(WorldManager_ClearLocation),        // DT_OYT_SYM1
+              &SYM(ScoreKeeper_Keeper),                // DT_OUT_SYM2
+              &SYM(ScoreKeeper_SetVictory),            // DT_OUT_SYM3
+              &SYM(ScoreKeeper_SetSector),             // DT_OUT_SYM4
+              &SYM(WorldManager_CreateNewGame) }
+};
+
+INITWRAP(WorldManager_CreateNewGame);
+Symbol SYM(WorldManager_CreateNewGame) = {
+    SYMNAME("WorldManager::CreateNewGame"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_Restart_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager13CreateNewGameEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_CreateNewGame) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+DisasmTrace WorldManager_CreateNewGame_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(WorldManager_CreateNewGame),
+    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 12 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // saved this pointer
+              { DT_OP(SKIP), .imin = 32, .imax = 53 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ScoreKeeper_Keeper) } },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ScoreKeeper::Reset
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(AchievementTracker_Tracker) } },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL AchievementTracker::Tracker
+              { DT_OP(SKIP), .imin = 14, .imax = 24 },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE, ARG_MATCH },
+                .args   = { { .ptrsize = 1 }, { .base = REG_UNDEF, .idx = REG_UNDEF, .addr = 0 } },
+                .argout = { DT_OUT_SYM3 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 8 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(TutorialManager_Running) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_LEA,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(WorldManager_starMap_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL StarMap::NewGame
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH1 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argout = { DT_OUT_SYM5 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ScoreKeeper_Reset),               // DT_OUT_SYM1
+              &SYM(AchievementTracker_ResetFlags),   // DT_OUT_SYM2
+              &SYM(RNG_useSysRand),                  // DT_OUT_SYM3
+              &SYM(StarMap_NewGame),                 // DT_OUT_SYM4
+              &SYM(WorldManager_CreateLocation) }
+};
+
+INITWRAP(WorldManager_ClearLocation);
+Symbol SYM(WorldManager_ClearLocation) = {
+    SYMNAME("WorldManager::ClearLocation"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_Restart_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager13ClearLocationEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_ClearLocation) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+INITWRAP(WorldManager_CreateLocation);
+Symbol SYM(WorldManager_CreateLocation) = {
+    SYMNAME("WorldManager::CreateLocation"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CreateNewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN12WorldManager14CreateLocationEP8Location" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_CreateLocation) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } },
+    .rettype = RET_VOID
 };

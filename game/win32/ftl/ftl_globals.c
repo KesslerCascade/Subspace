@@ -2,6 +2,7 @@
 #include "ftl/cfps.h"
 #include "ftl/globals.h"
 #include "ftl/scorekeeper.h"
+#include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
 // Move to Settings module if we ever hook it
@@ -89,4 +90,11 @@ Symbol SYM(ResourceControl_GlobalResources) = {
 Symbol SYM(Settings_difficulty) = {
     SYMNAME("Settings::difficulty"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ScoreKeeper_Save_trace }, { 0 } }
+};
+
+Symbol SYM(RNG_useSysRand) = {
+    SYMNAME("RNG::useSysRand"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CreateNewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7Globals3RNGE" },
+             { 0 } }
 };

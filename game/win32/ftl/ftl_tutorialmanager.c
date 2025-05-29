@@ -1,3 +1,4 @@
+#include "ftl/capp.h"
 #include "ftl/misc.h"
 #include "ftl/scorekeeper.h"
 #include "ftl/tutorialmanager.h"
@@ -21,3 +22,14 @@ Symbol SYM(TutorialManager_Running) = {
 FuncInfo FUNCINFO(TutorialManager_Running) = { .nargs   = 1,
                                          .stdcall = true,
                                          .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+INITWRAP(TutorialManager_Stop);
+Symbol SYM(TutorialManager_Stop) = {
+    SYMNAME("TutorialManager::Stop"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace_s0 },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN15TutorialManager4StopEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(TutorialManager_Stop) = { .nargs   = 1,
+                                            .stdcall = true,
+                                            .args    = { { 4, ARG_PTR, REG_ECX, false } } };

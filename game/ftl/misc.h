@@ -9,6 +9,9 @@ DECLSYM(operator_delete);
 
 DECLSYM(basicstring_from_int);
 
+typedef int32_t (*FUNCTYPE(random32))();
+DECLFUNC(random32);
+
 // These aren't really addresses, but we use the symbol framework to extract them from the
 // disassembly.
 DECLSYM(version_major);

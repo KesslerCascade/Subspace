@@ -9,6 +9,7 @@
 #include "ftl/misc.h"
 #include "ftl/mousecontrol.h"
 #include "ftl/resourcecontrol.h"
+#include "ftl/scorekeeper.h"
 #include "ftl/startup.h"
 #include "ftl/textlibrary.h"
 #include "ftl/tutorialmanager.h"
@@ -549,23 +550,41 @@ DisasmTrace CApp_OnLoop_trace_s0 = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(wp_CApp_OnLoop_GetCommand_switch),
     .ops  = { { DT_OP(JMPTBL), .val = 0 },   // switch(), case 0
-              { DT_OP(SKIP), .imin = 6, .imax = 14 },
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(ScoreKeeper_Save) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(TutorialManager_Tutorial) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL TutorialManager::Stop
+              { DT_OP(SKIP), .imin = 0, .imax = 1 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CApp_world_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 1 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL WorldManager::Restart
+              { I_CALL, .argout = DT_OUT_SYM3 },       // CALL FileHelper::deleteAllSaveFiles
+              { DT_OP(SKIP), .imin = 0, .imax = 4, .flow = DT_FLOW_JMP_ALL },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX } },
                 .argsym = { 0, &SYM(CApp_gui_offset) } },
-             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CommandGui_IsGameOver
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CommandGui_IsGameOver
               { DT_OP(SKIP), .imin = 2, .imax = 7 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX } },
                 .argsym = { 0, &SYM(CApp_gui_offset) } },
-             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CommandGui_Restart
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CommandGui_Restart
               { DT_OP(FINISH) } },
-    .out  = { &SYM(CommandGui_IsGameOver),             // DT_OUT_SYM1
-              &SYM(CommandGui_Restart)
-
-    }
+    .out  = { &SYM(TutorialManager_Stop),              // DY_OUT_SYM1
+              &SYM(WorldManager_Restart),              // DT_OUT_SYM2
+              &SYM(FileHelper_deleteAllSaveFiles),     // DT_OUT_SYM3
+              &SYM(CommandGui_IsGameOver),             // DT_OUT_SYM4
+              &SYM(CommandGui_Restart) }
 };
 
 DisasmTrace CApp_OnLoop_trace_s1 = {

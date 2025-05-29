@@ -47,3 +47,14 @@ Symbol SYM(FileHelper_closeBinaryFile) = {
 FuncInfo FUNCINFO(FileHelper_closeBinaryFile) = { .nargs     = 1,
                                                   .purecdecl = true,
                                                   .args      = { { 4, ARG_INT, 0, true } } };
+
+INITWRAP(FileHelper_deleteAllSaveFiles);
+Symbol SYM(FileHelper_deleteAllSaveFiles) = {
+    SYMNAME("FileHelper::deleteAllSaveFiles"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace_s0 },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10FileHelper18deleteAllSaveFilesEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(FileHelper_deleteAllSaveFiles) = { .nargs     = 0,
+                                                     .purecdecl = true,
+                                                     .rettype   = RET_VOID };

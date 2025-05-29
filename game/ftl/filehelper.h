@@ -18,3 +18,6 @@ DECLFUNC(FileHelper_getSaveFile);
 
 typedef void (*FUNCTYPE(FileHelper_closeBinaryFile))(int fd);
 DECLFUNC(FileHelper_closeBinaryFile);
+
+typedef void (*FUNCTYPE(FileHelper_deleteAllSaveFiles))();
+DECLFUNC(FileHelper_deleteAllSaveFiles);
