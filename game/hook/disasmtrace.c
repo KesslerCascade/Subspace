@@ -1,3 +1,7 @@
+#if defined(_DEBUG) && defined(WIN32)
+#include <windows.h>
+#endif
+
 #include "disasmtrace.h"
 
 #include "hook/module.h"
@@ -20,6 +24,14 @@ typedef struct DisasmTraceState {
     addr_t outaddr[16];   // potential outputs
     addr_t labels[16];
 } DisasmTraceState;
+
+#if defined(_DEBUG) && defined(WIN32)
+#include <debugapi.h>
+// Uncomment and set _debug_trace ot trigger a breakpoint when a specific trace is about to be run
+// extern DisasmTrace StarMap_NewGame_trace;
+// static DisasmTrace* _debug_trace = &StarMap_NewGame_trace;
+static DisasmTrace* _debug_trace = NULL;
+#endif
 
 // Pushes the entire trace state to an unwind stack. This is so we can backtrack there upon failing
 // to find a match and see if we should have skipped more instructions
@@ -79,6 +91,12 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
     dts.p     = start;
     bool fail = false;
     unwind    = smalloc(sizeof(DisasmTraceState) * MAX_UNWIND);
+
+#if defined(_DEBUG) && defined(WIN32)
+    if (trace == _debug_trace && IsDebuggerPresent()) {
+        __debugbreak();
+    }
+#endif
 
     while (dts.p >= code.start && dts.p < code.end && dts.op->op != DT_FINISH) {
         bool skip = false;
