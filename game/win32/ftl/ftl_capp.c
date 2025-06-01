@@ -509,16 +509,16 @@ DisasmTrace CApp_OnLoop_trace = {
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL AchievementTracker::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
-             { I_CMP,                                 // (this->menu).bOpen
+             { DT_OP(LABEL), .val = 1 },              // we want to trace both outcomes
+              { I_CMP,                                 // (this->menu).bOpen
                 .argf = { ARG_PTRSIZE, ARG_ADDR },
                 .args = { { .ptrsize = 1 }, { .addr = 0 } } },
-             { DT_OP(LABEL), .val = 1 },   // we want to trace both outcomes
-              { DT_OP(SKIP), .imin = 0, .imax = 2, .flow = DT_FLOW_JMP_BOTH },   // branch reordering
+             { DT_OP(SKIP), .imin = 0, .imax = 2, .flow = DT_FLOW_JMP_BOTH },   // branch reordering
               { I_LEA, .outip = DT_OUT_SYM6 },   // menu handler waypoint
               { DT_OP(GOTO), .val = 1 },         // back to branch point
               { DT_OP(SKIP),
-                .imin = 1,
-                .imax = 6,
+                .imin = 2,
+                .imax = 7,
                 .flow = DT_FLOW_JMP_BOTH },   // JE/JNE branch ordering in different versions
               { I_CALL,
                 .argf   = { ARG_MATCH },

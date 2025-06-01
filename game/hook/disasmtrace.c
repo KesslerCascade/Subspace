@@ -19,6 +19,7 @@ typedef struct DisasmTraceState {
     int skipmin;
     int skipmax;
     int flow;
+    int curlabel;
     t_arg cap[16];        // captured arguments
     bool outset[16];      // is outaddr set for this slot (it may still be zero value)
     addr_t outaddr[16];   // potential outputs
@@ -114,9 +115,9 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
             ++dts.op;
             continue;
         } else if (dts.op->op == DT_LABEL) {
-            // just mark the current address as a label
+            // set this as current label; it will actually be saved when there's a match
             if (dts.op->val > 0 && dts.op->val <= 16)
-                dts.labels[dts.op->val - 1] = dts.p;
+                dts.curlabel = dts.op->val;
             ++dts.op;
             continue;
         } else if (dts.op->op == DT_GOTO) {
@@ -195,6 +196,11 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                 }
 
                 if (match) {
+                    pushUnwind(&dts,
+                               unwind,
+                               &nunwind,
+                               isize);   // save state in case it doesn't work out later
+
                     for (int i = 0; i < 3; i++) {
                         // capture any args from this match
                         if (dts.op->argcap[i] & DT_CAPTURE)
@@ -206,10 +212,12 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                         }
                     }
 
-                    pushUnwind(&dts,
-                               unwind,
-                               &nunwind,
-                               isize);   // save state in case it doesn't work out later
+                    // save label if set
+                    if (dts.curlabel) {
+                        dts.labels[dts.curlabel - 1] = dts.p;
+                        dts.curlabel                 = 0;
+                    }
+
                     dts.skipmax = 0;     // stop any skip in progress
                     ++dts.op;
                 } else if (dts.skipmax == 0) {
@@ -241,6 +249,12 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     // save unwind state before branching
                     pushUnwind(&dts, unwind, &nunwind, isize);
 
+                    // save label if set
+                    if (dts.curlabel) {
+                        dts.labels[dts.curlabel - 1] = dts.p;
+                        dts.curlabel                 = 0;
+                    }
+
                     // follow the first argument, which we've verified is a destination within
                     // the same module
                     dts.p       = disasm.arg[0].addr;
@@ -262,6 +276,12 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     *(uint32_t*)destptr >= code.start && *(uint32_t*)destptr < code.end) {
                     // save unwind state before branching
                     pushUnwind(&dts, unwind, &nunwind, isize);
+
+                    // save label if set
+                    if (dts.curlabel) {
+                        dts.labels[dts.curlabel - 1] = dts.p;
+                        dts.curlabel                 = 0;
+                    }
 
                     // follow the first argument, which we've verified is a destination within
                     // the same module

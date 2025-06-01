@@ -170,32 +170,38 @@ DisasmTrace StarMap_NewGame_trace = {
                 .argcap = { DT_CAPTURE1 } },   // this pointer
               { DT_OP(SKIP), .imin = 20, .imax = 34 },
              { I_CMP, .argf = { ARG_ADDR }, .argsym = { &SYM(RNG_useSysRand) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
              { DT_OP(LABEL), .val = 1 },   // remember current position because we need to trace
-              { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
-             { DT_OP(CALL) },
+              { DT_OP(CALL) },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_IMUL,
-                .argf  = { 0, 0, ARG_ADDR },
-                .args  = { { 0 }, { 0 }, { .addr = 0x5851f42d } },   // magic LCG
-                .outip = DT_OUT_SYM1 },
-             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+                .argf = { 0, 0, ARG_ADDR },
+                .args = { { 0 }, { 0 }, { .addr = 0x5851f42d } } },   // magic LCG
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
              { I_IMUL,
                 .argf = { 0, 0, ARG_ADDR },
                 .args = { { 0 }, { 0 }, { .addr = 0x4c957f2d } } },   // numbers
               { DT_OP(GOTO), .val = 1 },                              // go back into NewGame
-              { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
-             { I_CALL },                                             // CALL random32()
+              { I_CALL, .argout = { DT_OUT_SYM1 } },                  // CALL random32()
               { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_UNCOND },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_REG },
                 .argcap = { DT_MATCH1 },            // this [ +X ]
                 .args   = { { 0 }, { REG_EAX } },   // random32 output
                 .argout = { DT_OUT_SYM2 } },        // sectorMapSeed offset
-              { DT_OP(SKIP), .imin = 0, .imax = 5 },
-             { DT_OP(FINISH) } },
-    .out  = { &SYM(random32),                       // DT_OUT_SYM1
-              &SYM(StarMap_sectorMapSeed_offset),   // DT_OUT_SYM2
-              &SYM(StarMap_GenerateSectorMap) }
+              { DT_OP(SKIP), .imin = 3, .imax = 8 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH1 } },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL GenerateSectorMap
+              { DT_OP(SKIP), .imin = 4, .imax = 10 },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL GenerateMap
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(random32),                          // DT_OUT_SYM1
+              &SYM(StarMap_sectorMapSeed_offset),      // DT_OUT_SYM2
+              &SYM(StarMap_GenerateSectorMap),         // DT_OUT_SYM3
+              &SYM(StarMap_GenerateMap) }
 };
 
 Symbol SYM(StarMap_GenerateSectorMap) = {
