@@ -217,7 +217,53 @@ FuncInfo FUNC(StarMap_GenerateSectorMap) = {
     .rettype = RET_VOID
 };
 
+Symbol SYM(StarMap_GenerateMap) = {
+    SYMNAME("StarMap::GenerateMap"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_NewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap11GenerateMapEbb" },
+             { 0 } }
+};
+FuncInfo FUNC(StarMap_GenerateMap) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_PTR
+};
+
 Symbol SYM(StarMap_sectorMapSeed_offset) = {
     SYMNAME("StarMap->sectorMapSeed"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_NewGame_trace }, { 0 } }
+};
+
+DisasmTrace StarMap_GenerateMap_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(StarMap_GenerateMap),
+    .ops  = { { DT_OP(SKIP), .imin = 8, .imax = 16 },
+             { I_CMP,
+                .argf = { ARG_PTRSIZE, ARG_ADDR },
+                .args = { { .ptrsize = 1 }, { .addr = 0 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { DT_OP(LABEL), .val = 1 },
+             { I_JZ },
+             { I_MOV,
+                .argf   = { ARG_IGNORE, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { 0, DT_CAPTURE1 },   // seed = this->currentSectorSeed
+                .argout = { 0, DT_OUT_SYM1 } },
+             { DT_OP(GOTO), .val = 1 },        // go back to JZ
+              { DT_OP(JMP) },                   // follow JZ
+              { DT_OP(SKIP), .imin = 1, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(random32) } },
+             { DT_OP(SKIP), .imin = 1, .imax = 4, .flow = DT_FLOW_JMP_UNCOND },
+             { I_MOV,
+                .argf   = { ARG_ADDR, ARG_REG },   // this->currentSectorSeed = seed
+                .argcap = { DT_MATCH1 },
+                .args   = { { 0 }, { REG_EAX } } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(StarMap_currentSectorSeed_offset) }
+};
+
+Symbol SYM(StarMap_currentSectorSeed_offset) = {
+    SYMNAME("StarMap->currentSectorSeed"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_GenerateMap_trace }, { 0 } }
 };

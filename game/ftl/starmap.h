@@ -25,13 +25,19 @@ DECLFUNC(StarMap_NewGame);
 typedef void (*FUNCTYPE(StarMap_GenerateSectorMap))(StarMap* self);
 DECLFUNC(StarMap_GenerateSectorMap);
 
+typedef Location* (*FUNCTYPE(StarMap_GenerateMap))(StarMap* self, bool bTutorial, bool useOldSeed);
+DECLFUNC(StarMap_GenerateMap);
+
 DECLSYM(StarMap_bSecretSector_offset);
 DECLSYM(StarMap_currentSector_offset);
 DECLSYM(StarMap_secretSector_offset);
 DECLSYM(StarMap_sectorMapSeed_offset);
+DECLSYM(StarMap_currentSectorSeed_offset);
 
 #define StarMap_currentSector(starmap) *(&MEMBER(ftlbase, StarMap, starmap, Sector*, currentSector))
 #define StarMap_sectorMapSeed(starmap) *(&MEMBER(ftlbase, StarMap, starmap, int, sectorMapSeed))
+#define StarMap_currentSectorSeed(starmap) \
+    *(&MEMBER(ftlbase, StarMap, starmap, int, currentSectorSeed))
 
 DECLSYM(Sector_description_type_offset);
 #define Sector_description_type(sector) \
