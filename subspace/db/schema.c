@@ -12,6 +12,7 @@ static bool dbCreateRuns(sqlite3* db)
                      "seed INTEGER NOT NULL,"
                      "shiptype TEXT NOT NULL,"
                      "shipname TEXT NOT NULL,"
+                     "difficulty INTEGER NOT NULL,"
                      "result INTEGER NOT NULL DEFAULT 0,"
                      "start INTEGER NOT NULL DEFAULT 0,"
                      "end INTEGER NOT NULL DEFAULT 0,"
