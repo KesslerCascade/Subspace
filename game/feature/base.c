@@ -6,8 +6,14 @@
 // ---- Patching ----------------
 
 Patch* Base_patches[] = {
-    &patch_CApp_OnExecute,           &patch_CApp_OnLoop,   &patch_ResourceControl_RenderLoadingBar,
-    &patch_FileHelper_getUserFolder, &patch_MainMenu_Open, 0
+    &patch_CApp_OnExecute,
+    &patch_CApp_OnLoop,
+    &patch_ResourceControl_RenderLoadingBar,
+    &patch_FileHelper_getUserFolder,
+    &patch_MainMenu_Open,
+    &patch_WorldManager_CreateNewGame,
+    &patch_WorldManager_LoadGame,
+    0
 };
 
 SubspaceFeature Base_feature = {

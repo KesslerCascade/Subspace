@@ -6,6 +6,14 @@
 
 typedef struct ScoreKeeper ScoreKeeper;
 
+typedef struct StatTracker {
+    int maximum;
+    int total;
+    int current;
+    basic_string desc_id;
+    int sector;
+} StatTracker;
+
 // FTL functions & wrappers below
 
 extern DisasmTrace ScoreKeeper_Save_trace;
@@ -24,3 +32,6 @@ DECLFUNC(ScoreKeeper_SetSector);
 
 typedef void (*FUNCTYPE(ScoreKeeper_Reset))(ScoreKeeper* self);
 DECLFUNC(ScoreKeeper_Reset);
+
+// we know this is always at offset 0 in all versions
+#define ScoreKeeper_stats(keeper) ((StatTracker*)(keeper))

@@ -529,10 +529,16 @@ DisasmTrace CApp_OnLoop_trace = {
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
               { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL CommandGui::OnLoop
-              { DT_OP(SKIP), .imin = 0, .imax = 6 },
+              { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
+              { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL CommandGui::GetCommand
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CMP },
              { I_JA },
-             { I_JMP, .outip = { DT_OUT_SYM8 } },     // switch() waypoint
+             { I_JMP, .outip = { DT_OUT_SYM9 } },     // switch() waypoint
               { DT_OP(FINISH) } },
     .out  = { &SYM(CFPS_OnLoop),                       // DT_OUT_SYM1
               &SYM(MouseControl_OnLoop),               // DT_OUT_SYM2
@@ -541,6 +547,7 @@ DisasmTrace CApp_OnLoop_trace = {
               &SYM(AchievementTracker_OnLoop),         // DT_OUT_SYM5
               &SYM(wp_CApp_OnLoop_MenuMenu_handler),   // DT_OUT_SYM6
               &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM7
+              &SYM(CommandGui_GetCommand),             // DT_OUT_SYM8
               &SYM(wp_CApp_OnLoop_GetCommand_switch) }
 };
 

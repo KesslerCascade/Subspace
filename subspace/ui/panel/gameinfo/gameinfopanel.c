@@ -139,6 +139,27 @@ static void makeAtmenu(GameInfoPanel* self)
     IupSetAttribute(self->atmenu, "NCMARGIN", "8x8");
 }
 
+static void makeTutorial(GameInfoPanel* self)
+{
+    Ihandle* ttitle = IupFlatLabel(langGetC(self->ss, _S"ftl_tutorial_title"));
+    IupSetAttribute(ttitle, "FONT", "Helvetica, Bold 14");
+    IupSetAttribute(ttitle, "FGCOLOR", "255 255 255");
+    IupSetAttribute(ttitle, "EXPAND", "NO");
+    IupSetAttribute(ttitle, "ALIGNMENT", "ACENTER");
+
+    Ihandle* tlbl = IupFlatLabel(langGetC(self->ss, _S"ftl_tutorial_text"));
+    IupSetAttribute(tlbl, "FONT", "Helvetica, 12");
+    IupSetAttribute(tlbl, "FGCOLOR", "255 255 255");
+    IupSetAttribute(tlbl, "EXPAND", "YES");
+    IupSetAttribute(tlbl, "ALIGNMENT", "ATOP");
+    IupSetAttribute(tlbl, "TEXTWRAP", "YES");
+
+    self->tutorial = IupVbox(ttitle, tlbl, NULL);
+    IupSetAttribute(self->tutorial, "ALIGNMENT", "ACENTER");
+    IupSetAttribute(self->tutorial, "CGAP", "8");
+    IupSetAttribute(self->tutorial, "NCMARGIN", "8x8");
+}
+
 extern bool Panel_make(_In_ Panel* self);   // parent
 #define parent_make() Panel_make((Panel*)(self))
 bool GameInfoPanel_make(_In_ GameInfoPanel* self)
@@ -146,8 +167,9 @@ bool GameInfoPanel_make(_In_ GameInfoPanel* self)
     makeNotRunning(self);
     makeLoading(self);
     makeAtmenu(self);
+    makeTutorial(self);
 
-    self->zbox = IupZbox(self->notrunning, self->loading, self->atmenu, NULL);
+    self->zbox = IupZbox(self->notrunning, self->loading, self->atmenu, self->tutorial, NULL);
     IupSetAttribute(self->zbox, "CHILDSIZEALL", "NO");
 
     self->h = IupBackgroundBox(self->zbox);
@@ -202,6 +224,11 @@ bool GameInfoPanel_update(_In_ GameInfoPanel* self)
 
     if (st == GI_Menu) {
         gotoSubPanel(self, self->atmenu);
+        goto out;
+    }
+
+    if (st == GI_Tutorial) {
+        gotoSubPanel(self, self->tutorial);
         goto out;
     }
 

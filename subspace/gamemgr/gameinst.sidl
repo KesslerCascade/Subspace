@@ -12,6 +12,7 @@ typedef enum GameInstState {
     GI_Menu = GAME_MENU,
     GI_Run = GAME_RUN,
     GI_Practice = GAME_PRACTICE,
+    GI_Tutorial = GAME_TUTORIAL,
     GI_Launching,
     GI_Failed,
     GI_Exited,

@@ -49,6 +49,10 @@ typedef CompleteShip* (*FUNCTYPE(WorldManager_CreateShip))(WorldManager* self, S
                                                            bool boss);
 DECLFUNC(WorldManager_CreateShip);
 
+DECLSYM(WorldManager_playerShip_offset);
+#define WorldManager_playerShip(worldmgr) \
+    *(&MEMBER(ftlbase, WorldManager, worldmgr, CompleteShip*, playerShip))
+
 DECLSYM(WorldManager_bossShip_offset);
 
 DECLSYM(WorldManager_starMap_offset);

@@ -12,4 +12,5 @@ typedef enum GameState {
     GAME_MENU,
     GAME_RUN,
     GAME_PRACTICE,
+    GAME_TUTORIAL
 } GameState;

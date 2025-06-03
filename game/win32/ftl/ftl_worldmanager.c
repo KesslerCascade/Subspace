@@ -55,7 +55,8 @@ Symbol SYM(WorldManager_LoadGame) = {
 FuncInfo FUNCINFO(WorldManager_LoadGame) = {
     .nargs   = 2,
     .stdcall = true,
-    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } }
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } },
+    .rettype = RET_VOID
 };
 
 DisasmTrace WorldManager_CreateShip_trace = {
@@ -125,15 +126,20 @@ Symbol SYM(WorldManager_bossShip_offset) = {
 DisasmTrace WorldManager_StartGame_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(WorldManager_StartGame),
-    .ops  = { { DT_OP(SKIP), .imin = 45, .imax = 60 },
-             { I_ADD, .argout = { 0, DT_OUT_SYM1 } },
+    .ops  = { { DT_OP(SKIP), .imin = 8, .imax = 16 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_REG },           // MOV ECX, DWORD PTR [ECX+?]
+                .args = { { REG_ECX }, { REG_ECX } },   // (but ? should be 0 in all known versions)
+                .argout = { 0, DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 33, .imax = 48 },
+             { I_ADD, .argout = { 0, DT_OUT_SYM2 } },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ESP } },
                 .argsym = { 0, &SYM(Globals_Library) } },
              { DT_OP(FINISH) } },
-    .out  = { &SYM(ShipManager_myBlueprint_name_offset) },
+    .out  = { &SYM(WorldManager_playerShip_offset), &SYM(ShipManager_myBlueprint_name_offset) },
 };
 
 DisasmTrace WorldManager_OnInit_trace = {
@@ -310,4 +316,9 @@ FuncInfo FUNCINFO(WorldManager_CreateLocation) = {
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } },
     .rettype = RET_VOID
+};
+
+Symbol SYM(WorldManager_playerShip_offset) = {
+    SYMNAME("WorldManager->playerShip"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_StartGame_trace }, { 0 } }
 };

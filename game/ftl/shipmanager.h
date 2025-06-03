@@ -43,3 +43,6 @@ DECLSYM(ShipManager_myBlueprint_blueprintName_offset);
 #define ShipManager_ship(ship_manager) (&MEMBER(ftlbase, ShipManager, ship_manager, Ship, ship))
 #define ShipManager_current_target(ship_manager) \
     (&MEMBER(ftlbase, ShipManager, ship_manager, ShipManager, current_target))
+
+#define ShipManager_myBlueprint(ship_manager) \
+    (&MEMBER(ftlbase, ShipManager, ship_manager, ShipBlueprint, myBlueprint))

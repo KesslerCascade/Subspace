@@ -45,6 +45,7 @@ typedef struct GameInfoPanel {
     Ihandle* loading;
     Ihandle* progressbar;
     Ihandle* atmenu;
+    Ihandle* tutorial;
     Ihandle* info;
     Ihandle* zbox;
     string loadpct;

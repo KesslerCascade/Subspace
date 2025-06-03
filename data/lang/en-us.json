@@ -109,5 +109,7 @@
     "tweaks_30fps": "30 FPS",
     "tweaks_60fps": "60 FPS",
     "tweaks_120fps": "120 FPS",
-    "tweaks_custom": "Custom:"
+    "tweaks_custom": "Custom:",
+    "ftl_tutorial_title": "Playing... the tutorial?!",
+    "ftl_tutorial_text": "Well, I'm not going to judge... much."
 }

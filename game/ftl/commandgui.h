@@ -51,6 +51,9 @@ DECLFUNC(CommandGui_OnInit);
 typedef void (*FUNCTYPE(CommandGui_LinkMap))(CommandGui* self, StarMap* map);
 DECLFUNC(CommandGui_LinkMap);
 
+typedef int (*FUNCTYPE(CommandGui_GetCommand))(CommandGui* self);
+DECLFUNC(CommandGui_GetCommand);
+
 DECLSYM(CommandGui_SpaceBar);
 DECLSYM(CommandGui_shipComplete_offset);
 

@@ -109,6 +109,7 @@ add_executable(subspacegame
     hook/cfps/cfps_onloop.c
     hook/cfps/cfps_targetframetime.c
     hook/combatcontrol/combatcontrol_rendertarget.c
+    hook/commandgui/commandgui_getcommand.c
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
     hook/commandgui/commandgui_renderstatic.c
@@ -120,6 +121,8 @@ add_executable(subspacegame
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
     hook/textlibrary/textlibrary_gettext.c
+    hook/worldmanager/worldmanager_createnewgame.c
+    hook/worldmanager/worldmanager_loadgame.c
     input/keybinds.c
     input/keyboard.c
     log/log.c

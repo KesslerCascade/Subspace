@@ -12,5 +12,4 @@ DECLSYM(ShipBlueprint_blueprintName_offset);
     (&MEMBER(ftlbase, ShipBlueprint, bprint, basic_string, blueprintName))
 
 DECLSYM(ShipBlueprint_name_offset);
-#define ShipBlueprint_name(bprint) \
-    (&MEMBER(ftlbase, ShipBlueprint, bprint, TextString, blueprintName))
+#define ShipBlueprint_name(bprint) (&MEMBER(ftlbase, ShipBlueprint, bprint, TextString, name))

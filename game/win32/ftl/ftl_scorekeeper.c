@@ -32,7 +32,7 @@ DisasmTrace ScoreKeeper_Save_trace = {
              {
                  I_MOV,
                   .argcap = { DT_CAPTURE1 },
-                  .argout = { DT_OUT_SYM4 }   // settings.difficulty
+                  .argout = { 0, DT_OUT_SYM4 }   // settings.difficulty
              }, { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CMP,   // difficulty == 1
                 .argf   = { ARG_MATCH, ARG_ADDR },
