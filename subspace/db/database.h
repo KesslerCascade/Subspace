@@ -41,7 +41,6 @@ typedef struct Database {
 
     Subspace* ss;
     sqlite3* db;
-    TRFifo* fifo;        // for database multi-threading
 } Database;
 extern ObjClassInfo Database_clsinfo;
 #define Database(inst) ((Database*)(unused_noeval((inst) && &((inst)->_is_Database)), (inst)))

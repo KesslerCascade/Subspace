@@ -35,11 +35,9 @@ bool Database_open(_In_ Database* self)
     pathJoin(&fspath, fspath, DB_FILENAME);
     pathToPlatform(&fspath, fspath);
 
-    // SQLITE_OPEN_NOMUTEX is used because we're using a TRFifo to simulate a mutex rather than
-    // using sqlite's mutexes
     if (sqlite3_open_v2(strC(fspath),
                         &self->db,
-                        SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_NOMUTEX,
+                        SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE | SQLITE_OPEN_FULLMUTEX,
                         NULL) == SQLITE_OK)
         ret = true;
 
@@ -102,9 +100,6 @@ void Database_close(_In_ Database* self)
 void Database_destroy(_In_ Database* self)
 {
     databaseClose(self);
-    // Autogen begins -----
-    objRelease(&self->fifo);
-    // Autogen ends -------
 }
 
 // Autogen begins -----
