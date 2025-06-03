@@ -1,14 +1,11 @@
 #include "asm.h"
 #include "codegen_private.h"
-
-#include "minicrt.h"
+#include "codegen.h"
 
 bool cgAsmInit(AsmState* as, int maxinstr)
 {
-    cgInit();
-
     if (maxinstr > 0) {
-        as->dest = smalloc_heap(&codegen_heap, maxinstr * MAXCMDSIZE);
+        as->dest = cgReserve(maxinstr * MAXCMDSIZE);
         if (!as->dest)
             return false;
         as->remaining = maxinstr * MAXCMDSIZE;
@@ -77,12 +74,7 @@ bool cgAsmFinish(AsmState* as)
 {
     bool ret = true;
     if (as->reserved) {
-        // TODO: smalloc shrink!!!
-        /*        void* rp = srealloc_heap(&codegen_heap, as->dest, as->p - as->dest);
-                if (rp)
-                    as->dest = rp;
-                else
-                    ret = false; */
+        ret           = cgComplete(as->p - as->dest);
         as->p         = NULL;
         as->reserved  = false;
         as->remaining = 0;
