@@ -9,6 +9,7 @@
 #include "runtracker.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include "gamemgr/gameinst.h"
 
 _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss)
 {
@@ -22,8 +23,10 @@ _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss)
     return self;
 }
 
-extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
-#define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
+extern SettingsPage*
+SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
+#define parent_createSettingsPage(ui) \
+    SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
 SettingsPage* RunTracker_createSettingsPage(_In_ RunTracker* self, SubspaceUI* ui)
 {
     return NULL;
@@ -33,6 +36,23 @@ extern void SubspaceFeature_applyDefaultSettings(_In_ SubspaceFeature* self);   
 #define parent_applyDefaultSettings() SubspaceFeature_applyDefaultSettings((SubspaceFeature*)(self))
 void RunTracker_applyDefaultSettings(_In_ RunTracker* self)
 {
+    return;
+}
+
+extern void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled);   // parent
+#define parent_enable(enabled) SubspaceFeature_enable((SubspaceFeature*)(self), enabled)
+void RunTracker_enable(_In_ RunTracker* self, bool enabled)
+{
+    GameInst* inst = subspaceCurInst(self->ss);
+    if (!inst || ginstGetState(inst) == GI_Menu) {
+        // can change this if the game isn't running or is at the menu
+        parent_enable(enabled);
+        objRelease(&inst);
+        return;
+    }
+
+    // otherwise do nothing; can't enable or disable
+    objRelease(&inst);
     return;
 }
 
