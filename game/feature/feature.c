@@ -31,6 +31,9 @@ void registerAllFeatures()
     registerFeature(&TimeWarp_feature);
     registerFeature(&FrameAdv_feature);
     registerFeature(&NumericHull_feature);
+    registerFeature(&PracticeMode_feature);
+    registerFeature(&RunTracker_feature);
+    registerFeature(&SaveManager_feature);
     registerFeature(&Tweaks_feature);
 }
 

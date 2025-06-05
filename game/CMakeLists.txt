@@ -92,6 +92,9 @@ add_executable(subspacegame
     feature/frameadv.c
     feature/infoblock.c
     feature/numerichull.c
+    feature/practicemode.c
+    feature/runtracker.c
+    feature/savemanager.c
     feature/timewarp.c
     feature/tweaks.c
     ftl/graphics/colors.c

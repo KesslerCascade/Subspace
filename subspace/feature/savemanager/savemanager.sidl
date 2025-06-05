@@ -1,0 +1,7 @@
+#include "feature/feature.sidl"
+
+class SaveManager extends SubspaceFeature {
+    factory create(Subspace *ss);
+    override createSettingsPage;
+    override applyDefaultSettings;
+}

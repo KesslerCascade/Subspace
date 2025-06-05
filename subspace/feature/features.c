@@ -24,6 +24,9 @@ void registerAllFeatures(FeatureRegistry *reg)
     registerFeature(reg, frameadvCreate(ss));
     registerFeature(reg, infoblockCreate(ss));
     registerFeature(reg, numerichullCreate(ss));
+    registerFeature(reg, practicemodeCreate(ss));
+    registerFeature(reg, runtrackerCreate(ss));
+    registerFeature(reg, savemanagerCreate(ss));
     registerFeature(reg, timewarpCreate(ss));
     registerFeature(reg, tweaksCreate(ss));
 }

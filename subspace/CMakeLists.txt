@@ -36,6 +36,9 @@ set(SUBSPACE_SIDL
     feature/infoblock/infoblock.sidl
     feature/infoblock/infoblockpage.sidl
     feature/numerichull/numerichull.sidl
+    feature/practicemode/practicemode.sidl
+    feature/runtracker/runtracker.sidl
+    feature/savemanager/savemanager.sidl
     feature/timewarp/timewarp.sidl
     feature/timewarp/timewarppage.sidl
     feature/tweaks/tweaks.sidl
@@ -92,6 +95,9 @@ add_executable(subspace
     feature/infoblock/infoblock.c
     feature/infoblock/infoblockpage.c
     feature/numerichull/numerichull.c
+    feature/practicemode/practicemode.c
+    feature/runtracker/runtracker.c
+    feature/savemanager/savemanager.c
     feature/timewarp/timewarp.c
     feature/timewarp/timewarppage.c
     feature/tweaks/tweaks.c

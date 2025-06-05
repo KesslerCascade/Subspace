@@ -111,5 +111,11 @@
     "tweaks_120fps": "120 FPS",
     "tweaks_custom": "Custom:",
     "ftl_tutorial_title": "Playing... the tutorial?!",
-    "ftl_tutorial_text": "Well, I'm not going to judge... much."
+    "ftl_tutorial_text": "Well, I'm not going to judge... much.",
+    "feature_practicemode": "Practice Mode",
+    "feature_practicemode_desc": "Adds a menu option to load a specific save file for practice, without affecting achievements or statistics.",
+    "feature_runtracker": "Run Tracker",
+    "feature_runtracker_desc": "Records and saves detailed information about each run. Cannot be enabled or disabled while a run is in progress.",
+    "feature_savemanager": "Save Manager",
+    "feature_savemanager_desc": "Copies the save file at each beacon, so that the copy can be loaded back in to practice mode later."
 }
