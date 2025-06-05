@@ -6,7 +6,7 @@
 #ifdef _DEBUG
 // For debugging purposes, instead of the native loader, use LoadLibrary to load the exe. This
 // registers it as a modeule and makes it easier for debuggers to locate symbol information, etc.
-#define LOAD_EXE_AS_DLL
+// #define LOAD_EXE_AS_DLL
 #endif
 
 // This whole module is basically a userspace-only reimplementaton of the Windows
