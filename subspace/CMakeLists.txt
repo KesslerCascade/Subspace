@@ -29,6 +29,7 @@ set(SUBSPACE_SIDL
     control/controltask.sidl
     control/controlserver.sidl
     db/database.sidl
+    db/dbstmt.sidl
     feature/feature.sidl
     feature/featureregistry.sidl
     feature/frameadv/frameadv.sidl

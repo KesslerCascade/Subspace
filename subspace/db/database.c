@@ -88,6 +88,12 @@ bool Database_check(_In_ Database* self)
     return true;
 }
 
+DbStmt* Database_prepare(_In_ Database* self, _In_opt_ strref sql)
+{
+    DbStmt* ret = dbstmtCreate(self, sql);
+    return ret;
+}
+
 void Database_close(_In_ Database* self)
 {
     if (self->db) {
@@ -99,7 +105,12 @@ void Database_close(_In_ Database* self)
 
 void Database_destroy(_In_ Database* self)
 {
-    databaseClose(self);
+    dbClose(self);
+}
+
+int64 Database_lastId(_In_ Database* self)
+{
+    return sqlite3_last_insert_rowid(self->db);
 }
 
 // Autogen begins -----

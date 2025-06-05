@@ -116,8 +116,8 @@ static void subspaceStartup(LogDest** pdeferredlogs)
         ret &= tqStart(subspace.workq);
 
     // 10 -------- Database
-    subspace.db = databaseCreate(&subspace);
-    if (!databaseOpen(subspace.db) || !databaseCheck(subspace.db)) {
+    subspace.db = dbCreate(&subspace);
+    if (!dbOpen(subspace.db) || !dbCheck(subspace.db)) {
         fatalError(_S"Failed to open database.", false);
     }
 
@@ -143,7 +143,7 @@ static void subspaceShutdown()
     ssuiShutdown(subspace.ui);
 
     // 10 -------- Database shutdown
-    databaseClose(subspace.db);
+    dbClose(subspace.db);
     objRelease(&subspace.db);
 
     // 09 -------- Task queue shutdown

@@ -1,0 +1,16 @@
+struct sqlite3_stmt;
+class Database;
+class DbStmt {
+    object:Database db;
+    sqlite3_stmt *stmt;
+    sarray:stvar row;
+    bool error;
+
+    [canfail] factory create(Database *db, strref sql);
+
+    bool bind(int ncol, stvar val);
+    bool exec();
+
+    void reset();
+    void clearBind();
+}

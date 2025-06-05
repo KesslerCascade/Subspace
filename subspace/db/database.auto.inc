@@ -11,6 +11,8 @@ static Database_ClassIf _impl_Database_Database_ClassIf = {
     .open = (bool (*)(void*))Database_open,
     .check = (bool (*)(void*))Database_check,
     .close = (void (*)(void*))Database_close,
+    .prepare = (DbStmt* (*)(void*, strref))Database_prepare,
+    .lastId = (int64 (*)(void*))Database_lastId,
 };
 
 static ObjIface* _ifimpl_Database[] = {
