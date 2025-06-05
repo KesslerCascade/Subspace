@@ -4,6 +4,8 @@
 // clang-format off
 #include <cx/obj.h>
 #include "feature/feature.h"
+#include "gamedata/gamedata.h"
+#include "run/runinfo.h"
 #include "subspace.h"
 #include "process.h"
 #include "proto.h"
@@ -70,8 +72,10 @@ typedef struct GameInst {
     GameInstState state;
     hashtable features;
     int32 ver[3];
+    GameData* data;
     float loadPct;
     int failReason;
+    RunInfo* currentRun;
 } GameInst;
 extern ObjClassInfo GameInst_clsinfo;
 #define GameInst(inst) ((GameInst*)(unused_noeval((inst) && &((inst)->_is_GameInst)), (inst)))

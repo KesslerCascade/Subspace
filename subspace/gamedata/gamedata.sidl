@@ -1,0 +1,5 @@
+#include "subspace.h"
+
+class GameData {
+    
+}

@@ -9,6 +9,7 @@ static FeatureRegistry_ClassIf _impl_FeatureRegistry_FeatureRegistry_ClassIf = {
     ._size = sizeof(FeatureRegistry_ClassIf),
     ._implements = (ObjIface*)&FeatureRegistry_ClassIf_tmpl,
     .find = (SubspaceFeature* (*)(void*, strref))FeatureRegistry_find,
+    .isEnabled = (bool (*)(void*, strref))FeatureRegistry_isEnabled,
 };
 
 static ObjIface* _ifimpl_FeatureRegistry[] = {

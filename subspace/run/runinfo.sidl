@@ -1,0 +1,43 @@
+#include "subspace.h"
+
+// Do NOT change the ordering of these; the values are saved in the database as-is!
+typedef enum {
+    RUN_Active = 0,
+    RUN_Victory = 1,
+    RUN_Defeat = 2,
+    RUN_Abandoned = 3
+} RunResult;
+
+class RunInfo {
+    Subspace *ss;
+    RWLock lock;
+
+    int64 runid;          // -1 if not tracked
+    int32 seed;
+    string shipType;
+    string shipName;
+    int32 difficulty;
+    RunResult result;
+
+    int64 startTime;
+    int64 endTime;
+
+    int64 savepoint;
+
+    int32 shipsDefeated;
+    int32 beaconsExplored;
+    int32 scrapCollected;
+    int32 crewHired;
+    int32 scrapActual;
+    int32 damageTaken;
+
+    string savePath;
+
+    bool recording;     // is this run being currently recorded (i.e. not a historical run)
+
+    factory create(Subspace *ss);
+    void newGame(int seed, strref shipType, strref shipName, int difficulty);
+    void loadGame(int seed, strref shipType, strref shipName, int difficulty, int beacons);
+
+    void abandon();
+}

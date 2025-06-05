@@ -8,8 +8,10 @@ DECLCMD(GameReady);
 DECLCMD(GameStart);
 DECLCMD(GameState);
 DECLCMD(LaunchFail);
+DECLCMD(LoadGame);
 DECLCMD(Loading);
 DECLCMD(Log);
+DECLCMD(NewGame);
 DECLCMD(Validate);
 
 #define REGCMD(cmdname) \
@@ -32,4 +34,6 @@ void registerCmds(ControlServer* csvr)
     REGCMDI(LaunchFail);
     REGCMDI(Loading);
     REGCMD(Log);
+    REGCMDREQI(NewGame, csvr->gameStart);
+    REGCMDREQI(LoadGame, csvr->gameStart);
 }

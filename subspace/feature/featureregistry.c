@@ -46,6 +46,15 @@ void FeatureRegistry_destroy(_In_ FeatureRegistry* self)
     // Autogen ends -------
 }
 
+bool FeatureRegistry_isEnabled(_In_ FeatureRegistry* self, _In_opt_ strref name)
+{
+    htelem elem = htFind(self->features, strref, name, none, NULL);
+    if (!elem)
+        return false;
+
+    return featureIsEnabled((SubspaceFeature*)hteVal(self->features, object, elem));
+}
+
 // Autogen begins -----
 #include "featureregistry.auto.inc"
 // Autogen ends -------

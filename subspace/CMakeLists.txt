@@ -43,11 +43,13 @@ set(SUBSPACE_SIDL
     feature/timewarp/timewarppage.sidl
     feature/tweaks/tweaks.sidl
     feature/tweaks/tweakspage.sidl
+    gamedata/gamedata.sidl
     gamemgr/gameinst.sidl
     gamemgr/gamemgr.sidl
     kbmgr/kbmgr.sidl
     kbmgr/keybind.sidl
     lang/langdb.sidl
+    run/runinfo.sidl
     ui/mainwin.sidl
     ui/settingswin.sidl
     ui/subspaceui.sidl
@@ -83,10 +85,13 @@ add_executable(subspace
     control/cmds/cmdgamestart.c
     control/cmds/cmdgamestate.c
     control/cmds/cmdlaunchfail.c
+    control/cmds/cmdloadgame.c
     control/cmds/cmdloading.c
     control/cmds/cmdlog.c
+    control/cmds/cmdnewgame.c
     control/cmds/cmdvalidate.c
     db/database.c
+    db/dbstmt.c
     db/schema.c
     feature/feature.c
     feature/features.c
@@ -102,6 +107,7 @@ add_executable(subspace
     feature/timewarp/timewarppage.c
     feature/tweaks/tweaks.c
     feature/tweaks/tweakspage.c
+    gamedata/gamedata.c
     gamemgr/gameinst.c
     gamemgr/gamemgr.c
     kbmgr/kbmgr.c
@@ -109,6 +115,7 @@ add_executable(subspace
     kbmgr/keymap.c
     lang/lang.c
     lang/langdb.c
+    run/runinfo.c
     ui/about.c
     ui/mainwin.c
     ui/mainwinlayout.c

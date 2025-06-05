@@ -11,6 +11,7 @@
     hashtable:string:object features;
 
     SubspaceFeature *find(strref name);
+    bool isEnabled(strref name);
 
     factory create(Subspace *ss);
 }

@@ -25,6 +25,7 @@ typedef struct FeatureRegistry_ClassIf {
     size_t _size;
 
     SubspaceFeature* (*find)(_In_ void* self, _In_opt_ strref name);
+    bool (*isEnabled)(_In_ void* self, _In_opt_ strref name);
 } FeatureRegistry_ClassIf;
 extern FeatureRegistry_ClassIf FeatureRegistry_ClassIf_tmpl;
 
@@ -64,4 +65,6 @@ _objfactory_guaranteed FeatureRegistry* FeatureRegistry_create(Subspace* ss);
 
 // SubspaceFeature* fregFind(FeatureRegistry* self, strref name);
 #define fregFind(self, name) (self)->_->find(FeatureRegistry(self), name)
+// bool fregIsEnabled(FeatureRegistry* self, strref name);
+#define fregIsEnabled(self, name) (self)->_->isEnabled(FeatureRegistry(self), name)
 

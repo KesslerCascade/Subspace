@@ -90,6 +90,7 @@ typedef struct ControlServer {
     RWLock handler_lock;
     hashtable handlers;
     TRFifo* preGameReady;
+    TRFifo* gameStart;        // loading, saving, new game, etc
 } ControlServer;
 extern ObjClassInfo ControlServer_clsinfo;
 #define ControlServer(inst) ((ControlServer*)(unused_noeval((inst) && &((inst)->_is_ControlServer)), (inst)))
