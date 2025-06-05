@@ -50,7 +50,11 @@ static void parseArgs(Subspace* ss, VFS* vfs)
 
 GameInst* subspaceCurInst(Subspace* ss)
 {
-    return objAcquireFromWeak(GameInst, ss->curinst);
+    GameInst* ret = NULL;
+    withReadLock (&ss->lock) {
+        ret = objAcquire(ss->curinst);
+    }
+    return ret;
 }
 
 void subspaceUpdateUI(Subspace* ss)
@@ -60,6 +64,9 @@ void subspaceUpdateUI(Subspace* ss)
 
 static void subspaceStartup(LogDest** pdeferredlogs)
 {
+    // Basic prerequisites
+    rwlockInit(&subspace.lock);
+
     // 01 -------- event that workers can use to notify the main thread of something
     eventInit(&subspace.notify);
 
@@ -136,6 +143,11 @@ static void subspaceStartup(LogDest** pdeferredlogs)
 
 static void subspaceShutdown()
 {
+    // 13 -------- Running state
+    withWriteLock (&subspace.lock) {
+        objRelease(&subspace.curinst);
+    }
+
     // 12 -------- Control Server shutdown
     cserverStop(subspace.svr);
 
@@ -177,6 +189,9 @@ static void subspaceShutdown()
     // Release some objects that were kept avialable during shutdown
     objRelease(&subspace.svr);
     objRelease(&subspace.workq);
+
+    // Final cleanup
+    rwlockDestroy(&subspace.lock);
 }
 
 int entryPoint()

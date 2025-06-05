@@ -44,7 +44,8 @@ typedef struct Subspace {
     SSDNode* settings;
     Event notify;   // notification event for the main thread
 
-    Weak(GameInst)* curinst;   // game instance that is focused by the UI
+    RWLock lock;    // for volatile data (curinst)
+    GameInst* curinst;   // game instance that is focused by the UI
 
     TaskQueue* workq;
     ControlServer* svr;

@@ -191,7 +191,7 @@ void SubspaceFeature_applyDefaultSettings(_In_ SubspaceFeature* self)
 
 void SubspaceFeature_sendSettingCur(_In_ SubspaceFeature* self, _In_opt_ strref name)
 {
-    GameInst* cur = objAcquireFromWeak(GameInst, self->ss->curinst);
+    GameInst* cur = subspaceCurInst(self->ss);
     if (!cur)
         return;
 

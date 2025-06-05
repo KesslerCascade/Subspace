@@ -72,10 +72,12 @@ static void instCloseCb(ProcessHandle* h, uint32 pid, void* userdata)
             objRelease(&gmgr);
         }
 
-        if (ss->curinst == atomicLoad(ptr, &inst->_weakref, Relaxed)) {
-            objDestroyWeak(&ss->curinst);
-            ssuiUpdateMain(ss->ui, NULL);
-            ssuiUpdateMain(ss->ui, _S"gameinfo");
+        withWriteLock (&ss->lock) {
+            if (ss->curinst == inst) {
+                objRelease(&ss->curinst);
+                ssuiUpdateMain(ss->ui, NULL);
+                ssuiUpdateMain(ss->ui, _S"gameinfo");
+            }
         }
 
         withWriteLock (&inst->lock) {
@@ -154,9 +156,11 @@ void GameInst_setStateLocked(_In_ GameInst* self, GameInstState state)
 {
     if (self->state != state) {
         self->state = state;
-        if ((void*)self->ss->curinst == atomicLoad(ptr, &self->_weakref, Relaxed)) {
-            ssuiUpdateMain(self->ss->ui, NULL);
-            ssuiUpdateMain(self->ss->ui, _S"gameinfo");
+        withReadLock (&self->ss->lock) {
+            if (self->ss->curinst == self) {
+                ssuiUpdateMain(self->ss->ui, NULL);
+                ssuiUpdateMain(self->ss->ui, _S"gameinfo");
+            }
         }
     }
 }

@@ -94,8 +94,10 @@ bool GameMgr_launchGame(_In_ GameMgr* self, LaunchMode mode, GameInst** out)
 
     // if we're launching to play, set this as the focused instance
     if (ret && mode == LAUNCH_PLAY) {
-        objDestroyWeak(&ss->curinst);
-        ss->curinst = objGetWeak(GameInst, ninst);
+        withWriteLock (&ss->lock) {
+            objRelease(&ss->curinst);
+            ss->curinst = objAcquire(ninst);
+        }
         subspaceUpdateUI(ss);
     }
 

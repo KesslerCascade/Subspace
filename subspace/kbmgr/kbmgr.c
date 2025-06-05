@@ -111,7 +111,7 @@ bool KBMgr_bind(_In_ KBMgr* self, _In_opt_ strref name, int key)
         saveKeyBind(self->ss, name, key);
 
         ControlClient* client = NULL;
-        GameInst* ginst       = objAcquireFromWeak(GameInst, self->ss->curinst);
+        GameInst* ginst       = subspaceCurInst(self->ss);
         if (ginst)
             client = objAcquireFromWeak(ControlClient, ginst->client);
 
