@@ -12,16 +12,13 @@ int subspace_CommandGui_GetCommand_post(int ret, CommandGui* self)
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    return symResolve(base, CommandGui_GetCommand);
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return hookFunction(base, CommandGui_GetCommand, NULL, subspace_CommandGui_GetCommand_post);
 }
 
-Patch patch_CommandGui_GetCommand = { .Relevant = AlwaysRequired,
-                                      .Validate = validate,
-                                      .Apply    = apply };
+Patch patch_CommandGui_GetCommand = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(CommandGui_GetCommand), 0 }
+};

@@ -35,14 +35,13 @@ int subspace_CApp_OnRender_pre(CApp* self)
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    return symResolve(base, CApp_OnRender) && symResolve(base, CFPS_GetTime) && symResolve(base, CFPS_FPSControl);
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return hookFunction(base, CApp_OnRender, subspace_CApp_OnRender_pre, NULL);
 }
 
-Patch patch_CApp_OnRender = { .Relevant = AlwaysRequired, .Validate = validate, .Apply = apply };
+Patch patch_CApp_OnRender = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(CApp_OnRender), &SYM(CFPS_GetTime), &SYM(CFPS_FPSControl), 0 }
+};

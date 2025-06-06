@@ -30,6 +30,7 @@ static bool apply(addr_t base, Patch* p, PatchState* ps)
     return replaceFunctionP(base, TextLibrary_GetText, subspace_TextLibrary_GetText);
 }
 
-Patch patch_TextLibrary_GetText = { .Relevant = AlwaysRequired,
-                                    .Validate = validate,
-                                    .Apply    = apply };
+Patch patch_TextLibrary_GetText = { .relevant        = AlwaysRequired,
+                                    .validate        = validate,
+                                    .apply           = apply,
+                                    .requiredSymbols = { 0 } };

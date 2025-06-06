@@ -17,16 +17,13 @@ basic_string* subspace_FileHelper_getUserFolder(basic_string* out)
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    return symResolve(base, FileHelper_getUserFolder);
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return replaceFunction(base, FileHelper_getUserFolder, subspace_FileHelper_getUserFolder);
 }
 
-Patch patch_FileHelper_getUserFolder = { .Relevant = AlwaysRequired,
-                                         .Validate = validate,
-                                         .Apply    = apply };
+Patch patch_FileHelper_getUserFolder = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(FileHelper_getUserFolder), 0 }
+};

@@ -23,11 +23,6 @@ void subspace_CommandGui_OnLoop_post(CommandGui* self)
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    return symAddr(base, CommandGui_OnLoop) != 0;
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return hookFunction(base,
@@ -36,6 +31,8 @@ static bool apply(addr_t base, Patch* p, PatchState* ps)
                         subspace_CommandGui_OnLoop_post);
 }
 
-Patch patch_CommandGui_OnLoop = { .Relevant = AlwaysRequired,
-                                  .Validate = validate,
-                                  .Apply    = apply };
+Patch patch_CommandGui_OnLoop = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(CommandGui_OnLoop), 0 }
+};

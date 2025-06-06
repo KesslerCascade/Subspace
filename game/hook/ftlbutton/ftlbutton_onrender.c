@@ -15,16 +15,13 @@ int subspace_FTLButton_OnRender_pre(FTLButton* self)
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    return symResolve(base, FTLButton_OnRender);
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return hookFunction(base, FTLButton_OnRender, subspace_FTLButton_OnRender_pre, NULL);
 }
 
-Patch patch_FTLButton_OnRender = { .Relevant = AlwaysRequired,
-                                   .Validate = validate,
-                                   .Apply    = apply };
+Patch patch_FTLButton_OnRender = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(FTLButton_OnRender), 0 }
+};

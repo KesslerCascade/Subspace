@@ -17,16 +17,17 @@ int subspace_CApp_OnExecute_pre(CApp* self)
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    // this is one of the required patches, so we stick the version number globals in here
-    return symResolve(base, CApp_OnExecute) && symResolve(base, version_major) &&
-        symResolve(base, version_minor) && symResolve(base, version_rev);
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return hookFunction(base, CApp_OnExecute, subspace_CApp_OnExecute_pre, NULL);
 }
 
-Patch patch_CApp_OnExecute = { .Relevant = AlwaysRequired, .Validate = validate, .Apply = apply };
+Patch patch_CApp_OnExecute = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(CApp_OnExecute),
+                        &SYM(version_major),
+                        &SYM(version_minor),
+                        &SYM(version_rev),
+                        0 }
+};

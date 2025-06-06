@@ -25,11 +25,6 @@ void subspace_ShipStatus_RenderHealth_post(ShipStatus* self, bool renderText)
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    return symResolve(base, ShipStatus_RenderHealth) && symResolve(base, ShipStatus_ship_offset);
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return hookFunction(base,
@@ -38,6 +33,8 @@ static bool apply(addr_t base, Patch* p, PatchState* ps)
                         subspace_ShipStatus_RenderHealth_post);
 }
 
-Patch patch_ShipStatus_RenderHealth = { .Relevant = AlwaysRequired,
-                                        .Validate = validate,
-                                        .Apply    = apply };
+Patch patch_ShipStatus_RenderHealth = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(ShipStatus_RenderHealth), &SYM(ShipStatus_ship_offset), 0 }
+};

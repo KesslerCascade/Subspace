@@ -23,11 +23,13 @@ typedef struct PatchState {
 
 typedef int PatchHandle;
 typedef struct Patch Patch;
+typedef struct Symbol Symbol;
 typedef struct Patch {
-    PatchRelevancy (*Relevant)(addr_t base, Patch* p, PatchState* ps);
-    bool (*Validate)(addr_t base, Patch* p, PatchState* ps);
-    bool (*Apply)(addr_t base, Patch* p, PatchState* ps);
+    PatchRelevancy (*relevant)(addr_t base, Patch* p, PatchState* ps);
+    bool (*validate)(addr_t base, Patch* p, PatchState* ps);
+    bool (*apply)(addr_t base, Patch* p, PatchState* ps);
     int _state;
+    Symbol* requiredSymbols[];   // symbols required by this patch
 } Patch;
 
 typedef Patch* PatchSequence[];

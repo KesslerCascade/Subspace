@@ -46,18 +46,6 @@ void subspace_WorldManager_CreateNewGame_post(WorldManager* self)
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    return symResolve(base, WorldManager_CreateNewGame) &&
-        symResolve(base, WorldManager_playerShip_offset) &&
-        symResolve(base, WorldManager_starMap_offset) &&
-        symResolve(base, StarMap_sectorMapSeed_offset) &&
-        symResolve(base, CompleteShip_shipManager_offset) &&
-        symResolve(base, ShipBlueprint_blueprintName_offset) &&
-        symResolve(base, ShipBlueprint_name_offset) && symResolve(base, Settings_difficulty) &&
-        symResolve(base, TutorialManager_Running);
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return hookFunction(base,
@@ -66,6 +54,17 @@ static bool apply(addr_t base, Patch* p, PatchState* ps)
                         subspace_WorldManager_CreateNewGame_post);
 }
 
-Patch patch_WorldManager_CreateNewGame = { .Relevant = AlwaysRequired,
-                                           .Validate = validate,
-                                           .Apply    = apply };
+Patch patch_WorldManager_CreateNewGame = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(WorldManager_CreateNewGame),
+                        &SYM(WorldManager_playerShip_offset),
+                        &SYM(WorldManager_starMap_offset),
+                        &SYM(StarMap_sectorMapSeed_offset),
+                        &SYM(CompleteShip_shipManager_offset),
+                        &SYM(ShipBlueprint_blueprintName_offset),
+                        &SYM(ShipBlueprint_name_offset),
+                        &SYM(Settings_difficulty),
+                        &SYM(TutorialManager_Running),
+                        0 }
+};

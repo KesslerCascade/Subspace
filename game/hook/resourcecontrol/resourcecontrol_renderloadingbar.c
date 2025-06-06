@@ -33,14 +33,6 @@ int subspace_ResourceControl_RenderLoadingBar_pre(ResourceControl* self, float i
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    return symResolve(base, ResourceControl_RenderLoadingBar) &&
-        symResolve(base, ResourceControl_preLoadProgress1_offset) &&
-        symResolve(base, ResourceControl_preLoadProgress2_offset) &&
-        symResolve(base, ResourceControl_GlobalResources);
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return hookFunction(base,
@@ -49,6 +41,12 @@ static bool apply(addr_t base, Patch* p, PatchState* ps)
                         NULL);
 }
 
-Patch patch_ResourceControl_RenderLoadingBar = { .Relevant = AlwaysRequired,
-                                                 .Validate = validate,
-                                                 .Apply    = apply };
+Patch patch_ResourceControl_RenderLoadingBar = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(ResourceControl_RenderLoadingBar),
+                        &SYM(ResourceControl_preLoadProgress1_offset),
+                        &SYM(ResourceControl_preLoadProgress2_offset),
+                        &SYM(ResourceControl_GlobalResources),
+                        0 }
+};

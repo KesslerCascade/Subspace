@@ -26,14 +26,13 @@ void subspace_CFPS_OnLoop_post(CFPS* self)
 
 // ---- Patch ----------------
 
-static bool validate(addr_t base, Patch* p, PatchState* ps)
-{
-    return symResolve(base, CFPS_OnLoop) && symResolve(base, CFPS_SpeedFactor_offset);
-}
-
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
     return hookFunction(base, CFPS_OnLoop, NULL, subspace_CFPS_OnLoop_post);
 }
 
-Patch patch_CFPS_OnLoop = { .Relevant = AlwaysRequired, .Validate = validate, .Apply = apply };
+Patch patch_CFPS_OnLoop = {
+    .relevant        = AlwaysRequired,
+    .apply           = apply,
+    .requiredSymbols = { &SYM(CFPS_OnLoop), &SYM(CFPS_SpeedFactor_offset), 0 }
+};

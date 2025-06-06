@@ -1,4 +1,5 @@
 #include "patch.h"
+#include "hook/symbol.h"
 
 bool patchBegin(PatchState* ps, addr_t base)
 {
@@ -33,7 +34,7 @@ void patchScanSeq(PatchState* ps, PatchSequence seq)
     for (Patch** pl = seq; *pl; pl++) {
         Patch* p = *pl;
         if (p->_state == S_INIT)
-            p->_state |= p->Relevant(base, p, ps);
+            p->_state |= p->relevant(base, p, ps);
     }
 }
 
@@ -52,7 +53,17 @@ bool patchValidateSeq(PatchState* ps, PatchSequence seq)
         if (p->_state & (R_IGNORE | S_VALIDATED))
             continue;
 
-        if (p->Validate(base, p, ps))
+        bool valid = true;
+
+        for (Symbol** s = p->requiredSymbols; *s; s++) {
+            if (!_symResolve(base, *s))
+                valid = false;
+        }
+
+        if (valid && p->validate)
+            valid &= p->validate(base, p, ps);
+
+        if (valid)
             p->_state |= S_VALIDATED;
         else if (p->_state & R_REQUIRED)   // Abort whole sequence if a required
             return false;                  // patch fails to validate
@@ -75,7 +86,7 @@ bool patchApplySeq(PatchState* ps, PatchSequence seq)
         if ((p->_state & S_APPLIED) || !(p->_state & S_VALIDATED))
             continue;
 
-        if (p->Apply(base, p, ps))
+        if (p->apply(base, p, ps))
             p->_state |= S_APPLIED;
         else if (p->_state & R_REQUIRED)   // Already patching, don't quit halfway,
             ret = false;                   // but still return failure
