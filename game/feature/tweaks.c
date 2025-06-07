@@ -65,15 +65,30 @@ void tweaksFinalizeSave()
         basic_string nfile;
         basic_string_set(&nfile, gs.saveFileOverride);
 
+        basic_string ofile;
+        ofile.buf = malloc(sfile.len + 14);
+        memcpy(ofile.buf, sfile.buf, sfile.len);
+        memcpy(ofile.buf + sfile.len, ".subspace-old", 14);
+        ofile.len = sfile.len + 13;
+
+        // clear out any lingering old files that couldn't be deleted
+        if (FileHelper_fileExists(&ofile)) {
+            FileHelper_deleteFile(&ofile);
+        }
+
         // double check that the overriden file was actually created
         if (FileHelper_fileExists(&nfile)) {
             // delete save file, rename newly created save into place.
-            // interestingly, the game already does this for ae_prof.sav, just not continue.sav
-            FileHelper_deleteFile(&sfile);
+            // interestingly, the game already does this for ae_prof.sav, just not continue.sav.
+            // JUST IN CASE some other process has a read lock, rename the existing save instead of
+            // deleting it (which might fail).
+            FileHelper_renameFile(&sfile, &ofile);
             FileHelper_renameFile(&nfile, &sfile);
+            FileHelper_deleteFile(&ofile);
         }
 
         basic_string_destroy(&sfile);
+        basic_string_destroy(&ofile);
         basic_string_destroy(&nfile);
 
         free(gs.saveFileOverride);
