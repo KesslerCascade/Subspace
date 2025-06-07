@@ -1,4 +1,5 @@
 #include "control/controlclient.h"
+#include "feature/tweaks.h"
 #include "ftl/blueprintmanager.h"
 #include "ftl/capp.h"
 #include "ftl/completeship.h"
@@ -14,8 +15,19 @@
 
 // ---- Hooks ----------------
 
+int subspace_WorldManager_LoadGame_pre(WorldManager* self, basic_string* file)
+{
+    if (Tweaks_feature.enabled && tweaksPreserveLoad())
+        gs.ignoreFileDeletion = true;
+
+    return 1;
+}
+
 void subspace_WorldManager_LoadGame_post(WorldManager* self, basic_string* file)
 {
+    if (Tweaks_feature.enabled && tweaksPreserveLoad())
+        gs.ignoreFileDeletion = false;
+
     CompleteShip* playerShip = WorldManager_playerShip(self);
     StarMap* map             = WorldManager_starMap(self);
     ShipManager* smgr        = playerShip ? CompleteShip_shipManager(playerShip) : NULL;
@@ -44,7 +56,10 @@ void subspace_WorldManager_LoadGame_post(WorldManager* self, basic_string* file)
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
-    return hookFunction(base, WorldManager_LoadGame, NULL, subspace_WorldManager_LoadGame_post);
+    return hookFunction(base,
+                        WorldManager_LoadGame,
+                        subspace_WorldManager_LoadGame_pre,
+                        subspace_WorldManager_LoadGame_post);
 }
 
 Patch patch_WorldManager_LoadGame = {

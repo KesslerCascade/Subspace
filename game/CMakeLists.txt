@@ -117,6 +117,8 @@ add_executable(subspacegame
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
     hook/commandgui/commandgui_renderstatic.c
+    hook/filehelper/filehelper_deletefile.c
+    hook/filehelper/filehelper_getsavefile.c
     hook/filehelper/filehelper_getuserfolder.c
     hook/ftlbutton/ftlbutton_onrender.c
     hook/mainmenu/mainmenu_open.c
@@ -127,6 +129,7 @@ add_executable(subspacegame
     hook/textlibrary/textlibrary_gettext.c
     hook/worldmanager/worldmanager_createnewgame.c
     hook/worldmanager/worldmanager_loadgame.c
+    hook/worldmanager/worldmanager_savegame.c
     input/keybinds.c
     input/keyboard.c
     log/log.c

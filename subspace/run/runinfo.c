@@ -72,6 +72,7 @@ static void RunInfo_newTracked(RunInfo* self, int seed, strref shipType, strref 
     dbstmtBind(stmt, 5, stvar(int64, clockWall()));
     if (dbstmtExec(stmt)) {
         self->runid = dbLastId(self->ss->db);
+        self->recording = true;
         logFmt(Info,
                _S"Tracking new run [${int}]: ${string} (${string})",
                stvar(int64, self->runid),
@@ -114,6 +115,7 @@ static void RunInfo_findOrCreateTracked(RunInfo* self, int seed, strref shipType
             stConvert(int32, &self->scrapActual, stvar, stmt->row.a[7]);
             stConvert(int32, &self->damageTaken, stvar, stmt->row.a[8]);
             stConvert(string, &self->savePath, stvar, stmt->row.a[9]);
+            self->recording = true;
 
             logFmt(Info,
                    _S"Loaded run [${int}]: ${string} (${string})",

@@ -33,6 +33,10 @@ void Tweaks_applyDefaultSettings(_In_ Tweaks* self)
     {
         if (!ssdPtr(self->settings, _S"targetfps"))
             ssdSet(self->settings, _S"targetfps", false, stvar(int32, 60));
+        if (!ssdPtr(self->settings, _S"preserveload"))
+            ssdSet(self->settings, _S"preserveload", false, stvar(bool, true));
+        if (!ssdPtr(self->settings, _S"savecompat"))
+            ssdSet(self->settings, _S"savecompat", false, stvar(bool, true));
     }
 }
 

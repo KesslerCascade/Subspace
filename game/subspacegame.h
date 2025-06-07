@@ -97,6 +97,8 @@ typedef struct GameGlobalState {
 
     // Tweaks
     bool tweaksOverrideFPS;
+    bool ignoreFileDeletion;
+    char* saveFileOverride;   // temporary override for save file location
 } GameGlobalState;
 
 extern SubspaceGameSettings settings;

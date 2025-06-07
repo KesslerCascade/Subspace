@@ -117,5 +117,10 @@
     "feature_runtracker": "Run Tracker",
     "feature_runtracker_desc": "Records and saves detailed information about each run. Cannot be enabled or disabled while a run is in progress.",
     "feature_savemanager": "Save Manager",
-    "feature_savemanager_desc": "Copies the save file at each beacon, so that the copy can be loaded back in to practice mode later."
+    "feature_savemanager_desc": "Copies the save file at each beacon, so that the copy can be loaded back in to practice mode later.",
+    "tweaks_savegame": "Saved Games",
+    "tweaks_preserveload": "Don't Delete on Load",
+    "tweaks_preserveload_tip": "Prevents the game from deleting the continue.sav file upon load a saved game from the menu.",
+    "tweaks_savecompat": "Save Game Compatibility Fix",
+    "tweaks_savecompat_tip": "Alters the behaviour of saving games to write to a temporary file and then rename it into place when complete.\nThis increases compatibility with third-party tools that read the save file while the game is running."
 }

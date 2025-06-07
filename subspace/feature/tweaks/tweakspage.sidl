@@ -12,6 +12,8 @@ class TweaksPage extends SettingsPage {
     Ihandle* fps120;
     Ihandle* fpscustom;
     Ihandle* fpscustomval;
+    Ihandle* preserveload;
+    Ihandle* savecompat;
 
     factory create(Tweaks* feature, SubspaceUI* ui);
     override make;

@@ -87,6 +87,27 @@ static int fpscustom_killfocus(Ihandle *ih)
     return IUP_DEFAULT;
 }
 
+static int preserveload_action(Ihandle* ih, int state)
+{
+    TweaksPage* self = iupGetParentObj(TweaksPage, ih);
+    if (!self)
+        return IUP_DEFAULT;
+
+    ssdSet(self->feature->settings, _S"preserveload", true, stvar(bool, state ? true : false));
+    featureSendSettingCur(self->feature, _S"preserveload");
+    return IUP_DEFAULT;
+}
+
+static int savecompat_action(Ihandle* ih, int state)
+{
+    TweaksPage* self = iupGetParentObj(TweaksPage, ih);
+    if (!self)
+        return IUP_DEFAULT;
+
+    ssdSet(self->feature->settings, _S"savecompat", true, stvar(bool, state ? true : false));
+    featureSendSettingCur(self->feature, _S"savecompat");
+    return IUP_DEFAULT;
+}
 
 extern bool SettingsPage_make(_In_ SettingsPage* self, Ihandle* list);   // parent
 #define parent_make(list) SettingsPage_make((SettingsPage*)(self), list)
@@ -132,7 +153,37 @@ bool TweaksPage_make(_In_ TweaksPage* self, Ihandle* list)
 
     self->fpsradio = IupRadio(fpsvbox);
 
-    Ihandle* vbox = IupVbox(fpslabel, fpsdesc, self->fpsradio, IupFill(), NULL);
+    Ihandle* savespc = IupSpace();
+    IupSetAttribute(savespc, "SIZE", "1x6");
+
+    Ihandle* savesep = IupLabel("");
+    IupSetAttribute(savesep, "SEPARATOR", "HORIZONTAL");
+    IupSetAttribute(savesep, "EXPAND", "HORIZONTAL");
+
+    Ihandle* savelbl = IupLabel(langGetC(self->ss, _S"tweaks_savegame"));
+    IupSetAttribute(savelbl, "FONT", "Helvetica, Bold 10");
+
+    self->preserveload = IupToggle(langGetC(self->ss, _S"tweaks_preserveload"), NULL);
+    iupSetObj(self->preserveload, ObjNone, self, self->ui);
+    IupSetCallback(self->preserveload, "ACTION", (Icallback)preserveload_action);
+    setTip(self->preserveload,
+           langGet(self->ss, _S"tweaks_preserveload_tip"),
+           langGet(self->ss, _S"tweaks_preserveload"),
+           0);
+
+    self->savecompat = IupToggle(langGetC(self->ss, _S"tweaks_savecompat"), NULL);
+    iupSetObj(self->savecompat, ObjNone, self, self->ui);
+    IupSetCallback(self->savecompat, "ACTION", (Icallback)savecompat_action);
+    setTip(self->savecompat,
+           langGet(self->ss, _S"tweaks_savecompat_tip"),
+           langGet(self->ss, _S"tweaks_savecompat"),
+           0);
+
+    Ihandle* savevbox = IupVbox(savesep, savelbl, self->preserveload, self->savecompat, NULL);
+    IupSetAttribute(savevbox, "CMARGIN", "0x0");
+    IupSetAttribute(savevbox, "CGAP", "2");
+
+    Ihandle* vbox = IupVbox(fpslabel, fpsdesc, self->fpsradio, savespc, savevbox, IupFill(), NULL);
     IupSetAttribute(vbox, "CMARGIN", "6x6");
 
     self->h = IupBackgroundBox(vbox);
@@ -163,6 +214,14 @@ bool TweaksPage_update(_In_ TweaksPage* self)
         strFromInt32(&self->fpscustomtext, val, 10);
         IupSetAttribute(self->fpscustomval, "VALUE", strC(self->fpscustomtext));
     }
+
+    IupSetAttribute(self->preserveload,
+                    "VALUE",
+                    ssdVal(bool, self->feature->settings, _S"preserveload", false) ? "ON" : "OFF");
+    IupSetAttribute(self->savecompat,
+                    "VALUE",
+                    ssdVal(bool, self->feature->settings, _S"savecompat", false) ? "ON" : "OFF");
+
     return true;
 }
 

@@ -62,6 +62,8 @@ typedef struct TweaksPage {
     Ihandle* fps120;
     Ihandle* fpscustom;
     Ihandle* fpscustomval;
+    Ihandle* preserveload;
+    Ihandle* savecompat;
 } TweaksPage;
 extern ObjClassInfo TweaksPage_clsinfo;
 #define TweaksPage(inst) ((TweaksPage*)(unused_noeval((inst) && &((inst)->_is_TweaksPage)), (inst)))
