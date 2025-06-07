@@ -39,7 +39,7 @@ strref cfieldString(hashtable fields, strref name);
     RWLock handler_lock;
     hashtable:string:object handlers;
     object:TRFifo preGameReady;
-    object:TRFifo gameStart;    // loading, saving, new game, etc
+    object:TRFifo gameEvents;   // game events that should be processed in order
 
     factory create(Subspace* subspace);
     bool start();

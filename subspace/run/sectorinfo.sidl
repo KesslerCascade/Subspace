@@ -1,0 +1,10 @@
+#include "subspace.h"
+
+class SectorInfo implements Sortable {
+    int64 sectorpoint;
+    int64 time;     // time first entered
+    string type;
+    int32 seed;
+
+    factory create();
+}

@@ -4,6 +4,7 @@
 // clang-format off
 #include <cx/obj.h>
 #include "subspace.h"
+#include "sectorinfo.h"
 
 typedef struct RunInfo RunInfo;
 typedef struct RunInfo_WeakRef RunInfo_WeakRef;
@@ -17,6 +18,10 @@ typedef enum {
     RUN_Abandoned = 3
 } RunResult;
 
+#define SPOINT(num, extra) (((num) << 8) | ((extra) & 0xff))
+#define SPOINT_NUM(spoint) ((spoint) >> 8)
+#define SPOINT_EXTRA(spoint) ((spoint) & 0xff)
+
 typedef struct RunInfo_ClassIf {
     ObjIface* _implements;
     ObjIface* _parent;
@@ -24,6 +29,7 @@ typedef struct RunInfo_ClassIf {
 
     void (*newGame)(_In_ void* self, int seed, _In_opt_ strref shipType, _In_opt_ strref shipName, int difficulty);
     void (*loadGame)(_In_ void* self, int seed, _In_opt_ strref shipType, _In_opt_ strref shipName, int difficulty, int beacons);
+    void (*enterSector)(_In_ void* self, int num, int seed, _In_opt_ strref type, bool secret);
     void (*abandon)(_In_ void* self);
 } RunInfo_ClassIf;
 extern RunInfo_ClassIf RunInfo_ClassIf_tmpl;
@@ -49,6 +55,7 @@ typedef struct RunInfo {
     int64 startTime;
     int64 endTime;
     int64 savepoint;
+    int64 sectorpoint;
     int32 shipsDefeated;
     int32 beaconsExplored;
     int32 scrapCollected;
@@ -56,6 +63,7 @@ typedef struct RunInfo {
     int32 scrapActual;
     int32 damageTaken;
     string savePath;
+    sa_SectorInfo sectors;
     bool recording;        // is this run being currently recorded (i.e. not a historical run)
 } RunInfo;
 extern ObjClassInfo RunInfo_clsinfo;
@@ -81,6 +89,8 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoNewGame(self, seed, shipType, shipName, difficulty) (self)->_->newGame(RunInfo(self), seed, shipType, shipName, difficulty)
 // void runinfoLoadGame(RunInfo* self, int seed, strref shipType, strref shipName, int difficulty, int beacons);
 #define runinfoLoadGame(self, seed, shipType, shipName, difficulty, beacons) (self)->_->loadGame(RunInfo(self), seed, shipType, shipName, difficulty, beacons)
+// void runinfoEnterSector(RunInfo* self, int num, int seed, strref type, bool secret);
+#define runinfoEnterSector(self, num, seed, type, secret) (self)->_->enterSector(RunInfo(self), num, seed, type, secret)
 // void runinfoAbandon(RunInfo* self);
 #define runinfoAbandon(self) (self)->_->abandon(RunInfo(self))
 

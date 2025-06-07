@@ -1,4 +1,5 @@
 #include "subspace.h"
+#include "sectorinfo.sidl"
 
 // Do NOT change the ordering of these; the values are saved in the database as-is!
 typedef enum {
@@ -8,11 +9,21 @@ typedef enum {
     RUN_Abandoned = 3
 } RunResult;
 
+// Sectorpoint is 256 * [sector number] + extra
+// Savepoint is 256 * [beacon number] + extra
+// Where extra is the number of extra sectors or beacons there are.
+// For sectors going to a secret sector increments extra.
+// For beacons, waiting on the same beacon increments extra.
+
+#define SPOINT(num, extra) (((num) << 8) | ((extra) & 0xff))
+#define SPOINT_NUM(spoint) ((spoint) >> 8)
+#define SPOINT_EXTRA(spoint) ((spoint) & 0xff)
+
 class RunInfo {
     Subspace *ss;
     RWLock lock;
 
-    int64 runid;          // -1 if not tracked
+    int64 runid;        // -1 if not tracked
     int32 seed;
     string shipType;
     string shipName;
@@ -23,6 +34,7 @@ class RunInfo {
     int64 endTime;
 
     int64 savepoint;
+    int64 sectorpoint;
 
     int32 shipsDefeated;
     int32 beaconsExplored;
@@ -33,11 +45,15 @@ class RunInfo {
 
     string savePath;
 
+    [sorted] sarray:object:SectorInfo sectors;
+
     bool recording;     // is this run being currently recorded (i.e. not a historical run)
 
     factory create(Subspace *ss);
     void newGame(int seed, strref shipType, strref shipName, int difficulty);
     void loadGame(int seed, strref shipType, strref shipName, int difficulty, int beacons);
+
+    void enterSector(int num, int seed, strref type, bool secret);
 
     void abandon();
 }

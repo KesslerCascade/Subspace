@@ -17,6 +17,7 @@ static bool dbCreateRuns(sqlite3* db)
                      "start INTEGER NOT NULL DEFAULT 0,"
                      "end INTEGER NOT NULL DEFAULT 0,"
                      "savepoint INTEGER NOT NULL DEFAULT 0,"
+                     "sectorpoint INTEGER NOT NULL DEFAULT 256,"
                      "beacons_explored INTEGER NOT NULL DEFAULT 0,"
                      "ships_defeated INTEGER NOT NULL DEFAULT 0,"
                      "scrap_collected INTEGER NOT NULL DEFAULT 0,"
@@ -57,11 +58,11 @@ static bool dbCreateSectors(sqlite3* db)
     if (sqlite3_exec(db,
                      "CREATE TABLE sectors ("
                      "runid INTEGER NOT NULL,"
-                     "sectornum INTEGER NOT NULL,"
+                     "sectorpoint INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
                      "type TEXT NOT NULL,"
                      "seed INTEGER NOT NULL,"
-                     "PRIMARY KEY (runid, sectornum))",
+                     "PRIMARY KEY (runid, sectorpoint))",
                      NULL,
                      NULL,
                      NULL) != SQLITE_OK)
@@ -85,7 +86,7 @@ static bool dbCreateBeacons(sqlite3* db)
                      "CREATE TABLE beacons ("
                      "runid INTEGER NOT NULL,"
                      "savepoint INTEGER NOT NULL,"
-                     "sectornum INTEGER NOT NULL,"
+                     "sectorpoint INTEGER NOT NULL,"
                      "beaconidx INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
                      "initial_event TEXT,"
@@ -114,7 +115,7 @@ static bool dbCreateSaves(sqlite3* db)
                      "CREATE TABLE saves ("
                      "runid INTEGER NOT NULL,"
                      "savepoint INTEGER NOT NULL,"
-                     "sectornum INTEGER NOT NULL,"
+                     "sectorpoint INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
                      "filename TEXT NOT NULL,"
                      "PRIMARY KEY (runid, savepoint))",
@@ -141,7 +142,7 @@ static bool dbCreateEvents(sqlite3* db)
                      "CREATE TABLE events ("
                      "runid INTEGER NOT NULL,"
                      "savepoint INTEGER NOT NULL,"
-                     "sectornum INTEGER NOT NULL,"
+                     "sectorpoint INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
                      "event TEXT NOT NULL,"
                      "param1,"
@@ -166,7 +167,7 @@ static bool dbCreateEvents(sqlite3* db)
         ret = false;
 
     if (sqlite3_exec(db,
-                     "CREATE INDEX events_runid_sectornum ON events (runid, sectornum)",
+                     "CREATE INDEX events_runid_sectorpoint ON events (runid, sectorpoint)",
                      NULL,
                      NULL,
                      NULL) != SQLITE_OK)
@@ -191,7 +192,7 @@ static bool dbCreateCombatEvents(sqlite3* db)
                      "CREATE TABLE combatevents ("
                      "runid INTEGER NOT NULL,"
                      "savepoint INTEGER NOT NULL,"
-                     "sectornum INTEGER NOT NULL,"
+                     "sectorpoint INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
                      "event TEXT NOT NULL,"
                      "param1,"

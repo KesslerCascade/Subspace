@@ -50,6 +50,7 @@ set(SUBSPACE_SIDL
     kbmgr/keybind.sidl
     lang/langdb.sidl
     run/runinfo.sidl
+    run/sectorinfo.sidl
     ui/mainwin.sidl
     ui/settingswin.sidl
     ui/subspaceui.sidl
@@ -89,6 +90,7 @@ add_executable(subspace
     control/cmds/cmdloading.c
     control/cmds/cmdlog.c
     control/cmds/cmdnewgame.c
+    control/cmds/cmdsector.c
     control/cmds/cmdvalidate.c
     db/database.c
     db/dbstmt.c
@@ -116,6 +118,7 @@ add_executable(subspace
     lang/lang.c
     lang/langdb.c
     run/runinfo.c
+    run/sectorinfo.c
     ui/about.c
     ui/mainwin.c
     ui/mainwinlayout.c

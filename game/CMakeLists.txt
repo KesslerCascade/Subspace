@@ -126,6 +126,7 @@ add_executable(subspacegame
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
+    hook/starmap/starmap_generatemap.c
     hook/textlibrary/textlibrary_gettext.c
     hook/worldmanager/worldmanager_createnewgame.c
     hook/worldmanager/worldmanager_loadgame.c

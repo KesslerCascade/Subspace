@@ -21,6 +21,7 @@ extern Patch patch_MouseControl_OnRender;
 extern Patch patch_ResourceControl_RenderLoadingBar;
 extern Patch patch_ShipStatus_RenderHealth;
 extern Patch patch_ShipStatus_OnRender;
+extern Patch patch_StarMap_GenerateMap;
 extern Patch patch_TextLibrary_GetText;
 extern Patch patch_WorldManager_CreateNewGame;
 extern Patch patch_WorldManager_LoadGame;

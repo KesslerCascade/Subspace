@@ -10,6 +10,7 @@ static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     ._implements = (ObjIface*)&RunInfo_ClassIf_tmpl,
     .newGame = (void (*)(void*, int, strref, strref, int))RunInfo_newGame,
     .loadGame = (void (*)(void*, int, strref, strref, int, int))RunInfo_loadGame,
+    .enterSector = (void (*)(void*, int, int, strref, bool))RunInfo_enterSector,
     .abandon = (void (*)(void*))RunInfo_abandon,
 };
 

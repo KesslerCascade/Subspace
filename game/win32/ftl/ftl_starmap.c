@@ -59,7 +59,7 @@ Symbol SYM(StarMap_StartSecretSector) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap17StartSecretSectorEv" },
              { 0 } }
 };
-FuncInfo FUNC(StarMap_StartSecretSector) = {
+FuncInfo FUNCINFO(StarMap_StartSecretSector) = {
     .nargs   = 1,
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false } },
@@ -153,7 +153,7 @@ Symbol SYM(StarMap_NewGame) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap7NewGameEb" },
              { 0 } }
 };
-FuncInfo FUNC(StarMap_NewGame) = {
+FuncInfo FUNCINFO(StarMap_NewGame) = {
     .nargs   = 2,
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
@@ -210,7 +210,7 @@ Symbol SYM(StarMap_GenerateSectorMap) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap17GenerateSectorMapEv" },
              { 0 } }
 };
-FuncInfo FUNC(StarMap_GenerateSectorMap) = {
+FuncInfo FUNCINFO(StarMap_GenerateSectorMap) = {
     .nargs   = 1,
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false } },
@@ -223,7 +223,7 @@ Symbol SYM(StarMap_GenerateMap) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap11GenerateMapEbb" },
              { 0 } }
 };
-FuncInfo FUNC(StarMap_GenerateMap) = {
+FuncInfo FUNCINFO(StarMap_GenerateMap) = {
     .nargs   = 3,
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_INT, 0, true } },
@@ -266,4 +266,19 @@ DisasmTrace StarMap_GenerateMap_trace = {
 Symbol SYM(StarMap_currentSectorSeed_offset) = {
     SYMNAME("StarMap->currentSectorSeed"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_GenerateMap_trace }, { 0 } }
+};
+
+static void StarMap_worldLevel_offset_find(addr_t addr, Symbol* sym, SymbolFind* find)
+{
+    if (symResolve(addr, WorldManager_starMap_offset) &&
+        symResolve(addr, WorldManager_starMap_worldLevel_offset)) {
+        sym->addr = SYM(WorldManager_starMap_worldLevel_offset).addr -
+            SYM(WorldManager_starMap_offset).addr;
+        sym->resolved = true;
+    }
+}
+
+Symbol SYM(StarMap_worldLevel_offset) = {
+    SYMNAME("StarMap->worldLevel"),
+    .find = { { .type = SYMBOL_FIND_CUSTOM, .func = StarMap_worldLevel_offset_find }, { 0 } }
 };

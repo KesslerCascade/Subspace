@@ -75,6 +75,7 @@ typedef struct SubspaceGameSettings {
 
 typedef struct GameGlobalState {
     bool clearToStart;
+    bool sendSectorInfo;   // send sector info next frame
 
     // Numeric Hull
     bool overrideHullText;

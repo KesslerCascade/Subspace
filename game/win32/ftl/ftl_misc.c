@@ -57,4 +57,4 @@ Symbol SYM(random32) = {
              { .type = SYMBOL_FIND_EXPORT, .name = "random32" },
              { 0 } }
 };
-FuncInfo FUNC(random32) = { .nargs = 0, .purecdecl = true, .rettype = RET_INT };
+FuncInfo FUNCINFO(random32) = { .nargs = 0, .purecdecl = true, .rettype = RET_INT };

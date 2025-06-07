@@ -156,6 +156,10 @@ void GameInst_setStateLocked(_In_ GameInst* self, GameInstState state)
 {
     if (self->state != state) {
         self->state = state;
+
+        if (self->state != GI_Run)
+            objRelease(&self->currentRun);
+
         withReadLock (&self->ss->lock) {
             if (self->ss->curinst == self) {
                 ssuiUpdateMain(self->ss->ui, NULL);
