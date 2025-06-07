@@ -181,10 +181,10 @@ bool TweaksPage_make(_In_ TweaksPage* self, Ihandle* list)
 
     Ihandle* savevbox = IupVbox(savesep, savelbl, self->preserveload, self->savecompat, NULL);
     IupSetAttribute(savevbox, "CMARGIN", "0x0");
-    IupSetAttribute(savevbox, "CGAP", "2");
 
     Ihandle* vbox = IupVbox(fpslabel, fpsdesc, self->fpsradio, savespc, savevbox, IupFill(), NULL);
     IupSetAttribute(vbox, "CMARGIN", "6x6");
+    IupSetAttribute(vbox, "CGAP", "4");
 
     self->h = IupBackgroundBox(vbox);
 
