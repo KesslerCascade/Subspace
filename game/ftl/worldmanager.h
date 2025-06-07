@@ -10,6 +10,7 @@ typedef struct CompleteShip CompleteShip;
 typedef struct ShipEvent ShipEvent;
 typedef struct StarMap StarMap;
 typedef struct Location Location;
+typedef struct CommandGui CommandGui;
 
 int subspace_WorldManager_ctor_pre(WorldManager* self);
 
@@ -20,6 +21,10 @@ extern DisasmTrace WorldManager_StartGame_trace;
 extern DisasmTrace WorldManager_OnInit_trace;
 extern DisasmTrace WorldManager_Restart_trace;
 extern DisasmTrace WorldManager_CreateNewGame_trace;
+extern DisasmTrace WorldManager_CheckForNewLocation_trace;
+extern DisasmTrace WorldManager_CheckForNewLocation_trace_2;
+extern DisasmTrace WorldManager_PrepareAutoSave_trace;
+extern DisasmTrace WorldManager_PauseLoop_trace;
 
 typedef int (*FUNCTYPE(WorldManager_ctor))(WorldManager* self);
 DECLFUNC(WorldManager_ctor);
@@ -27,11 +32,20 @@ DECLFUNC(WorldManager_ctor);
 typedef int (*FUNCTYPE(WorldManager_OnInit))(WorldManager* self);
 DECLFUNC(WorldManager_OnInit);
 
+typedef void (*FUNCTYPE(WorldManager_OnLoop))(WorldManager* self);
+DECLFUNC(WorldManager_OnLoop);
+
 typedef void (*FUNCTYPE(WorldManager_StartGame))(WorldManager* self, ShipManager* newShip);
 DECLFUNC(WorldManager_StartGame);
 
 typedef void (*FUNCTYPE(WorldManager_LoadGame))(WorldManager* self, basic_string* file);
 DECLFUNC(WorldManager_LoadGame);
+
+typedef void (*FUNCTYPE(WorldManager_SaveGame))(WorldManager* self);
+DECLFUNC(WorldManager_SaveGame);
+
+typedef void (*FUNCTYPE(WorldManager_PrepareAutoSave))(WorldManager* self);
+DECLFUNC(WorldManager_PrepareAutoSave);
 
 typedef void (*FUNCTYPE(WorldManager_Restart))(WorldManager* self);
 DECLFUNC(WorldManager_Restart);
@@ -61,3 +75,13 @@ DECLSYM(WorldManager_starMap_offset);
 DECLSYM(WorldManager_starMap_worldLevel_offset);
 #define WorldManager_worldLevel(worldmgr) \
     (*(&MEMBER(ftlbase, WorldManager, worldmgr, int, starMap_worldLevel)))
+
+DECLSYM(WorldManager_commandGui_offset);
+#define WorldManager_commandGui(worldmgr) \
+    (*(&MEMBER(ftlbase, WorldManager, worldmgr, CommandGui*, commandGui)))
+
+typedef void (*FUNCTYPE(WorldManager_PauseLoop))(WorldManager* self);
+DECLFUNC(WorldManager_PauseLoop);
+
+typedef bool (*FUNCTYPE(WorldManager_CheckForNewLocation))(WorldManager* self, bool savingGame);
+DECLFUNC(WorldManager_CheckForNewLocation);

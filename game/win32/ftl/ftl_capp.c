@@ -522,23 +522,25 @@ DisasmTrace CApp_OnLoop_trace = {
                 .flow = DT_FLOW_JMP_BOTH },   // JE/JNE branch ordering in different versions
               { I_CALL,
                 .argf   = { ARG_MATCH },
-                .argcap = { DT_MATCH1 } },   // CALL CommandGui::IsPaused
-              { DT_OP(SKIP), .imin = 3, .imax = 10 },
+                .argcap = { DT_MATCH1 } },             // CALL CommandGui::IsPaused
+              { DT_OP(SKIP), .imin = 1, .imax = 5 },
+             { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL WorldManager::OnLoop
+              { DT_OP(SKIP), .imin = 1, .imax = 8 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
-              { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL CommandGui::OnLoop
+              { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL CommandGui::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
-              { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL CommandGui::GetCommand
+              { I_CALL, .argout = { DT_OUT_SYM9 } },   // CALL CommandGui::GetCommand
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CMP },
              { I_JA },
-             { I_JMP, .outip = { DT_OUT_SYM9 } },     // switch() waypoint
+             { I_JMP, .outip = { DT_OUT_SYM10 } },    // switch() waypoint
               { DT_OP(FINISH) } },
     .out  = { &SYM(CFPS_OnLoop),                       // DT_OUT_SYM1
               &SYM(MouseControl_OnLoop),               // DT_OUT_SYM2
@@ -546,8 +548,9 @@ DisasmTrace CApp_OnLoop_trace = {
               &SYM(AchievementTracker_Tracker),        // DT_OUT_SYM4
               &SYM(AchievementTracker_OnLoop),         // DT_OUT_SYM5
               &SYM(wp_CApp_OnLoop_MenuMenu_handler),   // DT_OUT_SYM6
-              &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM7
-              &SYM(CommandGui_GetCommand),             // DT_OUT_SYM8
+              &SYM(WorldManager_OnLoop),               // DT_OUT_SYM7
+              &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM8
+              &SYM(CommandGui_GetCommand),             // DT_OUT_SYM9
               &SYM(wp_CApp_OnLoop_GetCommand_switch) }
 };
 
@@ -631,6 +634,34 @@ DisasmTrace CApp_OnLoop_trace_s5 = {
     .out  = { &SYM(MainMenu_Open) }
 };
 
+/*
+UNUSED: In some versions this points to a wrapper around SaveGame that checks IsGameOver first,
+        but in others that wrapper gets inlined. See WorldManager_PrepareAutoSave_trace instead.
+DisasmTrace CApp_OnLoop_trace_s8 = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(wp_CApp_OnLoop_GetCommand_switch),
+    .ops  = { { DT_OP(JMPTBL), .val = 8 },   // switch(), case 8
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL,
+                .argf   = { ARG_MATCH },
+                .argsym = { &SYM(TutorialManager_Running) } },   // CALL TutorialManager_Running
+              { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_ALL },
+             { I_CALL,
+                .argf   = { ARG_MATCH },
+                .argsym = { &SYM(CommandGui_IsGameOver) } },   // CALL CommandGui_IsGameOver
+              { DT_OP(SKIP), .imin = 2, .imax = 5 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CApp_world_offset) } },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL WorldManager::SaveGame
+              { I_JMP },
+
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(WorldManager_SaveGame) }
+};
+*/
+
 DisasmTrace CApp_OnLoop_menu = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(wp_CApp_OnLoop_MenuMenu_handler),
@@ -650,12 +681,17 @@ DisasmTrace CApp_OnLoop_menu = {
              { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = 9 } } },
              { DT_OP(SKIP), .imin = 4, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(FileHelper_getSaveFile) } },
-             { DT_OP(SKIP), .imin = 7, .imax = 16 },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL FileHelper::fileExists
+              { DT_OP(SKIP), .imin = 5, .imax = 14 },
              { I_TEST, .argf = { ARG_REG, ARG_REG }, .args = { { REG_AL }, { REG_AL } } },
              { DT_OP(SKIP), .imin = 1, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(FileHelper_getSaveFile) } },
              { DT_OP(SKIP), .imin = 1, .imax = 6 },
-             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL WorldManager::LoadGame
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL WorldManager::LoadGame
               { DT_OP(FINISH) } },
-    .out  = { &SYM(MainMenu_OnLoop), &SYM(MainMenu_Choice), &SYM(WorldManager_LoadGame) }
+    .out  = { &SYM(MainMenu_OnLoop),                   // DT_OUT_SYM1
+              &SYM(MainMenu_Choice),                   // DT_OUT_SYM2
+              &SYM(FileHelper_fileExists),             // DT_OUT_SYM3
+              &SYM(WorldManager_LoadGame) }
 };

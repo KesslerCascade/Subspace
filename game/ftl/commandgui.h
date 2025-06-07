@@ -36,6 +36,18 @@ typedef bool (*FUNCTYPE(CommandGui_IsGameOver))(CommandGui* self);
 DECLFUNC(CommandGui_IsGameOver);
 #define CommandGui_IsGameOver(self) FCALL(ftlbase, CommandGui_IsGameOver, self)
 
+typedef bool (*FUNCTYPE(CommandGui_IsJumpComplete))(CommandGui* self);
+DECLFUNC(CommandGui_IsJumpComplete);
+#define CommandGui_IsJumpComplete(self) FCALL(ftlbase, CommandGui_IsJumpComplete, self)
+
+typedef void (*FUNCTYPE(CommandGui_ForceJumpComplete))(CommandGui* self);
+DECLFUNC(CommandGui_ForceJumpComplete);
+#define CommandGui_ForceJumpComplete(self) FCALL(ftlbase, CommandGui_ForceJumpComplete, self)
+
+typedef bool (*FUNCTYPE(CommandGui_CanSave))(CommandGui* self);
+DECLFUNC(CommandGui_CanSave);
+#define CommandGui_CanSave(self) FCALL(ftlbase, CommandGui_CanSave, self)
+
 typedef void (*FUNCTYPE(CommandGui_RenderStatic))(CommandGui* self);
 DECLFUNC(CommandGui_RenderStatic);
 

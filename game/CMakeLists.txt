@@ -40,6 +40,7 @@ if(WIN32)
         win32/ftl/ftl_combatcontrol.c
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
+        win32/ftl/ftl_eventsystem.c
         win32/ftl/ftl_filehelper.c
         win32/ftl/ftl_ftlbutton.c
         win32/ftl/ftl_globals.c

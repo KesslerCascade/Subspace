@@ -2,6 +2,7 @@
 #include "ftl/capp.h"
 #include "ftl/commandgui.h"
 #include "ftl/completeship.h"
+#include "ftl/eventsystem.h"
 #include "ftl/globals.h"
 #include "ftl/misc.h"
 #include "ftl/scorekeeper.h"
@@ -321,4 +322,188 @@ FuncInfo FUNCINFO(WorldManager_CreateLocation) = {
 Symbol SYM(WorldManager_playerShip_offset) = {
     SYMNAME("WorldManager->playerShip"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_StartGame_trace }, { 0 } }
+};
+
+DisasmTrace WorldManager_CheckForNewLocation_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(WorldManager_CheckForNewLocation),
+    .ops  = { { I_PUSH },
+             { DT_OP(SKIP), .imin = 9, .imax = 15 },
+             { I_CALL },   // CALL CommandGui::GetNewLocation
+              { DT_OP(SKIP), .imin = 2, .imax = 8 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM1 } },        // this->commandGui
+              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL CommandGui::IsJumpComplete
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(WorldManager_commandGui_offset),    // DT_OUT_SYM1
+              &SYM(CommandGui_IsJumpComplete) }
+};
+
+// In some versions, this half of the function is part of the main CheckForNewLocation function
+// (inlined?), but in others, it's a separate static function that is called from it.
+DisasmTrace WorldManager_CheckForNewLocation_trace_2 = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "FLEET_DISTRACTION",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH },
+             { DT_OP(SKIP), .imin = 10, .imax = 30, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(WorldManager_commandGui_offset) } },   // this->commandGui
+              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL CommandGui::ForceJumpComplete
+              { DT_OP(SKIP), .imin = 6, .imax = 13, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = &SYM(StarMap_GenerateMap) },
+             { DT_OP(SKIP), .imin = 8, .imax = 18 },
+             { I_MOV, .argf = { 0, ARG_ADDR }, .argstr = { 0, "FLEET_DISTRACTION" } },
+             { DT_OP(SKIP), .imin = 2, .imax = 7 },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 1 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL ShipObject::HasEquipment
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_ForceJumpComplete),      // DT_OUT_SYM1
+              &SYM(ShipManager_HasEquipment) }
+};
+
+DisasmTrace WorldManager_PauseLoop_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "ACH_FED_DIPLOMACY",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 6, .imax = 12 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // this pointer
+              { DT_OP(SKIP), .imin = 10, .imax = 50, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(WorldManager_CheckForNewLocation) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { 0, DT_OUT_SYM2 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL EventSystem::PollEvent
+              { DT_OP(SKIP), .imin = 2, .imax = 8 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH1 } },          // ECX back to this
+              { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL WorldManager::PrepareAutoSave
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(WorldManager_PauseLoop),            // DT_OUT_SYM1
+              &SYM(EventSystem_EventManager),          // DT_OUT_SYM2
+              &SYM(EventSystem_PollEvent),             // DT_OUT_SYM3
+              &SYM(WorldManager_PrepareAutoSave) }
+};
+
+DisasmTrace WorldManager_PrepareAutoSave_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(WorldManager_PrepareAutoSave),
+    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // this pointer
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(WorldManager_commandGui_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL CommandGui::CanSave
+              { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .args = { ARG_ADDR }, .argsym = { &SYM(TutorialManager_Running) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .args = { ARG_ADDR }, .argsym = { &SYM(CommandGui_IsGameOver) } },
+             // some versions have a second IsGameOver call where the wrapper has been inlined;
+              // can work around that by looking for the right 'this' instance
+              { DT_OP(SKIP), .imin = 1, .imax = 11, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH1 } },          // set ECX back to this (WorldManager)
+              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL WorldManager::SaveGame
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_CanSave),                // DT_OUT_SYM1
+              &SYM(WorldManager_SaveGame) }
+};
+
+INITWRAP(WorldManager_SaveGame);
+Symbol SYM(WorldManager_SaveGame) = {
+    SYMNAME("WorldManager::SaveGame"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_PrepareAutoSave_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager8SaveGameEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_SaveGame) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+INITWRAP(WorldManager_PrepareAutoSave);
+Symbol SYM(WorldManager_PrepareAutoSave) = {
+    SYMNAME("WorldManager::PrepareAutoSave"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_PauseLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager15PrepareAutoSaveEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_PrepareAutoSave) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+Symbol SYM(WorldManager_commandGui_offset) = {
+    SYMNAME("WorldManager->commandGui"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CheckForNewLocation_trace },
+             { 0 } }
+};
+
+Symbol SYM(WorldManager_PauseLoop) = {
+    SYMNAME("WorldManager::PauseLoop"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_PauseLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager9PauseLoopEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_PauseLoop) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+Symbol SYM(WorldManager_OnLoop) = {
+    SYMNAME("WorldManager::OnLoop"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager6OnLoopEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_OnLoop) = { .nargs   = 1,
+                                           .stdcall = true,
+                                           .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                           .rettype = RET_VOID };
+
+DisasmTrace WorldManager_OnLoop_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(WorldManager_OnLoop),
+    .ops  = { { DT_OP(SKIP), .imin = 9, .imax = 17 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },
+             { DT_OP(FINISH) } },
+    .out  = &SYM(WorldManager_CheckForNewLocation)
+};
+
+Symbol SYM(WorldManager_CheckForNewLocation) = {
+    SYMNAME("WorldManager::CheckForNewLocation"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12WorldManager19CheckForNewLocationEb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_CheckForNewLocation) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
 };

@@ -274,3 +274,43 @@ FuncInfo FUNCINFO(CommandGui_GetCommand) = {
     .args    = { { 4, ARG_PTR, REG_ECX, false } },
     .rettype = RET_INT
 };
+
+INITWRAP(CommandGui_IsJumpComplete);
+Symbol SYM(CommandGui_IsJumpComplete) = {
+    SYMNAME("CommandGui::IsJumpComplete"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CheckForNewLocation_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui14IsJumpCompleteEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_IsJumpComplete) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_INT
+};
+
+INITWRAP(CommandGui_ForceJumpComplete);
+Symbol SYM(CommandGui_ForceJumpComplete) = {
+    SYMNAME("CommandGui::ForceJumpComplete"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CheckForNewLocation_trace_2 },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui17ForceJumpCompleteEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_ForceJumpComplete) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+INITWRAP(CommandGui_CanSave);
+Symbol SYM(CommandGui_CanSave) = {
+    SYMNAME("CommandGui::CanSave"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_PrepareAutoSave_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui7CanSaveEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_CanSave) = { .nargs   = 1,
+                                          .stdcall = true,
+                                          .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                          .rettype = RET_INT };

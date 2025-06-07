@@ -33,6 +33,12 @@ typedef int (*FUNCTYPE(ShipManager_GetMissileCount))(ShipManager* ship);
 DECLFUNC(ShipManager_GetMissileCount);
 #define ShipManager_GetMissileCount(self) FCALL(ftlbase, ShipManager_GetMissileCount, self)
 
+// technically this is a ShipObject method, but it's ShipManager's base class and is always at
+// offset 0
+typedef int (*FUNCTYPE(ShipManager_HasEquipment))(ShipManager* ship, basic_string* blueName);
+DECLFUNC(ShipManager_HasEquipment);
+#define ShipManager_HasEquipment(self) FCALL(ftlbase, ShipManager_HasEquipment, self)
+
 DECLSYM(ShipManager_ship_offset);
 DECLSYM(ShipManager_current_target_offset);
 DECLSYM(ShipManager_currentScrap_offset);

@@ -1,5 +1,6 @@
 #include "ftl/capp.h"
 #include "ftl/filehelper.h"
+#include "ftl/scorekeeper.h"
 #include "hook/disasmtrace.h"
 
 INITWRAP(FileHelper_getUserFolder);
@@ -58,3 +59,44 @@ Symbol SYM(FileHelper_deleteAllSaveFiles) = {
 FuncInfo FUNCINFO(FileHelper_deleteAllSaveFiles) = { .nargs     = 0,
                                                      .purecdecl = true,
                                                      .rettype   = RET_VOID };
+
+INITWRAP(FileHelper_fileExists);
+Symbol SYM(FileHelper_fileExists) = {
+    SYMNAME("FileHelper::fileExists"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name =
+                    "_ZN10FileHelper10fileExistsERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(FileHelper_fileExists) = { .nargs     = 1,
+                                             .purecdecl = true,
+                                             .args      = { { 4, ARG_PTR, 0, true } } };
+
+INITWRAP(FileHelper_deleteFile);
+Symbol SYM(FileHelper_deleteFile) = {
+    SYMNAME("FileHelper::deleteFile"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ScoreKeeper_Save_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name =
+                    "_ZN10FileHelper10deleteFileERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(FileHelper_deleteFile) = { .nargs     = 1,
+                                             .purecdecl = true,
+                                             .args      = { { 4, ARG_PTR, 0, true } } };
+
+INITWRAP(FileHelper_renameFile);
+Symbol SYM(FileHelper_renameFile) = {
+    SYMNAME("FileHelper::renameFile"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ScoreKeeper_Save_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name =
+                    "_ZN10FileHelper10renameFileERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEES7_" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(FileHelper_renameFile) = {
+    .nargs     = 2,
+    .purecdecl = true,
+    .args      = { { 4, ARG_PTR, 0, true }, { 4, ARG_PTR, 0, true } }
+};
