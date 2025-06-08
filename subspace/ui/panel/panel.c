@@ -17,6 +17,7 @@ const char* panelbg = "32 32 32";
 void Panel_destroy(_In_ Panel* self)
 {
     // Autogen begins -----
+    objRelease(&self->sc);
     strDestroy(&self->title);
     // Autogen ends -------
 }
@@ -39,6 +40,14 @@ bool Panel_update(_In_ Panel* self)
 intptr Panel_cmp(_In_ Panel* self, Panel* other, uint32 flags)
 {
     return stCmp(strref, self->name, other->name);
+}
+
+_objinit_guaranteed bool Panel_init(_In_ Panel* self)
+{
+    self->sc = uiscCreate(self->ss);
+    // Autogen begins -----
+    return true;
+    // Autogen ends -------
 }
 
 // Autogen begins -----

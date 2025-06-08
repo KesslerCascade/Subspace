@@ -28,6 +28,7 @@ static ObjIface* _ifimpl_Panel[] = {
 ObjClassInfo Panel_clsinfo = {
     .instsize = sizeof(Panel),
     .classif = (ObjIface*)&Panel_ClassIf_tmpl,
+    .init = (bool(*)(void*))Panel_init,
     .destroy = (void(*)(void*))Panel_destroy,
     .ifimpl = _ifimpl_Panel,
 };

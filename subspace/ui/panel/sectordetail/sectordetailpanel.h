@@ -36,6 +36,7 @@ typedef struct SectorDetailPanel {
 
     Subspace* ss;
     SubspaceUI* ui;
+    UIStrCache* sc;
     Ihandle* h;
     Ihandle* parent;
     strref name;

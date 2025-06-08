@@ -1,0 +1,14 @@
+#include "subspace.h"
+
+typedef const char const_char;
+
+[methodprefix uisc] class UIStrCache {
+    Subspace* ss;
+    hashtable:string:none cache;
+
+    factory create(Subspace* ss);
+    strref add(strref str);
+    const_char* cadd(strref str);
+    strref trans(strref lang_key);
+    const_char* ctrans(strref lang_key);
+}

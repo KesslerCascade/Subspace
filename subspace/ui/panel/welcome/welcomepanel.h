@@ -36,6 +36,7 @@ typedef struct WelcomePanel {
 
     Subspace* ss;
     SubspaceUI* ui;
+    UIStrCache* sc;
     Ihandle* h;
     Ihandle* parent;
     strref name;

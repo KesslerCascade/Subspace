@@ -70,6 +70,7 @@ set(SUBSPACE_SIDL
     ui/util/iupattrdispatch.sidl
     ui/util/iuprefreshdispatch.sidl
     ui/util/iupsetimagedispatch.sidl
+    ui/util/uistrcache.sidl
     ui/util/uiupdatedispatch.sidl
     )
 
@@ -146,6 +147,7 @@ add_executable(subspace
     ui/util/iuprefreshdispatch.c
     ui/util/iupsetimagedispatch.c
     ui/util/settip.c
+    ui/util/uistrcache.c
     ui/util/uiupdatedispatch.c
     win32/process.c
     win32/subspace.manifest

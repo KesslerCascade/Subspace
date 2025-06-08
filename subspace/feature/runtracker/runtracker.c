@@ -25,8 +25,8 @@ _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss)
 
 extern SettingsPage*
 SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
-#define parent_createSettingsPage(ui) \
-    SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
+extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
+#define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
 SettingsPage* RunTracker_createSettingsPage(_In_ RunTracker* self, SubspaceUI* ui)
 {
     return NULL;

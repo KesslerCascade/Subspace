@@ -20,6 +20,7 @@ static ObjIface* _ifimpl_SettingsPage[] = {
 ObjClassInfo SettingsPage_clsinfo = {
     .instsize = sizeof(SettingsPage),
     .classif = (ObjIface*)&SettingsPage_ClassIf_tmpl,
+    .init = (bool(*)(void*))SettingsPage_init,
     .destroy = (void(*)(void*))SettingsPage_destroy,
     .ifimpl = _ifimpl_SettingsPage,
 };
