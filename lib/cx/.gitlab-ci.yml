@@ -63,7 +63,7 @@ build_wasm:
   stage: build
   tags:
     - docker
-  image: 'emscripten/emsdk'
+  image: 'emscripten/emsdk:4.0.8'
   script:
     - 'cmake -S . -DCMAKE_BUILD_TYPE=Release -B _native'
     - 'make -C _native -j4 cxobjgen'
@@ -117,7 +117,7 @@ test_wasm:
   stage: test
   tags:
     - docker
-  image: 'emscripten/emsdk'
+  image: 'emscripten/emsdk:4.0.8'
   dependencies:
     - build_wasm
   script:

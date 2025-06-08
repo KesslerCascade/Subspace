@@ -462,7 +462,23 @@ const char *_Nonnull strC(strref s)
 }
 
 _Use_decl_annotations_
-uint8 *_Nonnull strBuffer(strhandle ps, uint32 minsz)
+const char* strPC(strhandle ps)
+{
+    if (!STR_CHECK_VALID(*ps))
+        return "";
+
+    if (!(_strHdr(*ps) & STR_ROPE)) {
+        // simple string, can just return the buffer
+        return (char*)_strBuffer(*ps);
+    } else {
+        // it's a rope, flatten the referenced string
+        _strFlatten(ps, _strFastLen(*ps));
+        return (char*)_strBuffer(*ps);
+    }
+}
+
+_Use_decl_annotations_
+uint8 *strBuffer(strhandle ps, uint32 minsz)
 {
     if (!STR_CHECK_VALID(*ps))
         strReset(ps, minsz);

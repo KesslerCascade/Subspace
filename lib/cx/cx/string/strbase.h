@@ -81,6 +81,19 @@ void strDestroy(_Inout_ strhandle ps);
 // Returns: C-style string
 _Ret_valid_ const char *_Nonnull strC(_In_opt_ strref s);
 
+// Obtains a *persistent* read-only pointer to a classic C-style string.
+// This function occupies a middle ground between strC and strBuffer.
+// Unlike strC, the returned pointer is guarnateed to be persistent, so
+// long as the string object pointed to by ps is not modified.
+// Unlike strBuffer, this function may return a pointer to a buffer that
+// is shared between multiple string instances, so the returned C
+// string must be treated as read-only.
+// Also unlike strBuffer, it will not duplicate the string if shared,
+// only if the string is not in a compatible form (i.e. a rope).
+//      ps: Pointer to string handle.
+// Returns: C-style string
+_Ret_valid_ const char* _Nonnull strPC(_Inout_ strhandle ps);
+
 // Obtains a read-write pointer to a string's backing memory buffer.
 // This causes string memory to no longer be shared with duplicates.
 // Pointer is valid until the next string function is called.
