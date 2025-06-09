@@ -44,8 +44,9 @@ typedef struct Subspace {
     SSDNode* settings;
     Event notify;   // notification event for the main thread
 
-    RWLock lock;    // for volatile data (curinst)
-    GameInst* curinst;   // game instance that is focused by the UI
+    RWLock lock;    // for volatile data (game, run)
+    GameInst* game;   // active game instance
+    RunInfo* run;     // run that is focused in the UI
 
     TaskQueue* workq;
     ControlServer* svr;
@@ -72,8 +73,14 @@ bool subspaceMount(Subspace* ss);
 void subspaceUnmount(Subspace* ss);
 void subspaceUpdateUI(Subspace* ss);       // use sparingly, updates entire UI
 void spointFormat(string* out, int64 spoint);
-GameInst* subspaceCurInst(Subspace* ss);   // acquires inst, must release!
-RunInfo* subspaceCurRun(Subspace* ss);     // acquires inst, must release!
+GameInst* subspaceGame(Subspace* ss);      // acquires gameinst, must release!
+void subspaceSetGame(Subspace* ss, GameInst* game);
+bool subspaceIsGame(Subspace* ss, GameInst* game);
+void subspaceClearGame(Subspace* ss, GameInst* ifgame);
+RunInfo* subspaceRun(Subspace* ss);   // acquires runinfo, must release!
+void subspaceSetRun(Subspace* ss, RunInfo* run);
+bool subspaceIsRun(Subspace* ss, RunInfo* run);
+void subspaceClearRun(Subspace* ss, RunInfo* ifrun);
 bool logOpen(VFS* vfs, string filename, LogDest** defer);
 bool logClose(void);
 void fatalError(strref msg, bool osdeperr);

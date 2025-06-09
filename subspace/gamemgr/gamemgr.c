@@ -94,11 +94,7 @@ bool GameMgr_launchGame(_In_ GameMgr* self, LaunchMode mode, GameInst** out)
 
     // if we're launching to play, set this as the focused instance
     if (ret && mode == LAUNCH_PLAY) {
-        withWriteLock (&ss->lock) {
-            objRelease(&ss->curinst);
-            ss->curinst = objAcquire(ninst);
-        }
-        subspaceUpdateUI(ss);
+        subspaceSetGame(ss, ninst);
     }
 
     if (out)

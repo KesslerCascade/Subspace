@@ -72,13 +72,7 @@ static void instCloseCb(ProcessHandle* h, uint32 pid, void* userdata)
             objRelease(&gmgr);
         }
 
-        withWriteLock (&ss->lock) {
-            if (ss->curinst == inst) {
-                objRelease(&ss->curinst);
-                ssuiUpdateMain(ss->ui, NULL);
-                ssuiUpdateMain(ss->ui, _S"gameinfo");
-            }
-        }
+        subspaceClearGame(ss, inst);
 
         withWriteLock (&inst->lock) {
             procCloseHandle(&inst->process);
@@ -157,14 +151,9 @@ void GameInst_setStateLocked(_In_ GameInst* self, GameInstState state)
     if (self->state != state) {
         self->state = state;
 
-        if (self->state != GI_Run)
-            objRelease(&self->currentRun);
-
-        withReadLock (&self->ss->lock) {
-            if (self->ss->curinst == self) {
-                ssuiUpdateMain(self->ss->ui, NULL);
-                ssuiUpdateMain(self->ss->ui, _S"gameinfo");
-            }
+        if (subspaceIsGame(self->ss, self)) {
+            ssuiUpdateMain(self->ss->ui, NULL);
+            ssuiUpdateMain(self->ss->ui, _S"gameinfo");
         }
     }
 }
@@ -215,6 +204,33 @@ void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
     subspaceUpdateUI(ss);
 }
 
+RunInfo* GameInst_run(_In_ GameInst* self)
+{
+    RunInfo* ret;
+    withReadLock (&self->lock) {
+        ret = objAcquire(self->activeRun);
+    }
+    return ret;
+}
+
+void GameInst_setRun(_In_ GameInst* self, RunInfo* run)
+{
+    withWriteLock (&self->lock) {
+        objRelease(&self->activeRun);
+        self->activeRun = objAcquire(run);
+    }
+}
+
+void GameInst_clearRun(_In_ GameInst* self)
+{
+    withWriteLock (&self->lock) {
+        objRelease(&self->activeRun);
+    }
+
+    // do NOT update subspace focused run, because the user may want to gaze lovingly at it for a
+    // while after finishing
+}
+
 void GameInst_destroy(_In_ GameInst* self)
 {
     if (self->process)
@@ -226,7 +242,7 @@ void GameInst_destroy(_In_ GameInst* self)
     strDestroy(&self->exepath);
     htDestroy(&self->features);
     objRelease(&self->data);
-    objRelease(&self->currentRun);
+    objRelease(&self->activeRun);
     // Autogen ends -------
 }
 

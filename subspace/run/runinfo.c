@@ -181,6 +181,9 @@ void RunInfo_newGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
         RunInfo_newTracked(self, seed, shipType, shipName, difficulty);
     else
         RunInfo_newUntracked(self, seed, shipType, shipName, difficulty);
+
+    // when starting a new game, the run is automatically focused by the UI
+    subspaceSetRun(self->ss, self);
 }
 
 void RunInfo_loadGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
@@ -190,6 +193,9 @@ void RunInfo_loadGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
         RunInfo_findOrCreateTracked(self, seed, shipType, shipName, difficulty, beacons);
     else
         RunInfo_newUntracked(self, seed, shipType, shipName, difficulty);
+
+    // when loading a saved game, the run is automatically focused by the UI
+    subspaceSetRun(self->ss, self);
 }
 
 void RunInfo_abandon(_In_ RunInfo* self)
@@ -260,7 +266,9 @@ void RunInfo_enterSector(_In_ RunInfo* self, int num, int seed, _In_opt_ strref 
         }
 
         saPushC(&self->sectors, object, &nsec);
-        ssuiUpdateMain(self->ss->ui, _S"gameinfo");
+
+        if (subspaceIsRun(self->ss, self))
+            ssuiUpdateMain(self->ss->ui, _S"gameinfo");
 
 out:
         break;
@@ -337,7 +345,8 @@ void RunInfo_updateStats(_In_ RunInfo* self, int ships, int beacons, int scrap, 
             dbstmtExec(stmt);
         }
 
-        ssuiUpdateMain(self->ss->ui, _S"gameinfo");
+        if (subspaceIsRun(self->ss, self))
+            ssuiUpdateMain(self->ss->ui, _S"gameinfo");
     }
 
     strDestroy(&sql);

@@ -42,7 +42,7 @@ typedef enum GameInstState {
     float loadPct;
     int failReason;
 
-    object:RunInfo currentRun;
+    object:RunInfo activeRun;   // run that is being updated by this instance
 
     factory create(GameMgr *mgr, strref exepath, LaunchMode mode);
     factory createForClient(GameMgr *mgr, ControlClient *client, uint32 cookie); // for dev mode clients
@@ -50,6 +50,10 @@ typedef enum GameInstState {
     void setState(GameInstState state);
     void setStateLocked(GameInstState state);
     GameInstState getState();
+
+    RunInfo *run();     // acquires runinfo, must release!
+    void setRun(RunInfo *run);
+    void clearRun();
 
     void onGameReady(ControlClient *client);
 }

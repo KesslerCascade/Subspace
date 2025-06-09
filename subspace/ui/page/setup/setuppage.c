@@ -474,7 +474,7 @@ bool SetupPage_update(_In_ SetupPage* self)
                 ssdSet(self->ss->settings, _S"ftl/ver", true, stvar(string, self->verstr));
                 subspaceUpdateUI(self->ss);
 
-                GameInst* curinst = subspaceCurInst(self->ss);
+                GameInst* curinst = subspaceGame(self->ss);
                 int rinststate    = curinst ? ginstGetState(curinst) : GI_Init;
 
                 // cache feature availability

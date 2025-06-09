@@ -10,9 +10,8 @@ void cmdLoadGame(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtab
     int difficulty  = cfieldValD(int32, fields, _S"difficulty", 0);
     int beacons  = cfieldValD(int32, fields, _S"beacons", 0);
 
-    withWriteLock (&inst->lock) {
-        objRelease(&inst->currentRun);
-        inst->currentRun = runinfoCreate(inst->ss);
-        runinfoLoadGame(inst->currentRun, seed, shiptype, shipname, difficulty, beacons);
-    }
+    RunInfo* nrun = runinfoCreate(inst->ss);
+    ginstSetRun(inst, nrun);
+    runinfoLoadGame(nrun, seed, shiptype, shipname, difficulty, beacons);
+    objRelease(&nrun);
 }

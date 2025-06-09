@@ -9,11 +9,7 @@ void cmdStats(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable 
     int scrap    = cfieldValD(int32, fields, _S"scrap", -1);
     int crew    = cfieldValD(int32, fields, _S"crew", -1);
 
-    RunInfo* cur = NULL;
-    withReadLock (&inst->lock) {
-        cur = objAcquire(inst->currentRun);
-    }
-
+    RunInfo* cur = ginstRun(inst);
     if (cur) {
         runinfoUpdateStats(cur, ships, beacons, scrap, crew);
         objRelease(&cur);

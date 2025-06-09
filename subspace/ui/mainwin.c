@@ -223,7 +223,7 @@ void MainWin_update(_In_ MainWin* self)
 
     // update play button status
     if (haveexe) {
-        GameInst* inst = subspaceCurInst(self->ss);
+        GameInst* inst = subspaceGame(self->ss);
         if (inst) {
             GameInstState st = ginstGetState(inst);
             if (st == GI_Init || st == GI_Exited)

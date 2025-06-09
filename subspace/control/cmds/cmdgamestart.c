@@ -20,10 +20,8 @@ void cmdGameStart(GameInst* inst, ControlClient* client, ControlMsg* msg, hashta
         ssdStringOut(ss->settings, _S"ftl/exe", &inst->exepath);
         gmgrReg(ss->gmgr, inst);
 
-        withWriteLock (&ss->lock) {
-            objRelease(&ss->curinst);
-            ss->curinst = objAcquire(inst);
-        }
+        // set this client as the focused instance
+        subspaceSetGame(ss, inst);
     }
 
     if (inst) {

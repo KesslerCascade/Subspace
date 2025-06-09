@@ -48,30 +48,94 @@ static void parseArgs(Subspace* ss, VFS* vfs)
     }
 }
 
-GameInst* subspaceCurInst(Subspace* ss)
+GameInst* subspaceGame(Subspace* ss)
 {
     GameInst* ret = NULL;
     withReadLock (&ss->lock) {
-        ret = objAcquire(ss->curinst);
+        ret = objAcquire(ss->game);
     }
     return ret;
 }
 
-RunInfo* subspaceCurRun(Subspace* ss)
+RunInfo* subspaceRun(Subspace* ss)
 {
-    GameInst* inst = NULL;
-    RunInfo* ret   = NULL;
-
+    RunInfo* ret = NULL;
     withReadLock (&ss->lock) {
-        inst = objAcquire(ss->curinst);
+        ret = objAcquire(ss->run);
     }
-
-    withReadLock (&inst->lock) {
-        ret = objAcquire(inst->currentRun);
-    }
-
-    objRelease(&inst);
     return ret;
+}
+
+void subspaceSetGame(Subspace* ss, GameInst* game)
+{
+    withWriteLock (&ss->lock) {
+        objRelease(&ss->game);
+        ss->game = objAcquire(game);
+    }
+    // toolbar and info panel
+    ssuiUpdateMain(ss->ui, NULL);
+    ssuiUpdateMain(ss->ui, _S"gameinfo");
+}
+
+bool subspaceIsGame(Subspace* ss, GameInst* game)
+{
+    bool ret = false;
+    withReadLock (&ss->lock) {
+        ret = (ss->game == game);
+    }
+    return ret;
+}
+
+void subspaceClearGame(Subspace* ss, GameInst* ifgame)
+{
+    bool cleared = false;
+    withWriteLock (&ss->lock) {
+        if (ss->game && (ss->game == ifgame || !ifgame)) {
+            objRelease(&ss->game);
+            cleared = true;
+        }
+    }
+
+    if (cleared) {
+        // toolbar and info panel
+        ssuiUpdateMain(ss->ui, NULL);
+        ssuiUpdateMain(ss->ui, _S"gameinfo");
+    }
+}
+
+void subspaceSetRun(Subspace* ss, RunInfo* run)
+{
+    withWriteLock (&ss->lock) {
+        objRelease(&ss->run);
+        ss->run = objAcquire(run);
+    }
+    // refresh all UI components
+    subspaceUpdateUI(ss);
+}
+
+bool subspaceIsRun(Subspace* ss, RunInfo* run)
+{
+    bool ret = false;
+    withReadLock (&ss->lock) {
+        ret = (ss->run == run);
+    }
+    return ret;
+}
+
+void subspaceClearRun(Subspace* ss, RunInfo* ifrun)
+{
+    bool cleared = false;
+    withWriteLock (&ss->lock) {
+        if (ss->run && (ss->run == ifrun || !ifrun)) {
+            objRelease(&ss->run);
+            cleared = true;
+        }
+    }
+
+    if (cleared) {
+        // refresh all UI components
+        subspaceUpdateUI(ss);
+    }
 }
 
 void subspaceUpdateUI(Subspace* ss)
@@ -162,7 +226,8 @@ static void subspaceShutdown()
 {
     // 13 -------- Running state
     withWriteLock (&subspace.lock) {
-        objRelease(&subspace.curinst);
+        objRelease(&subspace.game);
+        objRelease(&subspace.run);
     }
 
     // 12 -------- Control Server shutdown

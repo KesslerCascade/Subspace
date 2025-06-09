@@ -204,6 +204,9 @@ static void makeInfo(GameInfoPanel* self)
     IupSetAttribute(self->statsbox, "BGCOLOR", panelbg);
     IupSetAttribute(self->statsbox, "BGCOLOR*:0", "56 56 56");
     IupSetAttribute(self->statsbox, "FGCOLOR", "255 255 255");
+    IupSetAttribute(self->statsbox, "SZIE", "1x1");
+    IupSetAttribute(self->statsbox, "NUMCOL_VISIBLE", "0");
+    IupSetAttribute(self->statsbox, "NUMLIN_VISIBLE", "0");
     IupSetAttribute(self->statsbox, "EXPAND", "YES");
     IupSetAttribute(self->statsbox, "FLATSCROLLBAR", "VERTICAL");
     IupSetAttribute(self->statsbox, "FRAMECOLOR", "48 48 48");
@@ -264,13 +267,94 @@ static void gotoSubPanel(GameInfoPanel* self, Ihandle* subpanel)
     }
 }
 
+static void GameInfoPanel_updateRun(GameInfoPanel* self, RunInfo* run)
+{
+    gotoSubPanel(self, self->info);
+
+    withReadLock (&run->lock) {
+        string temp = 0, temp2 = 0;
+
+        IupSetStrAttribute(self->shipname, "TITLE", strC(run->shipName));
+        IupSetStrAttribute(self->shiptype, "TITLE",
+                           strC(run->shipType));   // TODO: Translate
+        if (saSize(run->sectors) > 0) {
+            SectorInfo* last = run->sectors.a[saSize(run->sectors) - 1];
+
+            spointFormat(&temp2, last->sectorpoint);
+            strFormat(&temp,
+                      langGet(self->ss, _S"runinfo_sector_format"),
+                      stvar(strref, temp2),
+                      stvar(strref, last->type));   // TODO: Translate
+            IupSetStrAttribute(self->sector, "TITLE", strC(temp));
+        } else {
+            IupSetAttribute(self->sector, "TITLE", langGetC(self->ss, "runinfo_sector_unknown"));
+        }
+
+        string diffstr = _S"difficulty_unknown";
+        if (run->difficulty == 2)
+            diffstr = _S"difficulty_hard";
+        else if (run->difficulty == 1)
+            diffstr = _S"difficulty_normal";
+        else if (run->difficulty == 0)
+            diffstr = _S"difficulty_easy";
+
+        IupSetStrAttribute(self->difficulty, "TITLE", strC(langGet(self->ss, diffstr)));
+
+        strFormat(&temp, langGet(self->ss, _S"runinfo_seed_format"), stvar(int32, run->seed));
+        IupSetStrAttribute(self->seed, "TITLE", strC(temp));
+
+        // update stats
+        int64 started = toLocalTime(run->startTime);
+        TimeParts p;
+        timeDecompose(&p, started);
+
+        strFormat(&temp2, _S"weekday_short${int}", stvar(int32, p.wday));
+        strFormat(&temp,
+                  _S"${string} ${int}-${0int(2)}-${0int(2)} ${0int(2)}:${0int(2)}:${0int(2)}",
+                  stvar(strref, langGet(self->ss, temp2)),
+                  stvar(int32, p.year),
+                  stvar(int32, p.month),
+                  stvar(int32, p.day),
+                  stvar(int32, p.hour),
+                  stvar(int32, p.minute),
+                  stvar(int32, p.second));
+        IupSetStrAttribute(self->statsbox, "1:1", strC(temp));
+
+        // TODO: Add actual if known
+        strFromInt32(&temp, run->scrapCollected, 10);
+        IupSetStrAttribute(self->statsbox, "2:1", strC(temp));
+
+        strFromInt32(&temp, run->beaconsExplored, 10);
+        IupSetStrAttribute(self->statsbox, "3:1", strC(temp));
+
+        strFromInt32(&temp, run->shipsDefeated, 10);
+        IupSetStrAttribute(self->statsbox, "4:1", strC(temp));
+
+        strFromInt32(&temp, run->crewHired, 10);
+        IupSetStrAttribute(self->statsbox, "5:1", strC(temp));
+
+        strFromInt32(&temp, runinfoScore(run), 10);
+        IupSetStrAttribute(self->statsbox, "6:1", strC(temp));
+
+        IupSetAttribute(self->statsbox, "REDRAW", "ALL");
+
+        IupRefresh(self->info);
+    }
+}
+
 extern bool Panel_update(_In_ Panel* self);   // parent
 #define parent_update() Panel_update((Panel*)(self))
 bool GameInfoPanel_update(_In_ GameInfoPanel* self)
 {
-    GameInst* inst   = subspaceCurInst(self->ss);
+    GameInst* inst   = subspaceGame(self->ss);
+    RunInfo* run     = subspaceRun(self->ss);
     GameInstState st = GI_Init;
-    bool running     = false;
+
+    // If a run is currently focused (either live or loaded from the database), that takes priority
+    if (run) {
+        GameInfoPanel_updateRun(self, run);
+        goto out;
+    }
 
     // play button disabling
 
@@ -310,88 +394,8 @@ bool GameInfoPanel_update(_In_ GameInfoPanel* self)
         goto out;
     }
 
-    if (st == GI_Run) {
-        RunInfo* run = subspaceCurRun(self->ss);
-        if (run) {
-            gotoSubPanel(self, self->info);
-
-            withReadLock (&run->lock) {
-                string temp = 0, temp2 = 0;
-
-                IupSetStrAttribute(self->shipname, "TITLE", strC(run->shipName));
-                IupSetStrAttribute(self->shiptype,
-                                   "TITLE",
-                                   strC(run->shipType));   // TODO: Translate
-                if (saSize(run->sectors) > 0) {
-                    SectorInfo* last = run->sectors.a[saSize(run->sectors) - 1];
-
-                    spointFormat(&temp2, last->sectorpoint);
-                    strFormat(&temp,
-                              langGet(self->ss, _S"runinfo_sector_format"),
-                              stvar(strref, temp2),
-                              stvar(strref, last->type));   // TODO: Translate
-                    IupSetStrAttribute(self->sector, "TITLE", strC(temp));
-                } else {
-                    IupSetAttribute(self->sector,
-                                    "TITLE",
-                                    langGetC(self->ss, "runinfo_sector_unknown"));
-                }
-
-                string diffstr = _S"difficulty_unknown";
-                if (run->difficulty == 2)
-                    diffstr = _S"difficulty_hard";
-                else if (run->difficulty == 1)
-                    diffstr = _S"difficulty_normal";
-                else if (run->difficulty == 0)
-                    diffstr = _S"difficulty_easy";
-
-                IupSetStrAttribute(self->difficulty, "TITLE", strC(langGet(self->ss, diffstr)));
-
-                strFormat(&temp, langGet(self->ss, _S"runinfo_seed_format"), stvar(int32, run->seed));
-                IupSetStrAttribute(self->seed, "TITLE", strC(temp));
-
-                // update stats
-                int64 started = toLocalTime(run->startTime);
-                TimeParts p;
-                timeDecompose(&p, started);
-
-                strFormat(&temp2, _S"weekday_short${int}", stvar(int32, p.wday));
-                strFormat(&temp,
-                          _S"${string} ${int}-${0int(2)}-${0int(2)} ${int}:${0int(2)}:${0int(2)}",
-                          stvar(strref, langGet(self->ss, temp2)),
-                          stvar(int32, p.year),
-                          stvar(int32, p.month),
-                          stvar(int32, p.day),
-                          stvar(int32, p.hour),
-                          stvar(int32, p.minute),
-                          stvar(int32, p.second));
-                IupSetStrAttribute(self->statsbox, "1:1", strC(temp));
-
-                // TODO: Add actual if known
-                strFromInt32(&temp, run->scrapCollected, 10);
-                IupSetStrAttribute(self->statsbox, "2:1", strC(temp));
-
-                strFromInt32(&temp, run->beaconsExplored, 10);
-                IupSetStrAttribute(self->statsbox, "3:1", strC(temp));
-
-                strFromInt32(&temp, run->shipsDefeated, 10);
-                IupSetStrAttribute(self->statsbox, "4:1", strC(temp));
-
-                strFromInt32(&temp, run->crewHired, 10);
-                IupSetStrAttribute(self->statsbox, "5:1", strC(temp));
-
-                strFromInt32(&temp, runinfoScore(run), 10);
-                IupSetStrAttribute(self->statsbox, "6:1", strC(temp));
-
-                IupSetAttribute(self->statsbox, "REDRAW", "ALL");
-
-                IupRefresh(self->info);
-            }
-            objRelease(&run);
-        }
-    }
-
 out:
+    objRelease(&run);
     objRelease(&inst);
     return true;
 }

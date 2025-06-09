@@ -9,11 +9,7 @@ void cmdSector(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable
     bool secret = cfieldValD(bool, fields, _S"secret", false);
     strref type = cfieldString(fields, _S"type");
 
-    RunInfo* cur = NULL;
-    withReadLock (&inst->lock) {
-        cur = objAcquire(inst->currentRun);
-    }
-
+    RunInfo* cur = ginstRun(inst);
     if (cur) {
         runinfoEnterSector(cur, num, seed, type, secret);
         objRelease(&cur);

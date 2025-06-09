@@ -43,7 +43,7 @@ extern void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled);   
 #define parent_enable(enabled) SubspaceFeature_enable((SubspaceFeature*)(self), enabled)
 void RunTracker_enable(_In_ RunTracker* self, bool enabled)
 {
-    GameInst* inst = subspaceCurInst(self->ss);
+    GameInst* inst = subspaceGame(self->ss);
     if (!inst || ginstGetState(inst) == GI_Menu) {
         // can change this if the game isn't running or is at the menu
         parent_enable(enabled);

@@ -9,9 +9,8 @@ void cmdNewGame(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtabl
     int seed        = cfieldValD(int32, fields, _S"seed", 0);
     int difficulty  = cfieldValD(int32, fields, _S"difficulty", 0);
 
-    withWriteLock (&inst->lock) {
-        objRelease(&inst->currentRun);
-        inst->currentRun = runinfoCreate(inst->ss);
-        runinfoNewGame(inst->currentRun, seed, shiptype, shipname, difficulty);
-    }
+    RunInfo* nrun = runinfoCreate(inst->ss);
+    ginstSetRun(inst, nrun);
+    runinfoNewGame(nrun, seed, shiptype, shipname, difficulty);
+    objRelease(&nrun);
 }
