@@ -1,10 +1,14 @@
 #include "control/controlclient.h"
 #include "ftl/capp.h"
+#include "ftl/scorekeeper.h"
 #include "ftl/starmap.h"
 #include "ftl/worldmanager.h"
 #include "hook/hook.h"
 #include "patch/patchlist.h"
 #include "subspacegame.h"
+
+#define NUM_STATS 4
+static int lastStats[NUM_STATS];
 
 // ---- Hooks ----------------
 
@@ -31,7 +35,38 @@ int subspace_CApp_OnLoop_pre(CApp* self)
     return 1;   // we do want to execute the original CApp::OnLoop
 }
 
-void subspace_CApp_OnLoop_post(CApp* self) {}
+void subspace_CApp_OnLoop_post(CApp* self)
+{
+    StatTracker* stats = ScoreKeeper_stats(SKeeper);
+    int statschanged   = 0;
+
+    // we actually have hooks for the stat update functions, but it's super cheap to simply check
+    // them each loop anyway, since for stat tracking we don't care about WHY it changed
+
+    for (int i = 0; i < NUM_STATS; i++) {
+        if (stats[i].current != lastStats[i])
+            statschanged++;
+    }
+
+    if (statschanged) {
+        ControlMsg* msg = controlNewMsg("Stats", statschanged);
+
+        int f = 0;
+        if (stats[0].current != lastStats[0])
+            controlMsgInt(msg, f++, "ships", stats[0].current);
+        if (stats[1].current != lastStats[1])
+            controlMsgInt(msg, f++, "beacons", stats[1].current);
+        if (stats[2].current != lastStats[2])
+            controlMsgInt(msg, f++, "scrap", stats[2].current);
+        if (stats[3].current != lastStats[3])
+            controlMsgInt(msg, f++, "crew", stats[3].current);
+        controlClientQueue(msg);
+
+        for (int i = 0; i < NUM_STATS; i++) {
+            lastStats[i] = stats[i].current;
+        }
+    }
+}
 
 // ---- Patch ----------------
 
@@ -51,5 +86,6 @@ Patch patch_CApp_OnLoop = {
                         &SYM(StarMap_bSecretSector_offset),
                         &SYM(StarMap_worldLevel_offset),
                         &SYM(Sector_description_type_offset),
+                        &SYM(ScoreKeeper_Keeper),
                         0 }
 };

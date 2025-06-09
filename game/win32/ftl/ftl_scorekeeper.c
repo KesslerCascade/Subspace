@@ -114,3 +114,57 @@ Symbol SYM(ScoreKeeper_Reset) = {
 FuncInfo FUNCINFO(ScoreKeeper_Reset) = { .nargs   = 1,
                                          .stdcall = true,
                                          .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+
+INITWRAP(ScoreKeeper_AddDefeatedShips);
+Symbol SYM(ScoreKeeper_AddDefeatedShips) = {
+    SYMNAME("ScoreKeeper::AddDefeatedShips"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_OnLoop_Mantis_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ScoreKeeper16AddDefeatedShipsEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ScoreKeeper_AddDefeatedShips) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+INITWRAP(ScoreKeeper_AddCrew);
+Symbol SYM(ScoreKeeper_AddCrew) = {
+    SYMNAME("ScoreKeeper::AddCrew"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CreateNewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ScoreKeeper7AddCrewEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ScoreKeeper_AddCrew) = { .nargs   = 1,
+                                           .stdcall = true,
+                                           .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                           .rettype = RET_VOID };
+
+INITWRAP(ScoreKeeper_AddExploredLocations);
+Symbol SYM(ScoreKeeper_AddExploredLocations) = {
+    SYMNAME("ScoreKeeper::AddExploredLocations"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CreateLocation_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ScoreKeeper20AddExploredLocationsEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ScoreKeeper_AddExploredLocations) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+INITWRAP(ScoreKeeper_AddScrapCollected);
+Symbol SYM(ScoreKeeper_AddScrapCollected) = {
+    SYMNAME("ScoreKeeper::AddScrapCollected"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_ModifyResources_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ScoreKeeper17AddScrapCollectedEi" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ScoreKeeper_AddScrapCollected) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_VOID
+};

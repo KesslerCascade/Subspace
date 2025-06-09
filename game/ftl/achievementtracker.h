@@ -16,3 +16,8 @@ DECLFUNC(AchievementTracker_OnLoop);
 
 typedef void (*FUNCTYPE(AchievementTracker_ResetFlags))(AchievementTracker* self);
 DECLFUNC(AchievementTracker_ResetFlags);
+
+typedef void (*FUNCTYPE(AchievementTracker_SetAchievement))(AchievementTracker* self,
+                                                            basic_string* achievement, bool noPopup,
+                                                            bool sendToServer);
+DECLFUNC(AchievementTracker_SetAchievement);

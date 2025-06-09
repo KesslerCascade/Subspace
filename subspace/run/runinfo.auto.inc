@@ -11,6 +11,8 @@ static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     .newGame = (void (*)(void*, int, strref, strref, int))RunInfo_newGame,
     .loadGame = (void (*)(void*, int, strref, strref, int, int))RunInfo_loadGame,
     .enterSector = (void (*)(void*, int, int, strref, bool))RunInfo_enterSector,
+    .updateStats = (void (*)(void*, int, int, int, int))RunInfo_updateStats,
+    .score = (int32 (*)(void*))RunInfo_score,
     .abandon = (void (*)(void*))RunInfo_abandon,
 };
 

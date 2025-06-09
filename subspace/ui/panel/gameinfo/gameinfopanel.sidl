@@ -10,6 +10,14 @@ class GameInfoPanel extends Panel {
     Ihandle *info;
     Ihandle *zbox;
 
+    Ihandle *shipname;
+    Ihandle *shiptype;
+    Ihandle *sector;
+    Ihandle *difficulty;
+
+    Ihandle *statsbox;
+    Ihandle *seed;
+
     string loadpct;
     Ihandle *cursub;
 

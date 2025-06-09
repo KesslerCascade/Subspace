@@ -10,6 +10,7 @@ typedef struct CompleteShip CompleteShip;
 typedef struct ShipEvent ShipEvent;
 typedef struct StarMap StarMap;
 typedef struct Location Location;
+typedef struct LocationEvent LocationEvent;
 typedef struct CommandGui CommandGui;
 
 int subspace_WorldManager_ctor_pre(WorldManager* self);
@@ -25,6 +26,9 @@ extern DisasmTrace WorldManager_CheckForNewLocation_trace;
 extern DisasmTrace WorldManager_CheckForNewLocation_trace_2;
 extern DisasmTrace WorldManager_PrepareAutoSave_trace;
 extern DisasmTrace WorldManager_PauseLoop_trace;
+extern DisasmTrace WorldManager_ModifyResources_trace;
+extern DisasmTrace WorldManager_OnLoop_Mantis_trace;
+extern DisasmTrace WorldManager_CreateLocation_trace;
 
 typedef int (*FUNCTYPE(WorldManager_ctor))(WorldManager* self);
 DECLFUNC(WorldManager_ctor);
@@ -85,3 +89,7 @@ DECLFUNC(WorldManager_PauseLoop);
 
 typedef bool (*FUNCTYPE(WorldManager_CheckForNewLocation))(WorldManager* self, bool savingGame);
 DECLFUNC(WorldManager_CheckForNewLocation);
+
+typedef LocationEvent* (*FUNCTYPE(WorldManager_ModifyResources))(WorldManager* self,
+                                                                 LocationEvent* event);
+DECLFUNC(WorldManager_ModifyResources);

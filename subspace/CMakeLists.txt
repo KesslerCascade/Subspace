@@ -92,6 +92,7 @@ add_executable(subspace
     control/cmds/cmdlog.c
     control/cmds/cmdnewgame.c
     control/cmds/cmdsector.c
+    control/cmds/cmdstats.c
     control/cmds/cmdvalidate.c
     db/database.c
     db/dbstmt.c
@@ -155,6 +156,7 @@ add_executable(subspace
     win32/win32.c
     filesys.c
     log.c
+    misc.c
     subspace.c
     version.c
     ../lib/cx/cx/cx.natvis

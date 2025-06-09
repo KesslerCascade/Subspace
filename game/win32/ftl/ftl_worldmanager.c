@@ -282,12 +282,20 @@ DisasmTrace WorldManager_CreateNewGame_trace = {
                 .argcap = { 0, DT_MATCH1 } },
              { DT_OP(SKIP), .imin = 0, .imax = 3 },
              { I_CALL, .argout = { DT_OUT_SYM5 } },
+             { DT_OP(SKIP), .imin = 5, .imax = 15, .flow = DT_FLOW_JMP_ALL },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ScoreKeeper_Keeper) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM6 } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(ScoreKeeper_Reset),               // DT_OUT_SYM1
               &SYM(AchievementTracker_ResetFlags),   // DT_OUT_SYM2
               &SYM(RNG_useSysRand),                  // DT_OUT_SYM3
               &SYM(StarMap_NewGame),                 // DT_OUT_SYM4
-              &SYM(WorldManager_CreateLocation) }
+              &SYM(WorldManager_CreateLocation),     // DT_OUT_SYM5
+              &SYM(ScoreKeeper_AddCrew) }
 };
 
 INITWRAP(WorldManager_ClearLocation);
@@ -506,4 +514,89 @@ FuncInfo FUNCINFO(WorldManager_CheckForNewLocation) = {
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
     .rettype = RET_INT
+};
+
+DisasmTrace WorldManager_ModifyResources_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "clonebay",
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 31, .imax = 51 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 1 } } },   // income = true
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_CALL, .argout = DT_OUT_SYM2 },            // CALL ShipManager::ModifyScrapCount
+              { DT_OP(SKIP), .imin = 0, .imax = 10 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ScoreKeeper_Keeper) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL ScoreKeeper::AddScrapCollected
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(WorldManager_ModifyResources),      // DT_OUT_SYM1
+              &SYM(ShipManager_ModifyScrapCount),      // DT_OUT_SYM2
+              &SYM(ScoreKeeper_AddScrapCollected) }
+};
+
+Symbol SYM(WorldManager_ModifyResources) = {
+    SYMNAME("WorldManager::ModifyResources"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_ModifyResources_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN12WorldManager15ModifyResourcesEP13LocationEvent" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_ModifyResources) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } },
+    .rettype = RET_PTR
+};
+
+DisasmTrace WorldManager_OnLoop_Mantis_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "ACH_MANTIS_SURVIVOR",
+    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 7 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(AchievementTracker_Tracker) } },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL AchievementTracker::SetAchievement
+              { DT_OP(SKIP), .imin = 3, .imax = 10 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ScoreKeeper_Keeper) } },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },     // CALL ScoreKeeper::AddDefeatedShips
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(AchievementTracker_SetAchievement),   // DT_OUT_SYM1
+              &SYM(ScoreKeeper_AddDefeatedShips) }
+};
+
+DisasmTrace WorldManager_CreateLocation_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(WorldManager_CreateLocation),
+    .ops  = { { DT_OP(SKIP), .imin = 35, .imax = 60, .flow = DT_FLOW_JMP_BOTH },
+             { DT_OP(SKIP), .imin = 3, .imax = 10 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ScoreKeeper_Keeper) } },
+             { DT_OP(LABEL), .val = 1 },
+             // trace into ScoreKeeper::AddExploredLocations to verify this is the
+              // right ScoreKeeper function
+              { DT_OP(CALL) },
+             { I_PUSH, .outip = DT_OUT_SYM1 },   // ScoreKeeper::AddExploredLocations
+              { DT_OP(SKIP), .imin = 0, .imax = 8 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(TutorialManager_Tutorial) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(TutorialManager_Running) } },
+             // go back to call site in CreateLocaiton in case we want
+              // to trace this function further in the future
+              { DT_OP(GOTO), .val = 1 },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ScoreKeeper_AddExploredLocations) }
 };

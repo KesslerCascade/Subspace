@@ -18,9 +18,9 @@ typedef enum {
     RUN_Abandoned = 3
 } RunResult;
 
-#define SPOINT(num, extra) (((num) << 8) | ((extra) & 0xff))
-#define SPOINT_NUM(spoint) ((spoint) >> 8)
-#define SPOINT_EXTRA(spoint) ((spoint) & 0xff)
+#define SPOINT(num, extra) ((((int64)(num)) << 8) | ((extra) & 0xff))
+#define SPOINT_NUM(spoint) (int32)(((spoint) >> 8))
+#define SPOINT_EXTRA(spoint) ((int32)((spoint) & 0xff))
 
 typedef struct RunInfo_ClassIf {
     ObjIface* _implements;
@@ -30,6 +30,8 @@ typedef struct RunInfo_ClassIf {
     void (*newGame)(_In_ void* self, int seed, _In_opt_ strref shipType, _In_opt_ strref shipName, int difficulty);
     void (*loadGame)(_In_ void* self, int seed, _In_opt_ strref shipType, _In_opt_ strref shipName, int difficulty, int beacons);
     void (*enterSector)(_In_ void* self, int num, int seed, _In_opt_ strref type, bool secret);
+    void (*updateStats)(_In_ void* self, int ships, int beacons, int scrap, int crew);
+    int32 (*score)(_In_ void* self);
     void (*abandon)(_In_ void* self);
 } RunInfo_ClassIf;
 extern RunInfo_ClassIf RunInfo_ClassIf_tmpl;
@@ -91,6 +93,10 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoLoadGame(self, seed, shipType, shipName, difficulty, beacons) (self)->_->loadGame(RunInfo(self), seed, shipType, shipName, difficulty, beacons)
 // void runinfoEnterSector(RunInfo* self, int num, int seed, strref type, bool secret);
 #define runinfoEnterSector(self, num, seed, type, secret) (self)->_->enterSector(RunInfo(self), num, seed, type, secret)
+// void runinfoUpdateStats(RunInfo* self, int ships, int beacons, int scrap, int crew);
+#define runinfoUpdateStats(self, ships, beacons, scrap, crew) (self)->_->updateStats(RunInfo(self), ships, beacons, scrap, crew)
+// int32 runinfoScore(RunInfo* self);
+#define runinfoScore(self) (self)->_->score(RunInfo(self))
 // void runinfoAbandon(RunInfo* self);
 #define runinfoAbandon(self) (self)->_->abandon(RunInfo(self))
 

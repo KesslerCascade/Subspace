@@ -9,6 +9,8 @@
 #include "gameinfopanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include <cx/format.h>
+#include <iupcontrols.h>
 #include "gamemgr/gamemgr.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iupsetobj.h"
@@ -16,7 +18,7 @@
 _objfactory_guaranteed GameInfoPanel* GameInfoPanel_create(SubspaceUI* ui)
 {
     GameInfoPanel* self;
-    self = objInstCreate(GameInfoPanel);
+    self     = objInstCreate(GameInfoPanel);
     self->ss = ui->ss;
     self->ui = ui;
     strDup(&self->title, langGet(self->ss, _S"panel_gameinfo"));
@@ -160,6 +162,74 @@ static void makeTutorial(GameInfoPanel* self)
     IupSetAttribute(self->tutorial, "NCMARGIN", "8x8");
 }
 
+static void makeInfo(GameInfoPanel* self)
+{
+    self->shipname = IupFlatLabel("");
+    IupSetAttribute(self->shipname, "EXPAND", "HORIZONTAL");
+    self->shiptype = IupFlatLabel("");
+
+    Ihandle* headerline1 = IupHbox(self->shipname, self->shiptype, NULL);
+    IupSetAttribute(headerline1, "CMARGIN", "0x0");
+
+    self->sector = IupFlatLabel("");
+    IupSetAttribute(self->sector, "EXPAND", "HORIZONTAL");
+    self->difficulty = IupFlatLabel("");
+
+    Ihandle* headerline2 = IupHbox(self->sector, self->difficulty, NULL);
+    IupSetAttribute(headerline2, "CMARGIN", "0x0");
+
+    Ihandle* header   = IupVbox(headerline1, headerline2, NULL);
+    Ihandle* headerbg = IupBackgroundBox(header);
+    IupSetAttribute(headerbg, "BGCOLOR", "0 0 128");
+    IupSetAttribute(headerbg, "FGCOLOR", "255 255 255");
+    IupSetAttribute(headerbg, "FONT", "Helvetica, Bold 9");
+    IupSetAttribute(headerbg, "CGAP", "2");
+    IupSetAttribute(headerbg, "CMARGIN", "3x2");
+
+    self->seed      = IupFlatLabel("");
+    Ihandle* footer = IupHbox(IupFill(), self->seed, NULL);
+    IupSetAttribute(footer, "CMARGIN", "3x2");
+    Ihandle* footerbg = IupBackgroundBox(footer);
+    IupSetAttribute(footerbg, "BGCOLOR", "0 0 128");
+    IupSetAttribute(footerbg, "FGCOLOR", "255 255 255");
+    IupSetAttribute(footerbg, "FONT", "Helvetica, Bold 8");
+
+    self->statsbox = IupMatrix("");
+    IupSetAttribute(self->statsbox, "CURSOR", "ARROW");
+    IupSetAttribute(self->statsbox, "FLAT", "YES");
+    IupSetAttribute(self->statsbox, "READONLY", "YES");
+    IupSetAttribute(self->statsbox, "HIDEFOCUS", "YES");
+    IupSetAttribute(self->statsbox, "NUMCOL", "1");
+    IupSetAttribute(self->statsbox, "NUMLIN", "6");
+    IupSetAttribute(self->statsbox, "BGCOLOR", panelbg);
+    IupSetAttribute(self->statsbox, "BGCOLOR*:0", "56 56 56");
+    IupSetAttribute(self->statsbox, "FGCOLOR", "255 255 255");
+    IupSetAttribute(self->statsbox, "EXPAND", "YES");
+    IupSetAttribute(self->statsbox, "FLATSCROLLBAR", "VERTICAL");
+    IupSetAttribute(self->statsbox, "FRAMECOLOR", "48 48 48");
+    IupSetAttribute(self->statsbox, "ALIGNMENT0", "ARIGHT");
+    IupSetAttribute(self->statsbox, "ALIGNMENT1", "ALEFT");
+    IupSetAttribute(self->statsbox, "1:0", langGetC(self->ss, _S"runinfo_started"));
+    IupSetAttribute(self->statsbox, "2:0", langGetC(self->ss, _S"runinfo_scrap"));
+    IupSetAttribute(self->statsbox, "3:0", langGetC(self->ss, _S"runinfo_beacons"));
+    IupSetAttribute(self->statsbox, "4:0", langGetC(self->ss, _S"runinfo_ships"));
+    IupSetAttribute(self->statsbox, "5:0", langGetC(self->ss, _S"runinfo_crew"));
+    IupSetAttribute(self->statsbox, "6:0", langGetC(self->ss, _S"runinfo_score"));
+
+    self->info = IupVbox(headerbg, self->statsbox, footerbg, NULL);
+}
+
+static int panelResize(Ihandle* ih, int width, int height)
+{
+    GameInfoPanel* self = iupGetParentObj(GameInfoPanel, ih);
+    if (self) {
+        int titlewidth = IupGetInt(self->statsbox, "RASTERWIDTH0");
+        IupSetInt(self->statsbox, "RASTERWIDTH1", width - titlewidth);
+    }
+
+    return IUP_DEFAULT;
+}
+
 extern bool Panel_make(_In_ Panel* self);   // parent
 #define parent_make() Panel_make((Panel*)(self))
 bool GameInfoPanel_make(_In_ GameInfoPanel* self)
@@ -168,12 +238,20 @@ bool GameInfoPanel_make(_In_ GameInfoPanel* self)
     makeLoading(self);
     makeAtmenu(self);
     makeTutorial(self);
+    makeInfo(self);
 
-    self->zbox = IupZbox(self->notrunning, self->loading, self->atmenu, self->tutorial, NULL);
+    self->zbox = IupZbox(self->notrunning,
+                         self->loading,
+                         self->atmenu,
+                         self->tutorial,
+                         self->info,
+                         NULL);
     IupSetAttribute(self->zbox, "CHILDSIZEALL", "NO");
 
     self->h = IupBackgroundBox(self->zbox);
     IupSetAttribute(self->h, "BGCOLOR", panelbg);
+    iupSetObj(self->h, ObjNone, self, self->ui);
+    IupSetCallback(self->h, "RESIZE_CB", (Icallback)panelResize);
 
     return parent_make();
 }
@@ -230,6 +308,87 @@ bool GameInfoPanel_update(_In_ GameInfoPanel* self)
     if (st == GI_Tutorial) {
         gotoSubPanel(self, self->tutorial);
         goto out;
+    }
+
+    if (st == GI_Run) {
+        RunInfo* run = subspaceCurRun(self->ss);
+        if (run) {
+            gotoSubPanel(self, self->info);
+
+            withReadLock (&run->lock) {
+                string temp = 0, temp2 = 0;
+
+                IupSetAttribute(self->shipname, "TITLE", uiscCadd(self->sc, run->shipName));
+                IupSetAttribute(self->shiptype,
+                                "TITLE",
+                                uiscCadd(self->sc, run->shipType));   // TODO: Translate
+                if (saSize(run->sectors) > 0) {
+                    SectorInfo* last = run->sectors.a[saSize(run->sectors) - 1];
+
+                    spointFormat(&temp2, last->sectorpoint);
+                    strFormat(&temp,
+                              langGet(self->ss, _S"runinfo_sector_format"),
+                              stvar(strref, temp2),
+                              stvar(strref, last->type));   // TODO: Translate
+                    IupSetAttribute(self->sector, "TITLE", uiscCadd(self->sc, temp));
+                } else {
+                    IupSetAttribute(self->sector,
+                                    "TITLE",
+                                    langGetC(self->ss, _S"runinfo_sector_unknown"));
+                }
+
+                string diffstr = _S"difficulty_unknown";
+                if (run->difficulty == 2)
+                    diffstr = _S"difficulty_hard";
+                else if (run->difficulty == 1)
+                    diffstr = _S"difficulty_normal";
+                else if (run->difficulty == 0)
+                    diffstr = _S"difficulty_easy";
+
+                IupSetAttribute(self->difficulty, "TITLE", langGetC(self->ss, diffstr));
+
+                strFormat(&temp, langGet(self->ss, _S"runinfo_seed_format"), stvar(int32, run->seed));
+                IupSetAttribute(self->seed, "TITLE", uiscCadd(self->sc, temp));
+
+                // update stats
+                int64 started = toLocalTime(run->startTime);
+                TimeParts p;
+                timeDecompose(&p, started);
+
+                strFormat(&temp2, _S"weekday_short${int}", stvar(int32, p.wday));
+                strFormat(&temp,
+                          _S"${string} ${int}-${0int(2)}-${0int(2)} ${int}:${0int(2)}:${0int(2)}",
+                          stvar(strref, langGet(self->ss, temp2)),
+                          stvar(int32, p.year),
+                          stvar(int32, p.month),
+                          stvar(int32, p.day),
+                          stvar(int32, p.hour),
+                          stvar(int32, p.minute),
+                          stvar(int32, p.second));
+                IupSetAttribute(self->statsbox, "1:1", uiscCadd(self->sc, temp));
+
+                // TODO: Add actual if known
+                strFromInt32(&temp, run->scrapCollected, 10);
+                IupSetAttribute(self->statsbox, "2:1", uiscCadd(self->sc, temp));
+
+                strFromInt32(&temp, run->beaconsExplored, 10);
+                IupSetAttribute(self->statsbox, "3:1", uiscCadd(self->sc, temp));
+
+                strFromInt32(&temp, run->shipsDefeated, 10);
+                IupSetAttribute(self->statsbox, "4:1", uiscCadd(self->sc, temp));
+
+                strFromInt32(&temp, run->crewHired, 10);
+                IupSetAttribute(self->statsbox, "5:1", uiscCadd(self->sc, temp));
+
+                strFromInt32(&temp, runinfoScore(run), 10);
+                IupSetAttribute(self->statsbox, "6:1", uiscCadd(self->sc, temp));
+
+                IupSetAttribute(self->statsbox, "REDRAW", "ALL");
+
+                IupRefresh(self->info);
+            }
+            objRelease(&run);
+        }
     }
 
 out:

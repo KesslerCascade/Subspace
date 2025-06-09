@@ -49,6 +49,12 @@ typedef struct GameInfoPanel {
     Ihandle* tutorial;
     Ihandle* info;
     Ihandle* zbox;
+    Ihandle* shipname;
+    Ihandle* shiptype;
+    Ihandle* sector;
+    Ihandle* difficulty;
+    Ihandle* statsbox;
+    Ihandle* seed;
     string loadpct;
     Ihandle* cursub;
 } GameInfoPanel;

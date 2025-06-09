@@ -33,7 +33,7 @@ typedef struct FeatureRegistry FeatureRegistry;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct LanguageDB LanguageDB;
 typedef struct GameInst GameInst;
-typedef struct GameInst_WeakRef GameInst_WeakRef;
+typedef struct RunInfo RunInfo;
 typedef struct Database Database;
 
 typedef struct Subspace {
@@ -71,7 +71,10 @@ void subspaceSetBaseDir(Subspace* ss, VFS* vfs, strref path);
 bool subspaceMount(Subspace* ss);
 void subspaceUnmount(Subspace* ss);
 void subspaceUpdateUI(Subspace* ss);       // use sparingly, updates entire UI
+void spointFormat(string* out, int64 spoint);
 GameInst* subspaceCurInst(Subspace* ss);   // acquires inst, must release!
+RunInfo* subspaceCurRun(Subspace* ss);     // acquires inst, must release!
 bool logOpen(VFS* vfs, string filename, LogDest** defer);
 bool logClose(void);
 void fatalError(strref msg, bool osdeperr);
+int64 toLocalTime(int64 time);

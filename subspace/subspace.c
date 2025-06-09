@@ -57,6 +57,23 @@ GameInst* subspaceCurInst(Subspace* ss)
     return ret;
 }
 
+RunInfo* subspaceCurRun(Subspace* ss)
+{
+    GameInst* inst = NULL;
+    RunInfo* ret   = NULL;
+
+    withReadLock (&ss->lock) {
+        inst = objAcquire(ss->curinst);
+    }
+
+    withReadLock (&inst->lock) {
+        ret = objAcquire(inst->currentRun);
+    }
+
+    objRelease(&inst);
+    return ret;
+}
+
 void subspaceUpdateUI(Subspace* ss)
 {
     ssuiUpdate(ss->ui);

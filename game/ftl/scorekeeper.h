@@ -33,5 +33,17 @@ DECLFUNC(ScoreKeeper_SetSector);
 typedef void (*FUNCTYPE(ScoreKeeper_Reset))(ScoreKeeper* self);
 DECLFUNC(ScoreKeeper_Reset);
 
+typedef void (*FUNCTYPE(ScoreKeeper_AddCrew))(ScoreKeeper* self);
+DECLFUNC(ScoreKeeper_AddCrew);
+
+typedef void (*FUNCTYPE(ScoreKeeper_AddDefeatedShips))(ScoreKeeper* self);
+DECLFUNC(ScoreKeeper_AddDefeatedShips);
+
+typedef void (*FUNCTYPE(ScoreKeeper_AddExploredLocations))(ScoreKeeper* self);
+DECLFUNC(ScoreKeeper_AddExploredLocations);
+
+typedef void (*FUNCTYPE(ScoreKeeper_AddScrapCollected))(ScoreKeeper* self, int amount);
+DECLFUNC(ScoreKeeper_AddScrapCollected);
+
 // we know this is always at offset 0 in all versions
 #define ScoreKeeper_stats(keeper) ((StatTracker*)(keeper))

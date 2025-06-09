@@ -15,9 +15,9 @@ typedef enum {
 // For sectors going to a secret sector increments extra.
 // For beacons, waiting on the same beacon increments extra.
 
-#define SPOINT(num, extra) (((num) << 8) | ((extra) & 0xff))
-#define SPOINT_NUM(spoint) ((spoint) >> 8)
-#define SPOINT_EXTRA(spoint) ((spoint) & 0xff)
+#define SPOINT(num, extra) ((((int64)(num)) << 8) | ((extra) & 0xff))
+#define SPOINT_NUM(spoint) (int32)(((spoint) >> 8))
+#define SPOINT_EXTRA(spoint) ((int32)((spoint) & 0xff))
 
 class RunInfo {
     Subspace *ss;
@@ -54,6 +54,8 @@ class RunInfo {
     void loadGame(int seed, strref shipType, strref shipName, int difficulty, int beacons);
 
     void enterSector(int num, int seed, strref type, bool secret);
+    void updateStats(int ships, int beacons, int scrap, int crew);
+    int32 score();
 
     void abandon();
 }

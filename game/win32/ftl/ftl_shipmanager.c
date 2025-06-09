@@ -143,3 +143,17 @@ FuncInfo FUNCINFO(ShipManager_HasEquipment) = {
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } }
 };
+
+INITWRAP(ShipManager_ModifyScrapCount);
+Symbol SYM(ShipManager_ModifyScrapCount) = {
+    SYMNAME("ShipManager::ModifyScrapCount"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_ModifyResources_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager16ModifyScrapCountEib" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_ModifyScrapCount) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_VOID
+};

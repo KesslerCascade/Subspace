@@ -40,3 +40,23 @@ FuncInfo FUNCINFO(AchievementTracker_ResetFlags) = {
     .args    = { { 4, ARG_PTR, REG_ECX, false } },
     .rettype = RET_VOID
 };
+
+INITWRAP(AchievementTracker_SetAchievement);
+Symbol SYM(AchievementTracker_SetAchievement) = {
+    SYMNAME("AchievementTracker::SetAchievement"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_OnLoop_Mantis_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name =
+                    "_ZN18AchievementTracker14SetAchievementENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEbb" },
+             { 0 } }
+};
+DECLFUNC(AchievementTracker_SetAchievement);
+FuncInfo FUNCINFO(AchievementTracker_SetAchievement) = {
+    .nargs   = 4,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false },
+                { 4, ARG_PTR, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true } },
+    .rettype = RET_VOID
+};

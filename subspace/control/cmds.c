@@ -13,6 +13,7 @@ DECLCMD(Loading);
 DECLCMD(Log);
 DECLCMD(NewGame);
 DECLCMD(Sector);
+DECLCMD(Stats);
 DECLCMD(Validate);
 
 #define REGCMD(cmdname) \
@@ -38,4 +39,5 @@ void registerCmds(ControlServer* csvr)
     REGCMDREQI(NewGame, csvr->gameEvents);
     REGCMDREQI(LoadGame, csvr->gameEvents);
     REGCMDREQI(Sector, csvr->gameEvents);
+    REGCMDREQI(Stats, csvr->gameEvents);
 }
