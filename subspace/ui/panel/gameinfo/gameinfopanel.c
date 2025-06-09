@@ -14,6 +14,9 @@
 #include "gamemgr/gamemgr.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iupsetobj.h"
+#include "statlayoutinfo.h"
+
+const char* statslabelbg = "56 56 56";
 
 _objfactory_guaranteed GameInfoPanel* GameInfoPanel_create(SubspaceUI* ui)
 {
@@ -199,10 +202,11 @@ static void makeInfo(GameInfoPanel* self)
     IupSetAttribute(self->statsbox, "FLAT", "YES");
     IupSetAttribute(self->statsbox, "READONLY", "YES");
     IupSetAttribute(self->statsbox, "HIDEFOCUS", "YES");
-    IupSetAttribute(self->statsbox, "NUMCOL", "1");
+    IupSetAttribute(self->statsbox, "NUMCOL", "4");
     IupSetAttribute(self->statsbox, "NUMLIN", "6");
     IupSetAttribute(self->statsbox, "BGCOLOR", panelbg);
-    IupSetAttribute(self->statsbox, "BGCOLOR*:0", "56 56 56");
+    IupSetAttribute(self->statsbox, "BGCOLOR*:1", statslabelbg);
+    IupSetAttribute(self->statsbox, "BGCOLOR*:3", statslabelbg);
     IupSetAttribute(self->statsbox, "FGCOLOR", "255 255 255");
     IupSetAttribute(self->statsbox, "SZIE", "1x1");
     IupSetAttribute(self->statsbox, "NUMCOL_VISIBLE", "0");
@@ -210,25 +214,63 @@ static void makeInfo(GameInfoPanel* self)
     IupSetAttribute(self->statsbox, "EXPAND", "YES");
     IupSetAttribute(self->statsbox, "FLATSCROLLBAR", "VERTICAL");
     IupSetAttribute(self->statsbox, "FRAMECOLOR", "48 48 48");
-    IupSetAttribute(self->statsbox, "ALIGNMENT0", "ARIGHT");
-    IupSetAttribute(self->statsbox, "ALIGNMENT1", "ALEFT");
-    IupSetAttribute(self->statsbox, "1:0", langGetC(self->ss, "runinfo_started"));
-    IupSetAttribute(self->statsbox, "2:0", langGetC(self->ss, "runinfo_scrap"));
-    IupSetAttribute(self->statsbox, "3:0", langGetC(self->ss, "runinfo_beacons"));
-    IupSetAttribute(self->statsbox, "4:0", langGetC(self->ss, "runinfo_ships"));
-    IupSetAttribute(self->statsbox, "5:0", langGetC(self->ss, "runinfo_crew"));
-    IupSetAttribute(self->statsbox, "6:0", langGetC(self->ss, "runinfo_score"));
+    IupSetAttribute(self->statsbox, "ALIGNMENT1", "ARIGHT");
+    IupSetAttribute(self->statsbox, "ALIGNMENT2", "ALEFT");
+    IupSetAttribute(self->statsbox, "ALIGNMENT3", "ARIGHT");
+    IupSetAttribute(self->statsbox, "ALIGNMENT4", "ALEFT");
+    // some presets for calculating the layout size
+    IupSetAttribute(self->statsbox, "1:1", langGetC(self->ss, "runinfo_scrap"));
+    IupSetAttribute(self->statsbox, "2:1", langGetC(self->ss, "runinfo_beacons"));
+    IupSetAttribute(self->statsbox, "3:1", langGetC(self->ss, "runinfo_ships"));
+    IupSetAttribute(self->statsbox, "4:1", langGetC(self->ss, "runinfo_crew"));
+    IupSetAttribute(self->statsbox, "5:1", langGetC(self->ss, "runinfo_score"));
+    IupSetAttribute(self->statsbox, "6:1", langGetC(self->ss, "runinfo_started"));
+    self->statcols = 2;
 
     self->info = IupVbox(headerbg, self->statsbox, footerbg, NULL);
+}
+
+static void recalcStatsSize(GameInfoPanel* self)
+{
+    int width, height;
+    IupGetIntInt(self->statsbox, "RASTERSIZE", &width, &height);
+
+    int bestcols    = 1;
+    int titlewidth1 = IupGetInt(self->statsbox, "RASTERWIDTH1");
+
+    // figure out how many columns is best for this size
+    if (width - titlewidth1 > titlewidth1 * 2)
+        bestcols = 2;
+
+    if (bestcols != self->statcols) {
+        self->statcols = bestcols;
+        // need to redo the layout since columns changed
+        RunInfo* run   = subspaceRun(self->ss);
+        if (run)
+            gameinfopanelUpdateRun(self, run);
+        objRelease(&run);
+
+        // recalculate the best raster size for the title columns
+        IupSetAttribute(self->statsbox, "FITTOTEXT", "C1");
+        if (bestcols == 2)
+            IupSetAttribute(self->statsbox, "FITTOTEXT", "C3");
+
+        // fix background colors
+        IupSetAttribute(self->statsbox, "BGCOLOR*:1", statslabelbg);
+        IupSetAttribute(self->statsbox, "BGCOLOR*:3", statslabelbg);
+    }
+
+    int titlewidth3 = self->statcols == 2 ? IupGetInt(self->statsbox, "RASTERWIDTH3") : 0;
+
+    IupSetInt(self->statsbox, "RASTERWIDTH2", (width - titlewidth1 - titlewidth3) / self->statcols);
+    IupSetInt(self->statsbox, "RASTERWIDTH4", (width - titlewidth1 - titlewidth3) / self->statcols);
 }
 
 static int panelResize(Ihandle* ih, int width, int height)
 {
     GameInfoPanel* self = iupGetParentObj(GameInfoPanel, ih);
-    if (self) {
-        int titlewidth = IupGetInt(self->statsbox, "RASTERWIDTH0");
-        IupSetInt(self->statsbox, "RASTERWIDTH1", width - titlewidth);
-    }
+    if (self)
+        recalcStatsSize(self);
 
     return IUP_DEFAULT;
 }
@@ -267,7 +309,7 @@ static void gotoSubPanel(GameInfoPanel* self, Ihandle* subpanel)
     }
 }
 
-static void GameInfoPanel_updateRun(GameInfoPanel* self, RunInfo* run)
+void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run)
 {
     gotoSubPanel(self, self->info);
 
@@ -304,9 +346,46 @@ static void GameInfoPanel_updateRun(GameInfoPanel* self, RunInfo* run)
         IupSetStrAttribute(self->seed, "TITLE", strC(temp));
 
         // update stats
-        int64 started = toLocalTime(run->startTime);
+        sa_StatLayoutInfo layout;
+        StatLayoutInfo* li;
+        saInit(&layout, object, 8);
+
+        int curcol = IupGetInt(self->statsbox, "NUMCOL");
+        if (curcol != self->statcols * 2)
+            IupSetInt(self->statsbox, "NUMCOL", self->statcols * 2);
+        IupSetAttribute(self->statsbox, "NUMLIN", "0");
+
+        // TODO: Add actual if known
+        strFromInt32(&temp, run->scrapCollected, 10);
+        li = statlayoutinfoCreate(langGet(self->ss, _S"runinfo_scrap"), temp, false);
+        saPushC(&layout, object, &li);
+
+        strFromInt32(&temp, run->beaconsExplored, 10);
+        li = statlayoutinfoCreate(langGet(self->ss, _S"runinfo_beacons"), temp, false);
+        saPushC(&layout, object, &li);
+
+        strFromInt32(&temp, run->shipsDefeated, 10);
+        li = statlayoutinfoCreate(langGet(self->ss, _S"runinfo_ships"), temp, false);
+        saPushC(&layout, object, &li);
+
+        strFromInt32(&temp, run->crewHired, 10);
+        li = statlayoutinfoCreate(langGet(self->ss, _S"runinfo_crew"), temp, false);
+        saPushC(&layout, object, &li);
+
+        strFromInt32(&temp, runinfoScore(run), 10);
+        li = statlayoutinfoCreate(langGet(self->ss, _S"runinfo_score"), temp, false);
+        saPushC(&layout, object, &li);
+
+        if (run->damageTaken >= 0) {
+            strFromInt32(&temp, run->damageTaken, 10);
+            li = statlayoutinfoCreate(langGet(self->ss, _S"runinfo_damage"), temp, false);
+            saPushC(&layout, object, &li);
+        }
+
+        // column-spanned items
+        int64 ltime = toLocalTime(run->startTime);
         TimeParts p;
-        timeDecompose(&p, started);
+        timeDecompose(&p, ltime);
 
         strFormat(&temp2, _S"weekday_short${int}", stvar(int32, p.wday));
         strFormat(&temp,
@@ -318,27 +397,88 @@ static void GameInfoPanel_updateRun(GameInfoPanel* self, RunInfo* run)
                   stvar(int32, p.hour),
                   stvar(int32, p.minute),
                   stvar(int32, p.second));
-        IupSetStrAttribute(self->statsbox, "1:1", strC(temp));
+        li = statlayoutinfoCreate(langGet(self->ss, _S"runinfo_started"), temp, true);
+        saPushC(&layout, object, &li);
 
-        // TODO: Add actual if known
-        strFromInt32(&temp, run->scrapCollected, 10);
-        IupSetStrAttribute(self->statsbox, "2:1", strC(temp));
+        if (run->endTime > 0) {
+            ltime = toLocalTime(run->endTime);
+            timeDecompose(&p, ltime);
 
-        strFromInt32(&temp, run->beaconsExplored, 10);
-        IupSetStrAttribute(self->statsbox, "3:1", strC(temp));
+            strFormat(&temp2, _S"weekday_short${int}", stvar(int32, p.wday));
+            strFormat(&temp,
+                      _S"${string} ${int}-${0int(2)}-${0int(2)} ${0int(2)}:${0int(2)}:${0int(2)}",
+                      stvar(strref, langGet(self->ss, temp2)),
+                      stvar(int32, p.year),
+                      stvar(int32, p.month),
+                      stvar(int32, p.day),
+                      stvar(int32, p.hour),
+                      stvar(int32, p.minute),
+                      stvar(int32, p.second));
+            li = statlayoutinfoCreate(langGet(self->ss, _S"runinfo_ended"), temp, true);
+            saPushC(&layout, object, &li);
+        }
 
-        strFromInt32(&temp, run->shipsDefeated, 10);
-        IupSetStrAttribute(self->statsbox, "4:1", strC(temp));
+        // do layout
+        int ccol = 1, clin = 1, nonspanned = 0, spanned = 0;
 
-        strFromInt32(&temp, run->crewHired, 10);
-        IupSetStrAttribute(self->statsbox, "5:1", strC(temp));
+        // count number of NON spanned items
+        foreach (sarray, idx, StatLayoutInfo*, li, layout) {
+            if (li->span)
+                spanned++;
+            else
+                nonspanned++;
+        }
 
-        strFromInt32(&temp, runinfoScore(run), 10);
-        IupSetStrAttribute(self->statsbox, "6:1", strC(temp));
+        int nlines = self->statcols == 2 ? (nonspanned + 1) / 2 : nonspanned;
+        IupSetInt(self->statsbox, "NUMLIN", nlines + spanned);
+
+        // count number of NON spanned items
+        foreach (sarray, idx, StatLayoutInfo*, li, layout) {
+            if (li->span)
+                spanned++;
+            else
+                nonspanned++;
+        }
+
+        // go through and assign cell locations for NON-spanned items
+        foreach (sarray, idx, StatLayoutInfo*, li, layout) {
+            if (!li->span) {
+                li->col = ccol;
+                li->lin = clin++;
+                if (clin > nlines) {
+                    clin = 1;
+                    ccol = 3;
+                }
+            }
+        }
+
+        // now spanned lines
+        clin = nlines + 1;
+        foreach (sarray, idx, StatLayoutInfo*, li, layout) {
+            if (li->span) {
+                li->col = 1;
+                li->lin = clin++;
+            }
+        }
+
+        // actually set the cell info
+        foreach (sarray, idx, StatLayoutInfo*, li, layout) {
+            statlayoutinfoUpdate(li, self->statsbox);
+        }
+
+        // possibly recalc sizes (once)
+        if (self->statitems != saSize(layout)) {
+            self->statitems = saSize(layout);
+            IupSetAttribute(self->statsbox, "FITTOTEXT", "C1");
+            IupSetAttribute(self->statsbox, "FITTOTEXT", "C3");
+            recalcStatsSize(self);   // may recursively calls us again, but only once
+        }
 
         IupSetAttribute(self->statsbox, "REDRAW", "ALL");
 
-        IupRefresh(self->info);
+        saDestroy(&layout);
+
+        IupRefreshChildren(self->info);
     }
 }
 

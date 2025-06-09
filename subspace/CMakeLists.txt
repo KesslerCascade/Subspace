@@ -63,6 +63,7 @@ set(SUBSPACE_SIDL
     ui/page/setup/setuppage.sidl
     ui/panel/panel.sidl
     ui/panel/gameinfo/gameinfopanel.sidl
+    ui/panel/gameinfo/statlayoutinfo.sidl
     ui/panel/runsummary/runsummarypanel.sidl
     ui/panel/scrapgraph/scrapgraphpanel.sidl
     ui/panel/sectordetail/sectordetailpanel.sidl
@@ -138,6 +139,7 @@ add_executable(subspace
     ui/page/setup/setuppage.c
     ui/panel/panel.c
     ui/panel/gameinfo/gameinfopanel.c
+    ui/panel/gameinfo/statlayoutinfo.c
     ui/panel/runsummary/runsummarypanel.c
     ui/panel/scrapgraph/scrapgraphpanel.c
     ui/panel/sectordetail/sectordetailpanel.c

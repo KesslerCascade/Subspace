@@ -1,0 +1,13 @@
+#include <iup.h>
+
+class StatLayoutInfo {
+    string title;
+    string value;
+
+    int col;
+    int lin;
+    bool span;
+
+    factory create(strref title, strref value, bool span);
+    void update(Ihandle *mtx);
+}

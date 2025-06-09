@@ -7,6 +7,8 @@
 
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
+typedef struct RunInfo RunInfo;
+typedef struct RunInfo_WeakRef RunInfo_WeakRef;
 typedef struct GameInfoPanel GameInfoPanel;
 typedef struct GameInfoPanel_WeakRef GameInfoPanel_WeakRef;
 saDeclarePtr(GameInfoPanel);
@@ -53,6 +55,8 @@ typedef struct GameInfoPanel {
     Ihandle* sector;
     Ihandle* difficulty;
     Ihandle* statsbox;
+    int statcols;
+    int statitems;
     Ihandle* seed;
     string loadpct;
     Ihandle* cursub;
@@ -76,6 +80,10 @@ typedef struct GameInfoPanel_WeakRef {
 _objfactory_guaranteed GameInfoPanel* GameInfoPanel_create(SubspaceUI* ui);
 // GameInfoPanel* gameinfopanelCreate(SubspaceUI* ui);
 #define gameinfopanelCreate(ui) GameInfoPanel_create(SubspaceUI(ui))
+
+void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run);
+// void gameinfopanelUpdateRun(GameInfoPanel* self, RunInfo* run);
+#define gameinfopanelUpdateRun(self, run) GameInfoPanel_updateRun(GameInfoPanel(self), RunInfo(run))
 
 // bool gameinfopanelMake(GameInfoPanel* self);
 #define gameinfopanelMake(self) (self)->_->make(GameInfoPanel(self))

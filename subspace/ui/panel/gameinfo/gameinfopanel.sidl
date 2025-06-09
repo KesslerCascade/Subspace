@@ -1,5 +1,6 @@
 #include "ui/panel/panel.sidl"
 
+class RunInfo;
 class GameInfoPanel extends Panel {
     Ihandle *notrunning;
     Ihandle *playbtn;
@@ -16,6 +17,8 @@ class GameInfoPanel extends Panel {
     Ihandle *difficulty;
 
     Ihandle *statsbox;
+    int statcols;
+    int statitems;
     Ihandle *seed;
 
     string loadpct;
@@ -24,4 +27,5 @@ class GameInfoPanel extends Panel {
     factory create(SubspaceUI *ui);
     override make;
     override update;
+    unbound void updateRun(RunInfo *run);
 }
