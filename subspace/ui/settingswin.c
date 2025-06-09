@@ -91,7 +91,7 @@ bool SettingsWin_make(_In_ SettingsWin* self)
     iupSetObj(self->pagelist, ObjNone, self, self->ui);
     IupSetCallback(self->pagelist, "FLAT_ACTION", (Icallback)pagelist_change);
 
-    Ihandle* closebtn = IupButton(langGetC(self->ss, _S"settings_close"), NULL);
+    Ihandle* closebtn = IupButton(langGetC(self->ss, "settings_close"), NULL);
     IupSetAttribute(closebtn, "CPADDING", "6x3");
     IupSetCallback(closebtn, "ACTION", (Icallback)closebtn_action);
     iupSetObj(closebtn, ObjNone, self, self->ui);
@@ -118,7 +118,7 @@ bool SettingsWin_make(_In_ SettingsWin* self)
     strFormat(&tmp, _S"${int}x${int}", stvar(int32, SETTINGSWIN_WIDTH), stvar(int32, SETTINGSWIN_HEIGHT));
     IupSetAttribute(self->win, "SIZE", strC(tmp));
     IupSetAttribute(self->win, "RESIZE", "NO");
-    IupSetAttribute(self->win, "TITLE", langGetC(self->ss, _S"settings_title"));
+    IupSetAttribute(self->win, "TITLE", langGetC(self->ss, "settings_title"));
     IupSetAttribute(self->win, "ICON", "SUBSPACE_ICON");
     iupSetObj(self->win, self, ObjNone, self->ui);
     IupSetAttribute(self->win, "PARENTDIALOG", "SUBSPACE_MAINWIN");

@@ -46,7 +46,6 @@ typedef struct SetupPage {
 
     Subspace* ss;
     SubspaceUI* ui;
-    UIStrCache* sc;
     Weak(SubspaceFeature)* owner;
     Ihandle* h;
     Ihandle* parent;

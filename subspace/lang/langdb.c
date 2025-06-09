@@ -58,6 +58,21 @@ strref LanguageDB_get(_In_ LanguageDB* self, _In_opt_ strref key)
     return key;
 }
 
+string* LanguageDB__getPtr(_In_ LanguageDB* self, _In_opt_ strref key)
+{
+    htelem elem;
+
+    elem = htFind(self->primary, strref, key, none, NULL);
+    if (elem)
+        return hteValPtr(self->primary, string, elem);
+
+    elem = htFind(self->fallback, strref, key, none, NULL);
+    if (elem)
+        return hteValPtr(self->fallback, string, elem);
+
+    return NULL;
+}
+
 void LanguageDB_destroy(_In_ LanguageDB* self)
 {
     // Autogen begins -----

@@ -118,7 +118,7 @@ extern bool SettingsPage_make(_In_ SettingsPage* self, Ihandle* list);   // pare
 #define parent_make(list) SettingsPage_make((SettingsPage*)(self), list)
 bool TimeWarpPage_make(_In_ TimeWarpPage* self, Ihandle* list)
 {
-    Ihandle* maxwarplbl = IupLabel(langGetC(self->ss, _S"timewarp_maxwarp"));
+    Ihandle* maxwarplbl = IupLabel(langGetC(self->ss, "timewarp_maxwarp"));
     self->maxwarp_val   = IupVal("HORIZONTAL");
     IupSetAttribute(self->maxwarp_val, "MIN", "1");
     IupSetAttribute(self->maxwarp_val, "MAX", "5");
@@ -136,7 +136,7 @@ bool TimeWarpPage_make(_In_ TimeWarpPage* self, Ihandle* list)
     self->maxwarp_val_num = IupLabel("32");
     IupSetAttribute(self->maxwarp_val_num, "EXPAND", "HORIZONTAL");
 
-    Ihandle* doubletaplbl = IupLabel(langGetC(self->ss, _S"timewarp_doubletap"));
+    Ihandle* doubletaplbl = IupLabel(langGetC(self->ss, "timewarp_doubletap"));
     self->doubletap_val   = IupVal("HORIZONTAL");
     IupSetAttribute(self->doubletap_val, "MIN", "0");
     IupSetAttribute(self->doubletap_val, "MAX", "5");
@@ -151,7 +151,7 @@ bool TimeWarpPage_make(_In_ TimeWarpPage* self, Ihandle* list)
            langGet(self->ss, _S"timewarp_doubletap_tip"),
            langGet(self->ss, _S"timewarp_doubletap"),
            1);
-    self->doubletap_val_num = IupLabel(langGetC(self->ss, _S"timewarp_doubletap_off"));
+    self->doubletap_val_num = IupLabel(langGetC(self->ss, "timewarp_doubletap_off"));
     IupSetAttribute(self->doubletap_val_num, "EXPAND", "HORIZONTAL");
 
     Ihandle* gbox = IupGridBox(maxwarplbl,
@@ -173,7 +173,7 @@ bool TimeWarpPage_make(_In_ TimeWarpPage* self, Ihandle* list)
     Ihandle* sep1 = IupSpace();
     IupSetAttribute(sep1, "SIZE", "1x6");
 
-    self->allowslowmo = IupToggle(langGetC(self->ss, _S"timewarp_allowslowmo"), NULL);
+    self->allowslowmo = IupToggle(langGetC(self->ss, "timewarp_allowslowmo"), NULL);
     iupSetObj(self->allowslowmo, ObjNone, self, self->ui);
     IupSetCallback(self->allowslowmo, "ACTION", (Icallback)slowmo_toggle);
     setTip(self->allowslowmo,

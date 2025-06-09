@@ -9,7 +9,6 @@
 #include "lang/lang.h"
 #include "ui/util/iupsetobj.h"
 #include "ui/util/settip.h"
-#include "ui/util/uistrcache.h"
 
 typedef struct SettingsPage SettingsPage;
 typedef struct SettingsPage_WeakRef SettingsPage_WeakRef;
@@ -46,7 +45,6 @@ typedef struct SettingsPage {
 
     Subspace* ss;
     SubspaceUI* ui;
-    UIStrCache* sc;
     Weak(SubspaceFeature)* owner;
     Ihandle* h;
     Ihandle* parent;

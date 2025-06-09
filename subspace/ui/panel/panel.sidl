@@ -1,7 +1,6 @@
 #include <iup.h>
 #include "subspace.h"
 #include "lang/lang.h"
-#include "ui/util/uistrcache.sidl"
 
 extern const char *panelbg;
 
@@ -9,7 +8,6 @@ class SubspaceUI;
 class Panel implements Sortable {
     Subspace *ss;
     SubspaceUI *ui;
-    object:UIStrCache sc;
 
     Ihandle *h;
     Ihandle *parent;

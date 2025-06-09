@@ -27,7 +27,6 @@ bool SettingsPage_update(_In_ SettingsPage* self)
 void SettingsPage_destroy(_In_ SettingsPage* self)
 {
     // Autogen begins -----
-    objRelease(&self->sc);
     objDestroyWeak(&self->owner);
     strDestroy(&self->imgname);
     strDestroy(&self->title);
@@ -36,7 +35,6 @@ void SettingsPage_destroy(_In_ SettingsPage* self)
 
 _objinit_guaranteed bool SettingsPage_init(_In_ SettingsPage* self)
 {
-    self->sc = uiscCreate(self->ss);
     // Autogen begins -----
     return true;
     // Autogen ends -------

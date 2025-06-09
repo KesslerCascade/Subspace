@@ -39,22 +39,22 @@ static int playbtn_action(Ihandle* ih)
 
 static void makeNotRunning(GameInfoPanel* self)
 {
-    Ihandle* nrlabel1 = IupFlatLabel(langGetC(self->ss, _S"ftl_notrunning"));
+    Ihandle* nrlabel1 = IupFlatLabel(langGetC(self->ss, "ftl_notrunning"));
     IupSetAttribute(nrlabel1, "FONT", "Helvetica, Bold 14");
     IupSetAttribute(nrlabel1, "FGCOLOR", "255 255 255");
     IupSetAttribute(nrlabel1, "EXPAND", "HORIZONTAL");
     IupSetAttribute(nrlabel1, "ALIGNMENT", "ACENTER");
 
-    Ihandle* hplabel1 = IupFlatLabel(langGetC(self->ss, _S"ftl_howtoplay1"));
+    Ihandle* hplabel1 = IupFlatLabel(langGetC(self->ss, "ftl_howtoplay1"));
     IupSetAttribute(hplabel1, "FONT", "Helvetica, 12");
     IupSetAttribute(hplabel1, "FGCOLOR", "255 255 255");
-    Ihandle* hplabel2 = IupFlatLabel(langGetC(self->ss, _S"ftl_howtoplay2"));
+    Ihandle* hplabel2 = IupFlatLabel(langGetC(self->ss, "ftl_howtoplay2"));
     IupSetAttribute(hplabel2, "FONT", "Helvetica, 12");
     IupSetAttribute(hplabel2, "FGCOLOR", "255 255 255");
-    Ihandle* hplabel3 = IupFlatLabel(langGetC(self->ss, _S"ftl_howtoplay3"));
+    Ihandle* hplabel3 = IupFlatLabel(langGetC(self->ss, "ftl_howtoplay3"));
     IupSetAttribute(hplabel3, "FONT", "Helvetica, 12");
     IupSetAttribute(hplabel3, "FGCOLOR", "255 255 255");
-    self->playbtn = IupFlatButton(langGetC(self->ss, _S"play"));
+    self->playbtn = IupFlatButton(langGetC(self->ss, "play"));
     IupSetAttribute(self->playbtn, "BGCOLOR", "85 44 92");
     IupSetAttribute(self->playbtn, "HLCOLOR", "139 73 131");
     IupSetAttribute(self->playbtn, "PSCOLOR", "48 25 52");
@@ -82,7 +82,7 @@ static void makeNotRunning(GameInfoPanel* self)
 
 static void makeLoading(GameInfoPanel* self)
 {
-    Ihandle* loadinglbl = IupFlatLabel(langGetC(self->ss, _S"ftl_loading"));
+    Ihandle* loadinglbl = IupFlatLabel(langGetC(self->ss, "ftl_loading"));
     IupSetAttribute(loadinglbl, "FONT", "Helvetica, Bold 14");
     IupSetAttribute(loadinglbl, "FGCOLOR", "255 255 255");
     IupSetAttribute(loadinglbl, "EXPAND", "HORIZONTAL");
@@ -91,7 +91,7 @@ static void makeLoading(GameInfoPanel* self)
     Ihandle* spc1 = IupSpace();
     IupSetAttribute(spc1, "SIZE", "1x10");
 
-    Ihandle* progresslbl = IupFlatLabel(langGetC(self->ss, _S"ftl_progress"));
+    Ihandle* progresslbl = IupFlatLabel(langGetC(self->ss, "ftl_progress"));
     IupSetAttribute(progresslbl, "FONT", "Helvetica, 12");
     IupSetAttribute(progresslbl, "FGCOLOR", "255 255 255");
 
@@ -114,21 +114,21 @@ static void makeLoading(GameInfoPanel* self)
 
 static void makeAtmenu(GameInfoPanel* self)
 {
-    Ihandle* waitlbl = IupFlatLabel(langGetC(self->ss, _S"ftl_waitingforrun"));
+    Ihandle* waitlbl = IupFlatLabel(langGetC(self->ss, "ftl_waitingforrun"));
     IupSetAttribute(waitlbl, "FONT", "Helvetica, Bold 14");
     IupSetAttribute(waitlbl, "FGCOLOR", "255 255 255");
     IupSetAttribute(waitlbl, "EXPAND", "YES");
     IupSetAttribute(waitlbl, "ALIGNMENT", "ACENTER");
     IupSetAttribute(waitlbl, "TEXTWRAP", "YES");
 
-    Ihandle* nglbl = IupFlatLabel(langGetC(self->ss, _S"ftl_newgame"));
+    Ihandle* nglbl = IupFlatLabel(langGetC(self->ss, "ftl_newgame"));
     IupSetAttribute(nglbl, "FONT", "Helvetica, 12");
     IupSetAttribute(nglbl, "FGCOLOR", "255 255 255");
     IupSetAttribute(nglbl, "EXPAND", "YES");
     IupSetAttribute(nglbl, "ALIGNMENT", "ACENTER");
     IupSetAttribute(nglbl, "TEXTWRAP", "YES");
 
-    Ihandle* gplbl = IupFlatLabel(langGetC(self->ss, _S"ftl_gopractice"));
+    Ihandle* gplbl = IupFlatLabel(langGetC(self->ss, "ftl_gopractice"));
     IupSetAttribute(gplbl, "FONT", "Helvetica, 12");
     IupSetAttribute(gplbl, "FGCOLOR", "255 255 255");
     IupSetAttribute(gplbl, "EXPAND", "YES");
@@ -143,13 +143,13 @@ static void makeAtmenu(GameInfoPanel* self)
 
 static void makeTutorial(GameInfoPanel* self)
 {
-    Ihandle* ttitle = IupFlatLabel(langGetC(self->ss, _S"ftl_tutorial_title"));
+    Ihandle* ttitle = IupFlatLabel(langGetC(self->ss, "ftl_tutorial_title"));
     IupSetAttribute(ttitle, "FONT", "Helvetica, Bold 14");
     IupSetAttribute(ttitle, "FGCOLOR", "255 255 255");
     IupSetAttribute(ttitle, "EXPAND", "NO");
     IupSetAttribute(ttitle, "ALIGNMENT", "ACENTER");
 
-    Ihandle* tlbl = IupFlatLabel(langGetC(self->ss, _S"ftl_tutorial_text"));
+    Ihandle* tlbl = IupFlatLabel(langGetC(self->ss, "ftl_tutorial_text"));
     IupSetAttribute(tlbl, "FONT", "Helvetica, 12");
     IupSetAttribute(tlbl, "FGCOLOR", "255 255 255");
     IupSetAttribute(tlbl, "EXPAND", "YES");
@@ -209,12 +209,12 @@ static void makeInfo(GameInfoPanel* self)
     IupSetAttribute(self->statsbox, "FRAMECOLOR", "48 48 48");
     IupSetAttribute(self->statsbox, "ALIGNMENT0", "ARIGHT");
     IupSetAttribute(self->statsbox, "ALIGNMENT1", "ALEFT");
-    IupSetAttribute(self->statsbox, "1:0", langGetC(self->ss, _S"runinfo_started"));
-    IupSetAttribute(self->statsbox, "2:0", langGetC(self->ss, _S"runinfo_scrap"));
-    IupSetAttribute(self->statsbox, "3:0", langGetC(self->ss, _S"runinfo_beacons"));
-    IupSetAttribute(self->statsbox, "4:0", langGetC(self->ss, _S"runinfo_ships"));
-    IupSetAttribute(self->statsbox, "5:0", langGetC(self->ss, _S"runinfo_crew"));
-    IupSetAttribute(self->statsbox, "6:0", langGetC(self->ss, _S"runinfo_score"));
+    IupSetAttribute(self->statsbox, "1:0", langGetC(self->ss, "runinfo_started"));
+    IupSetAttribute(self->statsbox, "2:0", langGetC(self->ss, "runinfo_scrap"));
+    IupSetAttribute(self->statsbox, "3:0", langGetC(self->ss, "runinfo_beacons"));
+    IupSetAttribute(self->statsbox, "4:0", langGetC(self->ss, "runinfo_ships"));
+    IupSetAttribute(self->statsbox, "5:0", langGetC(self->ss, "runinfo_crew"));
+    IupSetAttribute(self->statsbox, "6:0", langGetC(self->ss, "runinfo_score"));
 
     self->info = IupVbox(headerbg, self->statsbox, footerbg, NULL);
 }
@@ -318,10 +318,10 @@ bool GameInfoPanel_update(_In_ GameInfoPanel* self)
             withReadLock (&run->lock) {
                 string temp = 0, temp2 = 0;
 
-                IupSetAttribute(self->shipname, "TITLE", uiscCadd(self->sc, run->shipName));
-                IupSetAttribute(self->shiptype,
-                                "TITLE",
-                                uiscCadd(self->sc, run->shipType));   // TODO: Translate
+                IupSetStrAttribute(self->shipname, "TITLE", strC(run->shipName));
+                IupSetStrAttribute(self->shiptype,
+                                   "TITLE",
+                                   strC(run->shipType));   // TODO: Translate
                 if (saSize(run->sectors) > 0) {
                     SectorInfo* last = run->sectors.a[saSize(run->sectors) - 1];
 
@@ -330,11 +330,11 @@ bool GameInfoPanel_update(_In_ GameInfoPanel* self)
                               langGet(self->ss, _S"runinfo_sector_format"),
                               stvar(strref, temp2),
                               stvar(strref, last->type));   // TODO: Translate
-                    IupSetAttribute(self->sector, "TITLE", uiscCadd(self->sc, temp));
+                    IupSetStrAttribute(self->sector, "TITLE", strC(temp));
                 } else {
                     IupSetAttribute(self->sector,
                                     "TITLE",
-                                    langGetC(self->ss, _S"runinfo_sector_unknown"));
+                                    langGetC(self->ss, "runinfo_sector_unknown"));
                 }
 
                 string diffstr = _S"difficulty_unknown";
@@ -345,10 +345,10 @@ bool GameInfoPanel_update(_In_ GameInfoPanel* self)
                 else if (run->difficulty == 0)
                     diffstr = _S"difficulty_easy";
 
-                IupSetAttribute(self->difficulty, "TITLE", langGetC(self->ss, diffstr));
+                IupSetStrAttribute(self->difficulty, "TITLE", strC(langGet(self->ss, diffstr)));
 
                 strFormat(&temp, langGet(self->ss, _S"runinfo_seed_format"), stvar(int32, run->seed));
-                IupSetAttribute(self->seed, "TITLE", uiscCadd(self->sc, temp));
+                IupSetStrAttribute(self->seed, "TITLE", strC(temp));
 
                 // update stats
                 int64 started = toLocalTime(run->startTime);
@@ -365,23 +365,23 @@ bool GameInfoPanel_update(_In_ GameInfoPanel* self)
                           stvar(int32, p.hour),
                           stvar(int32, p.minute),
                           stvar(int32, p.second));
-                IupSetAttribute(self->statsbox, "1:1", uiscCadd(self->sc, temp));
+                IupSetStrAttribute(self->statsbox, "1:1", strC(temp));
 
                 // TODO: Add actual if known
                 strFromInt32(&temp, run->scrapCollected, 10);
-                IupSetAttribute(self->statsbox, "2:1", uiscCadd(self->sc, temp));
+                IupSetStrAttribute(self->statsbox, "2:1", strC(temp));
 
                 strFromInt32(&temp, run->beaconsExplored, 10);
-                IupSetAttribute(self->statsbox, "3:1", uiscCadd(self->sc, temp));
+                IupSetStrAttribute(self->statsbox, "3:1", strC(temp));
 
                 strFromInt32(&temp, run->shipsDefeated, 10);
-                IupSetAttribute(self->statsbox, "4:1", uiscCadd(self->sc, temp));
+                IupSetStrAttribute(self->statsbox, "4:1", strC(temp));
 
                 strFromInt32(&temp, run->crewHired, 10);
-                IupSetAttribute(self->statsbox, "5:1", uiscCadd(self->sc, temp));
+                IupSetStrAttribute(self->statsbox, "5:1", strC(temp));
 
                 strFromInt32(&temp, runinfoScore(run), 10);
-                IupSetAttribute(self->statsbox, "6:1", uiscCadd(self->sc, temp));
+                IupSetStrAttribute(self->statsbox, "6:1", strC(temp));
 
                 IupSetAttribute(self->statsbox, "REDRAW", "ALL");
 

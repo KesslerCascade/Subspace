@@ -8,4 +8,5 @@ class LanguageDB
     factory create();
     bool load(StreamBuffer *sb, bool fallback); // streambuffer must be in pull mode
     strref get(strref key);
+    string* _getPtr(strref key);    // for internal use by langGetC ONLY
 }

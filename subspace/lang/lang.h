@@ -12,7 +12,11 @@ _meta_inline strref langGet(Subspace* ss, strref key)
     return languagedbGet(ss->lang, key);
 }
 
-_meta_inline const char* langGetC(Subspace* ss, strref key)
+_meta_inline const char* langGetC(Subspace* ss, const char* key)
 {
-    return strC(languagedbGet(ss->lang, key));
+    string* sptr = languagedb_getPtr(ss->lang, (strref)key);
+    if (sptr)
+        return strPC(sptr);
+
+    return key;
 }

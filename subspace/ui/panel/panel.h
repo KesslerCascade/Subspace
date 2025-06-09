@@ -6,7 +6,6 @@
 #include <iup.h>
 #include "subspace.h"
 #include "lang/lang.h"
-#include "ui/util/uistrcache.h"
 
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
@@ -40,7 +39,6 @@ typedef struct Panel {
 
     Subspace* ss;
     SubspaceUI* ui;
-    UIStrCache* sc;
     Ihandle* h;
     Ihandle* parent;
     strref name;

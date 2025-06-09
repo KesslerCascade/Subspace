@@ -47,7 +47,6 @@ typedef struct KeybindsPage {
 
     Subspace* ss;
     SubspaceUI* ui;
-    UIStrCache* sc;
     Weak(SubspaceFeature)* owner;
     Ihandle* h;
     Ihandle* parent;

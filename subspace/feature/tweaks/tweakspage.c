@@ -113,26 +113,26 @@ extern bool SettingsPage_make(_In_ SettingsPage* self, Ihandle* list);   // pare
 #define parent_make(list) SettingsPage_make((SettingsPage*)(self), list)
 bool TweaksPage_make(_In_ TweaksPage* self, Ihandle* list)
 {
-    Ihandle* fpslabel = IupLabel(langGetC(self->ss, _S"tweaks_targetfps"));
+    Ihandle* fpslabel = IupLabel(langGetC(self->ss, "tweaks_targetfps"));
     IupSetAttribute(fpslabel, "FONT", "Helvetica, Bold 10");
 
-    Ihandle* fpsdesc = IupLabel(langGetC(self->ss, _S"tweaks_targetfps_desc"));
+    Ihandle* fpsdesc = IupLabel(langGetC(self->ss, "tweaks_targetfps_desc"));
     IupSetAttribute(fpsdesc, "SIZE", "1x26");
     IupSetAttribute(fpsdesc, "ALIGNMENT", "ALEFT:ATOP");
     IupSetAttribute(fpsdesc, "EXPAND", "HORIZONTAL");
     IupSetAttribute(fpsdesc, "WORDWRAP", "YES");
 
-    self->fps30 = IupToggle(langGetC(self->ss, _S"tweaks_30fps"), NULL);
+    self->fps30 = IupToggle(langGetC(self->ss, "tweaks_30fps"), NULL);
     iupSetObj(self->fps30, ObjNone, self, self->ui);
     IupSetCallback(self->fps30, "ACTION", (Icallback)fpstoggle_action);
-    self->fps60 = IupToggle(langGetC(self->ss, _S"tweaks_60fps"), NULL);
+    self->fps60 = IupToggle(langGetC(self->ss, "tweaks_60fps"), NULL);
     iupSetObj(self->fps60, ObjNone, self, self->ui);
     IupSetCallback(self->fps60, "ACTION", (Icallback)fpstoggle_action);
-    self->fps120 = IupToggle(langGetC(self->ss, _S"tweaks_120fps"), NULL);
+    self->fps120 = IupToggle(langGetC(self->ss, "tweaks_120fps"), NULL);
     iupSetObj(self->fps120, ObjNone, self, self->ui);
     IupSetCallback(self->fps120, "ACTION", (Icallback)fpstoggle_action);
 
-    self->fpscustom = IupToggle(langGetC(self->ss, _S"tweaks_custom"), NULL);
+    self->fpscustom = IupToggle(langGetC(self->ss, "tweaks_custom"), NULL);
     iupSetObj(self->fpscustom, ObjNone, self, self->ui);
     IupSetCallback(self->fpscustom, "ACTION", (Icallback)fpstoggle_action);
     self->fpscustomval = IupText(NULL);
@@ -160,10 +160,10 @@ bool TweaksPage_make(_In_ TweaksPage* self, Ihandle* list)
     IupSetAttribute(savesep, "SEPARATOR", "HORIZONTAL");
     IupSetAttribute(savesep, "EXPAND", "HORIZONTAL");
 
-    Ihandle* savelbl = IupLabel(langGetC(self->ss, _S"tweaks_savegame"));
+    Ihandle* savelbl = IupLabel(langGetC(self->ss, "tweaks_savegame"));
     IupSetAttribute(savelbl, "FONT", "Helvetica, Bold 10");
 
-    self->preserveload = IupToggle(langGetC(self->ss, _S"tweaks_preserveload"), NULL);
+    self->preserveload = IupToggle(langGetC(self->ss, "tweaks_preserveload"), NULL);
     iupSetObj(self->preserveload, ObjNone, self, self->ui);
     IupSetCallback(self->preserveload, "ACTION", (Icallback)preserveload_action);
     setTip(self->preserveload,
@@ -171,7 +171,7 @@ bool TweaksPage_make(_In_ TweaksPage* self, Ihandle* list)
            langGet(self->ss, _S"tweaks_preserveload"),
            0);
 
-    self->savecompat = IupToggle(langGetC(self->ss, _S"tweaks_savecompat"), NULL);
+    self->savecompat = IupToggle(langGetC(self->ss, "tweaks_savecompat"), NULL);
     iupSetObj(self->savecompat, ObjNone, self, self->ui);
     IupSetCallback(self->savecompat, "ACTION", (Icallback)savecompat_action);
     setTip(self->savecompat,

@@ -98,7 +98,7 @@ bool WelcomePanel_make(_In_ WelcomePanel* self)
         saPush(&welcomeopt2, ptr, lbl);
     }
 
-    Ihandle* setbtn = IupFlatButton(langGetC(self->ss, _S"settings"));
+    Ihandle* setbtn = IupFlatButton(langGetC(self->ss, "settings"));
     IupSetAttribute(setbtn, "BGCOLOR", "85 44 92");
     IupSetAttribute(setbtn, "HLCOLOR", "139 73 131");
     IupSetAttribute(setbtn, "PSCOLOR", "48 25 52");

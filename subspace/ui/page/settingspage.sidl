@@ -4,13 +4,11 @@
 #include "lang/lang.h"
 #include "ui/util/iupsetobj.h"
 #include "ui/util/settip.h"
-#include "ui/util/uistrcache.sidl"
 
 class SubspaceUI;
 class SettingsPage {
     Subspace *ss;
     SubspaceUI *ui;
-    object:UIStrCache sc;
 
     weak:SubspaceFeature owner;
 

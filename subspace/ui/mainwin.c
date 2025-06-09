@@ -128,7 +128,7 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(self->menubtn, "HLCOLOR", NULL);
     IupSetAttribute(self->menubtn, "PSCOLOR", NULL);
     IupSetAttribute(self->menubtn, "BORDERWIDTH", "0");
-    IupSetAttribute(self->menubtn, "TIP", langGetC(self->ss, _S"hamburger_tip"));
+    IupSetAttribute(self->menubtn, "TIP", langGetC(self->ss, "hamburger_tip"));
     iupSetObj(self->menubtn, ObjNone, self, self->ui);
     IupSetCallback(self->menubtn, "FLAT_ACTION", menubtn_action);
     iupLoadImage(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", self->menubtn);
@@ -140,7 +140,7 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(settings, "HLCOLOR", NULL);
     IupSetAttribute(settings, "PSCOLOR", NULL);
     IupSetAttribute(settings, "BORDERWIDTH", "0");
-    IupSetAttribute(settings, "TIP", langGetC(self->ss, _S"settings_tip"));
+    IupSetAttribute(settings, "TIP", langGetC(self->ss, "settings_tip"));
     iupSetObj(settings, ObjNone, self, self->ui);
     IupSetCallback(settings, "FLAT_ACTION", settingsbtn_action);
     iupLoadImage(self->ss, _S"IMAGE_SETTINGS", _S"svg", _S"subspace:/settings.svg", settings);
@@ -153,7 +153,7 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(self->playbtn, "HLCOLOR", NULL);
     IupSetAttribute(self->playbtn, "PSCOLOR", NULL);
     IupSetAttribute(self->playbtn, "BORDERWIDTH", "0");
-    IupSetAttribute(self->playbtn, "TIP", langGetC(self->ss, _S"play_tip"));
+    IupSetAttribute(self->playbtn, "TIP", langGetC(self->ss, "play_tip"));
     iupSetObj(self->playbtn, ObjNone, self, self->ui);
     IupSetCallback(self->playbtn, "FLAT_ACTION", playbtn_action);
     iupLoadImage(self->ss, _S"IMAGE_PLAY", _S"svg", _S"subspace:/play.svg", self->playbtn);
@@ -187,7 +187,7 @@ bool MainWin_make(_In_ MainWin* self)
     strFormat(&tmp, _S"${int}x${int}", stvar(int32, self->width), stvar(int32, self->height));
     IupSetAttribute(self->win, "SIZE", strC(tmp));
     IupSetAttribute(self->win, "SHRINK", "Yes");
-    IupSetAttribute(self->win, "TITLE", langGetC(self->ss, _S"subspace_title"));
+    IupSetAttribute(self->win, "TITLE", langGetC(self->ss, "subspace_title"));
     IupSetAttribute(self->win, "ICON", "SUBSPACE_ICON");
     iupSetObj(self->win, self, ObjNone, self->ui);
 

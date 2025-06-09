@@ -182,13 +182,13 @@ extern bool SettingsPage_make(_In_ SettingsPage* self, Ihandle* list);   // pare
 #define parent_make(list) SettingsPage_make((SettingsPage*)(self), list)
 bool InfoBlockPage_make(_In_ InfoBlockPage* self, Ihandle* list)
 {
-    Ihandle* instrlabel = IupLabel(langGetC(self->ss, _S"infoblock_instructions"));
+    Ihandle* instrlabel = IupLabel(langGetC(self->ss, "infoblock_instructions"));
     IupSetAttribute(instrlabel, "SIZE", "1x18");
     IupSetAttribute(instrlabel, "WORDWRAP", "YES");
     IupSetAttribute(instrlabel, "EXPAND", "HORIZONTAL");
     IupSetAttribute(instrlabel, "ALIGNMENT", "ALEFT:ATOP");
 
-    Ihandle* elabel   = IupLabel(langGetC(self->ss, _S"infoblock_enabled"));
+    Ihandle* elabel   = IupLabel(langGetC(self->ss, "infoblock_enabled"));
     self->enabledlist = IupList(NULL);
     IupSetAttribute(self->enabledlist, "SIZE", "1x100");
     IupSetAttribute(self->enabledlist, "EXPAND", "HORIZONTAL");
@@ -224,7 +224,7 @@ bool InfoBlockPage_make(_In_ InfoBlockPage* self, Ihandle* list)
     IupSetAttribute(ehbox, "EXPAND", "HORIZONTAL");
     IupSetAttribute(ehbox, "SIZE", "1x100");
 
-    Ihandle* dlabel    = IupLabel(langGetC(self->ss, _S"infoblock_disabled"));
+    Ihandle* dlabel    = IupLabel(langGetC(self->ss, "infoblock_disabled"));
     self->disabledlist = IupList(NULL);
     IupSetAttribute(self->disabledlist, "SIZE", "1x100");
     IupSetAttribute(self->disabledlist, "EXPAND", "HORIZONTAL");
@@ -282,13 +282,13 @@ bool InfoBlockPage_update(_In_ InfoBlockPage* self)
     IupSetAttribute(self->enabledlist, "1", NULL);
     foreach (sarray, idx, string, iname, self->order) {
         strConcat(&temp, _S"infoblock_", iname);
-        IupSetAttribute(self->enabledlist, "APPENDITEM", langGetC(self->ss, temp));
+        IupSetStrAttribute(self->enabledlist, "APPENDITEM", strC(langGet(self->ss, temp)));
     }
 
     IupSetAttribute(self->disabledlist, "1", NULL);
     foreach (sarray, idx, string, iname, self->orderdisabled) {
         strConcat(&temp, _S"infoblock_", iname);
-        IupSetAttribute(self->disabledlist, "APPENDITEM", langGetC(self->ss, temp));
+        IupSetStrAttribute(self->disabledlist, "APPENDITEM", strC(langGet(self->ss, temp)));
     }
 
     strDestroy(&temp);

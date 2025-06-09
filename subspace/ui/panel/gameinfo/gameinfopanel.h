@@ -36,7 +36,6 @@ typedef struct GameInfoPanel {
 
     Subspace* ss;
     SubspaceUI* ui;
-    UIStrCache* sc;
     Ihandle* h;
     Ihandle* parent;
     strref name;

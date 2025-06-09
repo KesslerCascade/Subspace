@@ -36,7 +36,6 @@ typedef struct ScrapGraphPanel {
 
     Subspace* ss;
     SubspaceUI* ui;
-    UIStrCache* sc;
     Ihandle* h;
     Ihandle* parent;
     strref name;

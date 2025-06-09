@@ -157,7 +157,7 @@ static int panel_draw(Ihandle* ih, float posx, float posy)
     int dummy;
     if (enabled) {
         IupSetAttribute(ih, "DRAWFONT", panelfontenabled);
-        IupDrawGetTextSize(ih, langGetC(ss, _S"feature_enabled"), -1, &ew, &dummy);
+        IupDrawGetTextSize(ih, langGetC(ss, "feature_enabled"), -1, &ew, &dummy);
         ew++;
         ewm = ew + 6;
     }
@@ -177,7 +177,7 @@ static int panel_draw(Ihandle* ih, float posx, float posy)
     if (enabled) {
         IupSetAttribute(ih, "DRAWFONT", panelfontenabled);
         IupDrawText(ih,
-                    langGetC(ss, _S"feature_enabled"),
+                    langGetC(ss, "feature_enabled"),
                     -1,
                     w - ew - xmargin - 2,
                     2 + ymargin,
@@ -236,7 +236,7 @@ bool FeaturesPage_make(_In_ FeaturesPage* self, Ihandle* list)
     IupSetAttribute(vbox, "CMARGIN", "6x6");
     IupSetAttribute(vbox, "CGAP", "4");
 
-    Ihandle* instlabel = IupLabel(langGetC(self->ss, _S"settings_features_instruction"));
+    Ihandle* instlabel = IupLabel(langGetC(self->ss, "settings_features_instruction"));
     IupSetAttribute(instlabel, "SIZE", "1x18");
     IupSetAttribute(instlabel, "EXPAND", "HORIZONTAL");
     IupSetAttribute(instlabel, "ALIGNMENT", "ALEFT:ATOP");
@@ -254,9 +254,9 @@ bool FeaturesPage_make(_In_ FeaturesPage* self, Ihandle* list)
         strLower(&sname);
 
         Ihandle* cpanel = IupCanvas(NULL);
-        IupSetAttribute(cpanel, "PANEL_TITLE", langGetC(self->ss, sname));
+        IupSetStrAttribute(cpanel, "PANEL_TITLE", strC(langGet(self->ss, sname)));
         strAppend(&sname, _S"_desc");
-        IupSetAttribute(cpanel, "PANEL_DESC", langGetC(self->ss, sname));
+        IupSetStrAttribute(cpanel, "PANEL_DESC", strC(langGet(self->ss, sname)));
         strDestroy(&sname);
         IupSetAttribute(cpanel, "BORDER", "NO");
         IupSetAttribute(cpanel, "EXPAND", "HORIZONTAL");

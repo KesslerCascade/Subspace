@@ -36,7 +36,7 @@ static void setCompatState(SetupPage* gp, strref state)
     string tmp = 0;
 
     strConcat(&tmp, _S"settings_ftl_compat_", state);
-    IupSetAttribute(gp->ftlcompatlabel, "TITLE", langGetC(gp->ss, tmp));
+    IupSetStrAttribute(gp->ftlcompatlabel, "TITLE", strC(langGet(gp->ss, tmp)));
     strNConcat(&tmp, _S"settings_ftl_compat_", state, _S"_tip");
     setTip(gp->ftlcompatlabel, langGet(gp->ss, tmp), NULL, 0);
     setTip(gp->ftlcompatimg, langGet(gp->ss, tmp), NULL, 0);
@@ -66,8 +66,8 @@ static int langselect_change(Ihandle* ih, char* text, int item, int state)
         IupSetAttributeHandle(imsg, "PARENTDIALOG", gp->ss->ui->settingsw->win);
         IupSetAttribute(imsg, "BUTTONS", "YESNO");
         IupSetAttribute(imsg, "DIALOGTYPE", "QUESTION");
-        IupSetAttribute(imsg, "TITLE", langGetC(gp->ss, _S"langconfirm_title"));
-        IupSetAttribute(imsg, "VALUE", langGetC(gp->ss, _S"langconfirm"));
+        IupSetAttribute(imsg, "TITLE", langGetC(gp->ss, "langconfirm_title"));
+        IupSetAttribute(imsg, "VALUE", langGetC(gp->ss, "langconfirm"));
         IupPopup(imsg, IUP_CENTER, IUP_CENTER);
 
         int resp = IupGetInt(imsg, "BUTTONRESPONSE");
@@ -92,8 +92,8 @@ static int browseforftl(Ihandle* ih)
     IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->settingsw->win);
     IupSetAttribute(idlg, "DIALOGTYPE", "OPEN");
     IupSetAttribute(idlg, "FILTER", "*.exe");
-    IupSetAttribute(idlg, "FILTERINFO", langGetC(gp->ss, _S"exe_files"));
-    IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, _S"ftl_browse_title"));
+    IupSetAttribute(idlg, "FILTERINFO", langGetC(gp->ss, "exe_files"));
+    IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, "ftl_browse_title"));
 
     IupPopup(idlg, IUP_CENTER, IUP_CENTER);
 
@@ -109,7 +109,7 @@ static int browseforftl(Ihandle* ih)
         gmgrReg(gp->ss->gmgr, gp->validateinst);
         bool ret = ginstLaunch(gp->validateinst);
 
-        IupSetAttribute(gp->ftlver, "TITLE", langGetC(gp->ss, _S"settings_ftl_ver_unknown"));
+        IupSetAttribute(gp->ftlver, "TITLE", langGetC(gp->ss, "settings_ftl_ver_unknown"));
         setCompatState(gp, _S"unknown");
 
         // failed to launch, don't track it in gamemgr
@@ -200,7 +200,7 @@ static int browseforsaveovr(Ihandle* ih)
     }
     IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->settingsw->win);
     IupSetAttribute(idlg, "DIALOGTYPE", "DIR");
-    IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, _S"settings_saveoverride_browse_title"));
+    IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, "settings_saveoverride_browse_title"));
     if (!strEmpty(startdir))
         IupSetAttribute(idlg, "DIRECTORY", strC(startdir));
 
@@ -260,7 +260,7 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     iupSetObj(self->langselect, ObjNone, self, self->ui);
     IupSetCallback(self->langselect, "ACTION", (Icallback)langselect_change);
 
-    Ihandle* langhbox = IupHbox(IupLabel(langGetC(self->ss, _S"settings_lang")),
+    Ihandle* langhbox = IupHbox(IupLabel(langGetC(self->ss, "settings_lang")),
                                 self->langselect,
                                 IupFill(),
                                 NULL);
@@ -274,7 +274,7 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     self->ftlloctext = IupText(NULL);
     IupSetAttribute(self->ftlloctext, "EXPAND", "HORIZONTAL");
     IupSetAttribute(self->ftlloctext, "ACTIVE", "NO");
-    self->ftlcompatlabel = IupLabel(langGetC(self->ss, _S"settings_ftl_compat_unknown"));
+    self->ftlcompatlabel = IupLabel(langGetC(self->ss, "settings_ftl_compat_unknown"));
     self->ftlcompatimg   = IupLabel("");
     IupSetAttribute(self->ftlcompatimg, "IMAGE", "IMAGE_COMPAT_UNKNOWN");
     Ihandle* ftlcompathbox = IupHbox(self->ftlcompatimg, self->ftlcompatlabel, NULL);
@@ -284,14 +284,14 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     setTip(self->ftlcompatimg, langGet(self->ss, _S"settings_ftl_compat_unknown_tip"), NULL, 0);
     setTip(self->ftlcompatlabel, langGet(self->ss, _S"settings_ftl_compat_unknown_tip"), NULL, 0);
 
-    Ihandle* browsebtn = IupButton(langGetC(self->ss, _S"settings_ftl_browse"), NULL);
+    Ihandle* browsebtn = IupButton(langGetC(self->ss, "settings_ftl_browse"), NULL);
     IupSetAttribute(browsebtn, "CPADDING", "6x1");
     iupSetObj(browsebtn, ObjNone, self, self->ui);
     IupSetCallback(browsebtn, "ACTION", (Icallback)browseforftl);
 
-    Ihandle* ftlloclabel = IupLabel(langGetC(self->ss, _S"settings_ftl_loc"));
+    Ihandle* ftlloclabel = IupLabel(langGetC(self->ss, "settings_ftl_loc"));
     IupSetAttribute(ftlloclabel, "FONT", "Helvetica, Bold 10");
-    Ihandle* ftlloclonglabel = IupLabel(langGetC(self->ss, _S"settings_ftl_loc_long"));
+    Ihandle* ftlloclonglabel = IupLabel(langGetC(self->ss, "settings_ftl_loc_long"));
     IupSetAttribute(ftlloclonglabel, "SIZE", "1x32");
     IupSetAttribute(ftlloclonglabel, "EXPAND", "HORIZONTAL");
     IupSetAttribute(ftlloclonglabel, "ALIGNMENT", "ALEFT:ATOP");
@@ -300,12 +300,12 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     Ihandle* ftlhbox = IupHbox(self->ftlloctext, ftlcompathbox, browsebtn, NULL);
     IupSetAttribute(ftlhbox, "ALIGNMENT", "ACENTER");
 
-    Ihandle* ftlverlabel = IupLabel(langGetC(self->ss, _S"settings_ftl_ver"));
-    self->ftlver         = IupLabel(langGetC(self->ss, _S"settings_ftl_ver_unknown"));
+    Ihandle* ftlverlabel = IupLabel(langGetC(self->ss, "settings_ftl_ver"));
+    self->ftlver         = IupLabel(langGetC(self->ss, "settings_ftl_ver_unknown"));
 
     Ihandle* ftlverhbox = IupHbox(ftlverlabel, self->ftlver, NULL);
 
-    self->saveoverridecheck = IupToggle(langGetC(self->ss, _S"settings_saveoverride"), NULL);
+    self->saveoverridecheck = IupToggle(langGetC(self->ss, "settings_saveoverride"), NULL);
     setTip(self->saveoverridecheck,
            langGet(self->ss, _S"settings_saveoverride_tip"),
            langGet(self->ss, _S"settings_saveoverride"),
@@ -313,7 +313,7 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     iupSetObj(self->saveoverridecheck, ObjNone, self, self->ui);
     IupSetCallback(self->saveoverridecheck, "ACTION", (Icallback)saveovrchange);
 
-    self->saveoverrideusercheck = IupToggle(langGetC(self->ss, _S"settings_saveoverride_user"), NULL);
+    self->saveoverrideusercheck = IupToggle(langGetC(self->ss, "settings_saveoverride_user"), NULL);
     setTip(self->saveoverrideusercheck,
            langGet(self->ss, _S"settings_saveoverride_user_tip"),
            langGet(self->ss, _S"settings_saveoverride_user"),
@@ -323,13 +323,13 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     IupSetAttribute(self->saveoverrideusercheck, "FLOATING", "YES");
     IupSetAttribute(self->saveoverrideusercheck, "VISIBLE", "NO");
 
-    Ihandle* saveovrlabel  = IupLabel(langGetC(self->ss, _S"settings_saveoverride_folder"));
+    Ihandle* saveovrlabel  = IupLabel(langGetC(self->ss, "settings_saveoverride_folder"));
     self->saveoverridetext = IupText(NULL);
     IupSetAttribute(self->saveoverridetext, "EXPAND", "HORIZONTAL");
     iupSetObj(self->saveoverridetext, ObjNone, self, self->ui);
     IupSetCallback(self->saveoverridetext, "ACTION", (Icallback)saveovrtextchange);
 
-    Ihandle* saveovrbrowse = IupButton(langGetC(self->ss, _S"settings_saveoverride_browse"), NULL);
+    Ihandle* saveovrbrowse = IupButton(langGetC(self->ss, "settings_saveoverride_browse"), NULL);
     IupSetAttribute(saveovrbrowse, "CPADDING", "6x1");
     iupSetObj(saveovrbrowse, ObjNone, self, self->ui);
     IupSetCallback(saveovrbrowse, "ACTION", (Icallback)browseforsaveovr);
@@ -347,7 +347,7 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
     Ihandle* featuressep = IupLabel("");
     IupSetAttribute(featuressep, "SEPARATOR", "HORIZONTAL");
 
-    Ihandle* featuresexplain = IupLabel(langGetC(self->ss, _S"settings_features_explainer"));
+    Ihandle* featuresexplain = IupLabel(langGetC(self->ss, "settings_features_explainer"));
     IupSetAttribute(featuresexplain, "SIZE", "1x1");
     IupSetAttribute(featuresexplain, "EXPAND", "YES");
     IupSetAttribute(featuresexplain, "WORDWRAP", "YES");
@@ -436,11 +436,11 @@ bool SetupPage_update(_In_ SetupPage* self)
                           stvar(int32, inst->ver[0]),
                           stvar(int32, inst->ver[1]),
                           stvar(int32, inst->ver[2]));
-                IupSetAttribute(self->ftlver, "TITLE", strC(self->verstr));
+                IupSetStrAttribute(self->ftlver, "TITLE", strC(self->verstr));
             } else {
                 IupSetAttribute(self->ftlver,
                                 "TITLE",
-                                langGetC(self->ss, _S"settings_ftl_ver_unknown"));
+                                langGetC(self->ss, "settings_ftl_ver_unknown"));
                 strDestroy(&self->verstr);
             }
 
@@ -503,10 +503,10 @@ bool SetupPage_update(_In_ SetupPage* self)
                 self->vpending = false;
             }
         } else if (state == GI_Failed) {
-            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, _S"settings_ftl_ver_unknown"));
+            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
             setCompatState(self, _S"incompat");
         } else if (state == GI_Exited) {
-            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, _S"settings_ftl_ver_unknown"));
+            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
             setCompatState(self, _S"unknown");
             objRelease(&self->validateinst);
         }
@@ -521,7 +521,7 @@ bool SetupPage_update(_In_ SetupPage* self)
         if (ssdStringOut(self->ss->settings, _S"ftl/ver", &self->verstr)) {
             IupSetAttribute(self->ftlver, "TITLE", strC(self->verstr));
         } else {
-            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, _S"settings_ftl_ver_unknown"));
+            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
         }
         string compat = 0;
         if (ssdStringOut(self->ss->settings, _S"ftl/compat", &compat)) {

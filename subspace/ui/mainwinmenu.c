@@ -25,11 +25,11 @@ void MainWin_makeMenu(_In_ MainWin* self)
 {
     SubspaceUI* ui = self->ui;
 
-    Ihandle* about = IupItem(langGetC(self->ss,_S"menu_about"), NULL);
+    Ihandle* about = IupItem(langGetC(self->ss, "menu_about"), NULL);
     iupSetObj(about, ObjNone, self, ui);
     IupSetCallback(about, "ACTION", menu_about);
 
-    Ihandle* exit = IupItem(langGetC(self->ss,_S"menu_exit"), NULL);
+    Ihandle* exit = IupItem(langGetC(self->ss, "menu_exit"), NULL);
     iupSetObj(exit, ObjNone, self, ui);
     IupSetCallback(exit, "ACTION", menu_exit);
 
@@ -137,7 +137,7 @@ void MainWin_showLayoutMenu(_In_ MainWin* self, Ihandle* tabparent, Ihandle* ih,
     }
 
     if (count > 0) {
-        Ihandle* addtabsub = IupSubmenu(langGetC(self->ss,_S"layoutmenu_addtab"), addtabmenu);
+        Ihandle* addtabsub = IupSubmenu(langGetC(self->ss, "layoutmenu_addtab"), addtabmenu);
         IupAppend(self->layoutmenu, addtabsub);
     } else {
         IupDestroy(addtabmenu);
@@ -145,7 +145,7 @@ void MainWin_showLayoutMenu(_In_ MainWin* self, Ihandle* tabparent, Ihandle* ih,
 
     if (tabparent) {
         // if this is a tab, add an option to remove it
-        Ihandle* removetab = IupItem(langGetC(self->ss,_S"layoutmenu_removetab"), NULL);
+        Ihandle* removetab = IupItem(langGetC(self->ss, "layoutmenu_removetab"), NULL);
         iupSetObj(removetab, ObjNone, self, self->ui);
         IupSetAttribute(removetab, "TABPARENT", (char*)tabparent);
         IupSetAttribute(removetab, "TOREMOVE", (char*)ih);
@@ -154,13 +154,13 @@ void MainWin_showLayoutMenu(_In_ MainWin* self, Ihandle* tabparent, Ihandle* ih,
     }
 
     // we can always add more splits
-    Ihandle* splithoriz = IupItem(langGetC(self->ss,_S"layoutmenu_split_horiz"), NULL);
+    Ihandle* splithoriz = IupItem(langGetC(self->ss, "layoutmenu_split_horiz"), NULL);
     iupSetObj(splithoriz, ObjNone, self, self->ui);
     IupSetAttribute(splithoriz, "SPLITAT", (char*)(tabparent ? tabparent : ih));
     IupSetCallback(splithoriz, "ACTION", (Icallback)layoutmenu_splithoriz);
     IupAppend(self->layoutmenu, splithoriz);
 
-    Ihandle* splitvert = IupItem(langGetC(self->ss,_S"layoutmenu_split_vert"), NULL);
+    Ihandle* splitvert = IupItem(langGetC(self->ss, "layoutmenu_split_vert"), NULL);
     iupSetObj(splitvert, ObjNone, self, self->ui);
     IupSetAttribute(splitvert, "SPLITAT", (char*)(tabparent ? tabparent : ih));
     IupSetCallback(splitvert, "ACTION", (Icallback)layoutmenu_splitvert);
@@ -168,7 +168,7 @@ void MainWin_showLayoutMenu(_In_ MainWin* self, Ihandle* tabparent, Ihandle* ih,
 
     if (!tabparent && ih) {
         // if this is a placeholder, add an option to remove it
-        Ihandle* remove = IupItem(langGetC(self->ss,_S"layoutmenu_remove"), NULL);
+        Ihandle* remove = IupItem(langGetC(self->ss, "layoutmenu_remove"), NULL);
         iupSetObj(remove, ObjNone, self, self->ui);
         IupSetAttribute(remove, "TOREMOVE", (char*)ih);
         IupSetCallback(remove, "ACTION", (Icallback)layoutmenu_removeph);

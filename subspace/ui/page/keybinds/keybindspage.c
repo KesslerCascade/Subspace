@@ -119,7 +119,7 @@ extern bool SettingsPage_make(_In_ SettingsPage* self, Ihandle* list);   // pare
 #define parent_make(list) SettingsPage_make((SettingsPage*)(self), list)
 bool KeybindsPage_make(_In_ KeybindsPage* self, Ihandle* list)
 {
-    Ihandle* kbinst = IupLabel(langGetC(self->ss, _S"keybind_instructions"));
+    Ihandle* kbinst = IupLabel(langGetC(self->ss, "keybind_instructions"));
     IupSetAttribute(kbinst, "SIZE", "1x24");
     IupSetAttribute(kbinst, "WORDWRAP", "YES");
     IupSetAttribute(kbinst, "EXPAND", "HORIZONTAL");
@@ -127,7 +127,7 @@ bool KeybindsPage_make(_In_ KeybindsPage* self, Ihandle* list)
     iupSetObj(kbinst, ObjNone, self, self->ui);
     IupSetCallback(kbinst, "BUTTON_CB", (Icallback)everythingelse_button);
 
-    Ihandle* kbnote = IupLabel(langGetC(self->ss, _S"keybind_note"));
+    Ihandle* kbnote = IupLabel(langGetC(self->ss, "keybind_note"));
     IupSetAttribute(kbnote, "SIZE", "1x48");
     IupSetAttribute(kbnote, "WORDWRAP", "YES");
     IupSetAttribute(kbnote, "EXPAND", "HORIZONTAL");
@@ -216,7 +216,11 @@ void KeybindsPage_populateGrid(_In_ KeybindsPage* self)
         IupSetInt(self->kbgrid, "NUMLIN", saSize(self->binds));
 
         foreach (sarray, idx, KeyBind*, bind, self->binds) {
-            IupSetAttributeId2(self->kbgrid, "", idx + 1, 1, langGetC(self->ss, bind->name));
+            IupSetStrAttributeId2(self->kbgrid,
+                                  "",
+                                  idx + 1,
+                                  1,
+                                  strC(langGet(self->ss, bind->name)));
 
             string keyname = 0;
             if (bind->iupkey == 0) {
@@ -248,7 +252,7 @@ void KeybindsPage_setHover(_In_ KeybindsPage* self, int row)
     IupSetAttribute(self->kbgrid, "REDRAW", strC(temp));
 
     strConcat(&temp, self->binds.a[row - 1]->name, _S"_tip");
-    IupSetAttribute(self->tip, "TITLE", langGetC(self->ss, temp));
+    IupSetStrAttribute(self->tip, "TITLE", strC(langGet(self->ss, temp)));
     strDestroy(&temp);
 }
 
@@ -285,7 +289,7 @@ void KeybindsPage_setBindRow(_In_ KeybindsPage* self, int row)
     IupSetAttribute(self->kbgrid, "REDRAW", strC(temp));
 
     strConcat(&temp, self->binds.a[row - 1]->name, _S"_tip");
-    IupSetAttribute(self->tip, "TITLE", langGetC(self->ss, temp));
+    IupSetStrAttribute(self->tip, "TITLE", strC(langGet(self->ss, temp)));
     strDestroy(&temp);
 }
 
