@@ -68,6 +68,7 @@ static void RunInfo_newTracked(RunInfo* self, int seed, strref shipType, strref 
         strDup(&self->shipName, shipName);
         self->difficulty  = difficulty;
         self->sectorpoint = 256;
+        self->startTime   = clockWall();
 
         DbStmt* stmt =
             dbPrepare(self->ss->db,
@@ -77,7 +78,7 @@ static void RunInfo_newTracked(RunInfo* self, int seed, strref shipType, strref 
         dbstmtBind(stmt, 2, stvar(strref, shipType));
         dbstmtBind(stmt, 3, stvar(strref, shipName));
         dbstmtBind(stmt, 4, stvar(int32, difficulty));
-        dbstmtBind(stmt, 5, stvar(int64, clockWall()));
+        dbstmtBind(stmt, 5, stvar(int64, self->startTime));
         if (dbstmtExec(stmt)) {
             self->runid     = dbLastId(self->ss->db);
             self->recording = true;
