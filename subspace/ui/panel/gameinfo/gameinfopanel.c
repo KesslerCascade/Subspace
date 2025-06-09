@@ -190,7 +190,9 @@ static void makeInfo(GameInfoPanel* self)
     IupSetAttribute(headerbg, "CMARGIN", "3x2");
 
     self->seed      = IupFlatLabel("");
-    Ihandle* footer = IupHbox(IupFill(), self->seed, NULL);
+    self->result    = IupFlatLabel("");
+    IupSetAttribute(self->result, "EXPAND", "HORIZONTAL");
+    Ihandle* footer = IupHbox(self->result, self->seed, NULL);
     IupSetAttribute(footer, "CMARGIN", "3x2");
     Ihandle* footerbg = IupBackgroundBox(footer);
     IupSetAttribute(footerbg, "BGCOLOR", "0 0 128");
@@ -247,7 +249,7 @@ static void recalcStatsSize(GameInfoPanel* self)
         // need to redo the layout since columns changed
         RunInfo* run   = subspaceRun(self->ss);
         if (run)
-            gameinfopanelUpdateRun(self, run);
+            gameinfopanelUpdateRun(self, run, true);
         objRelease(&run);
 
         // recalculate the best raster size for the title columns
@@ -309,9 +311,14 @@ static void gotoSubPanel(GameInfoPanel* self, Ihandle* subpanel)
     }
 }
 
-void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run)
+void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run, bool force)
 {
     gotoSubPanel(self, self->info);
+
+    if (run->modified == self->runupdate && !force)
+        return;   // no changes, don't flicker!
+
+    self->runupdate = run->modified;
 
     withReadLock (&run->lock) {
         string temp = 0, temp2 = 0;
@@ -344,6 +351,19 @@ void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run)
 
         strFormat(&temp, langGet(self->ss, _S"runinfo_seed_format"), stvar(int32, run->seed));
         IupSetStrAttribute(self->seed, "TITLE", strC(temp));
+
+        if (run->result == RUN_Victory) {
+            IupSetAttribute(self->result, "TITLE", langGetC(self->ss, "runinfo_victory"));
+            IupSetAttribute(self->result, "FGCOLOR", "128 255 128");
+        } else if (run->result == RUN_Defeat) {
+            IupSetAttribute(self->result, "TITLE", langGetC(self->ss, "runinfo_defeat"));
+            IupSetAttribute(self->result, "FGCOLOR", "255 0 0");
+        } else if (run->result == RUN_Abandoned) {
+            IupSetAttribute(self->result, "TITLE", langGetC(self->ss, "runinfo_abandoned"));
+            IupSetAttribute(self->result, "FGCOLOR", "255 255 128");
+        } else {
+            IupSetAttribute(self->result, "TITLE", "");
+        }
 
         // update stats
         sa_StatLayoutInfo layout;
@@ -492,7 +512,7 @@ bool GameInfoPanel_update(_In_ GameInfoPanel* self)
 
     // If a run is currently focused (either live or loaded from the database), that takes priority
     if (run) {
-        GameInfoPanel_updateRun(self, run);
+        GameInfoPanel_updateRun(self, run, false);
         goto out;
     }
 

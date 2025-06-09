@@ -15,11 +15,13 @@ class GameInfoPanel extends Panel {
     Ihandle *shiptype;
     Ihandle *sector;
     Ihandle *difficulty;
+    Ihandle *seed;
+    Ihandle *result;
 
     Ihandle *statsbox;
     int statcols;
     int statitems;
-    Ihandle *seed;
+    int64 runupdate;
 
     string loadpct;
     Ihandle *cursub;
@@ -27,5 +29,5 @@ class GameInfoPanel extends Panel {
     factory create(SubspaceUI *ui);
     override make;
     override update;
-    unbound void updateRun(RunInfo *run);
+    unbound void updateRun(RunInfo *run, bool force);
 }

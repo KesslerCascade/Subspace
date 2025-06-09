@@ -43,6 +43,8 @@ class RunInfo {
     int32 scrapActual;
     int32 damageTaken;
 
+    int64 modified;
+
     string savePath;
 
     [sorted] sarray:object:SectorInfo sectors;

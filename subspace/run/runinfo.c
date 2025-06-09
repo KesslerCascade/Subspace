@@ -57,6 +57,7 @@ static void RunInfo_newUntracked(RunInfo* self, int seed, strref shipType, strre
         strDup(&self->shipName, shipName);
         self->difficulty  = difficulty;
         self->startTime   = clockWall();
+        self->modified    = self->startTime;
         self->damageTaken = -1;   // will never have a value for this in untracked runs
     }
 }
@@ -71,6 +72,7 @@ static void RunInfo_newTracked(RunInfo* self, int seed, strref shipType, strref 
         self->difficulty  = difficulty;
         self->sectorpoint = 256;
         self->startTime   = clockWall();
+        self->modified    = self->startTime;
 
         DbStmt* stmt =
             dbPrepare(self->ss->db,
@@ -146,6 +148,7 @@ static void RunInfo_findOrCreateTracked(RunInfo* self, int seed, strref shipType
             strDup(&self->shipType, shipType);
             strDup(&self->shipName, shipName);
             self->difficulty = difficulty;
+            self->modified   = clockWall();
 
             stConvert(int64, &self->runid, stvar, stmt->row.a[0]);
             stConvert(int64, &self->startTime, stvar, stmt->row.a[1]);
@@ -209,6 +212,8 @@ void RunInfo_abandon(_In_ RunInfo* self)
             if (self->recording) {
                 // TODO: Record in database
             }
+
+            self->modified = clockWall();
         }
     }
 }
@@ -268,6 +273,8 @@ void RunInfo_enterSector(_In_ RunInfo* self, int num, int seed, _In_opt_ strref 
         }
 
         saPushC(&self->sectors, object, &nsec);
+
+        self->modified = clockWall();
 
         if (subspaceIsRun(self->ss, self))
             ssuiUpdateMain(self->ss->ui, _S"gameinfo");
@@ -346,6 +353,8 @@ void RunInfo_updateStats(_In_ RunInfo* self, int ships, int beacons, int scrap, 
             dbstmtBind(stmt, b++, stvar(int64, self->runid));
             dbstmtExec(stmt);
         }
+
+        self->modified = clockWall();
 
         if (subspaceIsRun(self->ss, self))
             ssuiUpdateMain(self->ss->ui, _S"gameinfo");

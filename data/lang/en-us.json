@@ -144,5 +144,8 @@
     "weekday_short3": "Wed",
     "weekday_short4": "Thu",
     "weekday_short5": "Fri",
-    "weekday_short6": "Sat"
+    "weekday_short6": "Sat",
+    "runinfo_victory": "VICTORY",
+    "runinfo_defeat": "DEFEAT",
+    "runinfo_abandoned": "Abandoned"
 }

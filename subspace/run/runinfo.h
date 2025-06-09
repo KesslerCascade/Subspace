@@ -64,6 +64,7 @@ typedef struct RunInfo {
     int32 crewHired;
     int32 scrapActual;
     int32 damageTaken;
+    int64 modified;
     string savePath;
     sa_SectorInfo sectors;
     bool recording;        // is this run being currently recorded (i.e. not a historical run)
