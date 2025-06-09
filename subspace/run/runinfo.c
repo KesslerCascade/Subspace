@@ -55,7 +55,9 @@ static void RunInfo_newUntracked(RunInfo* self, int seed, strref shipType, strre
         self->seed  = seed;
         strDup(&self->shipType, shipType);
         strDup(&self->shipName, shipName);
-        self->difficulty = difficulty;
+        self->difficulty  = difficulty;
+        self->startTime   = clockWall();
+        self->damageTaken = -1;   // will never have a value for this in untracked runs
     }
 }
 

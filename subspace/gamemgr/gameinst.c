@@ -151,6 +151,9 @@ void GameInst_setStateLocked(_In_ GameInst* self, GameInstState state)
     if (self->state != state) {
         self->state = state;
 
+        if (state != GI_Run)
+            objRelease(&self->activeRun);
+
         if (subspaceIsGame(self->ss, self)) {
             ssuiUpdateMain(self->ss->ui, NULL);
             ssuiUpdateMain(self->ss->ui, _S"gameinfo");

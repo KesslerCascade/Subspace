@@ -50,6 +50,8 @@ void subspace_WorldManager_LoadGame_post(WorldManager* self, basic_string* file)
         controlMsgInt(msg, 0, "state", GAME_RUN);
         controlClientQueue(msg);
     }
+
+    gs.sendAllStats = true;
 }
 
 // ---- Patch ----------------

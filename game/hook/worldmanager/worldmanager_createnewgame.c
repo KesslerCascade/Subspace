@@ -8,6 +8,7 @@
 #include "ftl/tutorialmanager.h"
 #include "ftl/worldmanager.h"
 #include "proto.h"
+#include "subspacegame.h"
 
 #include "hook/hook.h"
 #include "patch/patchlist.h"
@@ -42,6 +43,8 @@ void subspace_WorldManager_CreateNewGame_post(WorldManager* self)
         controlMsgInt(msg, 0, "state", GAME_TUTORIAL);
         controlClientQueue(msg);
     }
+
+    gs.sendAllStats = true;
 }
 
 // ---- Patch ----------------

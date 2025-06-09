@@ -48,17 +48,20 @@ void subspace_CApp_OnLoop_post(CApp* self)
             statschanged++;
     }
 
+    if (gs.sendAllStats)
+        statschanged = NUM_STATS;
+
     if (statschanged) {
         ControlMsg* msg = controlNewMsg("Stats", statschanged);
 
         int f = 0;
-        if (stats[0].current != lastStats[0])
+        if (gs.sendAllStats || stats[0].current != lastStats[0])
             controlMsgInt(msg, f++, "ships", stats[0].current);
-        if (stats[1].current != lastStats[1])
+        if (gs.sendAllStats || stats[1].current != lastStats[1])
             controlMsgInt(msg, f++, "beacons", stats[1].current);
-        if (stats[2].current != lastStats[2])
+        if (gs.sendAllStats || stats[2].current != lastStats[2])
             controlMsgInt(msg, f++, "scrap", stats[2].current);
-        if (stats[3].current != lastStats[3])
+        if (gs.sendAllStats || stats[3].current != lastStats[3])
             controlMsgInt(msg, f++, "crew", stats[3].current);
         controlClientQueue(msg);
 
@@ -66,6 +69,8 @@ void subspace_CApp_OnLoop_post(CApp* self)
             lastStats[i] = stats[i].current;
         }
     }
+
+    gs.sendAllStats = false;
 }
 
 // ---- Patch ----------------
