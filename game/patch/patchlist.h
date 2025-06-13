@@ -19,6 +19,7 @@ extern Patch patch_FTLButton_OnRender;
 extern Patch patch_MainMenu_Open;
 extern Patch patch_MouseControl_OnRender;
 extern Patch patch_ResourceControl_RenderLoadingBar;
+extern Patch patch_ShipManager_ModifyScrapCount;
 extern Patch patch_ShipStatus_RenderHealth;
 extern Patch patch_ShipStatus_OnRender;
 extern Patch patch_StarMap_GenerateMap;

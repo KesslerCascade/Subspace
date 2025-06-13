@@ -5,7 +5,10 @@
 #include <cx/obj.h>
 #include "subspace.h"
 #include "sectorinfo.h"
+#include "logentspec.h"
 
+typedef struct LogEnt LogEnt;
+typedef struct LogEnt_WeakRef LogEnt_WeakRef;
 typedef struct RunInfo RunInfo;
 typedef struct RunInfo_WeakRef RunInfo_WeakRef;
 saDeclarePtr(RunInfo);
@@ -31,6 +34,9 @@ typedef struct RunInfo_ClassIf {
     void (*loadGame)(_In_ void* self, int seed, _In_opt_ strref shipType, _In_opt_ strref shipName, int difficulty, int beacons);
     void (*enterSector)(_In_ void* self, int num, int seed, _In_opt_ strref type, bool secret);
     void (*updateStats)(_In_ void* self, int ships, int beacons, int scrap, int crew);
+    void (*runLog)(_In_ void* self, int sector, int beacons, int64 time, _In_opt_ strref id, stvar params[LOG_MAX_PARAMS]);
+    void (*processLog)(_In_ void* self, LogEnt* ent);
+    void (*processScrap)(_In_ void* self, _In_opt_ strref src, int amount, int rawamount);
     int32 (*score)(_In_ void* self);
     void (*abandon)(_In_ void* self);
 } RunInfo_ClassIf;
@@ -96,6 +102,12 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoEnterSector(self, num, seed, type, secret) (self)->_->enterSector(RunInfo(self), num, seed, type, secret)
 // void runinfoUpdateStats(RunInfo* self, int ships, int beacons, int scrap, int crew);
 #define runinfoUpdateStats(self, ships, beacons, scrap, crew) (self)->_->updateStats(RunInfo(self), ships, beacons, scrap, crew)
+// void runinfoRunLog(RunInfo* self, int sector, int beacons, int64 time, strref id, stvar params[LOG_MAX_PARAMS]);
+#define runinfoRunLog(self, sector, beacons, time, id, params) (self)->_->runLog(RunInfo(self), sector, beacons, time, id, params)
+// void runinfoProcessLog(RunInfo* self, LogEnt* ent);
+#define runinfoProcessLog(self, ent) (self)->_->processLog(RunInfo(self), LogEnt(ent))
+// void runinfoProcessScrap(RunInfo* self, strref src, int amount, int rawamount);
+#define runinfoProcessScrap(self, src, amount, rawamount) (self)->_->processScrap(RunInfo(self), src, amount, rawamount)
 // int32 runinfoScore(RunInfo* self);
 #define runinfoScore(self) (self)->_->score(RunInfo(self))
 // void runinfoAbandon(RunInfo* self);

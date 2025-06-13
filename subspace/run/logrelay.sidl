@@ -1,0 +1,33 @@
+#include <cx/taskqueue.sidl>
+#include "subspace.h"
+#include "logent.sidl"
+
+interface LogSubscriber {
+    void logNotify(LogEnt* ent, bool replay);
+    void logReset();
+}
+
+class RunInfo;
+class LogRelay
+{
+    Subspace *ss;
+    object:TRFifo replayqueue;
+    RWLock lock;
+
+    hashtable:string:sarray logsubs;
+    hashtable:ptr:none subscribers;
+
+    bool subscribe(ObjInst* subscriber, strref id);
+    void reset();
+    bool send(LogEnt* ent, bool replay);
+
+    factory create(Subspace *ss);
+}
+
+class LogDispatcher extends ComplexTask
+{
+    object:ObjInst subscriber;
+    object:LogEnt ent;
+    bool replay;
+    factory create(ObjInst *subscriber, LogEnt *ent, bool replay);
+}

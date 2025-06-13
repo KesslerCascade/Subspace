@@ -8,7 +8,7 @@ static bool runTracker_Enable(SubspaceFeature* feat, void* settings, bool enable
     return enabled;
 }
 
-Patch* RunTracker_patches[] = { 0 };
+Patch* RunTracker_patches[] = { &patch_ShipManager_ModifyScrapCount, 0 };
 
 SubspaceFeature RunTracker_feature = { .name            = "RunTracker",
                                        .enable          = runTracker_Enable,

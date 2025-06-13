@@ -83,6 +83,7 @@ add_executable(subspacegame
     control/controlclient.c
     control/controlconnect.c
     control/messagequeue.c
+    control/runlog.c
     control/cmds.c
     control/cmds/cmdbindkey.c
     control/cmds/cmdcleartostart.c
@@ -124,6 +125,7 @@ add_executable(subspacegame
     hook/mainmenu/mainmenu_open.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
+    hook/shipmanager/shipmanager_modifyscrapcount.c
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
     hook/starmap/starmap_generatemap.c
@@ -138,6 +140,7 @@ add_executable(subspacegame
     subspacegame.c
     version.c
     ${SHARED_SOURCE_DIR}/control.c
+    ${SHARED_SOURCE_DIR}/logentspec.c
     ${SHARED_SOURCE_DIR}/net.c
     ${GAME_OSDEP})
 target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})

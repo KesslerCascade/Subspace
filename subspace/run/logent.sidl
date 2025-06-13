@@ -1,0 +1,13 @@
+#include "logentspec.h"
+
+class LogEnt {
+    int64 sectorpoint;
+    int64 savepoint;
+    int64 time;
+    string id;
+    LogEntSpec *spec;
+    [size 4] sarray:stvar rawparams;
+    hashtable:string:stvar params;
+
+    [canfail] factory create(int64 sectorpoint, int64 savepoint, int64 time, strref id, stvar params[LOG_MAX_PARAMS]);
+}

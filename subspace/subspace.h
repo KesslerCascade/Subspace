@@ -35,6 +35,7 @@ typedef struct LanguageDB LanguageDB;
 typedef struct GameInst GameInst;
 typedef struct RunInfo RunInfo;
 typedef struct Database Database;
+typedef struct LogRelay LogRelay;
 
 typedef struct Subspace {
     string basedir;
@@ -47,6 +48,7 @@ typedef struct Subspace {
     RWLock lock;    // for volatile data (game, run)
     GameInst* game;   // active game instance
     RunInfo* run;     // run that is focused in the UI
+    LogRelay* runlog;   // run log to UI connector
 
     TaskQueue* workq;
     ControlServer* svr;

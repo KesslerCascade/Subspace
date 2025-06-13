@@ -7,6 +7,7 @@ typedef void (*controlclientcb_t)(ControlMsg* msg);
 bool controlClientStart(void);
 void controlClientStop(void);
 void controlClientNotify(void);
+bool controlClientConnected(void);
 
 void controlClientQueue(ControlMsg* msg);   // queue an outbound message
 void controlClientProcess(void);   // dispatch inbound messages to callbacks in main thread

@@ -17,3 +17,6 @@ bool osStartThread(threadfunc_t func, void* data);
 
 void osSleep(int msec);
 void osExit(int retcode);
+
+// time format is OS-specific but can be up to 64 bits wide
+void osTime64(uint32_t* high, uint32_t* low);

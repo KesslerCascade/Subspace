@@ -371,12 +371,19 @@ void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run, bool force)
         saInit(&layout, object, 8);
 
         int curcol = IupGetInt(self->statsbox, "NUMCOL");
-        if (curcol != self->statcols * 2)
+        if (curcol != self->statcols * 2) {
             IupSetInt(self->statsbox, "NUMCOL", self->statcols * 2);
-        IupSetAttribute(self->statsbox, "NUMLIN", "0");
+            IupSetAttribute(self->statsbox, "NUMLIN", "0");
+        }
 
-        // TODO: Add actual if known
-        strFromInt32(&temp, run->scrapCollected, 10);
+        if (run->scrapActual > 0 && run->scrapActual != run->scrapCollected) {
+            strFormat(&temp,
+                      _S"${int} (${int})",
+                      stvar(int32, run->scrapActual),
+                      stvar(int32, run->scrapCollected));
+        } else {
+            strFromInt32(&temp, run->scrapCollected, 10);
+        }
         li = statlayoutinfoCreate(langGet(self->ss, _S"runinfo_scrap"), temp, false);
         saPushC(&layout, object, &li);
 

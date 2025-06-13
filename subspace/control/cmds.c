@@ -12,6 +12,7 @@ DECLCMD(LoadGame);
 DECLCMD(Loading);
 DECLCMD(Log);
 DECLCMD(NewGame);
+DECLCMD(RunLog);
 DECLCMD(Sector);
 DECLCMD(Stats);
 DECLCMD(Validate);
@@ -40,4 +41,5 @@ void registerCmds(ControlServer* csvr)
     REGCMDREQI(LoadGame, csvr->gameEvents);
     REGCMDREQI(Sector, csvr->gameEvents);
     REGCMDREQI(Stats, csvr->gameEvents);
+    REGCMDI(RunLog);
 }

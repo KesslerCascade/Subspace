@@ -10,4 +10,7 @@ typedef struct Ship Ship;
 typedef int (*FUNCTYPE(Ship_DamageHull))(Ship *ship, int dmg);
 DECLFUNC(Ship_DamageHull);
 
+typedef void (*FUNCTYPE(Ship_ProjectileStrike))(Ship* self, int roomId, float damage);
+DECLFUNC(Ship_ProjectileStrike);
+
 DECLSYM(Ship_hullIntegrity_offset);

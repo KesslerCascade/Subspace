@@ -1,5 +1,8 @@
 #include "ftl/blueprintmanager.h"
+#include "ftl/capp.h"
+#include "ftl/scorekeeper.h"
 #include "ftl/starmap.h"
+#include "ftl/worldmanager.h"
 #include "patch/patchlist.h"
 #include "feature.h"
 
@@ -23,5 +26,8 @@ SubspaceFeature Base_feature = {
     .requiredSymbols = { &SYM(ShipBlueprint_blueprintName_offset),
                         &SYM(ShipBlueprint_name_offset),
                         &SYM(StarMap_sectorMapSeed_offset),
+                        &SYM(CApp_world_offset),
+                        &SYM(WorldManager_starMap_worldLevel_offset),
+                        &SYM(ScoreKeeper_Keeper),
                         0 }
 };

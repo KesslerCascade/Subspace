@@ -1,0 +1,43 @@
+#include "runlog.h"
+#include <stdarg.h>
+#include "ftl/capp.h"
+#include "ftl/scorekeeper.h"
+#include "ftl/worldmanager.h"
+#include "control.h"
+#include "controlclient.h"
+#include "osdep.h"
+
+bool runLogSend(LogEntSpec* spec, ...)
+{
+    // if disconnected, just drop combat events so that we don't queue up a ton of events
+    if (spec->combat && !controlClientConnected())
+        return false;
+
+    ControlMsg* msg = controlNewMsg("RunLog", 5 + spec->numParams);
+    controlMsgStr(msg, 0, "id", spec->id);
+    uint32_t timelow, timehigh;
+    osTime64(&timehigh, &timelow);
+    controlMsgUInt(msg, 1, "timelow", timelow);
+    controlMsgUInt(msg, 2, "timehigh", timehigh);
+
+    WorldManager* world = CApp_world(theApp);
+    controlMsgInt(msg, 3, "sector", WorldManager_worldLevel(world) + 1);
+    controlMsgInt(msg, 4, "beacons", ScoreKeeper_stats(SKeeper)[1].current);
+
+    va_list args;
+    va_start(args, spec);
+    char tmpbuf[3] = { 'p', 0, 0 };
+    for (int i = 0; i < spec->numParams; i++) {
+        tmpbuf[1] = '1' + i;
+        if (spec->paramTypes[i] == LP_INT)
+            controlMsgInt(msg, 5 + i, tmpbuf, va_arg(args, int));
+        else if (spec->paramTypes[i] == LP_STRING)
+            controlMsgStr(msg, 5 + i, tmpbuf, va_arg(args, const char*));
+        else
+            va_arg(args, int);
+    }
+    va_end(args);
+
+    controlClientQueue(msg);
+    return true;
+}

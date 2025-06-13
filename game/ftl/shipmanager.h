@@ -42,7 +42,18 @@ DECLFUNC(ShipManager_ModifyScrapCount);
 // offset 0
 typedef int (*FUNCTYPE(ShipManager_HasEquipment))(ShipManager* ship, basic_string* blueName);
 DECLFUNC(ShipManager_HasEquipment);
-#define ShipManager_HasEquipment(self) FCALL(ftlbase, ShipManager_HasEquipment, self)
+#define ShipManager_HasEquipment(self, blueName) \
+    FCALL(ftlbase, ShipManager_HasEquipment, self, blueName)
+
+typedef int (*FUNCTYPE(ShipManager_HasAugmentation))(ShipManager* ship, basic_string* augId);
+DECLFUNC(ShipManager_HasAugmentation);
+#define ShipManager_HasAugmentation(self, augId) \
+    FCALL(ftlbase, ShipManager_HasAugmentation, self, augId)
+
+typedef float (*FUNCTYPE(ShipManager_GetAugmentationValue))(ShipManager* ship, basic_string* augId);
+DECLFUNC(ShipManager_GetAugmentationValue);
+#define ShipManager_GetAugmentationValue(self, augId) \
+    FCALL(ftlbase, ShipManager_GetAugmentationValue, self, augId)
 
 DECLSYM(ShipManager_ship_offset);
 DECLSYM(ShipManager_current_target_offset);
@@ -55,5 +66,13 @@ DECLSYM(ShipManager_myBlueprint_blueprintName_offset);
 #define ShipManager_current_target(ship_manager) \
     (&MEMBER(ftlbase, ShipManager, ship_manager, ShipManager, current_target))
 
+#define ShipManager_currentScrap(ship_manager) \
+    (MEMBER(ftlbase, ShipManager, ship_manager, int, currentScrap))
+
 #define ShipManager_myBlueprint(ship_manager) \
     (&MEMBER(ftlbase, ShipManager, ship_manager, ShipBlueprint, myBlueprint))
+
+typedef void (*FUNCTYPE(ShipManager_CheckCrystalAugment))(ShipManager* self, Pointf location);
+DECLFUNC(ShipManager_CheckCrystalAugment);
+
+DECLSYM(ShipManager_DamageArea);

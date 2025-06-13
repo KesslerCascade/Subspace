@@ -173,3 +173,8 @@ void controlClientRegister(const char* cmd, controlclientcb_t cb)
     hashtbl_add(&client.handlers, cmd, cb);
     lock_rel(&client.lock);
 }
+
+bool controlClientConnected(void)
+{
+    return (control.sock != 0 && !control.closed);
+}

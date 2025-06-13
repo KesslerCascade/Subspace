@@ -23,6 +23,7 @@ SubspaceGameSettings settings = {
     .addr = 0x7f000001,   // 127.0.0.1
 };
 GameGlobalState gs;
+GameGlobalContext gc;
 
 static void parseArgs(int argc, char* argv[])
 {

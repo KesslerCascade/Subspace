@@ -30,3 +30,12 @@ void osExit(int retcode)
 {
     ExitProcess(retcode);
 }
+
+void osTime64(uint32_t* high, uint32_t* low)
+{
+    FILETIME ft;
+    GetSystemTimeAsFileTime(&ft);
+
+    *high = ft.dwHighDateTime;
+    *low  = ft.dwLowDateTime;
+}

@@ -1,6 +1,27 @@
 #include "ui/panel/panel.sidl"
+#include "run/logrelay.sidl"
 
-class ScrapGraphPanel extends Panel {
+typedef struct ScrapData {
+    int sectorpoint;
+    int amount;
+    int idx;
+} ScrapData;
+saDeclare(ScrapData);
+
+class ScrapGraphPanel extends Panel implements LogSubscriber {
+    Ihandle *plot;
+    int ds;
+    int si;
+
+    Mutex lock;
+    bool reset;
+    bool redraw;
+    [noinit] sarray:ScrapData newscrap;
+    [noinit] hashtable sdata;
+
+    void clear();
+
     factory create(SubspaceUI *ui);
     override make;
+    override update;
 }

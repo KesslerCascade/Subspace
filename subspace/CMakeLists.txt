@@ -49,6 +49,8 @@ set(SUBSPACE_SIDL
     kbmgr/kbmgr.sidl
     kbmgr/keybind.sidl
     lang/langdb.sidl
+    run/logent.sidl
+    run/logrelay.sidl
     run/runinfo.sidl
     run/sectorinfo.sidl
     ui/mainwin.sidl
@@ -91,6 +93,7 @@ add_executable(subspace
     control/cmds/cmdloading.c
     control/cmds/cmdlog.c
     control/cmds/cmdnewgame.c
+    control/cmds/cmdrunlog.c
     control/cmds/cmdsector.c
     control/cmds/cmdstats.c
     control/cmds/cmdvalidate.c
@@ -119,6 +122,8 @@ add_executable(subspace
     kbmgr/keymap.c
     lang/lang.c
     lang/langdb.c
+    run/logent.c
+    run/logrelay.c
     run/runinfo.c
     run/sectorinfo.c
     ui/about.c
@@ -161,6 +166,7 @@ add_executable(subspace
     version.c
     ../lib/cx/cx/cx.natvis
     ${SHARED_SOURCE_DIR}/control.c
+    ${SHARED_SOURCE_DIR}/logentspec.c
     ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_SIDL})
 target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast libpkg)

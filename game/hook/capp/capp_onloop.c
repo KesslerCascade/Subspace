@@ -1,4 +1,5 @@
 #include "control/controlclient.h"
+#include "feature/feature.h"
 #include "ftl/capp.h"
 #include "ftl/scorekeeper.h"
 #include "ftl/starmap.h"
@@ -71,6 +72,9 @@ void subspace_CApp_OnLoop_post(CApp* self)
     }
 
     gs.sendAllStats = false;
+
+    if (RunTracker_feature.enabled)
+        gc.curScrapSource = NULL;
 }
 
 // ---- Patch ----------------

@@ -118,6 +118,11 @@ Symbol SYM(WorldManager_CreateShip) = {
     SYMNAME("WorldManager::CreateShip"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CreateShip_trace }, { 0 } }
 };
+FuncInfo FUNCINFO(WorldManager_CreateShip) = {
+    .nargs   = 3,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_PTR
+};
 
 Symbol SYM(WorldManager_bossShip_offset) = {
     SYMNAME("WorldManager->bossShip"),
@@ -518,7 +523,8 @@ FuncInfo FUNCINFO(WorldManager_CheckForNewLocation) = {
 
 DisasmTrace WorldManager_ModifyResources_trace = {
     .c    = DTRACE_STRREFS,
-    .cstr = "clonebay",
+    .cstr = "AUGMENT_FULL",
+    .mod  = DTRACE_MOD_FUNCSTART,
     .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
              { DT_OP(SKIP), .imin = 31, .imax = 51 },
              { I_MOV,

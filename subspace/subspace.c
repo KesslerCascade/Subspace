@@ -7,6 +7,7 @@
 #include "gamemgr/gamemgr.h"
 #include "kbmgr/kbmgr.h"
 #include "lang/lang.h"
+#include "run/logrelay.h"
 #include "ui/subspaceui.h"
 
 #include <cx/debug.h>
@@ -109,6 +110,9 @@ void subspaceSetRun(Subspace* ss, RunInfo* run)
         objRelease(&ss->run);
         ss->run = objAcquire(run);
     }
+
+    logrelayReset(ss->runlog);
+
     // refresh all UI components
     subspaceUpdateUI(ss);
 }
@@ -131,6 +135,8 @@ void subspaceClearRun(Subspace* ss, RunInfo* ifrun)
             cleared = true;
         }
     }
+
+    logrelayReset(ss->runlog);
 
     if (cleared) {
         // refresh all UI components
@@ -209,13 +215,16 @@ static void subspaceStartup(LogDest** pdeferredlogs)
         fatalError(_S"Failed to open database.", false);
     }
 
-    // 11 -------- UI setup
+    // 11 -------- Log relay
+    subspace.runlog = logrelayCreate(&subspace);
+
+    // 12 -------- UI setup
     subspace.ui = ssuiCreate(&subspace);
     if (!ssuiInit(subspace.ui)) {
         fatalError(_S"Failed to initialize UI.", false);
     }
 
-    // 12 -------- Control Server setup
+    // 13 -------- Control Server setup
     subspace.svr = cserverCreate(&subspace);
     if (!cserverStart(subspace.svr)) {
         fatalError(_S"Failed to start control server.", false);
@@ -224,17 +233,20 @@ static void subspaceStartup(LogDest** pdeferredlogs)
 
 static void subspaceShutdown()
 {
-    // 13 -------- Running state
+    // 14 -------- Running state
     withWriteLock (&subspace.lock) {
         objRelease(&subspace.game);
         objRelease(&subspace.run);
     }
 
-    // 12 -------- Control Server shutdown
+    // 13 -------- Control Server shutdown
     cserverStop(subspace.svr);
 
-    // 11 -------- UI teardown
+    // 12 -------- UI teardown
     ssuiShutdown(subspace.ui);
+
+    // 11 -------- Log relay
+    objRelease(&subspace.runlog);
 
     // 10 -------- Database shutdown
     dbClose(subspace.db);

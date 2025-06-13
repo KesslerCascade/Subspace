@@ -103,8 +103,14 @@ typedef struct GameGlobalState {
     char* saveFileOverride;   // temporary override for save file location
 } GameGlobalState;
 
+// Game state that reflets the current context of the FTL client
+typedef struct GameGlobalContext {
+    const char* curScrapSource;
+} GameGlobalContext;
+
 extern SubspaceGameSettings settings;
 extern GameGlobalState gs;
+extern GameGlobalContext gc;
 extern ControlState control;
 
 int sscmain(int argc, char* argv[]);

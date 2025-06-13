@@ -134,17 +134,17 @@ static bool dbCreateSaves(sqlite3* db)
     return ret;
 }
 
-static bool dbCreateEvents(sqlite3* db)
+static bool dbCreateLog(sqlite3* db)
 {
     bool ret = true;
 
     if (sqlite3_exec(db,
-                     "CREATE TABLE events ("
+                     "CREATE TABLE log ("
                      "runid INTEGER NOT NULL,"
                      "savepoint INTEGER NOT NULL,"
                      "sectorpoint INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
-                     "event TEXT NOT NULL,"
+                     "id TEXT NOT NULL,"
                      "param1,"
                      "param2,"
                      "param3,"
@@ -155,46 +155,44 @@ static bool dbCreateEvents(sqlite3* db)
                      NULL) != SQLITE_OK)
         ret = false;
 
-    if (sqlite3_exec(db, "CREATE INDEX events_runid ON events (runid)", NULL, NULL, NULL) !=
-        SQLITE_OK)
+    if (sqlite3_exec(db, "CREATE INDEX log_runid ON log (runid)", NULL, NULL, NULL) != SQLITE_OK)
         ret = false;
 
     if (sqlite3_exec(db,
-                     "CREATE INDEX events_runid_savepoint ON events (runid, savepoint)",
+                     "CREATE INDEX log_runid_savepoint ON log (runid, savepoint)",
                      NULL,
                      NULL,
                      NULL) != SQLITE_OK)
         ret = false;
 
     if (sqlite3_exec(db,
-                     "CREATE INDEX events_runid_sectorpoint ON events (runid, sectorpoint)",
+                     "CREATE INDEX log_runid_sectorpoint ON log (runid, sectorpoint)",
                      NULL,
                      NULL,
                      NULL) != SQLITE_OK)
         ret = false;
 
-    if (sqlite3_exec(db, "CREATE INDEX events_event ON events (event)", NULL, NULL, NULL) !=
-        SQLITE_OK)
+    if (sqlite3_exec(db, "CREATE INDEX log_id ON log (id)", NULL, NULL, NULL) != SQLITE_OK)
         ret = false;
 
     if (!ret)
-        logStr(Error, _S"Failed to create events table");
+        logStr(Error, _S"Failed to create log table");
 
     return ret;
 }
 
 // copy and paste this because it's identical for now, but may change later
-static bool dbCreateCombatEvents(sqlite3* db)
+static bool dbCreateCombatLog(sqlite3* db)
 {
     bool ret = true;
 
     if (sqlite3_exec(db,
-                     "CREATE TABLE combatevents ("
+                     "CREATE TABLE combatlog ("
                      "runid INTEGER NOT NULL,"
                      "savepoint INTEGER NOT NULL,"
                      "sectorpoint INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
-                     "event TEXT NOT NULL,"
+                     "id TEXT NOT NULL,"
                      "param1,"
                      "param2,"
                      "param3,"
@@ -205,22 +203,19 @@ static bool dbCreateCombatEvents(sqlite3* db)
                      NULL) != SQLITE_OK)
         ret = false;
 
-    if (sqlite3_exec(db,
-                     "CREATE INDEX combatevents_runid ON combatevents (runid)",
-                     NULL,
-                     NULL,
-                     NULL) != SQLITE_OK)
+    if (sqlite3_exec(db, "CREATE INDEX combatlog_runid ON combatlog (runid)", NULL, NULL, NULL) !=
+        SQLITE_OK)
         ret = false;
 
     if (sqlite3_exec(db,
-                     "CREATE INDEX combatevents_runid_savepoint ON combatevents (runid, savepoint)",
+                     "CREATE INDEX combatlog_runid_savepoint ON combatlog (runid, savepoint)",
                      NULL,
                      NULL,
                      NULL) != SQLITE_OK)
         ret = false;
 
     if (!ret)
-        logStr(Error, _S"Failed to create combatevents table");
+        logStr(Error, _S"Failed to create combatlog table");
 
     return ret;
 }
@@ -230,7 +225,7 @@ bool dbCreateSchema(sqlite3* db)
     bool ret = false;
 
     if (!dbCreateRuns(db) || !dbCreateSectors(db) || !dbCreateBeacons(db) || !dbCreateSaves(db) ||
-        !dbCreateEvents(db) || !dbCreateCombatEvents(db))
+        !dbCreateLog(db) || !dbCreateCombatLog(db))
         return false;
 
     if (sqlite3_exec(db, "CREATE TABLE subspace (ver INT)", NULL, NULL, NULL) != SQLITE_OK)
@@ -270,7 +265,7 @@ static bool dbUpgradeFromV0(sqlite3* db, int* destver)
 {
     // version 0 only has subspace table; create the rest
     if (!dbCreateRuns(db) || !dbCreateSectors(db) || !dbCreateBeacons(db) || !dbCreateSaves(db) ||
-        !dbCreateEvents(db) || !dbCreateCombatEvents(db))
+        !dbCreateLog(db) || !dbCreateCombatLog(db))
         return false;
 
     // special case; this function upgrades stright to the current version and does not step through
