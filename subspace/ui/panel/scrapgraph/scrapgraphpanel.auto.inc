@@ -11,6 +11,7 @@ static LogSubscriber _impl_ScrapGraphPanel_LogSubscriber = {
     ._implements = (ObjIface*)&LogSubscriber_tmpl,
     .logNotify = (void (*)(void*, LogEnt*, bool))ScrapGraphPanel_logNotify,
     .logReset = (void (*)(void*))ScrapGraphPanel_logReset,
+    .logReplayComplete = (void (*)(void*))ScrapGraphPanel_logReplayComplete,
 };
 
 static ScrapGraphPanel_ClassIf _impl_ScrapGraphPanel_ScrapGraphPanel_ClassIf = {
@@ -21,6 +22,7 @@ static ScrapGraphPanel_ClassIf _impl_ScrapGraphPanel_ScrapGraphPanel_ClassIf = {
     .update = (bool (*)(void*))ScrapGraphPanel_update,
     .logNotify = (void (*)(void*, LogEnt*, bool))ScrapGraphPanel_logNotify,
     .logReset = (void (*)(void*))ScrapGraphPanel_logReset,
+    .logReplayComplete = (void (*)(void*))ScrapGraphPanel_logReplayComplete,
 };
 
 static ObjIface* _ifimpl_ScrapGraphPanel[] = {

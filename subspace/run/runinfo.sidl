@@ -57,6 +57,9 @@ class RunInfo {
     void newGame(int seed, strref shipType, strref shipName, int difficulty);
     void loadGame(int seed, strref shipType, strref shipName, int difficulty, int beacons);
 
+    bool loadHistoric(int64 runid);
+    void replayLog(bool combat, int64 savepoint, int64 sectorpoint);
+
     void enterSector(int num, int seed, strref type, bool secret);
     void updateStats(int ships, int beacons, int scrap, int crew);
     void runLog(int sector, int beacons, int64 time, strref id, stvar params[LOG_MAX_PARAMS]);

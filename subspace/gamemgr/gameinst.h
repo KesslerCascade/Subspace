@@ -16,6 +16,8 @@ typedef struct ControlClient ControlClient;
 typedef struct ControlClient_WeakRef ControlClient_WeakRef;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
+typedef struct LogEnt LogEnt;
+typedef struct LogEnt_WeakRef LogEnt_WeakRef;
 typedef struct GameMgr GameMgr;
 typedef struct GameMgr_WeakRef GameMgr_WeakRef;
 typedef struct ControlClient ControlClient;

@@ -105,15 +105,15 @@ static void RunInfo_newTracked(RunInfo* self, int seed, strref shipType, strref 
     objRelease(&stmt);
 }
 
-static void RunInfo_loadSectors(RunInfo* self, sa_SectorInfo* out)
+static void loadSectors(Database* db, int64 runid, sa_SectorInfo* out)
 {
-    DbStmt* stmt = dbPrepare(self->ss->db,
+    DbStmt* stmt = dbPrepare(db,
                              _S"SELECT sectorpoint, time, type, seed FROM sectors WHERE runid = ?");
     if (!stmt)
         return;
 
     saInit(out, object, 1, SA_Sorted);
-    dbstmtBind(stmt, 1, stvar(int64, self->runid));
+    dbstmtBind(stmt, 1, stvar(int64, runid));
 
     while (dbstmtExec(stmt) && saSize(stmt->row) == 4) {
         SectorInfo* nsec = sectorinfoCreate();
@@ -151,7 +151,7 @@ static void RunInfo_findOrCreateTracked(RunInfo* self, int seed, strref shipType
     if (saSize(stmt->row) == 11) {
         // found one, load it
         sa_SectorInfo loadsectors = saInitNone;
-        RunInfo_loadSectors(self, &loadsectors);
+        loadSectors(self->ss->db, stmt->row.a[0].data.st_int64, &loadsectors);
 
         withWriteLock (&self->lock) {
             self->seed = seed;
@@ -191,6 +191,66 @@ static void RunInfo_findOrCreateTracked(RunInfo* self, int seed, strref shipType
     objRelease(&stmt);
 }
 
+bool RunInfo_loadHistoric(_In_ RunInfo* self, int64 runid)
+{
+    bool ret     = false;
+    DbStmt* stmt = dbPrepare(
+        self->ss->db,
+        _S
+        "SELECT start, savepoint, sectorpoint, seed, shiptype, shipname, difficulty, result, beacons_explored, ships_defeated, "
+        "scrap_collected, crew_hired, scrap_actual, damage_taken, savepath "
+        "FROM runs WHERE runid = ?");
+    if (!stmt)
+        return false;
+
+    dbstmtBind(stmt, 1, stvar(int64, runid));
+    if (!dbstmtExec(stmt))
+        logStr(Error, _S"Database error trying to load run!");
+
+    if (saSize(stmt->row) == 15) {
+        // found one, load it
+        sa_SectorInfo loadsectors = saInitNone;
+        loadSectors(self->ss->db, runid, &loadsectors);
+
+        withWriteLock (&self->lock) {
+            self->modified = clockWall();
+            self->runid    = runid;
+
+            stConvert(int64, &self->startTime, stvar, stmt->row.a[0]);
+            stConvert(int64, &self->savepoint, stvar, stmt->row.a[1]);
+            stConvert(int64, &self->sectorpoint, stvar, stmt->row.a[2]);
+            stConvert(int32, &self->seed, stvar, stmt->row.a[3]);
+            stConvert(string, &self->shipType, stvar, stmt->row.a[4]);
+            stConvert(string, &self->shipName, stvar, stmt->row.a[5]);
+            stConvert(int32, &self->difficulty, stvar, stmt->row.a[6]);
+            stConvert(int32, &self->result, stvar, stmt->row.a[7]);
+            stConvert(int32, &self->beaconsExplored, stvar, stmt->row.a[8]);
+            stConvert(int32, &self->shipsDefeated, stvar, stmt->row.a[9]);
+            stConvert(int32, &self->scrapCollected, stvar, stmt->row.a[10]);
+            stConvert(int32, &self->crewHired, stvar, stmt->row.a[11]);
+            stConvert(int32, &self->scrapActual, stvar, stmt->row.a[12]);
+            stConvert(int32, &self->damageTaken, stvar, stmt->row.a[13]);
+            stConvert(string, &self->savePath, stvar, stmt->row.a[14]);
+
+            saDestroy(&self->sectors);
+            self->sectors = loadsectors;
+
+            self->recording = true;
+        }
+
+        logFmt(Info,
+               _S"Loaded run [${int}]: ${string} (${string})",
+               stvar(int64, self->runid),
+               stvar(strref, self->shipName),
+               stvar(strref, self->shipType));
+
+        ret = true;
+    }
+
+    objRelease(&stmt);
+    return ret;
+}
+
 void RunInfo_newGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
                      _In_opt_ strref shipName, int difficulty)
 {
@@ -206,13 +266,17 @@ void RunInfo_newGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
 void RunInfo_loadGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
                       _In_opt_ strref shipName, int difficulty, int beacons)
 {
-    if (fregIsEnabled(self->ss->freg, _S"RunTracker"))
+    bool usetracker = fregIsEnabled(self->ss->freg, _S"RunTracker");
+
+    if (usetracker)
         RunInfo_findOrCreateTracked(self, seed, shipType, shipName, difficulty, beacons);
     else
         RunInfo_newUntracked(self, seed, shipType, shipName, difficulty);
 
     // when loading a saved game, the run is automatically focused by the UI
     subspaceSetRun(self->ss, self);
+    if (usetracker)
+        runinfoReplayLog(self, false, 0, 0);
 }
 
 void RunInfo_abandon(_In_ RunInfo* self)
@@ -276,11 +340,12 @@ void RunInfo_enterSector(_In_ RunInfo* self, int num, int seed, _In_opt_ strref 
         }
 
         if (nsec->sectorpoint > self->sectorpoint) {
-            DbStmt* stmt = dbPrepare(self->ss->db, _S"UPDATE runs SET sectorpoint=? WHERE runid=?");
+            stmt = dbPrepare(self->ss->db, _S"UPDATE runs SET sectorpoint=? WHERE runid=?");
             if (stmt) {
                 dbstmtBind(stmt, 1, stvar(int64, nsec->sectorpoint));
                 dbstmtBind(stmt, 2, stvar(int64, self->runid));
                 dbstmtExec(stmt);
+                objRelease(&stmt);
             }
         }
     }
@@ -428,9 +493,10 @@ void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, _In
 
         if (!dbstmtExec(stmt))
             logStr(DevVerbose, _S"Failed to insert log entry");
-    }
 
-    objRelease(&ent);
+        objRelease(&ent);
+        objRelease(&stmt);
+    }
 }
 
 void RunInfo_processLog(_In_ RunInfo* self, LogEnt* ent)
@@ -454,7 +520,66 @@ void RunInfo_processScrap(_In_ RunInfo* self, _In_opt_ strref src, int amount, i
             dbstmtBind(stmt, 2, stvar(int64, self->runid));
             dbstmtExec(stmt);
         }
+        objRelease(&stmt);
     }
+}
+
+void RunInfo_replayLog(_In_ RunInfo* self, bool combat, int64 savepoint, int64 sectorpoint)
+{
+    string sql = combat ? _S
+        "SELECT savepoint, sectorpoint, time, id, param1, param2, param3, param4 FROM combatlog WHERE runid = ?" :
+                          _S
+        "SELECT savepoint, sectorpoint, time, id, param1, param2, param3, param4 FROM log WHERE runid = ?";
+
+    if (savepoint > 0)
+        strAppend(&sql, _S" AMD savepoint = ?");
+    if (sectorpoint > 0)
+        strAppend(&sql, _S" AND sectorpoint = ?");
+
+    DbStmt* stmt = dbPrepare(self->ss->db, sql);
+    if (!stmt)
+        goto out;
+
+    int nb = 1;
+    dbstmtBind(stmt, nb++, stvar(int64, self->runid));
+    if (savepoint > 0)
+        dbstmtBind(stmt, nb++, stvar(int64, savepoint));
+    if (sectorpoint > 0)
+        dbstmtBind(stmt, nb++, stvar(int64, sectorpoint));
+
+    LogRelay* runlog = self->ss->runlog;
+    logrelayReset(runlog);
+
+    while (dbstmtExec(stmt) && saSize(stmt->row) == 8) {
+        int64 savepoint              = 0;
+        int64 sectorpoint            = 0;
+        int64 time                   = 0;
+        string id                    = 0;
+        stvar params[LOG_MAX_PARAMS] = { 0 };
+
+        stConvert(int64, &savepoint, stvar, stmt->row.a[0]);
+        stConvert(int64, &sectorpoint, stvar, stmt->row.a[1]);
+        stConvert(int64, &time, stvar, stmt->row.a[2]);
+        stConvert(string, &id, stvar, stmt->row.a[3]);
+        params[0] = stmt->row.a[4];
+        params[1] = stmt->row.a[5];
+        params[2] = stmt->row.a[6];
+        params[3] = stmt->row.a[7];
+
+        LogEnt* nent = logentCreate(sectorpoint, savepoint, time, id, params);
+        if (nent) {
+            logrelaySend(runlog, nent, true);
+            objRelease(&nent);
+        }
+
+        strDestroy(&id);
+    }
+
+    logrelayReplayComplete(runlog);
+
+out:
+    strDestroy(&sql);
+    objRelease(&stmt);
 }
 
 // Autogen begins -----

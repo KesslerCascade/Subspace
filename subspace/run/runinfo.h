@@ -32,6 +32,8 @@ typedef struct RunInfo_ClassIf {
 
     void (*newGame)(_In_ void* self, int seed, _In_opt_ strref shipType, _In_opt_ strref shipName, int difficulty);
     void (*loadGame)(_In_ void* self, int seed, _In_opt_ strref shipType, _In_opt_ strref shipName, int difficulty, int beacons);
+    bool (*loadHistoric)(_In_ void* self, int64 runid);
+    void (*replayLog)(_In_ void* self, bool combat, int64 savepoint, int64 sectorpoint);
     void (*enterSector)(_In_ void* self, int num, int seed, _In_opt_ strref type, bool secret);
     void (*updateStats)(_In_ void* self, int ships, int beacons, int scrap, int crew);
     void (*runLog)(_In_ void* self, int sector, int beacons, int64 time, _In_opt_ strref id, stvar params[LOG_MAX_PARAMS]);
@@ -98,6 +100,10 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoNewGame(self, seed, shipType, shipName, difficulty) (self)->_->newGame(RunInfo(self), seed, shipType, shipName, difficulty)
 // void runinfoLoadGame(RunInfo* self, int seed, strref shipType, strref shipName, int difficulty, int beacons);
 #define runinfoLoadGame(self, seed, shipType, shipName, difficulty, beacons) (self)->_->loadGame(RunInfo(self), seed, shipType, shipName, difficulty, beacons)
+// bool runinfoLoadHistoric(RunInfo* self, int64 runid);
+#define runinfoLoadHistoric(self, runid) (self)->_->loadHistoric(RunInfo(self), runid)
+// void runinfoReplayLog(RunInfo* self, bool combat, int64 savepoint, int64 sectorpoint);
+#define runinfoReplayLog(self, combat, savepoint, sectorpoint) (self)->_->replayLog(RunInfo(self), combat, savepoint, sectorpoint)
 // void runinfoEnterSector(RunInfo* self, int num, int seed, strref type, bool secret);
 #define runinfoEnterSector(self, num, seed, type, secret) (self)->_->enterSector(RunInfo(self), num, seed, type, secret)
 // void runinfoUpdateStats(RunInfo* self, int ships, int beacons, int scrap, int crew);

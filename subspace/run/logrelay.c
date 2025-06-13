@@ -108,6 +108,19 @@ void LogRelay_reset(_In_ LogRelay* self)
     }
 }
 
+void LogRelay_replayComplete(_In_ LogRelay* self)
+{
+    withReadLock (&self->lock) {
+        foreach (hashtable, iter, self->subscribers) {
+            ObjInst* sub = htiKey(ptr, iter);
+
+            // tell all subscribers to reset their info; either for a fresh run or a replay
+            LogSubscriber* subif = objInstIf(sub, LogSubscriber);
+            subif->logReplayComplete(sub);
+        }
+    }
+}
+
 // -------- Event Dispatcher
 
 _objfactory_guaranteed LogDispatcher* LogDispatcher_create(ObjInst* subscriber, LogEnt* ent, bool replay)

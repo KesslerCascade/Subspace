@@ -46,6 +46,7 @@ typedef struct ScrapGraphPanel_ClassIf {
     void (*clear)(_In_ void* self);
     void (*logNotify)(_In_ void* self, LogEnt* ent, bool replay);
     void (*logReset)(_In_ void* self);
+    void (*logReplayComplete)(_In_ void* self);
 } ScrapGraphPanel_ClassIf;
 extern ScrapGraphPanel_ClassIf ScrapGraphPanel_ClassIf_tmpl;
 
@@ -107,4 +108,6 @@ _objfactory_guaranteed ScrapGraphPanel* ScrapGraphPanel_create(SubspaceUI* ui);
 #define scrapgraphpanelLogNotify(self, ent, replay) (self)->_->logNotify(ScrapGraphPanel(self), LogEnt(ent), replay)
 // void scrapgraphpanelLogReset(ScrapGraphPanel* self);
 #define scrapgraphpanelLogReset(self) (self)->_->logReset(ScrapGraphPanel(self))
+// void scrapgraphpanelLogReplayComplete(ScrapGraphPanel* self);
+#define scrapgraphpanelLogReplayComplete(self) (self)->_->logReplayComplete(ScrapGraphPanel(self))
 

@@ -38,6 +38,7 @@ typedef struct LogSubscriber {
 
     void (*logNotify)(_In_ void* self, LogEnt* ent, bool replay);
     void (*logReset)(_In_ void* self);
+    void (*logReplayComplete)(_In_ void* self);
 } LogSubscriber;
 extern LogSubscriber LogSubscriber_tmpl;
 
@@ -48,6 +49,7 @@ typedef struct LogRelay_ClassIf {
 
     bool (*subscribe)(_In_ void* self, ObjInst* subscriber, _In_opt_ strref id);
     void (*reset)(_In_ void* self);
+    void (*replayComplete)(_In_ void* self);
     bool (*send)(_In_ void* self, LogEnt* ent, bool replay);
 } LogRelay_ClassIf;
 extern LogRelay_ClassIf LogRelay_ClassIf_tmpl;
@@ -106,6 +108,8 @@ _objfactory_guaranteed LogRelay* LogRelay_create(Subspace* ss);
 #define logrelaySubscribe(self, subscriber, id) (self)->_->subscribe(LogRelay(self), ObjInst(subscriber), id)
 // void logrelayReset(LogRelay* self);
 #define logrelayReset(self) (self)->_->reset(LogRelay(self))
+// void logrelayReplayComplete(LogRelay* self);
+#define logrelayReplayComplete(self) (self)->_->replayComplete(LogRelay(self))
 // bool logrelaySend(LogRelay* self, LogEnt* ent, bool replay);
 #define logrelaySend(self, ent, replay) (self)->_->send(LogRelay(self), LogEnt(ent), replay)
 

@@ -57,7 +57,7 @@ bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
     self->si    = 0;
     self->reset = true;
     IupSetAttribute(self->plot, "FGCOLOR", "255 255 255");
-    IupSetAttribute(self->plot, "BARSPACING", "20");
+    IupSetAttribute(self->plot, "AXS_YAUTOMIN", "NO");
     IupSetAttribute(self->plot, "AXS_XTICKAUTO", "NO");
     IupSetAttribute(self->plot, "AXS_XTICKMINORDIVISION", "1");
 
@@ -74,7 +74,6 @@ void ScrapGraphPanel_clear(_In_ ScrapGraphPanel* self)
 {
     string temp = 0;
 
-    saClear(&self->newscrap);
     htClear(&self->sdata);
     IupSetAttribute(self->plot, "CLEAR", "1");
 
@@ -87,8 +86,10 @@ void ScrapGraphPanel_clear(_In_ ScrapGraphPanel* self)
     }
     self->ds = IupPlotEnd(self->plot);
     self->si = 8;
+    IupSetAttribute(self->plot, "DS_NAME", "Scrap");
     IupSetAttribute(self->plot, "DS_COLOR", "200 40 40");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
+    IupSetAttribute(self->plot, "DS_BARSPACING", "30");
     self->reset  = false;
     self->redraw = true;
 
@@ -160,7 +161,17 @@ void ScrapGraphPanel_logNotify(_In_ ScrapGraphPanel* self, LogEnt* ent, bool rep
 void ScrapGraphPanel_logReset(_In_ ScrapGraphPanel* self)
 {
     withMutex (&self->lock) {
+        saClear(&self->newscrap);
         self->reset = true;
+    }
+
+    ssuiUpdateMain(self->ss->ui, _S"scrapgraph");
+}
+
+void ScrapGraphPanel_logReplayComplete(_In_ ScrapGraphPanel* self)
+{
+    withMutex (&self->lock) {
+        self->redraw = true;
     }
 
     ssuiUpdateMain(self->ss->ui, _S"scrapgraph");

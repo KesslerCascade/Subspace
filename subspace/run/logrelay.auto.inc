@@ -19,6 +19,7 @@ static LogRelay_ClassIf _impl_LogRelay_LogRelay_ClassIf = {
     ._implements = (ObjIface*)&LogRelay_ClassIf_tmpl,
     .subscribe = (bool (*)(void*, ObjInst*, strref))LogRelay_subscribe,
     .reset = (void (*)(void*))LogRelay_reset,
+    .replayComplete = (void (*)(void*))LogRelay_replayComplete,
     .send = (bool (*)(void*, LogEnt*, bool))LogRelay_send,
 };
 

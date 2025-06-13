@@ -5,6 +5,7 @@
 interface LogSubscriber {
     void logNotify(LogEnt* ent, bool replay);
     void logReset();
+    void logReplayComplete();
 }
 
 class RunInfo;
@@ -19,6 +20,7 @@ class LogRelay
 
     bool subscribe(ObjInst* subscriber, strref id);
     void reset();
+    void replayComplete();
     bool send(LogEnt* ent, bool replay);
 
     factory create(Subspace *ss);
