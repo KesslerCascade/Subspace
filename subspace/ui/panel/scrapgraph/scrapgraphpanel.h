@@ -31,7 +31,6 @@ saDeclarePtr(ScrapGraphPanel_WeakRef);
 typedef struct ScrapData {
     int sectorpoint;
     int amount;
-    int idx;
 } ScrapData;
 saDeclare(ScrapData);
 
@@ -74,7 +73,7 @@ typedef struct ScrapGraphPanel {
     bool reset;
     bool redraw;
     sa_ScrapData newscrap;
-    hashtable sdata;
+    sa_ScrapData sdata;
 } ScrapGraphPanel;
 extern ObjClassInfo ScrapGraphPanel_clsinfo;
 #define ScrapGraphPanel(inst) ((ScrapGraphPanel*)(unused_noeval((inst) && &((inst)->_is_ScrapGraphPanel)), (inst)))

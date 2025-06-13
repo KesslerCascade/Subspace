@@ -16,6 +16,16 @@
 #include "run/runinfo.h"
 #include "ui/subspaceui.h"
 
+static intptr ScrapData_cmp(stype st, _In_ stgeneric gen1, _In_ stgeneric gen2, flags_t flags)
+{
+    ScrapData* s1 = (ScrapData*)gen1.st_opaque;
+    ScrapData* s2 = (ScrapData*)gen2.st_opaque;
+
+    return s1->sectorpoint - s2->sectorpoint;
+}
+
+STypeOps ScrapData_ops = { .cmp = ScrapData_cmp };
+
 _objfactory_guaranteed ScrapGraphPanel* ScrapGraphPanel_create(SubspaceUI* ui)
 {
     ScrapGraphPanel* self;
@@ -33,7 +43,7 @@ _objfactory_guaranteed ScrapGraphPanel* ScrapGraphPanel_create(SubspaceUI* ui)
 _objinit_guaranteed bool ScrapGraphPanel_init(_In_ ScrapGraphPanel* self)
 {
     saInit(&self->newscrap, opaque(ScrapData), 1);
-    htInit(&self->sdata, int64, opaque(ScrapData), 16);
+    saInit(&self->sdata, custom(opaque(ScrapData), ScrapData_ops), 8, SA_Sorted);
     // Autogen begins -----
     mutexInit(&self->lock);
     return true;
@@ -74,13 +84,13 @@ void ScrapGraphPanel_clear(_In_ ScrapGraphPanel* self)
 {
     string temp = 0;
 
-    htClear(&self->sdata);
+    saClear(&self->sdata);
     IupSetAttribute(self->plot, "CLEAR", "1");
 
     IupPlotBegin(self->plot, 1);
     for (int i = 1; i <= 8; i++) {
-        ScrapData sd = { .amount = 0, .idx = i - 1, .sectorpoint = SPOINT(i, 0) };
-        htInsert(&self->sdata, int64, sd.sectorpoint, opaque, sd);
+        ScrapData sd = { .amount = 0, .sectorpoint = SPOINT(i, 0) };
+        saPush(&self->sdata, opaque, sd);
         strFromInt32(&temp, i, 10);
         IupPlotAddStr(self->plot, strC(temp), 0);
     }
@@ -102,7 +112,7 @@ bool ScrapGraphPanel_update(_In_ ScrapGraphPanel* self)
 {
     string temp = 0;
     bool redraw = false;
-    ScrapData cur;
+    ScrapData* cur;
 
     withMutex (&self->lock) {
         if (self->reset)
@@ -110,16 +120,15 @@ bool ScrapGraphPanel_update(_In_ ScrapGraphPanel* self)
 
         foreach (sarray, idx, ScrapData, ns, self->newscrap) {
             spointFormat(&temp, ns.sectorpoint);
-            if (htFind(self->sdata, int64, ns.sectorpoint, opaque, &cur)) {
-                cur.amount += ns.amount;
-                IupPlotSetSampleStr(self->plot, self->ds, cur.idx, strC(temp), cur.amount);
-                htInsert(&self->sdata, int64, ns.sectorpoint, opaque, cur);
+            int32 idx = saFind(self->sdata, opaque, ns);   // this works because sdata custom
+                                                           // compare only checks sectorpoint
+            if (idx >= 0) {
+                cur = &self->sdata.a[idx];
+                cur->amount += ns.amount;
+                IupPlotSetSampleStr(self->plot, self->ds, idx, strC(temp), cur->amount);
             } else {
-                cur.sectorpoint = ns.sectorpoint;
-                cur.amount      = ns.amount;
-                cur.idx         = self->si++;
-                IupPlotInsertStr(self->plot, self->ds, cur.idx, strC(temp), cur.amount);
-                htInsert(&self->sdata, int64, ns.sectorpoint, opaque, cur);
+                idx = saPush(&self->sdata, opaque, ns);
+                IupPlotInsertStr(self->plot, self->ds, idx, strC(temp), ns.amount);
             }
         }
         saClear(&self->newscrap);
@@ -182,7 +191,7 @@ void ScrapGraphPanel_destroy(_In_ ScrapGraphPanel* self)
     // Autogen begins -----
     mutexDestroy(&self->lock);
     saDestroy(&self->newscrap);
-    htDestroy(&self->sdata);
+    saDestroy(&self->sdata);
     // Autogen ends -------
 }
 

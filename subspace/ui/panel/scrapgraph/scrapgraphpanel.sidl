@@ -4,7 +4,6 @@
 typedef struct ScrapData {
     int sectorpoint;
     int amount;
-    int idx;
 } ScrapData;
 saDeclare(ScrapData);
 
@@ -17,7 +16,7 @@ class ScrapGraphPanel extends Panel implements LogSubscriber {
     bool reset;
     bool redraw;
     [noinit] sarray:ScrapData newscrap;
-    [noinit] hashtable sdata;
+    [noinit] sarray:ScrapData sdata;
 
     void clear();
 
