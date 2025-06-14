@@ -70,6 +70,8 @@ bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
     IupSetAttribute(self->plot, "AXS_YAUTOMIN", "NO");
     IupSetAttribute(self->plot, "AXS_XTICKAUTO", "NO");
     IupSetAttribute(self->plot, "AXS_XTICKMINORDIVISION", "1");
+    IupSetAttribute(self->plot, "AXS_YTIPFORMAT", "%.0f");
+    IupSetAttribute(self->plot, "TIPFORMAT", "%.0s%.0s%s");
 
     self->h = IupBackgroundBox(self->plot);
     IupSetAttribute(self->h, "BGCOLOR", panelbg);
