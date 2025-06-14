@@ -8,7 +8,7 @@
 
 void cmdRunLog(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
 {
-    RunInfo* run = subspaceRun(client->ss);
+    RunInfo* run = ginstRun(inst);
     // can't do anything without a run in progress
     if (!run)
         return;
@@ -20,7 +20,7 @@ void cmdRunLog(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable
     int32 beacons   = cfieldValD(int32, fields, _S"beacons", 0);
 
     if (strEmpty(id) || sector == 0 || beacons == 0 || (timelow == 0 && timehigh == 0))
-        return;
+        goto out;
 
     stvar params[LOG_MAX_PARAMS] = { 0 };
     foreach (hashtable, hti, fields) {
@@ -38,10 +38,11 @@ void cmdRunLog(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable
     FILETIME ft;
     ft.dwHighDateTime = timehigh;
     ft.dwLowDateTime  = timelow;
-    int64 logtime = timeFromFileTime(&ft);
+    int64 logtime     = timeFromFileTime(&ft);
 #endif
 
     runinfoRunLog(run, sector, beacons, logtime, id, params);
 
+out:
     objRelease(&run);
 }
