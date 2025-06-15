@@ -15,6 +15,7 @@
 #include "run/logrelay.h"
 #include "run/runinfo.h"
 #include "ui/subspaceui.h"
+#include "ui/util/iupsetobj.h"
 
 static intptr ScrapData_cmp(stype st, _In_ stgeneric gen1, _In_ stgeneric gen2, flags_t flags)
 {
@@ -75,6 +76,7 @@ bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
 
     self->h = IupBackgroundBox(self->plot);
     IupSetAttribute(self->h, "BGCOLOR", panelbg);
+    iupSetObj(self->h, self, ObjNone, self->ui);
 
     // register to receive all scrap events
     logrelaySubscribe(self->ss->runlog, self, _S"Scrap");

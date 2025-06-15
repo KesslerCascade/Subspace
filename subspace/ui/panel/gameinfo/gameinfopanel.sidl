@@ -29,5 +29,6 @@ class GameInfoPanel extends Panel {
     factory create(SubspaceUI *ui);
     override make;
     override update;
+    override remap;
     unbound void updateRun(RunInfo *run, bool force);
 }

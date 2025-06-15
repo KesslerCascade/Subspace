@@ -79,6 +79,25 @@ static int placeholder_buttoncb(Ihandle* ih, int button, int pressed, int x, int
 
 typedef int (*iftcxytp_t)(Ihandle* ih, int x, int y);
 
+static void MainWin_notifyMappedTabs(Ihandle* ih)
+{
+    const char* cls = IupGetClassName(ih);
+    int tab         = -1;
+
+    // is this a panel?
+    Panel* panel = iupGetObj(Panel, ih);
+    if (panel) {
+        panelRemap(panel);
+        return;
+    }
+
+    // otherwise recurse into all children
+    int children = IupGetChildCount(ih);
+    for (int i = 0; i < children; i++) {
+        MainWin_notifyMappedTabs(IupGetChild(ih, i));
+    }
+}
+
 void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, Ihandle* nh,
                                bool destroy)
 {
@@ -93,6 +112,7 @@ void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, 
             IupDetach(oh);
         IupAppend(split, nh);
         IupMap(nh);
+        MainWin_notifyMappedTabs(nh);
 
         self->root = nh;
         IupSetAttributeHandle(self->zbox, "VALUE", self->root);
@@ -111,6 +131,7 @@ void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, 
         Ihandle* p1 = IupGetChild(split, 1);
         IupInsert(split, p1, nh);
         IupMap(nh);
+        MainWin_notifyMappedTabs(nh);
     } else {
         // can just remove and append
         if (destroy)
@@ -119,6 +140,7 @@ void MainWin_replaceSplitChild(_In_ MainWin* self, Ihandle* split, Ihandle* oh, 
             IupDetach(oh);
         IupAppend(split, nh);
         IupMap(nh);
+        MainWin_notifyMappedTabs(nh);
     }
     IupRefresh(split);
 }
@@ -416,6 +438,7 @@ void MainWin_addTab(_In_ MainWin* self, Ihandle* attachto, Ihandle* addbefore, _
     }
 
     IupMap(panel->h);
+    MainWin_notifyMappedTabs(panel->h);
     IupRefresh(panel->h);
     mainwinSetLayoutDirty(self);
 
@@ -449,6 +472,7 @@ void MainWin_addSplit(_In_ MainWin* self, Ihandle* at, bool vertical)
     Ihandle* ph = mainwinCreatePlaceholder(self);
     IupAppend(nsplit, ph);
     IupMap(at);
+    MainWin_notifyMappedTabs(at);
     IupMap(ph);
     IupRefresh(nsplit);
     mainwinSetLayoutDirty(self);

@@ -19,6 +19,7 @@ typedef struct RunSummaryPanel_ClassIf {
 
     bool (*make)(_In_ void* self);
     bool (*update)(_In_ void* self);
+    void (*remap)(_In_ void* self);
     intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
 } RunSummaryPanel_ClassIf;
 extern RunSummaryPanel_ClassIf RunSummaryPanel_ClassIf_tmpl;
@@ -65,6 +66,8 @@ _objfactory_guaranteed RunSummaryPanel* RunSummaryPanel_create(SubspaceUI* ui);
 #define runsummarypanelMake(self) (self)->_->make(RunSummaryPanel(self))
 // bool runsummarypanelUpdate(RunSummaryPanel* self);
 #define runsummarypanelUpdate(self) (self)->_->update(RunSummaryPanel(self))
+// void runsummarypanelRemap(RunSummaryPanel* self);
+#define runsummarypanelRemap(self) (self)->_->remap(RunSummaryPanel(self))
 // intptr runsummarypanelCmp(RunSummaryPanel* self, RunSummaryPanel* other, uint32 flags);
 #define runsummarypanelCmp(self, other, flags) (self)->_->cmp(RunSummaryPanel(self), other, flags)
 

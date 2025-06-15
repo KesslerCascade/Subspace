@@ -19,6 +19,7 @@ typedef struct WelcomePanel_ClassIf {
 
     bool (*make)(_In_ void* self);
     bool (*update)(_In_ void* self);
+    void (*remap)(_In_ void* self);
     intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
 } WelcomePanel_ClassIf;
 extern WelcomePanel_ClassIf WelcomePanel_ClassIf_tmpl;
@@ -65,6 +66,8 @@ _objfactory_guaranteed WelcomePanel* WelcomePanel_create(SubspaceUI* ui);
 #define welcomepanelMake(self) (self)->_->make(WelcomePanel(self))
 // bool welcomepanelUpdate(WelcomePanel* self);
 #define welcomepanelUpdate(self) (self)->_->update(WelcomePanel(self))
+// void welcomepanelRemap(WelcomePanel* self);
+#define welcomepanelRemap(self) (self)->_->remap(WelcomePanel(self))
 // intptr welcomepanelCmp(WelcomePanel* self, WelcomePanel* other, uint32 flags);
 #define welcomepanelCmp(self, other, flags) (self)->_->cmp(WelcomePanel(self), other, flags)
 

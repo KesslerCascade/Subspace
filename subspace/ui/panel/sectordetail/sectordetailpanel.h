@@ -19,6 +19,7 @@ typedef struct SectorDetailPanel_ClassIf {
 
     bool (*make)(_In_ void* self);
     bool (*update)(_In_ void* self);
+    void (*remap)(_In_ void* self);
     intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
 } SectorDetailPanel_ClassIf;
 extern SectorDetailPanel_ClassIf SectorDetailPanel_ClassIf_tmpl;
@@ -65,6 +66,8 @@ _objfactory_guaranteed SectorDetailPanel* SectorDetailPanel_create(SubspaceUI* u
 #define sectordetailpanelMake(self) (self)->_->make(SectorDetailPanel(self))
 // bool sectordetailpanelUpdate(SectorDetailPanel* self);
 #define sectordetailpanelUpdate(self) (self)->_->update(SectorDetailPanel(self))
+// void sectordetailpanelRemap(SectorDetailPanel* self);
+#define sectordetailpanelRemap(self) (self)->_->remap(SectorDetailPanel(self))
 // intptr sectordetailpanelCmp(SectorDetailPanel* self, SectorDetailPanel* other, uint32 flags);
 #define sectordetailpanelCmp(self, other, flags) (self)->_->cmp(SectorDetailPanel(self), other, flags)
 

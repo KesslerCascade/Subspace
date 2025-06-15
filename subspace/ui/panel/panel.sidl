@@ -16,4 +16,5 @@ class Panel implements Sortable {
     init();
     bool make();
     bool update();
+    void remap();
 }

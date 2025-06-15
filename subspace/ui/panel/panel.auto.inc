@@ -16,6 +16,7 @@ static Panel_ClassIf _impl_Panel_Panel_ClassIf = {
     ._implements = (ObjIface*)&Panel_ClassIf_tmpl,
     .make = (bool (*)(void*))Panel_make,
     .update = (bool (*)(void*))Panel_update,
+    .remap = (void (*)(void*))Panel_remap,
     .cmp = (intptr (*)(void*, void*, uint32))Panel_cmp,
 };
 

@@ -41,6 +41,7 @@ typedef struct ScrapGraphPanel_ClassIf {
 
     bool (*make)(_In_ void* self);
     bool (*update)(_In_ void* self);
+    void (*remap)(_In_ void* self);
     intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
     void (*clear)(_In_ void* self);
     void (*logNotify)(_In_ void* self, LogEnt* ent, bool replay);
@@ -99,6 +100,8 @@ _objfactory_guaranteed ScrapGraphPanel* ScrapGraphPanel_create(SubspaceUI* ui);
 #define scrapgraphpanelMake(self) (self)->_->make(ScrapGraphPanel(self))
 // bool scrapgraphpanelUpdate(ScrapGraphPanel* self);
 #define scrapgraphpanelUpdate(self) (self)->_->update(ScrapGraphPanel(self))
+// void scrapgraphpanelRemap(ScrapGraphPanel* self);
+#define scrapgraphpanelRemap(self) (self)->_->remap(ScrapGraphPanel(self))
 // intptr scrapgraphpanelCmp(ScrapGraphPanel* self, ScrapGraphPanel* other, uint32 flags);
 #define scrapgraphpanelCmp(self, other, flags) (self)->_->cmp(ScrapGraphPanel(self), other, flags)
 // void scrapgraphpanelClear(ScrapGraphPanel* self);

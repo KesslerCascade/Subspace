@@ -23,6 +23,7 @@ typedef struct Panel_ClassIf {
 
     bool (*make)(_In_ void* self);
     bool (*update)(_In_ void* self);
+    void (*remap)(_In_ void* self);
     intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
 } Panel_ClassIf;
 extern Panel_ClassIf Panel_ClassIf_tmpl;
@@ -63,6 +64,8 @@ typedef struct Panel_WeakRef {
 #define panelMake(self) (self)->_->make(Panel(self))
 // bool panelUpdate(Panel* self);
 #define panelUpdate(self) (self)->_->update(Panel(self))
+// void panelRemap(Panel* self);
+#define panelRemap(self) (self)->_->remap(Panel(self))
 // intptr panelCmp(Panel* self, Panel* other, uint32 flags);
 #define panelCmp(self, other, flags) (self)->_->cmp(Panel(self), other, flags)
 

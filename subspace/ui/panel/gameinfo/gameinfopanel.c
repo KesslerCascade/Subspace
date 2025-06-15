@@ -270,7 +270,7 @@ static void recalcStatsSize(GameInfoPanel* self)
 
 static int panelResize(Ihandle* ih, int width, int height)
 {
-    GameInfoPanel* self = iupGetParentObj(GameInfoPanel, ih);
+    GameInfoPanel* self = iupGetObj(GameInfoPanel, ih);
     if (self)
         recalcStatsSize(self);
 
@@ -297,7 +297,7 @@ bool GameInfoPanel_make(_In_ GameInfoPanel* self)
 
     self->h = IupBackgroundBox(self->zbox);
     IupSetAttribute(self->h, "BGCOLOR", panelbg);
-    iupSetObj(self->h, ObjNone, self, self->ui);
+    iupSetObj(self->h, self, ObjNone, self->ui);
     IupSetCallback(self->h, "RESIZE_CB", (Icallback)panelResize);
 
     return parent_make();
@@ -565,6 +565,14 @@ out:
     objRelease(&run);
     objRelease(&inst);
     return true;
+}
+
+extern void Panel_remap(_In_ Panel* self);   // parent
+#define parent_remap() Panel_remap((Panel*)(self))
+void GameInfoPanel_remap(_In_ GameInfoPanel* self)
+{
+    self->statcols = 0;   // matrix needs to be rebuilt
+    GameInfoPanel_update(self);
 }
 
 void GameInfoPanel_destroy(_In_ GameInfoPanel* self)

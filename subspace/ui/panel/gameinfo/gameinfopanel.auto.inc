@@ -11,6 +11,7 @@ static GameInfoPanel_ClassIf _impl_GameInfoPanel_GameInfoPanel_ClassIf = {
     ._implements = (ObjIface*)&GameInfoPanel_ClassIf_tmpl,
     .make = (bool (*)(void*))GameInfoPanel_make,
     .update = (bool (*)(void*))GameInfoPanel_update,
+    .remap = (void (*)(void*))GameInfoPanel_remap,
 };
 
 static ObjIface* _ifimpl_GameInfoPanel[] = {

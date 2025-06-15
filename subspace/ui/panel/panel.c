@@ -36,6 +36,11 @@ bool Panel_update(_In_ Panel* self)
     return true;
 }
 
+void Panel_remap(_In_ Panel* self)
+{
+    // do nothing
+}
+
 intptr Panel_cmp(_In_ Panel* self, Panel* other, uint32 flags)
 {
     return stCmp(strref, self->name, other->name);

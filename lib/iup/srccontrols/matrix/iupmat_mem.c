@@ -127,6 +127,11 @@ void iupMatrixMemRelease(Ihandle* ih)
 
   if (ih->data->merge_info)
   {
+    for (int lin=0; lin<ih->data->lines.num; lin++) {
+      for (int col=0; col<ih->data->columns.num; col++) {
+        iupAttribSetId2(ih, "MERGED", lin, col, NULL);
+      }
+    }
     free(ih->data->merge_info);
     ih->data->merge_info = NULL;
     ih->data->merge_info_max = 0;

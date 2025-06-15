@@ -21,6 +21,7 @@ typedef struct GameInfoPanel_ClassIf {
 
     bool (*make)(_In_ void* self);
     bool (*update)(_In_ void* self);
+    void (*remap)(_In_ void* self);
     intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
 } GameInfoPanel_ClassIf;
 extern GameInfoPanel_ClassIf GameInfoPanel_ClassIf_tmpl;
@@ -91,6 +92,8 @@ void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run, bool force)
 #define gameinfopanelMake(self) (self)->_->make(GameInfoPanel(self))
 // bool gameinfopanelUpdate(GameInfoPanel* self);
 #define gameinfopanelUpdate(self) (self)->_->update(GameInfoPanel(self))
+// void gameinfopanelRemap(GameInfoPanel* self);
+#define gameinfopanelRemap(self) (self)->_->remap(GameInfoPanel(self))
 // intptr gameinfopanelCmp(GameInfoPanel* self, GameInfoPanel* other, uint32 flags);
 #define gameinfopanelCmp(self, other, flags) (self)->_->cmp(GameInfoPanel(self), other, flags)
 
