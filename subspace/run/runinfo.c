@@ -279,20 +279,36 @@ void RunInfo_loadGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
         runinfoReplayLog(self, false, 0, 0);
 }
 
-void RunInfo_abandon(_In_ RunInfo* self)
+void RunInfo_finish(_In_ RunInfo* self, RunResult result)
 {
+    RunResult oldresult;
+    int64 now = clockWall();
+    withReadLock (&self->lock) {
+        oldresult = self->result;
+    }
+    if (oldresult != RUN_Active)
+        return;   // can't finish a run that's already been finished!
+
     if (self->recording) {
-        // TODO: Record in database
+        DbStmt* stmt = dbPrepare(self->ss->db, _S"UPDATE runs SET result=?, end=? WHERE runid=?");
+        if (stmt) {
+            dbstmtBind(stmt, 1, stvar(int32, result));
+            dbstmtBind(stmt, 2, stvar(int64, now));
+            dbstmtBind(stmt, 3, stvar(int64, self->runid));
+            dbstmtExec(stmt);
+        }
+        objRelease(&stmt);
     }
 
     withWriteLock (&self->lock) {
-        if (self->result == RUN_Active) {
-            self->result = RUN_Abandoned;
-
-            self->recording = false;
-            self->modified  = clockWall();
-        }
+        self->result    = result;
+        self->endTime   = now;
+        self->recording = false;
+        self->modified  = clockWall();
     }
+
+    if (subspaceIsRun(self->ss, self))
+        ssuiUpdateMain(self->ss->ui, _S"gameinfo");
 }
 
 void RunInfo_enterSector(_In_ RunInfo* self, int num, int seed, _In_opt_ strref type, bool secret)
@@ -450,6 +466,9 @@ void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, _In
     int64 savepoint   = max(SPOINT(beacons, 0), self->savepoint);
     int64 sectorpoint = max(SPOINT(sector, 0), self->sectorpoint);
 
+    // remember this now because runinfoProcessLog may change it for run-ending events
+    bool recording = self->recording;
+
     LogEnt* ent = logentCreate(sectorpoint, savepoint, time, id, params);
     if (!ent)
         return;
@@ -464,7 +483,7 @@ void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, _In
 
     string temp = 0;
     // save in database
-    if (self->recording) {
+    if (recording) {
         string sql = ent->spec->combat ? _S"INSERT INTO combatlog " : _S"INSERT INTO log ";
         strAppend(&sql, _S"(runid, savepoint, sectorpoint, time, id");
         for (int i = 0; i < spec->numParams; i++) {
@@ -506,6 +525,12 @@ void RunInfo_processLog(_In_ RunInfo* self, LogEnt* ent)
                             ent->rawparams.a[0].data.st_strref,
                             ent->rawparams.a[1].data.st_int32,
                             ent->rawparams.a[2].data.st_int32);
+    } else if (ent->spec == &Log_Victory) {
+        RunInfo_finish(self, RUN_Victory);
+    } else if (ent->spec == &Log_Defeat) {
+        RunInfo_finish(self, RUN_Defeat);
+    } else if (ent->spec == &Log_Abandon) {
+        RunInfo_finish(self, RUN_Abandoned);
     }
 }
 
@@ -513,14 +538,26 @@ void RunInfo_processScrap(_In_ RunInfo* self, _In_opt_ strref src, int amount, i
 {
     if (strEq(src, _S"Event") && amount > 0) {
         // for income from an event, record it as actual scrap
-        self->scrapActual += amount;
-        DbStmt* stmt = dbPrepare(self->ss->db, _S"UPDATE runs SET scrap_actual=? WHERE runid=?");
-        if (stmt) {
-            dbstmtBind(stmt, 1, stvar(int32, self->scrapActual));
-            dbstmtBind(stmt, 2, stvar(int64, self->runid));
-            dbstmtExec(stmt);
+        int32 scrapActual;
+        withWriteLock (&self->lock) {
+            self->scrapActual += amount;
+            self->modified = clockWall();
+            scrapActual    = self->scrapActual;
         }
-        objRelease(&stmt);
+
+        if (self->recording) {
+            DbStmt* stmt = dbPrepare(self->ss->db,
+                                     _S"UPDATE runs SET scrap_actual=? WHERE runid=?");
+            if (stmt) {
+                dbstmtBind(stmt, 1, stvar(int32, scrapActual));
+                dbstmtBind(stmt, 2, stvar(int64, self->runid));
+                dbstmtExec(stmt);
+            }
+            objRelease(&stmt);
+        }
+
+        if (subspaceIsRun(self->ss, self))
+            ssuiUpdateMain(self->ss->ui, _S"gameinfo");
     }
 }
 

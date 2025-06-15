@@ -62,6 +62,13 @@ Symbol SYM(ShipManager_current_target_offset) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SpaceBar_trace }, { 0 } }
 };
 
+Symbol SYM(ShipManager_bDestroyed_offset) = {
+    SYMNAME("ShipManager->bDestroyed"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace_2 },
+             { 0 } }
+};
+
 Symbol SYM(ShipManager_OnInit) = {
     SYMNAME("ShipManager::OnInit"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CompleteShip_OnInit_trace }, { 0 } }

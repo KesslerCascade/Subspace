@@ -129,6 +129,12 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
             }
             ++dts.op;
             continue;
+        } else if (dts.op->op == DT_NOUNWIND) {
+            // clear unwind stack; this pseudo-op is used when we're 100% certain that
+            // the trace is correct at that point; to keep that stack from growing too much
+            nunwind = 0;
+            ++dts.op;
+            continue;
         } else if (dts.op->op == DT_NOOP) {
             ++dts.op;
             continue;
@@ -218,7 +224,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                         dts.curlabel                 = 0;
                     }
 
-                    dts.skipmax = 0;     // stop any skip in progress
+                    dts.skipmax = 0;   // stop any skip in progress
                     ++dts.op;
                 } else if (dts.skipmax == 0) {
                     // can't skip; so we backtrack or fail

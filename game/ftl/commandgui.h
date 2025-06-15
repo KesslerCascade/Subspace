@@ -19,6 +19,8 @@ extern DisasmTrace CommandGui_RenderStatic_trace;
 extern DisasmTrace CommandGui_RunCommand_HULL_trace;
 extern DisasmTrace CommandGui_RunCommand_DELETE_trace;
 extern DisasmTrace CommandGui_Restart_trace;
+extern DisasmTrace CommandGui_CheckGameOver_trace;
+extern DisasmTrace CommandGui_CheckGameOver_trace_2;
 
 typedef void (*FUNCTYPE(CommandGui_KeyDown))(CommandGui* self, int key, bool shiftHeld);
 DECLFUNC(CommandGui_KeyDown);
@@ -35,6 +37,9 @@ DECLFUNC(CommandGui_IsPaused);
 typedef bool (*FUNCTYPE(CommandGui_IsGameOver))(CommandGui* self);
 DECLFUNC(CommandGui_IsGameOver);
 #define CommandGui_IsGameOver(self) FCALL(ftlbase, CommandGui_IsGameOver, self)
+
+typedef void (*FUNCTYPE(CommandGui_CheckGameOver))(CommandGui* self);
+DECLFUNC(CommandGui_CheckGameOver);
 
 typedef bool (*FUNCTYPE(CommandGui_IsJumpComplete))(CommandGui* self);
 DECLFUNC(CommandGui_IsJumpComplete);
@@ -68,6 +73,7 @@ DECLFUNC(CommandGui_GetCommand);
 
 DECLSYM(CommandGui_SpaceBar);
 DECLSYM(CommandGui_shipComplete_offset);
+DECLSYM(CommandGui_gameOverScreen_offset);
 
 #define CommandGui_shipComplete(cgui) MEMBER(ftlbase, CommandGui, cgui, CompleteShip*, shipComplete)
 // convenience macro since we almost always want the ShipManager

@@ -16,6 +16,7 @@ extern Patch patch_FileHelper_deleteFile;
 extern Patch patch_FileHelper_getSaveFile;
 extern Patch patch_FileHelper_getUserFolder;
 extern Patch patch_FTLButton_OnRender;
+extern Patch patch_GameOver_SetVictory;
 extern Patch patch_MainMenu_Open;
 extern Patch patch_MouseControl_OnRender;
 extern Patch patch_ResourceControl_RenderLoadingBar;

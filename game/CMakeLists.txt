@@ -43,6 +43,7 @@ if(WIN32)
         win32/ftl/ftl_eventsystem.c
         win32/ftl/ftl_filehelper.c
         win32/ftl/ftl_ftlbutton.c
+        win32/ftl/ftl_gameover.c
         win32/ftl/ftl_globals.c
         win32/ftl/ftl_mainmenu.c
         win32/ftl/ftl_misc.c
@@ -122,6 +123,7 @@ add_executable(subspacegame
     hook/filehelper/filehelper_getsavefile.c
     hook/filehelper/filehelper_getuserfolder.c
     hook/ftlbutton/ftlbutton_onrender.c
+    hook/gameover/gameover_setvictory.c
     hook/mainmenu/mainmenu_open.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c

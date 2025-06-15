@@ -28,6 +28,10 @@ DECLFUNC(StarMap_GenerateSectorMap);
 typedef Location* (*FUNCTYPE(StarMap_GenerateMap))(StarMap* self, bool bTutorial, bool useOldSeed);
 DECLFUNC(StarMap_GenerateMap);
 
+typedef bool (*FUNCTYPE(StarMap_CheckGameOver))(StarMap* self);
+DECLFUNC(StarMap_CheckGameOver);
+#define StarMap_CheckGameOver(map) FCALL(ftlbase, StarMap_CheckGameOver, map)
+
 DECLSYM(StarMap_bSecretSector_offset);
 DECLSYM(StarMap_currentSector_offset);
 DECLSYM(StarMap_secretSector_offset);

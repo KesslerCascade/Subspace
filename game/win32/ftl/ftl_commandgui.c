@@ -2,11 +2,15 @@
 #include "ftl/combatcontrol.h"
 #include "ftl/commandgui.h"
 #include "ftl/completeship.h"
+#include "ftl/filehelper.h"
 #include "ftl/ftlbutton.h"
+#include "ftl/gameover.h"
 #include "ftl/graphics/freetype.h"
 #include "ftl/misc.h"
 #include "ftl/shipmanager.h"
 #include "ftl/shipstatus.h"
+#include "ftl/starmap.h"
+#include "ftl/tutorialmanager.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -314,3 +318,196 @@ FuncInfo FUNCINFO(CommandGui_CanSave) = { .nargs   = 1,
                                           .stdcall = true,
                                           .args    = { { 4, ARG_PTR, REG_ECX, false } },
                                           .rettype = RET_INT };
+
+DisasmTrace CommandGui_CheckGameOver_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "gameover_fedbase",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 5, .imax = 14 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // this pointer
+              { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CommandGui_shipComplete_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_MOV,
+                .argf   = { 0, ARG_ADDR },
+                .argsym = { 0, &SYM(CompleteShip_shipManager_offset) },
+                .argcap = { DT_CAPTURE2 } },           // ShipManager register
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL CompleteShip::DeadCrew
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_CMP,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 1 }, { .addr = 0 } },
+                .argout = { DT_OUT_SYM3 } },   // CMP bDestroyed, 0
+              { DT_OP(SKIP), .imin = 0, .imax = 3, .flow = DT_FLOW_JMP_BOTH },
+             { I_LEA,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ShipManager_ship_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL Ship::DestroyedDone
+              { DT_OP(SKIP), .imin = 2, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { DT_OP(LABEL), .val = 1 },
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL StarMap::CheckGameOver
+              { DT_OP(SKIP), .imin = 4, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ESP } },               // confirm that the previous CALL is
+                .argstr = { 0, "gameover_fedbase" } },   // the correct one
+              { DT_OP(GOTO), .val = 1 },                 // go back to trace other path
+              { DT_OP(SKIP), .imin = 3, .imax = 7, .flow = DT_FLOW_JMP_BOTH },
+             // get back on the short path
+              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(TutorialManager_Running) } },
+             { DT_OP(NOUNWIND) },
+             { DT_OP(SKIP), .imin = 1, .imax = 5, .flow = DT_FLOW_JMP_BOTH },
+             { I_CMP,
+                .argf = { ARG_PTRSIZE, ARG_ADDR },
+                .args = { { .ptrsize = 1 }, { .addr = 0 } } },
+             { DT_OP(SKIP), .imin = 1, .imax = 3, .flow = DT_FLOW_JMP_BOTH },
+             { I_LEA,
+                .argf   = { 0, ARG_REG },
+                .argout = { DT_OUT_SYM6 },
+                .argcap = { DT_CAPTURE3, DT_MATCH1 } },   // offset of gameOverScreen
+              { DT_OP(SKIP), .imin = 3, .imax = 7 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_EBP } },
+                .argcap = { DT_CAPTURE4, DT_MATCH3 } },   // local variable for gameOverScreen
+              { DT_OP(SKIP), .imin = 4, .imax = 12 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH3 } },          // this = gameOverScreen
+              { DT_OP(SKIP), .imin = 2, .imax = 8 },
+             { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL GameOver::SetVictory
+              { DT_OP(SKIP), .imin = 15, .imax = 25, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH4 } },          // this = gameOverScreen (local)
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL GameOver::OpenText
+              { DT_OP(SKIP), .imin = 5, .imax = 10 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = &SYM(FileHelper_deleteAllSaveFiles) },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_CheckGameOver),           // DT_OUT_SYM1
+              &SYM(CompleteShip_DeadCrew),              // DT_OUT_SYM2
+              &SYM(ShipManager_bDestroyed_offset),      // DT_OUT_SYM3
+              &SYM(Ship_DestroyedDone),                 // DT_OUT_SYM4
+              &SYM(StarMap_CheckGameOver),              // DT_OUT_SYM5
+              &SYM(CommandGui_gameOverScreen_offset),   // DT_OUT_SYM6
+              &SYM(GameOver_SetVictory),                // DT_OUT_SYM7
+              &SYM(GameOver_OpenText) }
+};
+
+// alternate ordering that some older version use
+DisasmTrace CommandGui_CheckGameOver_trace_2 = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "gameover_fedbase",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 5, .imax = 14 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // this pointer
+              { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CommandGui_shipComplete_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_MOV,
+                .argf   = { 0, ARG_ADDR },
+                .argsym = { 0, &SYM(CompleteShip_shipManager_offset) },
+                .argcap = { DT_CAPTURE2 } },           // ShipManager register
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL CompleteShip::DeadCrew
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_CMP,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 1 }, { .addr = 0 } },
+                .argout = { DT_OUT_SYM3 } },   // CMP bDestroyed, 0
+              { DT_OP(SKIP), .imin = 0, .imax = 3, .flow = DT_FLOW_JMP_BOTH },
+             { I_LEA,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ShipManager_ship_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL Ship::DestroyedDone
+              { DT_OP(SKIP), .imin = 2, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { DT_OP(LABEL), .val = 1 },
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL StarMap::CheckGameOver
+              { DT_OP(SKIP), .imin = 4, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ESP } },               // confirm that the previous CALL is
+                .argstr = { 0, "gameover_fedbase" } },   // the correct one
+              { DT_OP(GOTO), .val = 1 },                 // go back to trace other path
+              { DT_OP(SKIP), .imin = 3, .imax = 7, .flow = DT_FLOW_JMP_BOTH },
+             // get back on the short path
+              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(TutorialManager_Running) } },
+             { DT_OP(NOUNWIND) },
+             { DT_OP(SKIP), .imin = 1, .imax = 5, .flow = DT_FLOW_JMP_BOTH },
+             { I_CMP,
+                .argf = { ARG_PTRSIZE, ARG_ADDR },
+                .args = { { .ptrsize = 1 }, { .addr = 0 } } },
+             { DT_OP(SKIP), .imin = 1, .imax = 15, .flow = DT_FLOW_JMP_BOTH },
+             { I_LEA,
+                .argf   = { 0, ARG_REG },
+                .argout = { DT_OUT_SYM6 },
+                .argcap = { DT_CAPTURE3, DT_MATCH1 } },   // offset of gameOverScreen
+              { DT_OP(SKIP), .imin = 1, .imax = 8 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_EBP } },
+                .argcap = { DT_CAPTURE4, DT_MATCH3 } },   // local variable for gameOverScreen
+              { DT_OP(SKIP), .imin = 0, .imax = 8 },
+             { I_CALL, .argout = { DT_OUT_SYM7 } },      // CALL GameOver::SetVictory
+              { DT_OP(SKIP), .imin = 15, .imax = 25, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH4 } },          // this = gameOverScreen (local)
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL GameOver::OpenText
+              { DT_OP(SKIP), .imin = 5, .imax = 10 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = &SYM(FileHelper_deleteAllSaveFiles) },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_CheckGameOver),           // DT_OUT_SYM1
+              &SYM(CompleteShip_DeadCrew),              // DT_OUT_SYM2
+              &SYM(ShipManager_bDestroyed_offset),      // DT_OUT_SYM3
+              &SYM(Ship_DestroyedDone),                 // DT_OUT_SYM4
+              &SYM(StarMap_CheckGameOver),              // DT_OUT_SYM5
+              &SYM(CommandGui_gameOverScreen_offset),   // DT_OUT_SYM6
+              &SYM(GameOver_SetVictory),                // DT_OUT_SYM7
+              &SYM(GameOver_OpenText) }
+};
+
+// can't use export for this one because the exported symbol is just a wrapper function
+Symbol SYM(CommandGui_CheckGameOver) = {
+    SYMNAME("CommandGui::CheckGameOver"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace_2 },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_CheckGameOver) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+Symbol SYM(CommandGui_gameOverScreen_offset) = {
+    SYMNAME("CommandGui->gameOverScreen"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace_2 },
+             { 0 } }
+};

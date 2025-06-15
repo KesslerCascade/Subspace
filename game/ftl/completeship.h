@@ -18,3 +18,7 @@ DECLFUNC(CompleteShip_OnInit);
 DECLSYM(CompleteShip_shipManager_offset);
 #define CompleteShip_shipManager(ship) \
     *(&MEMBER(ftlbase, CompleteShip, ship, ShipManager*, shipManager))
+
+typedef bool (*FUNCTYPE(CompleteShip_DeadCrew))(CompleteShip* this);
+DECLFUNC(CompleteShip_DeadCrew);
+#define CompleteShip_DeadCrew(ship) FCALL(ftlbase, CompleteShip_DeadCrew, ship)

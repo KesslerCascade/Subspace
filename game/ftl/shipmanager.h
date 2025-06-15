@@ -61,6 +61,7 @@ DECLSYM(ShipManager_currentScrap_offset);
 DECLSYM(ShipManager_myBlueprint_offset);
 DECLSYM(ShipManager_myBlueprint_name_offset);
 DECLSYM(ShipManager_myBlueprint_blueprintName_offset);
+DECLSYM(ShipManager_bDestroyed_offset);
 
 #define ShipManager_ship(ship_manager) (&MEMBER(ftlbase, ShipManager, ship_manager, Ship, ship))
 #define ShipManager_current_target(ship_manager) \
@@ -71,6 +72,9 @@ DECLSYM(ShipManager_myBlueprint_blueprintName_offset);
 
 #define ShipManager_myBlueprint(ship_manager) \
     (&MEMBER(ftlbase, ShipManager, ship_manager, ShipBlueprint, myBlueprint))
+
+#define ShipManager_bDestroyed(ship_manager) \
+    (MEMBER(ftlbase, ShipManager, ship_manager, bool, bDestroyed))
 
 typedef void (*FUNCTYPE(ShipManager_CheckCrystalAugment))(ShipManager* self, Pointf location);
 DECLFUNC(ShipManager_CheckCrystalAugment);

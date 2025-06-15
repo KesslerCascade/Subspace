@@ -34,3 +34,17 @@ DisasmTrace CompleteShip_OnInit_trace = {
               { DT_OP(FINISH) } },
     .out  = { &SYM(ShipManager_OnInit) }
 };
+
+INITWRAP(CompleteShip_DeadCrew);
+Symbol SYM(CompleteShip_DeadCrew) = {
+    SYMNAME("CompleteShip::DeadCrew"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace_2 },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CompleteShip_DeadCrew) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_INT
+};

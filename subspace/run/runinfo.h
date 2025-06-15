@@ -40,7 +40,7 @@ typedef struct RunInfo_ClassIf {
     void (*processLog)(_In_ void* self, LogEnt* ent);
     void (*processScrap)(_In_ void* self, _In_opt_ strref src, int amount, int rawamount);
     int32 (*score)(_In_ void* self);
-    void (*abandon)(_In_ void* self);
+    void (*finish)(_In_ void* self, RunResult result);
 } RunInfo_ClassIf;
 extern RunInfo_ClassIf RunInfo_ClassIf_tmpl;
 
@@ -116,6 +116,6 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoProcessScrap(self, src, amount, rawamount) (self)->_->processScrap(RunInfo(self), src, amount, rawamount)
 // int32 runinfoScore(RunInfo* self);
 #define runinfoScore(self) (self)->_->score(RunInfo(self))
-// void runinfoAbandon(RunInfo* self);
-#define runinfoAbandon(self) (self)->_->abandon(RunInfo(self))
+// void runinfoFinish(RunInfo* self, RunResult result);
+#define runinfoFinish(self, result) (self)->_->finish(RunInfo(self), result)
 

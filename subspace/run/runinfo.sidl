@@ -68,5 +68,5 @@ class RunInfo {
 
     int32 score();
 
-    void abandon();
+    void finish(RunResult result);
 }

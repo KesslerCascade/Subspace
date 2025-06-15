@@ -1,3 +1,4 @@
+#include "ftl/commandgui.h"
 #include "ftl/ship.h"
 #include "ftl/shipmanager.h"
 #include "hook/disasmtrace.h"
@@ -39,4 +40,18 @@ DisasmTrace Ship_DamageHull_trace = {
 Symbol SYM(Ship_hullIntegrity_offset) = {
     SYMNAME("Ship->hullIntegrity"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Ship_DamageHull_trace }, { 0 } }
+};
+
+INITWRAP(Ship_DestroyedDone);
+Symbol SYM(Ship_DestroyedDone) = {
+    SYMNAME("Ship::DestroyedDone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace_2 },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4Ship13DestroyedDoneEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(Ship_DestroyedDone) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } }
 };

@@ -1,3 +1,4 @@
+#include "ftl/commandgui.h"
 #include "ftl/globals.h"
 #include "ftl/graphics/freetype.h"
 #include "ftl/misc.h"
@@ -281,4 +282,19 @@ static void StarMap_worldLevel_offset_find(addr_t addr, Symbol* sym, SymbolFind*
 Symbol SYM(StarMap_worldLevel_offset) = {
     SYMNAME("StarMap->worldLevel"),
     .find = { { .type = SYMBOL_FIND_CUSTOM, .func = StarMap_worldLevel_offset_find }, { 0 } }
+};
+
+INITWRAP(StarMap_CheckGameOver);
+Symbol SYM(StarMap_CheckGameOver) = {
+    SYMNAME("StarMap::CheckGameOver"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace_2 },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap13CheckGameOverEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(StarMap_CheckGameOver) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_INT
 };

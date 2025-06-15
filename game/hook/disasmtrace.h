@@ -15,6 +15,7 @@ typedef enum DisasmOpType {
     DT_JMPTBL,     // follow entry number [val] of a jump table, i.e. for a switch statement
     DT_LABEL,      // save the current EIP as label [val] (1-16)
     DT_GOTO,       // move tracing to label [val] (1-16); useful for tracing both parts of a branch
+    DT_NOUNWIND,   // clear unwind stack, making it impossible to unwind to before this match
     DT_FINISH,   // if hit, indicates trace is successful and no other candidates should be checked
 } DisasmOpType;
 

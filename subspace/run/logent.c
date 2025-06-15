@@ -23,6 +23,9 @@ static void specinit(void* dummy)
 {
     htInit(&spechash, string, ptr, 10);
     addspec(&Log_Scrap);
+    addspec(&Log_Victory);
+    addspec(&Log_Defeat);
+    addspec(&Log_Abandon);
 }
 
 void LogEnt_destroy(_In_ LogEnt* self)

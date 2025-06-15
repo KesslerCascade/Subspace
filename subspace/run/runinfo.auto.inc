@@ -18,7 +18,7 @@ static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     .processLog = (void (*)(void*, LogEnt*))RunInfo_processLog,
     .processScrap = (void (*)(void*, strref, int, int))RunInfo_processScrap,
     .score = (int32 (*)(void*))RunInfo_score,
-    .abandon = (void (*)(void*))RunInfo_abandon,
+    .finish = (void (*)(void*, RunResult))RunInfo_finish,
 };
 
 static ObjIface* _ifimpl_RunInfo[] = {
