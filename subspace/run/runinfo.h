@@ -39,6 +39,7 @@ typedef struct RunInfo_ClassIf {
     void (*runLog)(_In_ void* self, int sector, int beacons, int64 time, _In_opt_ strref id, stvar params[LOG_MAX_PARAMS]);
     void (*processLog)(_In_ void* self, LogEnt* ent);
     void (*processScrap)(_In_ void* self, _In_opt_ strref src, int amount, int rawamount);
+    void (*processHullDamage)(_In_ void* self, _In_opt_ strref src, int amount);
     int32 (*score)(_In_ void* self);
     void (*finish)(_In_ void* self, RunResult result);
 } RunInfo_ClassIf;
@@ -114,6 +115,8 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoProcessLog(self, ent) (self)->_->processLog(RunInfo(self), LogEnt(ent))
 // void runinfoProcessScrap(RunInfo* self, strref src, int amount, int rawamount);
 #define runinfoProcessScrap(self, src, amount, rawamount) (self)->_->processScrap(RunInfo(self), src, amount, rawamount)
+// void runinfoProcessHullDamage(RunInfo* self, strref src, int amount);
+#define runinfoProcessHullDamage(self, src, amount) (self)->_->processHullDamage(RunInfo(self), src, amount)
 // int32 runinfoScore(RunInfo* self);
 #define runinfoScore(self) (self)->_->score(RunInfo(self))
 // void runinfoFinish(RunInfo* self, RunResult result);

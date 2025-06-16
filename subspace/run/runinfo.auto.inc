@@ -17,6 +17,7 @@ static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     .runLog = (void (*)(void*, int, int, int64, strref, stvar[LOG_MAX_PARAMS]))RunInfo_runLog,
     .processLog = (void (*)(void*, LogEnt*))RunInfo_processLog,
     .processScrap = (void (*)(void*, strref, int, int))RunInfo_processScrap,
+    .processHullDamage = (void (*)(void*, strref, int))RunInfo_processHullDamage,
     .score = (int32 (*)(void*))RunInfo_score,
     .finish = (void (*)(void*, RunResult))RunInfo_finish,
 };

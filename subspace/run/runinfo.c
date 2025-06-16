@@ -525,6 +525,10 @@ void RunInfo_processLog(_In_ RunInfo* self, LogEnt* ent)
                             ent->rawparams.a[0].data.st_strref,
                             ent->rawparams.a[1].data.st_int32,
                             ent->rawparams.a[2].data.st_int32);
+    } else if (ent->spec == &Log_HullDamage) {
+        runinfoProcessHullDamage(self,
+                                 ent->rawparams.a[0].data.st_strref,
+                                 ent->rawparams.a[1].data.st_int32);
     } else if (ent->spec == &Log_Victory) {
         RunInfo_finish(self, RUN_Victory);
     } else if (ent->spec == &Log_Defeat) {
@@ -550,6 +554,32 @@ void RunInfo_processScrap(_In_ RunInfo* self, _In_opt_ strref src, int amount, i
                                      _S"UPDATE runs SET scrap_actual=? WHERE runid=?");
             if (stmt) {
                 dbstmtBind(stmt, 1, stvar(int32, scrapActual));
+                dbstmtBind(stmt, 2, stvar(int64, self->runid));
+                dbstmtExec(stmt);
+            }
+            objRelease(&stmt);
+        }
+
+        if (subspaceIsRun(self->ss, self))
+            ssuiUpdateMain(self->ss->ui, _S"gameinfo");
+    }
+}
+
+void RunInfo_processHullDamage(_In_ RunInfo* self, _In_opt_ strref src, int amount)
+{
+    if (amount > 0) {
+        int32 damageTaken;
+        withWriteLock (&self->lock) {
+            self->damageTaken += amount;
+            self->modified = clockWall();
+            damageTaken    = self->damageTaken;
+        }
+
+        if (self->recording) {
+            DbStmt* stmt = dbPrepare(self->ss->db,
+                                     _S"UPDATE runs SET damage_taken=? WHERE runid=?");
+            if (stmt) {
+                dbstmtBind(stmt, 1, stvar(int32, damageTaken));
                 dbstmtBind(stmt, 2, stvar(int64, self->runid));
                 dbstmtExec(stmt);
             }

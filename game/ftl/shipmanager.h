@@ -11,6 +11,7 @@ typedef struct ShipBlueprint ShipBlueprint;
 // FTL functions & wrappers below
 
 extern DisasmTrace ShipManager_DamageHull_trace;
+extern DisasmTrace ShipManager_SunDamage_trace;
 
 typedef bool (*FUNCTYPE(ShipManager_OnInit))(ShipManager* ship, ShipBlueprint* bluePrint,
                                              int level);
@@ -79,4 +80,8 @@ DECLSYM(ShipManager_bDestroyed_offset);
 typedef void (*FUNCTYPE(ShipManager_CheckCrystalAugment))(ShipManager* self, Pointf location);
 DECLFUNC(ShipManager_CheckCrystalAugment);
 
+typedef void (*FUNCTYPE(ShipManager_SunDamage))(ShipManager* self);
+DECLFUNC(ShipManager_SunDamage);
+
 DECLSYM(ShipManager_DamageArea);
+DECLSYM(ShipManager_DamageSystem);

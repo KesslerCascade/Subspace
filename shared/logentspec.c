@@ -7,6 +7,13 @@ LogEntSpec Log_Scrap = {
     .paramNames = { "source",  "amount", "rawamount" }
 };
 
+LogEntSpec Log_HullDamage = {
+    .id         = "HullDamage",
+    .numParams  = 2,
+    .paramTypes = { LP_STRING, LP_INT   },
+    .paramNames = { "source",  "amount" }
+};
+
 LogEntSpec Log_Victory = { .id = "Victory", .numParams = 0 };
 LogEntSpec Log_Defeat  = { .id         = "Defeat",
                            .numParams  = 1,

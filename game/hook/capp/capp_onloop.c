@@ -73,8 +73,10 @@ void subspace_CApp_OnLoop_post(CApp* self)
 
     gs.sendAllStats = false;
 
-    if (RunTracker_feature.enabled)
+    if (RunTracker_feature.enabled) {
         gc.curScrapSource = NULL;
+        gc.curDamageSource = NULL;
+    }
 }
 
 // ---- Patch ----------------

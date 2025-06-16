@@ -26,6 +26,7 @@ static void specinit(void* dummy)
     addspec(&Log_Victory);
     addspec(&Log_Defeat);
     addspec(&Log_Abandon);
+    addspec(&Log_HullDamage);
 }
 
 void LogEnt_destroy(_In_ LogEnt* self)

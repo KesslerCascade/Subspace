@@ -17,3 +17,5 @@ typedef bool (*FUNCTYPE(Ship_DestroyedDone))(Ship* ship);
 DECLFUNC(Ship_DestroyedDone);
 
 DECLSYM(Ship_hullIntegrity_offset);
+#define Ship_hullIntegrity(ship)    (MEMBER(ftlbase, Ship, ship, int, hullIntegrity))
+#define Ship_hullIntegrityMax(ship) ((&MEMBER(ftlbase, Ship, ship, int, hullIntegrity))[1])

@@ -55,3 +55,16 @@ FuncInfo FUNCINFO(Ship_DestroyedDone) = {
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } }
 };
+
+Symbol SYM(Ship_ProjectileStrike) = {
+    SYMNAME("Ship::ProjectileStrike"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_SunDamage_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4Ship16ProjectileStrikeEif" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(Ship_ProjectileStrike) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_FLOAT, 0, true } },
+    .rettype = RET_VOID
+};

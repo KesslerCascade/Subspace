@@ -65,6 +65,7 @@ class RunInfo {
     void runLog(int sector, int beacons, int64 time, strref id, stvar params[LOG_MAX_PARAMS]);
     void processLog(LogEnt* ent);
     void processScrap(strref src, int amount, int rawamount);
+    void processHullDamage(strref src, int amount);
 
     int32 score();
 

@@ -164,3 +164,62 @@ FuncInfo FUNCINFO(ShipManager_ModifyScrapCount) = {
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_INT, 0, true } },
     .rettype = RET_VOID
 };
+
+DisasmTrace ShipManager_DamageSystem_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "ION_ARMOR",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 7, .imax = 15 },
+             // just the minimum necessary to disambiguate this from ShipMnaager::PulsarDamage
+              { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0 } } },
+             { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x4 } } },
+             { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x18 } } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_DamageSystem) },
+};
+
+Symbol SYM(ShipManager_DamageSystem) = {
+    SYMNAME("ShipManager::DamageSystem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DamageSystem_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager12DamageSystemEi6Damage" },
+             { 0 } }
+};
+
+DisasmTrace ShipManager_SunDamage_trace = {
+    .c    = DTRACE_CALLS,
+    .csym = &SYM(ShipManager_DamageSystem),
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 149, .imax = 199 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_EBP }, { .addr = 0xffffffff } } },   // damage.ownerId = -1
+              { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_EBP }, { .addr = 0xffffffff } } },   // damage.selfId = -1
+              { DT_OP(SKIP), .imin = 8, .imax = 18 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = &SYM(ShipManager_DamageSystem) },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x3f800000 } } },   // 1.0 damage
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },                 // CALL Ship::ProjectileStrike
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_SunDamage),                           // DT_OUT_SYM1
+              &SYM(Ship_ProjectileStrike) }
+};
+
+Symbol SYM(ShipManager_SunDamage) = {
+    SYMNAME("ShipManager::SunDamage"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_SunDamage_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager9SunDamageEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_SunDamage) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};

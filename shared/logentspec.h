@@ -18,3 +18,4 @@ extern LogEntSpec Log_Scrap;
 extern LogEntSpec Log_Victory;
 extern LogEntSpec Log_Defeat;
 extern LogEntSpec Log_Abandon;
+extern LogEntSpec Log_HullDamage;

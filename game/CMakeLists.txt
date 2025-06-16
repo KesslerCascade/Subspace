@@ -127,7 +127,10 @@ add_executable(subspacegame
     hook/mainmenu/mainmenu_open.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
+    hook/ship/ship_damagehull.c
+    hook/ship/ship_projectilestrike.c
     hook/shipmanager/shipmanager_modifyscrapcount.c
+    hook/shipmanager/shipmanager_sundamage.c
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
     hook/starmap/starmap_generatemap.c
