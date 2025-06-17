@@ -68,7 +68,7 @@ _objfactory_check LogEnt* LogEnt_create(int64 sectorpoint, int64 savepoint, int6
 
     objInstInit(self);
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < self->spec->numParams; i++) {
         saPush(&self->rawparams, stvar, params[i]);
         htInsert(&self->params, strref, (strref)self->spec->paramNames[i], stvar, params[i]);
     }
