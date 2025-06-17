@@ -42,6 +42,7 @@ bool Database_open(_In_ Database* self)
         ret = true;
 
     sqlite3_exec(self->db, "PRAGMA journal_mode=WAL", NULL, NULL, NULL);
+    sqlite3_exec(self->db, "PRAGMA synchronous=NORMAL", NULL, NULL, NULL);
 
     strDestroy(&fspath);
     return ret;
