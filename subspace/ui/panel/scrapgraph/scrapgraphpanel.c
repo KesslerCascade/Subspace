@@ -167,8 +167,6 @@ void ScrapGraphPanel_logNotify(_In_ ScrapGraphPanel* self, LogEnt* ent, bool rep
         // and process it
         ssuiUpdateMain(self->ss->ui, _S"scrapgraph");
     }
-
-    strDestroy(&source);
 }
 
 void ScrapGraphPanel_logReset(_In_ ScrapGraphPanel* self)
