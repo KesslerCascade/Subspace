@@ -41,5 +41,5 @@ void registerCmds(ControlServer* csvr)
     REGCMDREQI(LoadGame, csvr->gameEvents);
     REGCMDREQI(Sector, csvr->gameEvents);
     REGCMDREQI(Stats, csvr->gameEvents);
-    REGCMDI(RunLog);
+    REGCMDREQI(RunLog, csvr->gameEvents);
 }
