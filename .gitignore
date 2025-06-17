@@ -5,4 +5,6 @@
 /log
 /subspace.json
 /subspace.dat
+/subspace/.vs
+/game/.vs
 *.swp
