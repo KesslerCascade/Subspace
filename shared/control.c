@@ -23,37 +23,21 @@ static const uint8_t syncmagic[4] = { 0x0e, 0x19, 0x01, 0x17 };
 
 static void recvNotify(StreamBuffer* sb, size_t sz, void* ctx)
 {
-    // TODO: Pass on to control receive callback when a complete message is received
+    // do nothing, the main loop handles processing the buffer
+}
+
+static void sendNotify(StreamBuffer* sb, size_t sz, void* ctx)
+{
+    // do nothing, the main loop handles processing the buffer
 }
 
 bool sendToSocket(StreamBuffer* sb, const uint8_t* buf, size_t off, size_t sz, void* ctx)
 {
     ControlState* cs = (ControlState*)ctx;
-    intptr_t bsent   = send(cs->sock, buf + off, sz, 0);
+    intptr_t bsent   = send(cs->sock, buf, sz, 0);
     cs->lastsent += bsent > 0 ? bsent : 0;
     return false;   // always peek, because send() might short write and we don't want to consume
                     // all the data
-}
-
-static void sendNotify(StreamBuffer* sb, size_t sz, void* ctx)
-{
-    ControlState* cs = (ControlState*)ctx;
-    while (sz > 0) {
-        size_t tosend = min(sz, TCPBUF_SEND / 2);
-        bool shortsnd = true;
-        cs->lastsent  = 0;
-        if (sbufCSend(sb, sendToSocket, tosend) && cs->lastsent > 0) {
-            sbufCSkip(sb, cs->lastsent);
-            sz -= cs->lastsent;
-
-            if (cs->lastsent == tosend)
-                shortsnd = false;
-            cs->lastsent = 0;
-        }
-
-        if (shortsnd)
-            break;   // couldn't send all of it, buffer might be full
-    }
 }
 
 void controlInit(ControlState* cs, socket_t sock)
@@ -90,6 +74,7 @@ bool controlSend(ControlState* cs)
     while (sbufCAvail(sb) > 0) {
         size_t tosend = min(sbufCAvail(sb), TCPBUF_SEND / 2);
         bool shortsnd = true;
+        cs->lastsent  = 0;
         if (sbufCSend(sb, sendToSocket, tosend) && cs->lastsent > 0) {
             sbufCSkip(sb, cs->lastsent);
             ret = true;
