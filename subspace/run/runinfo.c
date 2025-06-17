@@ -197,7 +197,7 @@ bool RunInfo_loadHistoric(_In_ RunInfo* self, int64 runid)
     DbStmt* stmt = dbPrepare(
         self->ss->db,
         _S
-        "SELECT start, savepoint, sectorpoint, seed, shiptype, shipname, difficulty, result, beacons_explored, ships_defeated, "
+        "SELECT start, end, savepoint, sectorpoint, seed, shiptype, shipname, difficulty, result, beacons_explored, ships_defeated, "
         "scrap_collected, crew_hired, scrap_actual, damage_taken, savepath "
         "FROM runs WHERE runid = ?");
     if (!stmt)
@@ -207,7 +207,7 @@ bool RunInfo_loadHistoric(_In_ RunInfo* self, int64 runid)
     if (!dbstmtExec(stmt))
         logStr(Error, _S"Database error trying to load run!");
 
-    if (saSize(stmt->row) == 15) {
+    if (saSize(stmt->row) == 16) {
         // found one, load it
         sa_SectorInfo loadsectors = saInitNone;
         loadSectors(self->ss->db, runid, &loadsectors);
@@ -217,20 +217,21 @@ bool RunInfo_loadHistoric(_In_ RunInfo* self, int64 runid)
             self->runid    = runid;
 
             stConvert(int64, &self->startTime, stvar, stmt->row.a[0]);
-            stConvert(int64, &self->savepoint, stvar, stmt->row.a[1]);
-            stConvert(int64, &self->sectorpoint, stvar, stmt->row.a[2]);
-            stConvert(int32, &self->seed, stvar, stmt->row.a[3]);
-            stConvert(string, &self->shipType, stvar, stmt->row.a[4]);
-            stConvert(string, &self->shipName, stvar, stmt->row.a[5]);
-            stConvert(int32, &self->difficulty, stvar, stmt->row.a[6]);
-            stConvert(int32, &self->result, stvar, stmt->row.a[7]);
-            stConvert(int32, &self->beaconsExplored, stvar, stmt->row.a[8]);
-            stConvert(int32, &self->shipsDefeated, stvar, stmt->row.a[9]);
-            stConvert(int32, &self->scrapCollected, stvar, stmt->row.a[10]);
-            stConvert(int32, &self->crewHired, stvar, stmt->row.a[11]);
-            stConvert(int32, &self->scrapActual, stvar, stmt->row.a[12]);
-            stConvert(int32, &self->damageTaken, stvar, stmt->row.a[13]);
-            stConvert(string, &self->savePath, stvar, stmt->row.a[14]);
+            stConvert(int64, &self->endTime, stvar, stmt->row.a[1]);
+            stConvert(int64, &self->savepoint, stvar, stmt->row.a[2]);
+            stConvert(int64, &self->sectorpoint, stvar, stmt->row.a[3]);
+            stConvert(int32, &self->seed, stvar, stmt->row.a[4]);
+            stConvert(string, &self->shipType, stvar, stmt->row.a[5]);
+            stConvert(string, &self->shipName, stvar, stmt->row.a[6]);
+            stConvert(int32, &self->difficulty, stvar, stmt->row.a[7]);
+            stConvert(int32, &self->result, stvar, stmt->row.a[8]);
+            stConvert(int32, &self->beaconsExplored, stvar, stmt->row.a[9]);
+            stConvert(int32, &self->shipsDefeated, stvar, stmt->row.a[10]);
+            stConvert(int32, &self->scrapCollected, stvar, stmt->row.a[11]);
+            stConvert(int32, &self->crewHired, stvar, stmt->row.a[12]);
+            stConvert(int32, &self->scrapActual, stvar, stmt->row.a[13]);
+            stConvert(int32, &self->damageTaken, stvar, stmt->row.a[14]);
+            stConvert(string, &self->savePath, stvar, stmt->row.a[15]);
 
             saDestroy(&self->sectors);
             self->sectors = loadsectors;
