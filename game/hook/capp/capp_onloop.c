@@ -28,7 +28,7 @@ int subspace_CApp_OnLoop_pre(CApp* self)
             controlMsgInt(msg, 0, "num", StarMap_worldLevel(map) + 1);
             controlMsgInt(msg, 1, "seed", StarMap_currentSectorSeed(map));
             controlMsgStr(msg, 2, "type", Sector_description_type(cur)->buf);
-            controlMsgBool(msg, 3, "secret", Starmap_bSecretSector(map));
+            controlMsgBool(msg, 3, "secret", StarMap_bSecretSector(map));
             controlClientQueue(msg);
         }
     }

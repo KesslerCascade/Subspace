@@ -18,8 +18,8 @@ LogEntSpec Log_Victory = { .id = "Victory", .numParams = 0 };
 LogEntSpec Log_Defeat  = { .id         = "Defeat",
                            .numParams  = 1,
                            .paramTypes = { LP_STRING },
-                           .paramNames = "reason" };
+                           .paramNames = { "reason" } };
 LogEntSpec Log_Abandon = { .id         = "Abandon",
                            .numParams  = 1,
                            .paramTypes = { LP_STRING },
-                           .paramNames = "reason" };
+                           .paramNames = { "reason" } };

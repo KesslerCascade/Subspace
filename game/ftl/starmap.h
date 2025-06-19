@@ -40,7 +40,7 @@ DECLSYM(StarMap_currentSectorSeed_offset);
 DECLSYM(StarMap_worldLevel_offset);
 
 #define StarMap_worldLevel(starmap)    (*(&MEMBER(ftlbase, StarMap, starmap, int, worldLevel)))
-#define Starmap_bSecretSector(starmap) (*(&MEMBER(ftlbase, StarMap, starmap, bool, bSecretSector)))
+#define StarMap_bSecretSector(starmap) (*(&MEMBER(ftlbase, StarMap, starmap, bool, bSecretSector)))
 #define StarMap_currentSector(starmap) *(&MEMBER(ftlbase, StarMap, starmap, Sector*, currentSector))
 #define StarMap_sectorMapSeed(starmap) *(&MEMBER(ftlbase, StarMap, starmap, int, sectorMapSeed))
 #define StarMap_currentSectorSeed(starmap) \
