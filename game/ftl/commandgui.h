@@ -21,6 +21,7 @@ extern DisasmTrace CommandGui_RunCommand_DELETE_trace;
 extern DisasmTrace CommandGui_Restart_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace_2;
+extern DisasmTrace CommandGui_OnLoop_trace;
 
 typedef void (*FUNCTYPE(CommandGui_KeyDown))(CommandGui* self, int key, bool shiftHeld);
 DECLFUNC(CommandGui_KeyDown);
@@ -74,6 +75,8 @@ DECLFUNC(CommandGui_GetCommand);
 DECLSYM(CommandGui_SpaceBar);
 DECLSYM(CommandGui_shipComplete_offset);
 DECLSYM(CommandGui_gameOverScreen_offset);
+DECLSYM(CommandGui_starMap_offset);
+DECLSYM(CommandGui_newLocation_offset);
 
 #define CommandGui_shipComplete(cgui) MEMBER(ftlbase, CommandGui, cgui, CompleteShip*, shipComplete)
 // convenience macro since we almost always want the ShipManager

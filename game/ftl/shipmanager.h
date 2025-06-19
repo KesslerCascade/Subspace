@@ -26,6 +26,12 @@ typedef bool (*FUNCTYPE(ShipManager_GetIsJumping))(ShipManager* ship);
 DECLFUNC(ShipManager_GetIsJumping);
 #define ShipManager_GetIsJumping(self) FCALL(ftlbase, ShipManager_GetIsJumping, self)
 
+typedef void (*FUNCTYPE(ShipManager_Wait))(ShipManager* ship);
+DECLFUNC(ShipManager_Wait);
+
+typedef void (*FUNCTYPE(ShipManager_JumpLeave))(ShipManager* ship);
+DECLFUNC(ShipManager_JumpLeave);
+
 typedef int (*FUNCTYPE(ShipManager_GetDroneCount))(ShipManager* ship);
 DECLFUNC(ShipManager_GetDroneCount);
 #define ShipManager_GetDroneCount(self) FCALL(ftlbase, ShipManager_GetDroneCount, self)
@@ -63,6 +69,7 @@ DECLSYM(ShipManager_myBlueprint_offset);
 DECLSYM(ShipManager_myBlueprint_name_offset);
 DECLSYM(ShipManager_myBlueprint_blueprintName_offset);
 DECLSYM(ShipManager_bDestroyed_offset);
+DECLSYM(ShipManager_fuel_count_offset);
 
 #define ShipManager_ship(ship_manager) (&MEMBER(ftlbase, ShipManager, ship_manager, Ship, ship))
 #define ShipManager_current_target(ship_manager) \
@@ -76,6 +83,9 @@ DECLSYM(ShipManager_bDestroyed_offset);
 
 #define ShipManager_bDestroyed(ship_manager) \
     (MEMBER(ftlbase, ShipManager, ship_manager, bool, bDestroyed))
+
+#define ShipManager_fuel_count(ship_manager) \
+    (MEMBER(ftlbase, ShipManager, ship_manager, int, fuel_count))
 
 typedef void (*FUNCTYPE(ShipManager_CheckCrystalAugment))(ShipManager* self, Pointf location);
 DECLFUNC(ShipManager_CheckCrystalAugment);

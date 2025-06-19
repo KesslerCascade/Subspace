@@ -45,6 +45,7 @@ if(WIN32)
         win32/ftl/ftl_ftlbutton.c
         win32/ftl/ftl_gameover.c
         win32/ftl/ftl_globals.c
+        win32/ftl/ftl_location.c
         win32/ftl/ftl_mainmenu.c
         win32/ftl/ftl_misc.c
         win32/ftl/ftl_mousecontrol.c
@@ -129,15 +130,20 @@ add_executable(subspacegame
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
     hook/ship/ship_damagehull.c
     hook/ship/ship_projectilestrike.c
+    hook/shipmanager/shipmanager_jumpleave.c
     hook/shipmanager/shipmanager_modifyscrapcount.c
     hook/shipmanager/shipmanager_sundamage.c
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
     hook/starmap/starmap_generatemap.c
+    hook/starmap/starmap_updatedangerzone.c
     hook/textlibrary/textlibrary_gettext.c
+    hook/worldmanager/worldmanager_createlocation.c
     hook/worldmanager/worldmanager_createnewgame.c
+    hook/worldmanager/worldmanager_createship.c
     hook/worldmanager/worldmanager_loadgame.c
     hook/worldmanager/worldmanager_savegame.c
+    hook/worldmanager/worldmanager_updatelocation.c
     input/keybinds.c
     input/keyboard.c
     log/log.c

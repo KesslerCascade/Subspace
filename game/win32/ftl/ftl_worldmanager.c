@@ -4,6 +4,7 @@
 #include "ftl/completeship.h"
 #include "ftl/eventsystem.h"
 #include "ftl/globals.h"
+#include "ftl/location.h"
 #include "ftl/misc.h"
 #include "ftl/scorekeeper.h"
 #include "ftl/shipmanager.h"
@@ -120,7 +121,8 @@ Symbol SYM(WorldManager_CreateShip) = {
 };
 FuncInfo FUNCINFO(WorldManager_CreateShip) = {
     .nargs   = 3,
-    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true }, { 4, ARG_INT, 0, true } },
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
     .rettype = RET_PTR
 };
 
@@ -582,8 +584,17 @@ DisasmTrace WorldManager_OnLoop_Mantis_trace = {
 DisasmTrace WorldManager_CreateLocation_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(WorldManager_CreateLocation),
-    .ops  = { { DT_OP(SKIP), .imin = 35, .imax = 60, .flow = DT_FLOW_JMP_BOTH },
-             { DT_OP(SKIP), .imin = 3, .imax = 10 },
+    .ops  = { { DT_OP(SKIP), .imin = 30, .imax = 49, .flow = DT_FLOW_JMP_BOTH },
+             { I_CMP,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 1 }, { .addr = 0 } },
+                .argcap = { DT_CAPTURE1 } },   // if (!loc->boss)
+              { DT_OP(SKIP), .imin = 1, .imax = 4, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .argcap = { 0, DT_MATCH1 },
+                .argout = { 0, DT_OUT_SYM1 } },   // event = loc->event
+              { DT_OP(SKIP), .imin = 3, .imax = 12, .flow = DT_FLOW_JMP_BOTH },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX } },
@@ -592,7 +603,7 @@ DisasmTrace WorldManager_CreateLocation_trace = {
              // trace into ScoreKeeper::AddExploredLocations to verify this is the
               // right ScoreKeeper function
               { DT_OP(CALL) },
-             { I_PUSH, .outip = DT_OUT_SYM1 },   // ScoreKeeper::AddExploredLocations
+             { I_PUSH, .outip = DT_OUT_SYM2 },   // ScoreKeeper::AddExploredLocations
               { DT_OP(SKIP), .imin = 0, .imax = 8 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
@@ -604,5 +615,31 @@ DisasmTrace WorldManager_CreateLocation_trace = {
               // to trace this function further in the future
               { DT_OP(GOTO), .val = 1 },
              { DT_OP(FINISH) } },
-    .out  = { &SYM(ScoreKeeper_AddExploredLocations) }
+    .out  = { &SYM(Location_event_offset),   // DT_OUT_SYM1
+              &SYM(ScoreKeeper_AddExploredLocations) }
+};
+
+DisasmTrace WorldManager_UpdateLocation_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "eventDamage",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 30, .imax = 50, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ESP } },
+                .argstr = { 0, "ACH_INVADE_SHIP" } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(WorldManager_UpdateLocation) }
+};
+
+Symbol SYM(WorldManager_UpdateLocation) = {
+    SYMNAME("WorldManager::UpdateLocation"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_UpdateLocation_trace }, { 0 } }
+};
+FuncInfo FUNCINFO(WorldManager_UpdateLocation) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } },
+    .rettype = RET_VOID
 };

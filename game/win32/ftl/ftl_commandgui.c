@@ -511,3 +511,75 @@ Symbol SYM(CommandGui_gameOverScreen_offset) = {
              { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_CheckGameOver_trace_2 },
              { 0 } }
 };
+
+DisasmTrace CommandGui_LinkMap_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CommandGui_LinkMap),
+    .ops  = { { DT_OP(SKIP), .imin = 10, .imax = 16 },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { DT_OUT_SYM1 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_starMap_offset) }
+};
+
+Symbol SYM(CommandGui_starMap_offset) = {
+    SYMNAME("CommandGui->starMap"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_LinkMap_trace }, { 0 } }
+};
+
+DisasmTrace CommandGui_OnLoop_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CommandGui_OnLoop),
+    .ops  = { { DT_OP(SKIP), .imin = 7, .imax = 13 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // this pointer
+              { DT_OP(SKIP), .imin = 200, .imax = 300 },
+             { I_CMP,
+                .argf = { ARG_PTRSIZE, ARG_ADDR },
+                .args = { { .ptrsize = 1 }, { .addr = 0 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 3, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CommandGui_starMap_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(StarMap_StartSecretSector) } },
+             { DT_OP(NOUNWIND) },
+             { DT_OP(SKIP), .imin = 3, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CommandGui_starMap_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL StarMap::GetNewLocation
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_REG },
+                .argcap = { DT_MATCH1 },
+                .args   = { { 0 }, { REG_EAX } },
+                .argout = { DT_OUT_SYM2 } },   // this->newLocation
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CommandGui_starMap_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL StarMap::GetWaitLocation
+              { DT_OP(SKIP), .imin = 0, .imax = 8 },
+             { I_MOV,
+                .argf   = { 0, ARG_ADDR },
+                .argsym = { 0, &SYM(CommandGui_shipComplete_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL ShipManager::Wait
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(StarMap_GetNewLocation),            // DT_OUT_SYM1
+              &SYM(CommandGui_newLocation_offset),     // DT_OUT_SYM2
+              &SYM(StarMap_GetWaitLocation),           // DT_OUT_SYM3
+              &SYM(ShipManager_Wait) }
+};
+
+Symbol SYM(CommandGui_newLocation_offset) = {
+    SYMNAME("CommandGui->newLocation"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_OnLoop_trace }, { 0 } }
+};

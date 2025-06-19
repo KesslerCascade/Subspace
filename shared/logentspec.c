@@ -23,3 +23,18 @@ LogEntSpec Log_Abandon = { .id         = "Abandon",
                            .numParams  = 1,
                            .paramTypes = { LP_STRING },
                            .paramNames = { "reason" } };
+
+LogEntSpec Log_Jump = { .id = "Jump", .numParams = 0 };
+LogEntSpec Log_Wait = { .id = "Wait", .numParams = 0 };
+
+LogEntSpec Log_Event = {
+    .id         = "Event",
+    .numParams  = 2,
+    .paramTypes = { LP_STRING, LP_INT    },
+    .paramNames = { "name",    "initial" }
+};
+
+LogEntSpec Log_Ship = { .id         = "Ship",
+                        .numParams  = 1,
+                        .paramTypes = { LP_STRING },
+                        .paramNames = { "name" } };

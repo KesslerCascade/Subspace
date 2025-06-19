@@ -223,3 +223,47 @@ FuncInfo FUNCINFO(ShipManager_SunDamage) = {
     .args    = { { 4, ARG_PTR, REG_ECX, false } },
     .rettype = RET_VOID
 };
+
+Symbol SYM(ShipManager_Wait) = {
+    SYMNAME("ShipManager::Wait"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager4WaitEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_Wait) = { .nargs   = 1,
+                                        .stdcall = true,
+                                        .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                        .rettype = RET_VOID };
+
+DisasmTrace ShipManager_JumpLeave_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "jumpLeave",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 7, .imax = 14 },
+             { I_SUB,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX }, { .addr = 1 } },
+                .argout = { DT_OUT_SYM2 } },   // this->fuel_count -= 1
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_JumpLeave),     // DT_OUT_SYM1
+              &SYM(ShipManager_fuel_count_offset) }
+};
+
+Symbol SYM(ShipManager_JumpLeave) = {
+    SYMNAME("ShipManager::JumpLeave"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_JumpLeave_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager9JumpLeaveEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_JumpLeave) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+Symbol SYM(ShipManager_fuel_count_offset) = {
+    SYMNAME("ShipManager->fuel_count"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_JumpLeave_trace }, { 0 } }
+};

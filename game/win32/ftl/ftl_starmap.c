@@ -1,6 +1,7 @@
 #include "ftl/commandgui.h"
 #include "ftl/globals.h"
 #include "ftl/graphics/freetype.h"
+#include "ftl/location.h"
 #include "ftl/misc.h"
 #include "ftl/starmap.h"
 #include "ftl/worldmanager.h"
@@ -94,6 +95,16 @@ DisasmTrace Disasm_GenerateMap_Rock_Home_trace = {
 Symbol SYM(Sector_description_type_offset) = {
     SYMNAME("Sector->description.type"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Disasm_GenerateMap_Rock_Home_trace }, { 0 } }
+};
+
+DisasmTrace Disasm_GenerateMap_Rock_Crystal_Beacon_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "ROCK_CRYSTAL_BEACON",
+    .ops  = { { I_MOV },
+             { I_ADD, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { 0, DT_OUT_SYM1 } },
+             { I_CALL },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(LocationEvent_eventName_offset) }
 };
 
 // this one is kind of annoying to find, easiest way is to just check every call to
@@ -297,4 +308,69 @@ FuncInfo FUNCINFO(StarMap_CheckGameOver) = {
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false } },
     .rettype = RET_INT
+};
+
+Symbol SYM(StarMap_GetNewLocation) = {
+    SYMNAME("StarMap::GetNewLocation"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap14GetNewLocationEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(StarMap_GetNewLocation) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_PTR
+};
+
+Symbol SYM(StarMap_GetWaitLocation) = {
+    SYMNAME("StarMap::GetWaitLocation"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap15GetWaitLocationEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(StarMap_GetWaitLocation) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_PTR
+};
+
+DisasmTrace StarMap_GetNewLocation_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(StarMap_GetNewLocation),
+    .ops  = { { DT_OP(SKIP), .imin = 8, .imax = 16 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL StarMap::UpdateDangerZone
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(StarMap_UpdateDangerZone) }
+};
+
+Symbol SYM(StarMap_UpdateDangerZone) = {
+    SYMNAME("StarMap::UpdateDangerZone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_GetNewLocation_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN7StarMap16UpdateDangerZoneEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(StarMap_UpdateDangerZone) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+DisasmTrace StarMap_UpdateDangerZone_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(StarMap_UpdateDangerZone),
+    .ops  = { { DT_OP(SKIP), .imin = 10, .imax = 16 },
+             { I_CMP,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 1 }, { .addr = 0 } },
+                .argout = { DT_OUT_SYM1 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(StarMap_waiting_running_offset) }
+};
+
+Symbol SYM(StarMap_waiting_running_offset) = {
+    SYMNAME("StarMap->waiting.running"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_UpdateDangerZone_trace }, { 0 } }
 };

@@ -63,6 +63,9 @@ DECLFUNC(WorldManager_ClearLocation);
 typedef void (*FUNCTYPE(WorldManager_CreateLocation))(WorldManager* self, Location* loc);
 DECLFUNC(WorldManager_CreateLocation);
 
+typedef void (*FUNCTYPE(WorldManager_UpdateLocation))(WorldManager* self, LocationEvent* loc);
+DECLFUNC(WorldManager_UpdateLocation);
+
 typedef CompleteShip* (*FUNCTYPE(WorldManager_CreateShip))(WorldManager* self, ShipEvent* ship,
                                                            bool boss);
 DECLFUNC(WorldManager_CreateShip);

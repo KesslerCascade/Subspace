@@ -27,6 +27,10 @@ static void specinit(void* dummy)
     addspec(&Log_Defeat);
     addspec(&Log_Abandon);
     addspec(&Log_HullDamage);
+    addspec(&Log_Jump);
+    addspec(&Log_Wait);
+    addspec(&Log_Event);
+    addspec(&Log_Ship);
 }
 
 void LogEnt_destroy(_In_ LogEnt* self)

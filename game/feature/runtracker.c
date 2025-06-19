@@ -9,8 +9,17 @@ static bool runTracker_Enable(SubspaceFeature* feat, void* settings, bool enable
 }
 
 Patch* RunTracker_patches[] = {
-    &patch_ShipManager_ModifyScrapCount, &patch_GameOver_SetVictory,   &patch_Ship_DamageHull,
-    &patch_Ship_ProjectileStrike,        &patch_ShipManager_SunDamage, 0
+    &patch_ShipManager_ModifyScrapCount,
+    &patch_GameOver_SetVictory,
+    &patch_Ship_DamageHull,
+    &patch_Ship_ProjectileStrike,
+    &patch_ShipManager_SunDamage,
+    &patch_ShipManager_JumpLeave,
+    &patch_StarMap_UpdateDangerZone,
+    &patch_WorldManager_CreateLocation,
+    &patch_WorldManager_UpdateLocation,
+    &patch_WorldManager_CreateShip,
+    0
 };
 
 SubspaceFeature RunTracker_feature = { .name            = "RunTracker",

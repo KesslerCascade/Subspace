@@ -10,6 +10,7 @@ typedef struct Location Location;
 
 extern DisasmTrace StarMap_OnRender_sector_title_trace;
 extern DisasmTrace StarMap_NewGame_trace;
+extern DisasmTrace Disasm_GenerateMap_Rock_Crystal_Beacon_trace;
 
 // FTL functions & wrappers below
 
@@ -32,12 +33,22 @@ typedef bool (*FUNCTYPE(StarMap_CheckGameOver))(StarMap* self);
 DECLFUNC(StarMap_CheckGameOver);
 #define StarMap_CheckGameOver(map) FCALL(ftlbase, StarMap_CheckGameOver, map)
 
+typedef Location* (*FUNCTYPE(StarMap_GetNewLocation))(StarMap* self);
+DECLFUNC(StarMap_GetNewLocation);
+
+typedef Location* (*FUNCTYPE(StarMap_GetWaitLocation))(StarMap* self);
+DECLFUNC(StarMap_GetWaitLocation);
+
+typedef void (*FUNCTYPE(StarMap_UpdateDangerZone))(StarMap* self);
+DECLFUNC(StarMap_UpdateDangerZone);
+
 DECLSYM(StarMap_bSecretSector_offset);
 DECLSYM(StarMap_currentSector_offset);
 DECLSYM(StarMap_secretSector_offset);
 DECLSYM(StarMap_sectorMapSeed_offset);
 DECLSYM(StarMap_currentSectorSeed_offset);
 DECLSYM(StarMap_worldLevel_offset);
+DECLSYM(StarMap_waiting_running_offset);
 
 #define StarMap_worldLevel(starmap)    (*(&MEMBER(ftlbase, StarMap, starmap, int, worldLevel)))
 #define StarMap_bSecretSector(starmap) (*(&MEMBER(ftlbase, StarMap, starmap, bool, bSecretSector)))
@@ -45,6 +56,10 @@ DECLSYM(StarMap_worldLevel_offset);
 #define StarMap_sectorMapSeed(starmap) *(&MEMBER(ftlbase, StarMap, starmap, int, sectorMapSeed))
 #define StarMap_currentSectorSeed(starmap) \
     *(&MEMBER(ftlbase, StarMap, starmap, int, currentSectorSeed))
+
+// actually inside the AnimationTracker
+#define StarMap_waiting_running(starmap) \
+    (*(&MEMBER(ftlbase, StarMap, starmap, bool, waiting_running)))
 
 DECLSYM(Sector_description_type_offset);
 #define Sector_description_type(sector) \
