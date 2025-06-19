@@ -29,9 +29,13 @@ typedef struct DisasmTraceState {
 #if defined(_DEBUG) && defined(WIN32)
 #include <debugapi.h>
 // Uncomment and set _debug_trace ot trigger a breakpoint when a specific trace is about to be run
-// extern DisasmTrace StarMap_NewGame_trace;
-// static DisasmTrace* _debug_trace = &StarMap_NewGame_trace;
+// #define DEBUG_TRACE WorldManager_UpdateLocation_trace
+#ifdef DEBUG_TRACE
+extern DisasmTrace DEBUG_TRACE;
+static DisasmTrace* _debug_trace = &DEBUG_TRACE;
+#else
 static DisasmTrace* _debug_trace = NULL;
+#endif
 #endif
 
 // Pushes the entire trace state to an unwind stack. This is so we can backtrack there upon failing
