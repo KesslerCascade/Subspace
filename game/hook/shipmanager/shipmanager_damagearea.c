@@ -22,8 +22,8 @@ bool ShipManager_DamageArea_pre(ShipManager* self, Pointf location, Damage damag
             if (damage.selfId == -1 && damage.iDamage == 3 && damage.iShieldPiercing == 5 &&
                 damage.breachChance == 10 && damage.fireChance == 0)
                 damageSourceSet(&areasrc, "ASB");
-            if (damage.iDamage == 1 && damage.iShieldPiercing == 0 && damage.fireChance == 2 &&
-                damage.breachChance == 1)
+            else if (damage.iDamage == 1 && damage.iShieldPiercing == 0 && damage.fireChance == 2 &&
+                     damage.breachChance == 1)
                 damageSourceSet(&areasrc, "Asteroid");
             else if (damage.iShieldPiercing >= 5)
                 damageSourceSet(&areasrc, "Missile");
