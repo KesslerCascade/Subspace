@@ -34,3 +34,21 @@ typedef struct TextString {
     basic_string data;
     bool isLiteral;
 } TextString;
+
+typedef struct Damage {
+    int iDamage;
+    int iShieldPiercing;
+    int fireChance;
+    int breachChance;
+    int stunDamage;
+    int iIonDamage;
+    int iSystemDamage;
+    int iPersDamage;
+    bool bHullBuster;
+    int ownerId;
+    int selfId;
+    bool bLockdown;
+    bool crystalShard;
+    bool bFriendlyFire;
+    int iStun;
+} Damage;

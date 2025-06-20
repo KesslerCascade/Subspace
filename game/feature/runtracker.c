@@ -1,5 +1,24 @@
+#include "runtracker.h"
 #include "feature/feature.h"
 #include "patch/patchlist.h"
+
+void damageSourceSet(DamageSource* ds, const char* src)
+{
+    if (!ds->set) {
+        ds->prev           = gc.curDamageSource;
+        ds->set            = true;
+        gc.curDamageSource = src;
+    }
+}
+
+void damageSourceFinish(DamageSource* ds)
+{
+    if (ds->set) {
+        gc.curDamageSource = ds->prev;
+        ds->prev           = NULL;
+        ds->set            = false;
+    }
+}
 
 // ---- Patching ----------------
 
@@ -13,8 +32,12 @@ Patch* RunTracker_patches[] = {
     &patch_GameOver_SetVictory,
     &patch_Ship_DamageHull,
     &patch_Ship_ProjectileStrike,
+    &patch_ShipManager_DamageArea,
+    &patch_ShipManager_DamageBeam,
+    &patch_ShipManager_DamageHull,
     &patch_ShipManager_SunDamage,
     &patch_ShipManager_JumpLeave,
+    &patch_ShipSystem_GetExploded,
     &patch_StarMap_UpdateDangerZone,
     &patch_WorldManager_CreateLocation,
     &patch_WorldManager_UpdateLocation,

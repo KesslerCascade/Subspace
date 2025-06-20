@@ -1,18 +1,15 @@
-#include "feature/feature.h"
-#include "ftl/shipmanager.h"
+#include "feature/runtracker.h"
 #include "hook/hook.h"
 #include "patch/patchlist.h"
-#include "subspacegame.h"
+
+static DamageSource flaresrc;
 
 // ---- Hooks ----------------
-
-static const char* oldDamageSource;
 
 int ShipManager_SunDamage_pre(ShipManager* self)
 {
     if (RunTracker_feature.enabled) {
-        oldDamageSource    = gc.curDamageSource;
-        gc.curDamageSource = "SolarFlare";
+        damageSourceSet(&flaresrc, "SolarFlare");
     }
 
     return 1;
@@ -20,9 +17,7 @@ int ShipManager_SunDamage_pre(ShipManager* self)
 
 void ShipManager_SunDamage_post(ShipManager* self)
 {
-    if (RunTracker_feature.enabled) {
-        gc.curDamageSource = oldDamageSource;
-    }
+    damageSourceFinish(&flaresrc);
 }
 
 // ---- Patch ----------------

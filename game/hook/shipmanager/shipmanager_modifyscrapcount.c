@@ -1,18 +1,12 @@
 #include "control/runlog.h"
-#include "feature/feature.h"
-#include "ftl/capp.h"
-#include "ftl/completeship.h"
-#include "ftl/shipmanager.h"
-#include "ftl/worldmanager.h"
+#include "feature/runtracker.h"
 #include "hook/hook.h"
 #include "patch/patchlist.h"
-#include "subspacegame.h"
 
-static const char* oldDamageSource;
+static DamageSource repairsrc;
+static int pre_currentScrap;
 
 // ---- Hooks ----------------
-
-static int pre_currentScrap;
 
 int ShipManager_ModifyScrapCount_pre(ShipManager* self, int amount, bool income)
 {
@@ -27,8 +21,7 @@ int ShipManager_ModifyScrapCount_pre(ShipManager* self, int amount, bool income)
         }
 
         // for hull repair
-        oldDamageSource    = gc.curDamageSource;
-        gc.curDamageSource = "RepairArm";
+        damageSourceSet(&repairsrc, "RepairArm");
     }
 
     return 1;
@@ -49,9 +42,9 @@ void ShipManager_ModifyScrapCount_post(ShipManager* self, int amount, bool incom
             int deltaScrap = ShipManager_currentScrap(self) - pre_currentScrap;
             runLogSend(&Log_Scrap, src, deltaScrap, amount);
         }
-
-        gc.curDamageSource = oldDamageSource;
     }
+
+    damageSourceFinish(&repairsrc);
 }
 
 // ---- Patch ----------------

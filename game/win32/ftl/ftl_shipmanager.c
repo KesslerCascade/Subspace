@@ -2,6 +2,7 @@
 #include "ftl/ship.h"
 #include "ftl/shipmanager.h"
 #include "ftl/shipstatus.h"
+#include "ftl/shipsystem.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -267,3 +268,95 @@ Symbol SYM(ShipManager_fuel_count_offset) = {
     SYMNAME("ShipManager->fuel_count"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_JumpLeave_trace }, { 0 } }
 };
+
+DisasmTrace ShipManager_DamageArea_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "ACH_CRYSTAL_SHARD",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = { DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 4, .imax = 14 },
+             { I_ADD,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ShipManager_ship_offset) } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_DamageArea) }
+};
+
+Symbol SYM(ShipManager_DamageArea) = {
+    SYMNAME("ShipManager::DamageArea"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DamageArea_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_DamageArea) = {
+    .nargs   = 4,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false },
+                { 8, ARG_STRUCT, 0, true },
+                { 52, ARG_STRUCT, 0, true },
+                { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+DisasmTrace ShipManager_DamageBeam_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "ACH_SLUG_BIO",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = { DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 4, .imax = 14 },
+             { I_SUB, .argf = { ARG_REG }, .args = { { REG_ESP } } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_DamageBeam) }
+};
+
+Symbol SYM(ShipManager_DamageBeam) = {
+    SYMNAME("ShipManager::DamageBeam"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DamageBeam_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN11ShipManager10DamageAreaE6Pointf6Damageb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_DamageBeam) = {
+    .nargs   = 4,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false },
+                { 8, ARG_STRUCT, 0, true },
+                { 8, ARG_STRUCT, 0, true },
+                { 52, ARG_STRUCT, 0, true } },
+    .rettype = RET_INT
+};
+
+DisasmTrace ShipManager_OnLoop_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "ACH_TOUGH_SHIP",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 6, .imax = 12 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // this pointer
+              { DT_OP(SKIP), .imin = 1, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ESP } },
+                .argstr = { 0, "reactor" } },
+             { DT_OP(SKIP), .imin = 0, .imax = 500 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL ShipSystem::GetExploded
+              { I_TEST, .args = { ARG_REG, ARG_REG }, .args = { { REG_AL }, { REG_AL } } },
+             { DT_OP(SKIP), .imin = 1, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(ShipManager_DamageHull) } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_OnLoop),   // DT_OUT_SYM1
+              &SYM(ShipSystem_GetExploded) }
+};
+
+Symbol SYM(ShipManager_OnLoop) = {
+    SYMNAME("ShipManager::OnLoop"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_OnLoop_trace }, { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_OnLoop) = { .nargs   = 1,
+                                          .stdcall = true,
+                                          .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                          .rettype = RET_VOID };

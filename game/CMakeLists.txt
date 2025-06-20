@@ -56,6 +56,7 @@ if(WIN32)
         win32/ftl/ftl_ship.c
         win32/ftl/ftl_shipmanager.c
         win32/ftl/ftl_shipstatus.c
+        win32/ftl/ftl_shipsystem.c
         win32/ftl/ftl_starmap.c
         win32/ftl/ftl_startup.c
         win32/ftl/ftl_stdlib.c
@@ -130,11 +131,15 @@ add_executable(subspacegame
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
     hook/ship/ship_damagehull.c
     hook/ship/ship_projectilestrike.c
+    hook/shipmanager/shipmanager_damagearea.c
+    hook/shipmanager/shipmanager_damagebeam.c
+    hook/shipmanager/shipmanager_damagehull.c
     hook/shipmanager/shipmanager_jumpleave.c
     hook/shipmanager/shipmanager_modifyscrapcount.c
     hook/shipmanager/shipmanager_sundamage.c
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
+    hook/shipsystem/shipsystem_getexploded.c
     hook/starmap/starmap_generatemap.c
     hook/starmap/starmap_updatedangerzone.c
     hook/textlibrary/textlibrary_gettext.c
