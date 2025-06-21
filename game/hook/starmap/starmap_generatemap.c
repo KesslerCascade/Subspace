@@ -1,3 +1,4 @@
+#include "control/controlclient.h"
 #include "ftl/starmap.h"
 #include "ftl/worldmanager.h"
 #include "hook/hook.h"
@@ -9,9 +10,17 @@
 Location*
 subspace_StarMap_GenerateMap_post(Location* ret, StarMap* self, bool bTutorial, bool useOldSeed)
 {
-    // this gets called during new game creation, but we'd rather the Sector message come AFTER, so
-    // defer it until the next loop
-    gs.sendSectorInfo = true;
+    Sector* cur = self ? StarMap_currentSector(self) : NULL;
+
+    if (cur) {
+        ControlMsg* msg = controlNewMsg("Sector", 4);
+        controlMsgInt(msg, 0, "num", StarMap_worldLevel(self) + 1);
+        controlMsgInt(msg, 1, "seed", StarMap_currentSectorSeed(self));
+        controlMsgStr(msg, 2, "type", Sector_description_type(cur)->buf);
+        controlMsgBool(msg, 3, "secret", StarMap_bSecretSector(self));
+        msg->priority = 1;   // make sure this gets sent after NewGame
+        controlClientQueue(msg);
+    }
 
     return ret;
 }
@@ -26,5 +35,12 @@ static bool apply(addr_t base, Patch* p, PatchState* ps)
 Patch patch_StarMap_GenerateMap = {
     .relevant        = AlwaysRequired,
     .apply           = apply,
-    .requiredSymbols = { &SYM(StarMap_GenerateMap), 0 }
+    .requiredSymbols = { &SYM(StarMap_GenerateMap),
+                        &SYM(WorldManager_starMap_offset),
+                        &SYM(StarMap_currentSector_offset),
+                        &SYM(StarMap_currentSectorSeed_offset),
+                        &SYM(StarMap_bSecretSector_offset),
+                        &SYM(StarMap_worldLevel_offset),
+                        &SYM(Sector_description_type_offset),
+                        0 }
 };
