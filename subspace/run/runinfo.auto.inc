@@ -15,9 +15,11 @@ static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     .enterSector = (void (*)(void*, int, int, strref, bool))RunInfo_enterSector,
     .updateStats = (void (*)(void*, int, int, int, int))RunInfo_updateStats,
     .runLog = (void (*)(void*, int, int, int64, strref, stvar[LOG_MAX_PARAMS]))RunInfo_runLog,
+    .beacon = (void (*)(void*, int, int, int, int, int, int64, strref))RunInfo_beacon,
     .processLog = (void (*)(void*, LogEnt*))RunInfo_processLog,
     .processScrap = (void (*)(void*, strref, int, int))RunInfo_processScrap,
     .processHullDamage = (void (*)(void*, strref, int))RunInfo_processHullDamage,
+    .processShip = (void (*)(void*, strref))RunInfo_processShip,
     .score = (int32 (*)(void*))RunInfo_score,
     .finish = (void (*)(void*, RunResult))RunInfo_finish,
 };

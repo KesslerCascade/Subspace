@@ -1,6 +1,9 @@
+#include "control/controlclient.h"
 #include "control/runlog.h"
 #include "feature/feature.h"
+#include "ftl/capp.h"
 #include "ftl/location.h"
+#include "ftl/scorekeeper.h"
 #include "ftl/starmap.h"
 #include "ftl/worldmanager.h"
 #include "hook/hook.h"
@@ -11,9 +14,35 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
 {
     gs.waitInProgress = false;
 
+    if (gc.loadingGame)
+        return;   // don't do this while loading the game
+
+    LocationEvent* event    = loc ? Location_event(loc) : NULL;
+    basic_string* eventname = event ? LocationEvent_eventName(event) : NULL;
+
+    if (RunTracker_feature.enabled || SaveManager_feature.enabled) {
+        // send beacon details first so savepoint can be updated if needed
+        ControlMsg* msg     = controlNewMsg("Beacon", 8);
+        WorldManager* world = CApp_world(theApp);
+        int visits          = Location_visited(loc);
+        Pointf* pos         = (Pointf*)loc;   // always the first field in Location
+        uint32_t timelow, timehigh;
+        osTime64(&timehigh, &timelow);
+
+        controlMsgInt(msg, 0, "sector", WorldManager_worldLevel(world) + 1);
+        controlMsgInt(msg, 1, "beacons", ScoreKeeper_stats(SKeeper)[1].current);
+        controlMsgInt(msg, 2, "visit", MAX(visits, 1));
+        controlMsgInt(msg, 3, "x", (int)pos->x);
+        controlMsgInt(msg, 4, "y", (int)pos->y);
+        controlMsgUInt(msg, 5, "timelow", timelow);
+        controlMsgUInt(msg, 6, "timehigh", timehigh);
+        controlMsgStr(msg, 7, "event", eventname ? eventname->buf : "");
+
+        msg->priority = 2;   // ensure this comes after NewGame and Sector
+        controlClientQueue(msg);
+    }
+
     if (RunTracker_feature.enabled) {
-        LocationEvent* event = loc ? Location_event(loc) : NULL;
-        basic_string* eventname = event ? LocationEvent_eventName(event) : NULL;
         if (eventname) {
             int visits = Location_visited(loc);
             runLogSend(&Log_Event, eventname->buf, 1, MAX(visits, 1));

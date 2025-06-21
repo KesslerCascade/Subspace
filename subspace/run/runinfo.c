@@ -464,11 +464,14 @@ void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, _In
                     stvar params[LOG_MAX_PARAMS])
 {
     // normalize sectorpoint / savepoint
-    int64 savepoint   = max(SPOINT(beacons, 0), self->savepoint);
-    int64 sectorpoint = max(SPOINT(sector, 0), self->sectorpoint);
-
-    // remember this now because runinfoProcessLog may change it for run-ending events
-    bool recording = self->recording;
+    int64 savepoint, sectorpoint;
+    bool recording;
+    withReadLock (&self->lock) {
+        savepoint   = max(SPOINT(beacons, 0), self->savepoint);
+        sectorpoint = max(SPOINT(sector, 0), self->sectorpoint);
+        // remember this now because runinfoProcessLog may change it for run-ending events
+        recording   = self->recording;
+    }
 
     LogEnt* ent = logentCreate(sectorpoint, savepoint, time, id, params);
     if (!ent)
@@ -536,6 +539,8 @@ void RunInfo_processLog(_In_ RunInfo* self, LogEnt* ent)
         RunInfo_finish(self, RUN_Defeat);
     } else if (ent->spec == &Log_Abandon) {
         RunInfo_finish(self, RUN_Abandoned);
+    } else if (ent->spec == &Log_Ship) {
+        runinfoProcessShip(self, ent->rawparams.a[0].data.st_strref);
     }
 }
 
@@ -590,6 +595,28 @@ void RunInfo_processHullDamage(_In_ RunInfo* self, _In_opt_ strref src, int amou
         if (subspaceIsRun(self->ss, self))
             ssuiUpdateMain(self->ss->ui, _S"gameinfo");
     }
+}
+
+void RunInfo_processShip(_In_ RunInfo* self, _In_opt_ strref name)
+{
+    int64 runid, savepoint;
+    withWriteLock (&self->lock) {
+        if (!self->recording || self->updatedBeaconShip)
+            break;
+        self->updatedBeaconShip = true;
+        runid                   = self->runid;
+        savepoint               = self->savepoint;
+    }
+
+    DbStmt* stmt = dbPrepare(self->ss->db,
+                             _S"UPDATE beacons SET other_ship=? WHERE runid=? AND savepoint=?");
+    if (stmt) {
+        dbstmtBind(stmt, 1, stvar(strref, name));
+        dbstmtBind(stmt, 2, stvar(int64, runid));
+        dbstmtBind(stmt, 3, stvar(int64, savepoint));
+        dbstmtExec(stmt);
+    }
+    objRelease(&stmt);
 }
 
 void RunInfo_replayLog(_In_ RunInfo* self, bool combat, int64 savepoint, int64 sectorpoint)
@@ -648,6 +675,50 @@ void RunInfo_replayLog(_In_ RunInfo* self, bool combat, int64 savepoint, int64 s
 out:
     strDestroy(&sql);
     objRelease(&stmt);
+}
+
+void RunInfo_beacon(_In_ RunInfo* self, int sector, int beacons, int visit, int x, int y,
+                    int64 time, _In_opt_ strref event)
+{
+    int64 savepoint, sectorpoint, runid;
+    bool recording;
+    withWriteLock (&self->lock) {
+        savepoint   = max(SPOINT(beacons, 0), self->savepoint + 1);
+        sectorpoint = max(SPOINT(sector, 0), self->sectorpoint);
+        runid       = self->runid;
+        recording   = self->recording;
+
+        self->savepoint         = savepoint;   // we've always jumped or waited to get here
+        self->updatedBeaconShip = false;
+    }
+
+    if (recording) {
+        DbStmt* stmt = dbPrepare(self->ss->db, _S"UPDATE runs SET savepoint=? WHERE runid=?");
+        if (stmt) {
+            dbstmtBind(stmt, 1, stvar(int32, savepoint));
+            dbstmtBind(stmt, 2, stvar(int64, runid));
+            dbstmtExec(stmt);
+        }
+        objRelease(&stmt);
+
+        stmt = dbPrepare(
+            self->ss->db,
+            _S
+            "INSERT INTO beacons (runid, savepoint, sectorpoint, visit, x, y, time, initial_event) "
+            "VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        if (stmt) {
+            dbstmtBind(stmt, 1, stvar(int64, runid));
+            dbstmtBind(stmt, 2, stvar(int64, savepoint));
+            dbstmtBind(stmt, 3, stvar(int64, sectorpoint));
+            dbstmtBind(stmt, 4, stvar(int32, visit));
+            dbstmtBind(stmt, 5, stvar(int32, x));
+            dbstmtBind(stmt, 6, stvar(int32, y));
+            dbstmtBind(stmt, 7, stvar(int64, time));
+            dbstmtBind(stmt, 8, stvar(strref, event));
+            dbstmtExec(stmt);
+        }
+        objRelease(&stmt);
+    }
 }
 
 // Autogen begins -----

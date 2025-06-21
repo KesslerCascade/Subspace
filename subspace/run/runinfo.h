@@ -37,9 +37,11 @@ typedef struct RunInfo_ClassIf {
     void (*enterSector)(_In_ void* self, int num, int seed, _In_opt_ strref type, bool secret);
     void (*updateStats)(_In_ void* self, int ships, int beacons, int scrap, int crew);
     void (*runLog)(_In_ void* self, int sector, int beacons, int64 time, _In_opt_ strref id, stvar params[LOG_MAX_PARAMS]);
+    void (*beacon)(_In_ void* self, int sector, int beacons, int visit, int x, int y, int64 time, _In_opt_ strref event);
     void (*processLog)(_In_ void* self, LogEnt* ent);
     void (*processScrap)(_In_ void* self, _In_opt_ strref src, int amount, int rawamount);
     void (*processHullDamage)(_In_ void* self, _In_opt_ strref src, int amount);
+    void (*processShip)(_In_ void* self, _In_opt_ strref name);
     int32 (*score)(_In_ void* self);
     void (*finish)(_In_ void* self, RunResult result);
 } RunInfo_ClassIf;
@@ -73,6 +75,7 @@ typedef struct RunInfo {
     int32 crewHired;
     int32 scrapActual;
     int32 damageTaken;
+    bool updatedBeaconShip;
     int64 modified;
     string savePath;
     sa_SectorInfo sectors;
@@ -111,12 +114,16 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoUpdateStats(self, ships, beacons, scrap, crew) (self)->_->updateStats(RunInfo(self), ships, beacons, scrap, crew)
 // void runinfoRunLog(RunInfo* self, int sector, int beacons, int64 time, strref id, stvar params[LOG_MAX_PARAMS]);
 #define runinfoRunLog(self, sector, beacons, time, id, params) (self)->_->runLog(RunInfo(self), sector, beacons, time, id, params)
+// void runinfoBeacon(RunInfo* self, int sector, int beacons, int visit, int x, int y, int64 time, strref event);
+#define runinfoBeacon(self, sector, beacons, visit, x, y, time, event) (self)->_->beacon(RunInfo(self), sector, beacons, visit, x, y, time, event)
 // void runinfoProcessLog(RunInfo* self, LogEnt* ent);
 #define runinfoProcessLog(self, ent) (self)->_->processLog(RunInfo(self), LogEnt(ent))
 // void runinfoProcessScrap(RunInfo* self, strref src, int amount, int rawamount);
 #define runinfoProcessScrap(self, src, amount, rawamount) (self)->_->processScrap(RunInfo(self), src, amount, rawamount)
 // void runinfoProcessHullDamage(RunInfo* self, strref src, int amount);
 #define runinfoProcessHullDamage(self, src, amount) (self)->_->processHullDamage(RunInfo(self), src, amount)
+// void runinfoProcessShip(RunInfo* self, strref name);
+#define runinfoProcessShip(self, name) (self)->_->processShip(RunInfo(self), name)
 // int32 runinfoScore(RunInfo* self);
 #define runinfoScore(self) (self)->_->score(RunInfo(self))
 // void runinfoFinish(RunInfo* self, RunResult result);

@@ -3,7 +3,8 @@
 LogEntSpec Log_Scrap = {
     .id         = "Scrap",
     .numParams  = 3,
-    .paramTypes = { LP_STRING, LP_INT,   LP_INT        },
+    .priority   = 15, // Should come after events; since those often give scrap rewards
+    .paramTypes = { LP_STRING, LP_INT,   LP_INT      },
     .paramNames = { "source",  "amount", "rawamount" }
 };
 
@@ -30,11 +31,13 @@ LogEntSpec Log_Wait = { .id = "Wait", .numParams = 0 };
 LogEntSpec Log_Event = {
     .id         = "Event",
     .numParams  = 3,
+    .priority   = 10, // make sure this is sent AFTER LoadGame and such
     .paramTypes = { LP_STRING, LP_INT,    LP_INT  },
     .paramNames = { "name",    "initial", "visit" }
 };
 
 LogEntSpec Log_Ship = { .id         = "Ship",
                         .numParams  = 1,
+                        .priority   = 11,   // should always be sent AFTER the Event
                         .paramTypes = { LP_STRING },
                         .paramNames = { "name" } };

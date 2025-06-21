@@ -84,6 +84,7 @@ add_executable(subspace
     control/controlfields.c
     control/controlserver.c
     control/controltask.c
+    control/cmds/cmdbeacon.c
     control/cmds/cmdfeaturestate.c
     control/cmds/cmdgameready.c
     control/cmds/cmdgamestart.c

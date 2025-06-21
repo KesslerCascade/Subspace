@@ -17,6 +17,8 @@
 
 int subspace_WorldManager_LoadGame_pre(WorldManager* self, basic_string* file)
 {
+    gc.loadingGame = true;
+
     if (Tweaks_feature.enabled && tweaksPreserveLoad())
         gs.ignoreFileDeletion = true;
 
@@ -52,6 +54,7 @@ void subspace_WorldManager_LoadGame_post(WorldManager* self, basic_string* file)
     }
 
     gs.sendAllStats = true;
+    gc.loadingGame  = false;
 }
 
 // ---- Patch ----------------

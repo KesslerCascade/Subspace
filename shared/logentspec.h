@@ -10,6 +10,7 @@ typedef struct LogEntSpec {
     const char* id;
     bool combat;
     int numParams;
+    int priority;
     LogParamEnum paramTypes[LOG_MAX_PARAMS];
     const char* paramNames[LOG_MAX_PARAMS];
 } LogEntSpec;

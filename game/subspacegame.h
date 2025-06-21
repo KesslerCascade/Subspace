@@ -105,6 +105,7 @@ typedef struct GameGlobalState {
 
 // Game state that reflets the current context of the FTL client
 typedef struct GameGlobalContext {
+    bool loadingGame;
     const char* curScrapSource;
     const char* curDamageSource;
 } GameGlobalContext;

@@ -87,7 +87,9 @@ static bool dbCreateBeacons(sqlite3* db)
                      "runid INTEGER NOT NULL,"
                      "savepoint INTEGER NOT NULL,"
                      "sectorpoint INTEGER NOT NULL,"
-                     "beaconidx INTEGER NOT NULL,"
+                     "visit INTEGER NOT NULL,"
+                     "x INTEGER NOT NULL,"
+                     "y INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
                      "initial_event TEXT,"
                      "other_ship TEXT,"
@@ -105,6 +107,18 @@ static bool dbCreateBeacons(sqlite3* db)
         logStr(Error, _S"Failed to create beacons table");
 
     return ret;
+}
+
+static bool dbUpgradeV1Beacons(sqlite3* db)
+{
+    bool ret = true;
+
+    // the beacons table isn't actually used in V1 at all; so we can simply drop it
+
+    if (sqlite3_exec(db, "DROP TABLE beacons", NULL, NULL, NULL) != SQLITE_OK)
+        ret = false;
+
+    return ret && dbCreateBeacons(db);
 }
 
 static bool dbCreateSaves(sqlite3* db)
@@ -245,7 +259,8 @@ bool dbCreateSchema(sqlite3* db)
     return ret;
 }
 
-static bool updateVer(sqlite3* db, int newver) {
+static bool updateVer(sqlite3* db, int newver)
+{
     bool ret = false;
 
     sqlite3_stmt* s;
@@ -275,6 +290,11 @@ static bool dbUpgradeFromV0(sqlite3* db, int* destver)
     return true;
 }
 
+static bool dbUpgradeFromV1(sqlite3* db, int* destver)
+{
+    return dbUpgradeV1Beacons(db);
+}
+
 static bool dbUpgradeOnce(sqlite3* db, int* ver)
 {
     bool ret    = true;
@@ -284,6 +304,9 @@ static bool dbUpgradeOnce(sqlite3* db, int* ver)
     switch (*ver) {
     case 0:
         ret = dbUpgradeFromV0(db, &destver);
+        break;
+    case 1:
+        ret = dbUpgradeFromV1(db, &destver);
         break;
     default:
         ret = false;

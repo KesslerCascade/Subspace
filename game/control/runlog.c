@@ -38,6 +38,8 @@ bool runLogSend(LogEntSpec* spec, ...)
     }
     va_end(args);
 
+    msg->priority = spec->priority;
+
     controlClientQueue(msg);
     return true;
 }
