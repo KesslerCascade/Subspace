@@ -108,6 +108,10 @@ enum CFALLOCMODE_ENUM {
 typedef struct ControlMsg {
     ControlMsgHeader hdr;
     ControlField** fields;
+#ifdef SUBSPACE_GAME
+    int priority;   // if multiple messages are sent during the same tick, lower priorities are sent
+                    // first
+#endif
 } ControlMsg;
 
 typedef struct ControlState {

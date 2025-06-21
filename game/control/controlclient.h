@@ -10,5 +10,6 @@ void controlClientNotify(void);
 bool controlClientConnected(void);
 
 void controlClientQueue(ControlMsg* msg);   // queue an outbound message
-void controlClientProcess(void);   // dispatch inbound messages to callbacks in main thread
+void controlClientProcessInbound(void);     // dispatch inbound messages to callbacks in main thread
+void controlClientProcessOutbound(void);    // release queued outbound messages to send
 void controlClientRegister(const char* cmd, controlclientcb_t cb);

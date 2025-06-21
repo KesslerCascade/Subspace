@@ -20,6 +20,8 @@ typedef struct ControlClient {
     MessageQueue* outbound;
     MessageQueue* inbound_secondary;
     MessageQueue* outbound_secondary;
+    bool outbound_pending;
+    bool outbound_ready;
     hashtbl handlers;
 } ControlClient;
 
@@ -56,16 +58,37 @@ static int controlThread(void* data)
 
         // swap queues and process any outbound messages
         lock_acq(&client.lock);
-        // swap queues while locked
-        MessageQueue* oqueue      = client.outbound;
-        client.outbound           = client.outbound_secondary;
-        client.outbound_secondary = oqueue;
+        MessageQueue* oqueue = NULL;
+        if (client.outbound_ready) {
+            // swap queues while locked
+            oqueue                    = client.outbound;
+            client.outbound           = client.outbound_secondary;
+            client.outbound_secondary = oqueue;
+            client.outbound_ready     = false;
+        }
         lock_rel(&client.lock);
 
-        for (int i = 0; i < oqueue->nmsgs; i++) {
-            controlPutMsg(&control, &oqueue->msgs[i]->hdr, oqueue->msgs[i]->fields);
+        if (oqueue) {
+            int curprio  = 0;
+            int nextprio = 0;
+            do {
+                nextprio = 0x7fffffff;
+
+                for (int i = 0; i < oqueue->nmsgs; i++) {
+                    ControlMsg* msg = oqueue->msgs[i];
+                    if (msg->priority == curprio) {
+                        controlPutMsg(&control, &msg->hdr, msg->fields);
+                    } else {
+                        // get the smallest higher priority to be sent next
+                        if (msg->priority > curprio && msg->priority < nextprio)
+                            nextprio = msg->priority;
+                    }
+                }
+
+                curprio = nextprio;
+            } while (nextprio != 0x7fffffff);
+            msgqClear(oqueue);
         }
-        msgqClear(oqueue);
 
         if (isconn) {
             controlSend(&control);
@@ -147,11 +170,11 @@ void controlClientQueue(ControlMsg* msg)
 {
     lock_acq(&client.lock);
     msgqAdd(client.outbound, msg, NULL);
+    client.outbound_pending = true;
     lock_rel(&client.lock);
-    controlClientNotify();
 }
 
-void controlClientProcess(void)
+void controlClientProcessInbound(void)
 {
     lock_acq(&client.lock);
     // swap queues while locked
@@ -165,6 +188,22 @@ void controlClientProcess(void)
             queue->cbs[i](queue->msgs[i]);
     }
     msgqClear(queue);
+}
+
+void controlClientProcessOutbound(void)
+{
+    bool dosend = false;
+    lock_acq(&client.lock);
+    if (client.outbound_pending) {
+        client.outbound_ready   = true;   // clear to send
+        client.outbound_pending = false;
+        dosend                  = true;
+    }
+    lock_rel(&client.lock);
+
+    // notify client thread to send
+    if (dosend)
+        controlClientNotify();
 }
 
 void controlClientRegister(const char* cmd, controlclientcb_t cb)

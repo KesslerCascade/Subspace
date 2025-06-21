@@ -133,7 +133,8 @@ void sscmain2(void)
 
     // loop until we get the all-clear
     while (!gs.clearToStart) {
-        controlClientProcess();
+        controlClientProcessInbound();
+        controlClientProcessOutbound();
         osSleep(1);
 
         // ensure we don't get stuck here if the connection closes

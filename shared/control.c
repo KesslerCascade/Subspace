@@ -631,6 +631,9 @@ ControlMsg* controlAllocMsg(int nfields, int allocmode)
     ControlMsg* ret = allocBytes(sizeof(ControlMsg), NULL, allocmode, 0);
     if (!ret)
         return NULL;
+#ifdef SUBSPACE_GAME
+    ret->priority = 0;
+#endif
 
     memset(&ret->hdr, 0, sizeof(ControlMsgHeader));
     ret->hdr.nfields = nfields;

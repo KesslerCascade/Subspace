@@ -26,7 +26,8 @@ int subspace_ResourceControl_RenderLoadingBar_pre(ResourceControl* self, float i
         }
     }
 
-    controlClientProcess();
+    controlClientProcessInbound();
+    controlClientProcessOutbound();
 
     return 1;
 }

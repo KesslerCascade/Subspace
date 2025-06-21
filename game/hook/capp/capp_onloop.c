@@ -15,7 +15,7 @@ static int lastStats[NUM_STATS];
 
 int subspace_CApp_OnLoop_pre(CApp* self)
 {
-    controlClientProcess();
+    controlClientProcessInbound();
 
     if (gs.sendSectorInfo) {
         gs.sendSectorInfo   = false;
@@ -77,6 +77,8 @@ void subspace_CApp_OnLoop_post(CApp* self)
         gc.curScrapSource = NULL;
         gc.curDamageSource = NULL;
     }
+
+    controlClientProcessOutbound();
 }
 
 // ---- Patch ----------------
