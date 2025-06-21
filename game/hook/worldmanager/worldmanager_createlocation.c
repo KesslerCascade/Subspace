@@ -7,7 +7,7 @@
 #include "patch/patchlist.h"
 #include "subspacegame.h"
 
-int WorldManager_CreateLocation_pre(WorldManager* self, Location* loc)
+void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
 {
     gs.waitInProgress = false;
 
@@ -18,15 +18,13 @@ int WorldManager_CreateLocation_pre(WorldManager* self, Location* loc)
             runLogSend(&Log_Event, eventname->buf, 1);
         }
     }
-
-    return 1;
 }
 
 // ---- Patch ----------------
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
-    return hookFunction(base, WorldManager_CreateLocation, WorldManager_CreateLocation_pre, NULL);
+    return hookFunction(base, WorldManager_CreateLocation, NULL, WorldManager_CreateLocation_post);
 }
 
 Patch patch_WorldManager_CreateLocation = {
