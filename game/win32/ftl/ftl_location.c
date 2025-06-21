@@ -11,10 +11,14 @@ Symbol SYM(Location_event_offset) = {
              { 0 } }
 };
 
+Symbol SYM(Location_visited_offset) = {
+    SYMNAME("Location->visited"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_GetNewLocation_trace }, { 0 } }
+};
 
 Symbol SYM(LocationEvent_eventName_offset) = {
     SYMNAME("LocationEvent->eventName"),
     .find = { { .type   = SYMBOL_FIND_DISASM,
-                .disasm = &Disasm_GenerateMap_Rock_Crystal_Beacon_trace },
+                .disasm = &StarMap_GenerateMap_Rock_Crystal_Beacon_trace },
              { 0 } }
 };

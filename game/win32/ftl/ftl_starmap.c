@@ -83,7 +83,7 @@ Symbol SYM(StarMap_secretSector_offset) = {
 };
 
 // wow, how incredibly convenient that this is hardcoded
-DisasmTrace Disasm_GenerateMap_Rock_Home_trace = {
+DisasmTrace StarMap_GenerateMap_Rock_Home_trace = {
     .c    = DTRACE_STRREFS,
     .cstr = "ROCK_HOME",
     .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 2 },
@@ -94,10 +94,11 @@ DisasmTrace Disasm_GenerateMap_Rock_Home_trace = {
 
 Symbol SYM(Sector_description_type_offset) = {
     SYMNAME("Sector->description.type"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Disasm_GenerateMap_Rock_Home_trace }, { 0 } }
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_GenerateMap_Rock_Home_trace },
+             { 0 } }
 };
 
-DisasmTrace Disasm_GenerateMap_Rock_Crystal_Beacon_trace = {
+DisasmTrace StarMap_GenerateMap_Rock_Crystal_Beacon_trace = {
     .c    = DTRACE_STRREFS,
     .cstr = "ROCK_CRYSTAL_BEACON",
     .ops  = { { I_MOV },
@@ -341,8 +342,14 @@ DisasmTrace StarMap_GetNewLocation_trace = {
     .csym = &SYM(StarMap_GetNewLocation),
     .ops  = { { DT_OP(SKIP), .imin = 8, .imax = 16 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL StarMap::UpdateDangerZone
+              { DT_OP(SKIP), .imin = 5, .imax = 12 },
+             { I_ADD,
+                .argf   = { 0, ARG_ADDR },
+                .args   = { { 0 }, { .addr = 1 } },
+                .argout = { DT_OUT_SYM2 } },    // loc->visited++
               { DT_OP(FINISH) } },
-    .out  = { &SYM(StarMap_UpdateDangerZone) }
+    .out  = { &SYM(StarMap_UpdateDangerZone),   // DT_OUT_SYM1
+              &SYM(Location_visited_offset) }
 };
 
 Symbol SYM(StarMap_UpdateDangerZone) = {

@@ -29,9 +29,9 @@ LogEntSpec Log_Wait = { .id = "Wait", .numParams = 0 };
 
 LogEntSpec Log_Event = {
     .id         = "Event",
-    .numParams  = 2,
-    .paramTypes = { LP_STRING, LP_INT    },
-    .paramNames = { "name",    "initial" }
+    .numParams  = 3,
+    .paramTypes = { LP_STRING, LP_INT,    LP_INT  },
+    .paramNames = { "name",    "initial", "visit" }
 };
 
 LogEntSpec Log_Ship = { .id         = "Ship",

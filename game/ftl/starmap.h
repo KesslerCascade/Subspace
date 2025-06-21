@@ -10,7 +10,8 @@ typedef struct Location Location;
 
 extern DisasmTrace StarMap_OnRender_sector_title_trace;
 extern DisasmTrace StarMap_NewGame_trace;
-extern DisasmTrace Disasm_GenerateMap_Rock_Crystal_Beacon_trace;
+extern DisasmTrace StarMap_GenerateMap_Rock_Crystal_Beacon_trace;
+extern DisasmTrace StarMap_GetNewLocation_trace;
 
 // FTL functions & wrappers below
 

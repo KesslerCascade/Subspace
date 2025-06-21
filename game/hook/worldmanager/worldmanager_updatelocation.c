@@ -14,7 +14,7 @@ int WorldManager_UpdateLocation_pre(WorldManager* self, LocationEvent* event)
     if (RunTracker_feature.enabled) {
         basic_string* eventname = event ? LocationEvent_eventName(event) : NULL;
         if (eventname) {
-            runLogSend(&Log_Event, eventname->buf, 0);
+            runLogSend(&Log_Event, eventname->buf, 0, 0);
         }
     }
 

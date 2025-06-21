@@ -15,7 +15,8 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
         LocationEvent* event = loc ? Location_event(loc) : NULL;
         basic_string* eventname = event ? LocationEvent_eventName(event) : NULL;
         if (eventname) {
-            runLogSend(&Log_Event, eventname->buf, 1);
+            int visits = Location_visited(loc);
+            runLogSend(&Log_Event, eventname->buf, 1, MAX(visits, 1));
         }
     }
 }
@@ -32,6 +33,7 @@ Patch patch_WorldManager_CreateLocation = {
     .apply           = apply,
     .requiredSymbols = { &SYM(WorldManager_CreateLocation),
                         &SYM(Location_event_offset),
+                        &SYM(Location_visited_offset),
                         &SYM(LocationEvent_eventName_offset),
                         0 }
 };
