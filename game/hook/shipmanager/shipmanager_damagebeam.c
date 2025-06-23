@@ -32,7 +32,10 @@ bool ShipManager_DamageBeam_post(bool ret, ShipManager* self, Pointf current, Po
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
-    return hookFunction(base, ShipManager_DamageBeam, ShipManager_DamageBeam_pre, NULL);
+    return hookFunction(base,
+                        ShipManager_DamageBeam,
+                        ShipManager_DamageBeam_pre,
+                        ShipManager_DamageBeam_post);
 }
 
 Patch patch_ShipManager_DamageBeam = {
