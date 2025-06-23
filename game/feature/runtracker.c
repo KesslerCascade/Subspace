@@ -42,6 +42,7 @@ Patch* RunTracker_patches[] = {
     &patch_WorldManager_CreateLocation,
     &patch_WorldManager_UpdateLocation,
     &patch_WorldManager_CreateShip,
+    &patch_BlueprintManager_GetShipBlueprint,
     0
 };
 

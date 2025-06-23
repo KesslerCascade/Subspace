@@ -2,6 +2,7 @@
 #include "ftl/filehelper.h"
 #include "ftl/globals.h"
 #include "ftl/scorekeeper.h"
+#include "ftl/settings.h"
 #include "ftl/tutorialmanager.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
@@ -44,24 +45,29 @@ DisasmTrace ScoreKeeper_Save_trace = {
                 .argf   = { ARG_MATCH, ARG_ADDR },
                 .argcap = { DT_MATCH1 },
                 .args   = { { 0 }, { .addr = 2 } } },
-             { DT_OP(SKIP), .imin = 250, .imax = 1000 },
+             { DT_OP(SKIP), .imin = 9, .imax = 16 },
+             { I_CVTSI2SS },
+             { DT_OP(SKIP), .imin = 2, .imax = 9 },
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL Settings::GetDlcEnabled
+              { DT_OP(SKIP), .imin = 250, .imax = 1000 },
              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(FileHelper_closeBinaryFile) } },
              { DT_OP(SKIP), .imin = 2, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(FileHelper_fileExists) } },
              { DT_OP(SKIP), .imin = 0, .imax = 3 },
              { I_LEA, .argcap = { 0, DT_CAPTURE2 } },   // temp filename
               { DT_OP(SKIP), .imin = 0, .imax = 3 },
-             { I_CALL, .argout = { DT_OUT_SYM5 } },     // CALL FileHelper::deleteFile
+             { I_CALL, .argout = { DT_OUT_SYM6 } },     // CALL FileHelper::deleteFile
               { DT_OP(SKIP), .imin = 0, .imax = 3 },
              { I_LEA, .argf = { 0, ARG_MATCH }, .argcap = { 0, DT_MATCH2 } },   //
               { DT_OP(SKIP), .imin = 0, .imax = 7 },
-             { I_CALL, .argout = { DT_OUT_SYM6 } },   // CALL FileHelper::renameFile
+             { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL FileHelper::renameFile
               { DT_OP(FINISH) } },
     .out  = { &SYM(ScoreKeeper_Save),                  // SYM1
               &SYM(TutorialManager_Tutorial),          // SYM2
               &SYM(TutorialManager_Running),           // SYM3
               &SYM(Settings_difficulty),               // SYM4
-              &SYM(FileHelper_deleteFile),             // SYM5
+              &SYM(Settings_GetDlcEnabled),
+             &SYM(FileHelper_deleteFile),             // SYM6
               &SYM(FileHelper_renameFile) }
 };
 
