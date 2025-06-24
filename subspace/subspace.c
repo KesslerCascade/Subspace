@@ -22,6 +22,8 @@ DEFINE_ENTRY_POINT
 VFS* filesys;
 Subspace subspace = { .listenaddr = 0x7f000001 };
 
+#define SETTINGS_VER 1
+
 static void parseArgs(Subspace* ss, VFS* vfs)
 {
     int nargs = saSize(cmdArgs);
@@ -149,6 +151,22 @@ void subspaceUpdateUI(Subspace* ss)
     ssuiUpdate(ss->ui);
 }
 
+static upgradeSettings(SSDNode* settings)
+{
+    int curver    = ssdVal(int32, settings, _S"configver", 0);
+    string tmpstr = 0;
+
+    if (curver < 1) {
+        // update user save override
+        ssdStringOut(settings, _S"ftl/saveoverride", &tmpstr);
+        if (strEq(tmpstr, _S"user/"))
+            ssdSet(settings, _S"ftl/saveoverride", false, stvar(string, _S"[User]"));
+    }
+
+    ssdSet(settings, _S"configver", false, stvar(int32, SETTINGS_VER));
+    strDestroy(&tmpstr);
+}
+
 static void subspaceStartup(LogDest** pdeferredlogs)
 {
     // Basic prerequisites
@@ -159,6 +177,7 @@ static void subspaceStartup(LogDest** pdeferredlogs)
 
     // 02 -------- Filesystem setup
     subspace.fs = vfsCreate(0);
+    fsSetCurDir(subspace.basedir);   // for pathMakeAbsolute
     vfsMountVFS(subspace.fs, _S"/", filesys, subspace.basedir);
 
     // 03 -------- mount subspace:/ namespace
@@ -172,6 +191,7 @@ static void subspaceStartup(LogDest** pdeferredlogs)
 
     // 04 -------- Load Settings
     subspace.settings = setsOpen(subspace.fs, SETTINGS_FILENAME, 0);
+    upgradeSettings(subspace.settings);
 
     // 05 -------- Log file setup
     if (!logOpen(subspace.fs, LOG_FILENAME, pdeferredlogs)) {

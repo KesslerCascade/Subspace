@@ -158,7 +158,7 @@ static int saveovruserchange(Ihandle* ih, int state)
         return IUP_IGNORE;
 
     if (state == 1) {
-        ssdSet(gp->ss->settings, _S"ftl/saveoverride", true, stvar(string, _S"user/"));
+        ssdSet(gp->ss->settings, _S"ftl/saveoverride", true, stvar(string, _S"[User]"));
         IupSetAttribute(gp->saveoverridehbox, "VISIBLE", "NO");
         IupSetAttribute(gp->saveoverridehbox, "FLOATING", "YES");
     } else {
@@ -537,7 +537,7 @@ bool SetupPage_update(_In_ SetupPage* self)
         IupSetAttribute(self->saveoverridecheck, "VALUE", "ON");
         IupSetAttribute(self->saveoverrideusercheck, "FLOATING", "NO");
         IupSetAttribute(self->saveoverrideusercheck, "VISIBLE", "YES");
-        if (strEq(overrideloc, _S"user/")) {
+        if (strEq(overrideloc, _S"[User]")) {
             IupSetAttribute(self->saveoverrideusercheck, "VALUE", "ON");
             IupSetAttribute(self->saveoverridehbox, "VISIBLE", "NO");
             IupSetAttribute(self->saveoverridehbox, "FLOATING", "YES");

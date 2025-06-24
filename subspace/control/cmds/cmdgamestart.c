@@ -54,7 +54,12 @@ void cmdGameStart(GameInst* inst, ControlClient* client, ControlMsg* msg, hashta
         controlMsgStr(rmsg, 3, "gamepath", tmpstr);
 
         if (!strEmpty(saveovr)) {
-            pathToPlatform(&tmpstr, saveovr);
+            if (strEq(saveovr, _S"[User]")) {
+                strDup(&tmpstr, _S"user/");
+            } else {
+                pathMakeAbsolute(&saveovr, saveovr);
+                pathToPlatform(&tmpstr, saveovr);
+            }
             controlMsgStr(rmsg, 4, "saveoverride", tmpstr);
         }
 
