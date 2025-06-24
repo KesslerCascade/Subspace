@@ -23,7 +23,7 @@ typedef struct Pointf {
 typedef struct basic_string {
     char* buf;
     unsigned long len;
-    char stackbuf[15];
+    char stackbuf[16];
 } basic_string;
 
 void basic_string_reset(basic_string* str);

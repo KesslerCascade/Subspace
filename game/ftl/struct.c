@@ -17,6 +17,7 @@ void basic_string_set(basic_string* str, const char* src)
     } else {
         str->buf = malloc(len + 1);
         strcpy(str->buf, src);
+        *(unsigned long*)str->stackbuf = len + 1;   // allocated capacity
     }
 
     str->len = len;
@@ -26,6 +27,7 @@ void basic_string_destroy(basic_string* str)
 {
     if (str->buf != str->stackbuf)
         free(str->buf);
+    str->stackbuf[0] = 0;
     str->buf = str->stackbuf;
     str->len = 0;
 }
