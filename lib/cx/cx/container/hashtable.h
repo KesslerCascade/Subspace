@@ -3,6 +3,10 @@
 #include <cx/cx.h>
 #include <cx/debug/assert.h>
 
+#ifdef _MSC_VER
+#pragma warning(disable : 5287)
+#endif
+
 typedef struct hashtable_ref {
     void *_is_hashtable;
 } hashtable_ref;
