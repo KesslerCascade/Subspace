@@ -462,6 +462,7 @@ static void readCommon(_Inout_ StreamBuffer *sb, _Out_writes_bytes_opt_(skip + b
                     // count to 0. If the buffer rotation happens (because all non-overflow data was consumed),
                     // this ensures that the new head points to the start of the overflow.
                     if (!sendcb(sb, sb->overflow + skipcount, off, count, sb->consumerCtx)) {
+                        total -= count;
                         count = 0;
                         skipcount = 0;
                     }
@@ -663,7 +664,7 @@ bool sbufCSend(StreamBuffer *sb, sbufSendCB func, size_t sz)
     // cap sz at actual data available
     sz = min(sz, sbufCAvail(sb));
 
-    readCommon(sb, NULL, 0, sz, true, func);
+    readCommon(sb, NULL, 0, sz, false, func);
 
     return true;
 }

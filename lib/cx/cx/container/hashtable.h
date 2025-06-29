@@ -108,8 +108,8 @@ enum HASHTABLE_GROW_ENUM {
     HT_GROW_AT_MASK = 0x0f,
 
     // some presets
-    HT_GROW_MaxSpeed = HT_GROW_At50 | HT_GROW_By300,
-    HT_GROW_MinSize  = HT_GROW_At90 | HT_GROW_By50,
+    HT_GROW_MaxSpeed = (int)HT_GROW_At50 | (int)HT_GROW_By300,
+    HT_GROW_MinSize  = (int)HT_GROW_At90 | (int)HT_GROW_By50,
 };
 
 enum HASHTABLE_FUNC_FLAGS_ENUM {
