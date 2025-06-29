@@ -3,6 +3,8 @@
 #include "minicrt.h"
 #include "osdep.h"
 
+static uint64_t curFrameTime;
+
 #ifdef _DEBUG
 void osWriteDbg(const char* str)
 {
@@ -31,11 +33,17 @@ void osExit(int retcode)
     ExitProcess(retcode);
 }
 
-void osTime64(uint32_t* high, uint32_t* low)
+void osFrameTime(int64_t* time)
+{
+    memcpy(time, &curFrameTime, sizeof(int64_t));
+}
+
+void osNextFrame()
 {
     FILETIME ft;
     GetSystemTimeAsFileTime(&ft);
 
-    *high = ft.dwHighDateTime;
-    *low  = ft.dwLowDateTime;
+    uint32_t* parts = (uint32_t*)&curFrameTime;
+    parts[0]        = ft.dwLowDateTime;
+    parts[1]        = ft.dwHighDateTime;
 }

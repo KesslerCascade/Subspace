@@ -22,21 +22,20 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
 
     if (RunTracker_feature.enabled || SaveManager_feature.enabled) {
         // send beacon details first so savepoint can be updated if needed
-        ControlMsg* msg     = controlNewMsg("Beacon", 8);
+        ControlMsg* msg     = controlNewMsg("Beacon", 7);
         WorldManager* world = CApp_world(theApp);
         int visits          = Location_visited(loc);
         Pointf* pos         = (Pointf*)loc;   // always the first field in Location
-        uint32_t timelow, timehigh;
-        osTime64(&timehigh, &timelow);
+        uint64_t frametime;
+        osFrameTime(&frametime);
 
         controlMsgInt(msg, 0, "sector", WorldManager_worldLevel(world) + 1);
         controlMsgInt(msg, 1, "beacons", ScoreKeeper_stats(SKeeper)[1].current);
         controlMsgInt(msg, 2, "visit", MAX(visits, 1));
         controlMsgInt(msg, 3, "x", (int)pos->x);
         controlMsgInt(msg, 4, "y", (int)pos->y);
-        controlMsgUInt(msg, 5, "timelow", timelow);
-        controlMsgUInt(msg, 6, "timehigh", timehigh);
-        controlMsgStr(msg, 7, "event", eventname ? eventname->buf : "");
+        controlMsgUInt64(msg, 5, "time", frametime);
+        controlMsgStr(msg, 6, "event", eventname ? eventname->buf : "");
 
         msg->priority = 2;   // ensure this comes after NewGame and Sector
         controlClientQueue(msg);

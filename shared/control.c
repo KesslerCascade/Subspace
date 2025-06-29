@@ -144,6 +144,7 @@ static int32_t writeOneVal(StreamBuffer* sb, int typ, void* v, size_t rawsz)
         sbufPWrite(sb, v, 4);
         ret = 4;
         break;
+    case CF_INT64:
     case CF_FLOAT64:
         sbufPWrite(sb, v, 8);
         ret = 8;
@@ -205,6 +206,7 @@ bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** field
             case CF_FLOAT32:
                 dsize = 4;
                 break;
+            case CF_INT64:
             case CF_FLOAT64:
                 dsize = 8;
                 break;
@@ -250,6 +252,9 @@ bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** field
                 switch (cfh->ftype) {
                 case CF_INT:
                     pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_int_arr[j], 0);
+                    break;
+                case CF_INT64:
+                    pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_int64_arr[j], 0);
                     break;
                 case CF_FLOAT32:
                     pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_float32_arr[j], 0);
@@ -345,6 +350,7 @@ static bool parseField(StreamBuffer* sb, int ftype, void* dest, int allocmode, s
         sbufCRead(sb, dest, 4, &didread);
         *pad -= 4;
         return true;
+    case CF_INT64:
     case CF_FLOAT64:
         if (*pad < 8)
             return false;
@@ -426,16 +432,22 @@ bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
             if (!field->d.cfd_int_arr)
                 return false;
             break;
+        case CF_INT64:
+            field->d.cfd_int64_arr = (int64_t*)
+                allocBytes(field->count * sizeof(int64_t), NULL, allocmode, 0);
+            if (!field->d.cfd_int64_arr)
+                return false;
+            break;
         case CF_FLOAT32:
             field->d.cfd_float32_arr = (float*)
                 allocBytes(field->count * sizeof(float), NULL, allocmode, 0);
-            if (!field->d.cfd_int_arr)
+            if (!field->d.cfd_float32_arr)
                 return false;
             break;
         case CF_FLOAT64:
             field->d.cfd_float64_arr = (double*)
                 allocBytes(field->count * sizeof(double), NULL, allocmode, 0);
-            if (!field->d.cfd_int_arr)
+            if (!field->d.cfd_float64_arr)
                 return false;
             break;
         case CF_BOOL:
@@ -462,6 +474,14 @@ bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
             switch (hdr->ftype) {
             case CF_INT:
                 success = parseField(sb, hdr->ftype, &field->d.cfd_int_arr[j], allocmode, &pad, 0);
+                break;
+            case CF_INT64:
+                success = parseField(sb,
+                                     hdr->ftype,
+                                     &field->d.cfd_int64_arr[j],
+                                     allocmode,
+                                     &pad,
+                                     0);
                 break;
             case CF_FLOAT32:
                 success = parseField(sb,
@@ -570,6 +590,9 @@ void controlFieldFree(ControlField* field, int allocmode)
         switch (field->h.ftype) {
         case CF_INT:
             freeBytes(field->d.cfd_int_arr, allocmode);
+            break;
+        case CF_INT64:
+            freeBytes(field->d.cfd_int64_arr, allocmode);
             break;
         case CF_FLOAT32:
             freeBytes(field->d.cfd_float32_arr, allocmode);
@@ -708,6 +731,27 @@ void controlMsgBool(ControlMsg* msg, int nfield, const char* name, bool val)
     f->d.cfd_bool = val;
 }
 
+void controlMsgInt64(ControlMsg* msg, int nfield, const char* name, int64_t val)
+{
+    if (nfield > msg->hdr.nfields)
+        return;
+    ControlField* f = msg->fields[nfield];
+    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
+    f->h.ftype     = CF_INT64;
+    f->d.cfd_int64 = val;
+}
+
+void controlMsgUInt64(ControlMsg* msg, int nfield, const char* name, uint64_t val)
+{
+    if (nfield > msg->hdr.nfields)
+        return;
+    ControlField* f = msg->fields[nfield];
+    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
+    f->h.ftype = CF_INT64;
+    f->h.flags |= CF_UNSIGNED;
+    f->d.cfd_uint64 = val;
+}
+
 #ifdef SUBSPACE_GAME
 void controlMsgStr(ControlMsg* msg, int nfield, const char* name, const char* val)
 {
@@ -734,6 +778,21 @@ void controlMsgStr(ControlMsg* msg, int nfield, const char* name, strref val)
     strDup(&f->d.cfd_str, val);
 }
 #endif
+
+void controlMsgRaw(ControlMsg* msg, int nfield, const char* name, void* val, int valsz)
+{
+    if (nfield > msg->hdr.nfields)
+        return;
+    ControlField* f = msg->fields[nfield];
+    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
+    f->h.ftype = CF_RAW;
+
+    f->count     = valsz;
+    f->d.cfd_raw = allocBytes(valsz, NULL, CF_ALLOC_AUTO, 0);
+    if (!f->d.cfd_raw)
+        return;
+    memcpy(f->d.cfd_raw, val, valsz);
+}
 
 ControlField* controlMsgFindField(ControlMsg* msg, const char* name)
 {

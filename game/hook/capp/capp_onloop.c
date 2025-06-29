@@ -13,7 +13,8 @@ static int lastStats[NUM_STATS];
 
 int subspace_CApp_OnLoop_pre(CApp* self)
 {
-    controlClientProcessInbound();
+    osNextFrame();                   // record the current time for anything that uses it this frame
+    controlClientProcessInbound();   // process any incoming control messages
 
     return 1;   // we do want to execute the original CApp::OnLoop
 }

@@ -62,6 +62,15 @@ uint32 ControlTask_run(_In_ ControlTask* self, _In_ TaskQueue* tq, _In_ TQWorker
                     val.data.st_int32 = f->d.cfd_int;
                 }
                 break;
+            case CF_INT64:
+                if (f->h.flags & CF_UNSIGNED) {
+                    val.type           = stType(uint64);
+                    val.data.st_uint64 = f->d.cfd_uint64;
+                } else {
+                    val.type          = stType(int64);
+                    val.data.st_int64 = f->d.cfd_int64;
+                }
+                break;
             case CF_FLOAT32:
                 val.type            = stType(float32);
                 val.data.st_float32 = f->d.cfd_float32;
@@ -83,13 +92,22 @@ uint32 ControlTask_run(_In_ ControlTask* self, _In_ TaskQueue* tq, _In_ TQWorker
             val.type = stType(sarray);
             switch (f->h.ftype) {
             case CF_INT:
-                if (f->h.flags * CF_UNSIGNED)
+                if (f->h.flags & CF_UNSIGNED)
                     saInit(&val.data.st_sarray, uint32, f->count);
                 else
                     saInit(&val.data.st_sarray, int32, f->count);
 
                 saSetSize(&val.data.st_sarray, f->count);
                 memcpy(val.data.st_sarray.a, f->d.cfd_int_arr, f->count * sizeof(int32));
+                break;
+            case CF_INT64:
+                if (f->h.flags & CF_UNSIGNED)
+                    saInit(&val.data.st_sarray, uint64, f->count);
+                else
+                    saInit(&val.data.st_sarray, int64, f->count);
+
+                saSetSize(&val.data.st_sarray, f->count);
+                memcpy(val.data.st_sarray.a, f->d.cfd_int64_arr, f->count * sizeof(int64));
                 break;
             case CF_FLOAT32:
                 saInit(&val.data.st_sarray, float32, f->count);

@@ -13,13 +13,12 @@ void cmdRunLog(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable
     if (!run)
         return;
 
-    strref id       = cfieldString(fields, _S"id");
-    uint32 timelow  = cfieldValD(uint32, fields, _S"timelow", 0);
-    uint32 timehigh = cfieldValD(uint32, fields, _S"timehigh", 0);
-    int32 sector    = cfieldValD(int32, fields, _S"sector", 0);
-    int32 beacons   = cfieldValD(int32, fields, _S"beacons", 0);
+    strref id     = cfieldString(fields, _S"id");
+    uint64 time   = cfieldValD(uint64, fields, _S"time", 0);
+    int32 sector  = cfieldValD(int32, fields, _S"sector", 0);
+    int32 beacons = cfieldValD(int32, fields, _S"beacons", 0);
 
-    if (strEmpty(id) || sector == 0 || beacons == 0 || (timelow == 0 && timehigh == 0))
+    if (strEmpty(id) || sector == 0 || beacons == 0 || time == 0)
         goto out;
 
     stvar params[LOG_MAX_PARAMS] = { 0 };
@@ -36,8 +35,8 @@ void cmdRunLog(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable
 #ifdef _PLATFORM_WIN
     // TODO: Move this somewhere under osdep
     FILETIME ft;
-    ft.dwHighDateTime = timehigh;
-    ft.dwLowDateTime  = timelow;
+    ft.dwHighDateTime = time >> 32;
+    ft.dwLowDateTime  = time & 0xFFFFFFFF;
     int64 logtime     = timeFromFileTime(&ft);
 #endif
 

@@ -49,6 +49,7 @@ typedef struct ControlMsgHeader {
 
 enum CFTYPE_ENUM {
     CF_INT,
+    CF_INT64,
     CF_FLOAT32,
     CF_FLOAT64,
     CF_BOOL,
@@ -76,6 +77,10 @@ typedef struct ControlField {
         int* cfd_int_arr;
         unsigned int cfd_uint;
         unsigned int* cfd_uint_arr;
+        int64_t cfd_int64;
+        int64_t* cfd_int64_arr;
+        uint64_t cfd_uint64;
+        uint64_t* cfd_uint64_arr;
         float cfd_float32;
         float* cfd_float32_arr;
         double cfd_float64;
@@ -156,11 +161,14 @@ void controlMsgUInt(ControlMsg* msg, int nfield, const char* name, unsigned int 
 void controlMsgFloat32(ControlMsg* msg, int nfield, const char* name, float val);
 void controlMsgFloat64(ControlMsg* msg, int nfield, const char* name, double val);
 void controlMsgBool(ControlMsg* msg, int nfield, const char* name, bool val);
+void controlMsgInt64(ControlMsg* msg, int nfield, const char* name, int64_t val);
+void controlMsgUInt64(ControlMsg* msg, int nfield, const char* name, uint64_t val);
 #ifdef SUBSPACE_GAME
 void controlMsgStr(ControlMsg* msg, int nfield, const char* name, const char* val);
 #else
 void controlMsgStr(ControlMsg* msg, int nfield, const char* name, strref val);
 #endif
+void controlMsgRaw(ControlMsg* msg, int nfield, const char* name, void* val, int valsz);
 
 ControlField* controlMsgFindField(ControlMsg* msg, const char* name);
 
