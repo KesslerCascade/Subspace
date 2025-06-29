@@ -19,5 +19,5 @@ void osSleep(int msec);
 void osExit(int retcode);
 
 // time format is OS-specific but can be up to 64 bits wide
-void osFrameTime(uint64_t* time);
+int64_t osFrameTime();
 void osNextFrame();

@@ -20,6 +20,7 @@
 // 4 bytes total message size
 // 4 bytes unique Message ID
 // 4 bytes In-Reply-To Message ID (or 0 if not in reply to anything)
+// 8 bytes timestamp
 // 16 bytes command name (null-terminated string)
 // 4 bytes number of fields in payload
 // payload: repeating
@@ -43,6 +44,7 @@ typedef struct ControlMsgHeader {
     uint32_t size;
     uint32_t msgid;
     uint32_t replyid;
+    int64_t timestamp;
     char cmd[16];
     uint32_t nfields;
 } ControlMsgHeader;

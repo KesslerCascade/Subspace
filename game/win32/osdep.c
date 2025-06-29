@@ -1,9 +1,10 @@
 #include <windows.h>
 
+#include "int64.h"
 #include "minicrt.h"
 #include "osdep.h"
 
-static uint64_t curFrameTime;
+static int64_t curFrameTime;
 
 #ifdef _DEBUG
 void osWriteDbg(const char* str)
@@ -33,9 +34,9 @@ void osExit(int retcode)
     ExitProcess(retcode);
 }
 
-void osFrameTime(int64_t* time)
+int64_t osFrameTime()
 {
-    memcpy(time, &curFrameTime, sizeof(int64_t));
+    return curFrameTime;
 }
 
 void osNextFrame()
@@ -43,7 +44,17 @@ void osNextFrame()
     FILETIME ft;
     GetSystemTimeAsFileTime(&ft);
 
-    uint32_t* parts = (uint32_t*)&curFrameTime;
-    parts[0]        = ft.dwLowDateTime;
-    parts[1]        = ft.dwHighDateTime;
+    uint64_u nft = { .p.low = ft.dwLowDateTime, .p.high = ft.dwHighDateTime };
+
+    // convert filetime to CX time
+
+    // convert from 100-ns intervals to microseconds
+    nft = _uint64_div(nft, 10, NULL);
+    // FILETIME epoch is midnight on Jan 1, 1601
+    // Which is a julian date of 2305813.50000
+    // That's 199222286400 in seconds, or in microseconds...
+
+    nft = _uint64_add(nft, (uint64_u) { .v = 199222286400000000LL });   // adjust epoch
+
+    curFrameTime = (int64_t)nft.v;   // dividing by 10 earlier ensures this will never be negative
 }

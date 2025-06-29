@@ -8,9 +8,11 @@
 #ifdef SUBSPACE_GAME
 #include "ftl/stdlib.h"
 #include "minicrt.h"
+#include "osdep.h"
 #define control_malloc smalloc
 #define control_free   sfree
 #else
+#include <cx/time.h>
 #include <cx/xalloc.h>
 #define control_malloc xa_malloc
 #define control_free   xa_free
@@ -677,6 +679,14 @@ ControlMsg* controlNewMsg(const char* cmd, int nfields)
 
     ret = controlAllocMsg(nfields, CF_ALLOC_AUTO);
     strncpy(ret->hdr.cmd, cmd, sizeof(ret->hdr.cmd) - 1);
+
+#ifdef SUBSPACE_GAME
+    // use the current frame time for messages from the game
+    ret->hdr.timestamp = osFrameTime();
+#else
+    ret->hdr.timestamp = clockWall();
+#endif
+
     return ret;
 }
 

@@ -74,6 +74,7 @@ if(WIN32)
         win32/loader/rtldoverrides.c
         win32/patch/patch_osdep.c
         win32/entry.c
+        win32/int64.c
         win32/kernel32_overrides.c
         win32/subspacegame.rc
         win32/osdep.c
