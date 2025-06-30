@@ -267,7 +267,7 @@ public:
   bool FindPieSample(iupPlotTrafo *inTrafoX, iupPlotTrafo *inTrafoY, double inScreenX, double inScreenY, int &outSampleIndex, double &outX, double &outY) const;
   bool FindSegment(iupPlotTrafo *mTrafoX, iupPlotTrafo *mTrafoY, double inScreenX, double inScreenY, double inScreenTolerance, int &outSampleIndex1, int &outSampleIndex2, double &outX1, double &outY1, double &outX2, double &outY2) const;
 
-  void DrawData(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify) const;
+  void DrawData(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, const iupPlotAxis& inAxisY) const;
   void DrawDataPie(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, const iupPlotAxis& inAxisY, long inBackColor) const;
 
   int GetCount();
@@ -309,6 +309,7 @@ public:
   long mBarOutlineColor;
   bool mBarShowOutline;
   bool mBarMulticolor;
+  bool mBarLabel;
   int mBarSpacingPercent;
   double mPieRadius;
   double mPieStartAngle;
@@ -341,7 +342,7 @@ protected:
   void DrawDataMark(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify) const;
   void DrawDataStem(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, bool inShowMark) const;
   void DrawDataArea(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify) const;
-  void DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify) const;
+  void DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, const iupPlotAxis& inAxisY) const;
   void DrawDataHorizontalBar(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify) const;
   void DrawDataMultiBar(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify) const;
   void DrawSelection(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify) const;

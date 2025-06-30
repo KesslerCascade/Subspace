@@ -553,7 +553,7 @@ bool iupPlot::Render(cdCanvas* canvas)
         dataset->DrawDataPie(mAxisX.mTrafo, mAxisY.mTrafo, canvas, &theNotify, mAxisY, mBack.mColor);
     }
 
-    dataset->DrawData(mAxisX.mTrafo, mAxisY.mTrafo, canvas, &theNotify);
+    dataset->DrawData(mAxisX.mTrafo, mAxisY.mTrafo, canvas, &theNotify, mAxisY);
   }
 
   // draw the legend, crosshair and selection restricted to the dataset area

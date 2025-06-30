@@ -77,8 +77,8 @@ iupPlotDataSet::iupPlotDataSet(bool strXdata)
 : mColor(CD_BLACK), mLineStyle(CD_CONTINUOUS), mLineWidth(1), mAreaTransparency(255), mMarkStyle(CD_X), mMarkSize(7),
   mMultibarIndex(-1), mMultibarCount(0), mBarOutlineColor(0), mBarShowOutline(false), mBarSpacingPercent(10),
   mPieStartAngle(0), mPieRadius(0.95), mPieContour(false), mPieHole(0), mPieSliceLabelPos(0.95),
-  mHighlightedSample(-1), mHighlightedCurve(false), mBarMulticolor(false), mOrderedX(false), mSelectedCurve(false),
-  mPieSliceLabel(IUP_PLOT_NONE), mMode(IUP_PLOT_LINE), mName(NULL), mHasSelected(false), mUserData(0)
+  mHighlightedSample(-1), mHighlightedCurve(false), mBarMulticolor(false), mBarLabel(false), mOrderedX(false),
+  mSelectedCurve(false), mPieSliceLabel(IUP_PLOT_NONE), mMode(IUP_PLOT_LINE), mName(NULL), mHasSelected(false), mUserData(0)
 {
   if (strXdata)
     mDataX = (iupPlotData*)(new iupPlotDataString());
@@ -1175,7 +1175,7 @@ void iupPlotDataSet::DrawDataArea(const iupPlotTrafo *inTrafoX, const iupPlotTra
     iPlotDrawHighlightedCurve(canvas, theCount, mDataX, mDataY, mSegment, inTrafoX, inTrafoY, false, true);
 }
 
-void iupPlotDataSet::DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify) const
+void iupPlotDataSet::DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, const iupPlotAxis& inAxisY) const
 {
   int theCount = mDataX->GetCount();
   double theScreenY0 = inTrafoY->Transform(0);
@@ -1220,6 +1220,18 @@ void iupPlotDataSet::DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTraf
 
     if (mBarShowOutline && !mBarMulticolor)
       cdCanvasSetForeground(canvas, mColor); // restore curve color
+
+    if (mBarLabel) {
+      char theBuf[128];
+      inAxisY.SetFont(canvas, inAxisY.mFontStyle, inAxisY.mFontSize);
+      cdCanvasSetForeground(canvas, inAxisY.mColor);
+      double px = theBarX + theBarWidth/2;
+      double py = theScreenY0 + theBarHeight/2;
+      iupStrPrintfDoubleLocale(theBuf, inAxisY.mTick.mFormatString, theY, IupGetGlobal("DEFAULTDECIMALSYMBOL"));
+      iupPlotDrawText(canvas, px, py, CD_CENTER, theBuf);
+      if (!mBarMulticolor)
+        cdCanvasSetForeground(canvas, mColor);
+    }
   }
 }
 
@@ -1565,7 +1577,7 @@ void iupPlotDataSet::DrawSelection(const iupPlotTrafo *inTrafoX, const iupPlotTr
   }
 }
 
-void iupPlotDataSet::DrawData(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify) const
+void iupPlotDataSet::DrawData(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, const iupPlotAxis& inAxisY) const
 {
   int theXCount = mDataX->GetCount();
   int theYCount = mDataY->GetCount();
@@ -1601,7 +1613,7 @@ void iupPlotDataSet::DrawData(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *
     DrawDataArea(inTrafoX, inTrafoY, canvas, inNotify);
     break;
   case IUP_PLOT_BAR:
-    DrawDataBar(inTrafoX, inTrafoY, canvas, inNotify);
+    DrawDataBar(inTrafoX, inTrafoY, canvas, inNotify, inAxisY);
     break;
   case IUP_PLOT_PIE: /* handled outside DrawData */
     break;
