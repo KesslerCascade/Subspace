@@ -50,3 +50,35 @@ void iupLoadImage(Subspace* ss, strref iupname, strref driver, strref filename, 
                  stvar(ptr, torefresh));
     tqRun(ss->workq, &iload);
 }
+
+bool iupLoadImageWait(Subspace* ss, strref iupname, strref driver, strref filename)
+{
+    ImageLoad* iload = imageloadLoadFile(driver, ss->fs, filename);
+    int dpi          = atoi(IupGetGlobal("SCREENDPI"));
+
+    if (!iload)
+        return false;
+
+    iload->preferred_dpi = (dpi > 0) ? dpi : 96;
+
+    tqAdd(ss->workq, iload);
+    taskWait(iload, timeS(5));
+
+    if (!taskSucceeded(iload)) {
+        objRelease(&iload);
+        return false;
+    }
+
+    Ihandle* imgh = imageIupImage(iload->image);
+    if (!imgh)
+        return false;
+
+    const char* name = strC(iupname);
+    Ihandle* oldh    = IupGetHandle(name);
+    if (oldh)
+        IupDestroy(oldh);
+    IupSetHandle(name, imgh);
+
+    objRelease(&iload);
+    return true;
+}

@@ -166,6 +166,7 @@ static int tab_dropdata(Ihandle* ih, char* type, void* data, int size, int x, in
             ref = IupGetChild(ih, tab);
 
         IupReparent(mtab, ih, ref);
+        IupRefresh(mtab);
     } else if (!strcmp(cls, "backgroundbox")) {
         // destination is a placeholder, need to delete it and replace with tabs
         Ihandle* tabs = mainwinCreateTabs(mainwin);

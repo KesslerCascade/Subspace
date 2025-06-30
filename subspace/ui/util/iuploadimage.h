@@ -7,3 +7,4 @@ bool cbAttachImage(stvlist *cvars, stvlist *args);
 
 // must be called from UI thread
 void iupLoadImage(Subspace* ss, strref iupname, strref driver, strref filename, Ihandle* torefresh);
+bool iupLoadImageWait(Subspace* ss, strref iupname, strref driver, strref filename);

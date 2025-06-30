@@ -122,6 +122,20 @@ bool MainWin_make(_In_ MainWin* self)
     }
     panelMake(self->welcomepanel);
 
+    // load all the images needed
+    iupLoadImage(self->ss, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
+    iupLoadImage(self->ss, _S"IMAGE_SETTINGS_HOVER", _S"svg", _S"subspace:/settings-hover.svg", NULL);
+    iupLoadImage(self->ss, _S"IMAGE_PLAY_HOVER", _S"svg", _S"subspace:/play-hover.svg", NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_PLAY_DISABLED",
+                 _S"svg",
+                 _S"subspace:/play-disabled.svg",
+                 self->playbtn);
+    // wait on these three
+    iupLoadImageWait(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg");
+    iupLoadImageWait(self->ss, _S"IMAGE_SETTINGS", _S"svg", _S"subspace:/settings.svg");
+    iupLoadImageWait(self->ss, _S"IMAGE_PLAY", _S"svg", _S"subspace:/play.svg");
+
     self->menubtn = IupFlatButton(NULL);
     IupSetAttribute(self->menubtn, "IMAGE", "IMAGE_HAMBURGER");
     IupSetAttribute(self->menubtn, "IMAGEHIGHLIGHT", "IMAGE_HAMBURGER_HOVER");
@@ -131,8 +145,6 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(self->menubtn, "TIP", langGetC(self->ss, "hamburger_tip"));
     iupSetObj(self->menubtn, ObjNone, self, self->ui);
     IupSetCallback(self->menubtn, "FLAT_ACTION", menubtn_action);
-    iupLoadImage(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg", self->menubtn);
-    iupLoadImage(self->ss, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
 
     Ihandle* settings = IupFlatButton(NULL);
     IupSetAttribute(settings, "IMAGE", "IMAGE_SETTINGS");
@@ -143,8 +155,6 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(settings, "TIP", langGetC(self->ss, "settings_tip"));
     iupSetObj(settings, ObjNone, self, self->ui);
     IupSetCallback(settings, "FLAT_ACTION", settingsbtn_action);
-    iupLoadImage(self->ss, _S"IMAGE_SETTINGS", _S"svg", _S"subspace:/settings.svg", settings);
-    iupLoadImage(self->ss, _S"IMAGE_SETTINGS_HOVER", _S"svg", _S"subspace:/settings-hover.svg", NULL);
 
     self->playbtn = IupFlatButton(NULL);
     IupSetAttribute(self->playbtn, "IMAGE", "IMAGE_PLAY");
@@ -156,19 +166,13 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetAttribute(self->playbtn, "TIP", langGetC(self->ss, "play_tip"));
     iupSetObj(self->playbtn, ObjNone, self, self->ui);
     IupSetCallback(self->playbtn, "FLAT_ACTION", playbtn_action);
-    iupLoadImage(self->ss, _S"IMAGE_PLAY", _S"svg", _S"subspace:/play.svg", self->playbtn);
-    iupLoadImage(self->ss, _S"IMAGE_PLAY_HOVER", _S"svg", _S"subspace:/play-hover.svg", NULL);
-    iupLoadImage(self->ss,
-                 _S"IMAGE_PLAY_DISABLED",
-                 _S"svg",
-                 _S"subspace:/play-disabled.svg",
-                 self->playbtn);
 
     self->sidebar = IupVbox(self->menubtn, self->playbtn, settings, NULL);
     IupSetAttribute(self->sidebar, "CGAP", "2");
     IupSetAttribute(self->sidebar, "NCMARGIN", "2x2");
+    iupSetObj(self->sidebar, ObjNone, self, self->ui);
 
-    Ihandle* sep = IupFlatSeparator();
+    self->barsep = IupFlatSeparator();
     self->zbox   = IupZbox(self->welcomepanel->h, NULL);
     mainwinLoadLayout(self);
     IupAppend(self->zbox, self->root);
@@ -180,7 +184,7 @@ bool MainWin_make(_In_ MainWin* self)
         IupSetAttribute(self->zbox, "VALUE_HANDLE", (char*)self->welcomepanel->h);
     }
 
-    self->win = IupDialog(IupHbox(self->sidebar, sep, self->zbox, NULL));
+    self->win = IupDialog(IupHbox(self->sidebar, self->barsep, self->zbox, NULL));
     IupSetAttribute(self->win, "MINSIZE", "500x300");   // pixels, not the same units as SIZE
     self->width  = ssdVal(int32, self->ss->settings, _S"ui/size/width", MAINWIN_DEFAULT_WIDTH);
     self->height = ssdVal(int32, self->ss->settings, _S"ui/size/height", MAINWIN_DEFAULT_HEIGHT);
@@ -307,10 +311,13 @@ int MainWin_onClose(Ihandle* ih)
 
 int MainWin_onResize(Ihandle* ih, int width, int height)
 {
+    MainWin* self = iupGetObj(MainWin, ih);
+    if (IupGetInt(ih, "MINIMIZED") == 0)
+        mainwinRecalcSize(self);
+
     if (IupGetInt(ih, "MAXIMIZED") > 0 || IupGetInt(ih, "MINIMIZED") > 0)
         return IUP_DEFAULT;   // don't save maximized "size"
 
-    MainWin* self = iupGetObj(MainWin, ih);
     int w, h;
     if (IupGetIntInt(ih, "SIZE", &w, &h) == 2 && (w != self->width || h != self->height)) {
         self->width  = w;
@@ -319,6 +326,16 @@ int MainWin_onResize(Ihandle* ih, int width, int height)
     }
 
     return IUP_DEFAULT;
+}
+
+void MainWin_recalcSize(_In_ MainWin* self)
+{
+    int w, h, sw, sh, bw, bh;
+    IupGetIntInt(self->win, "CLIENTSIZE", &w, &h);
+    IupGetIntInt(self->sidebar, "RASTERSIZE", &sw, &sh);
+    IupGetIntInt(self->barsep, "RASTERSIZE", &bw, &bh);
+    IupSetStrf(self->root, "RASTERSIZE", "%dx%d", w - sw - bw, h);
+    IupSetStrf(self->root, "MAXSIZE", "%dx%d", w - sw - bw, h);
 }
 
 int MainWin_onTimer(Ihandle* ih)
