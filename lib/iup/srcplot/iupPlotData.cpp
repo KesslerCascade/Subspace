@@ -1223,14 +1223,18 @@ void iupPlotDataSet::DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTraf
 
     if (mBarLabel) {
       char theBuf[128];
+      int mwidth, height, ascent, descent;
       inAxisY.SetFont(canvas, inAxisY.mFontStyle, inAxisY.mFontSize);
-      cdCanvasSetForeground(canvas, inAxisY.mColor);
-      double px = theBarX + theBarWidth/2;
-      double py = theScreenY0 + theBarHeight/2;
-      iupStrPrintfDoubleLocale(theBuf, inAxisY.mTick.mFormatString, theY, IupGetGlobal("DEFAULTDECIMALSYMBOL"));
-      iupPlotDrawText(canvas, px, py, CD_CENTER, theBuf);
-      if (!mBarMulticolor)
-        cdCanvasSetForeground(canvas, mColor);
+      cdCanvasGetFontDim(canvas, &mwidth, &height, &ascent, &descent);
+      if (height < theBarHeight) {
+        cdCanvasSetForeground(canvas, inAxisY.mColor);
+        double px = theBarX + theBarWidth/2;
+        double py = theScreenY0 + theBarHeight/2;
+        iupStrPrintfDoubleLocale(theBuf, inAxisY.mTick.mFormatString, theY, IupGetGlobal("DEFAULTDECIMALSYMBOL"));
+        iupPlotDrawText(canvas, px, py, CD_CENTER, theBuf);
+        if (!mBarMulticolor)
+          cdCanvasSetForeground(canvas, mColor);
+      }
     }
   }
 }
