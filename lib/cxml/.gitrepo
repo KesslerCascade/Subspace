@@ -1,0 +1,12 @@
+; DO NOT EDIT (unless you know what you are doing)
+;
+; This subdirectory is a git "subrepo", and this file is maintained by the
+; git-subrepo command. See https://github.com/ingydotnet/git-subrepo#readme
+;
+[subrepo]
+	remote = https://github.com/ziord/cxml.git
+	branch = master
+	commit = 7b04d682a72b58b3c3736bb6237c8004e799d4fb
+	parent = 60e6c614b65a8399d9a8f3b5f6cdc396160242ce
+	method = merge
+	cmdver = 0.4.7
