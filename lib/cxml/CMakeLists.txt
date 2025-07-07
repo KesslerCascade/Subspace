@@ -169,7 +169,9 @@ if (CXML_BUILD_TESTS)
                 DEPENDS cxml_tests
                 VERBATIM)
 endif ()
+if(PROJECT_IS_TOP_LEVEL)
 install(TARGETS cxml DESTINATION cxml/lib)
 install(DIRECTORY ${CXML_INCLUDES} DESTINATION cxml/include)
+endif()
 
 # credits: lamarrr/stx

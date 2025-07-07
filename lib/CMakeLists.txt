@@ -28,6 +28,10 @@ else()
     add_subdirectory(freetype)
     target_link_libraries(freetype cx zlib png_static)
 
+    set(CXML_USE_XPATH_MOD  ON CACHE INTERNAL "Build cxml with XPATH features included" FORCE)
+    add_subdirectory(cxml)
+    target_link_libraries(cxml cx)
+
     add_subdirectory(iup)
     target_compile_definitions(iup PRIVATE XALLOC_REMAP_MALLOC)
 
