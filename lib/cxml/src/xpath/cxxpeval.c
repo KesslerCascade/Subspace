@@ -101,7 +101,7 @@ static bool cmp_expanded_name(cxml_elem_node *elem, cxml_attr_node *attr, cxml_x
             ns = _xpath_parser.xml_namespace;
         }else{ // fail if no namespace was found
             int buff_size = node_test->name_test.name.pname_len + 40;
-            char buff[buff_size];
+            char *buff = alloca(buff_size);
             snprintf(buff, buff_size, "Unknown namespace prefix - `%.*s`",
                      node_test->name_test.name.pname_len,
                      node_test->name_test.name.pname);
@@ -1560,7 +1560,7 @@ for (int j = 0; j < i; j++){                            \
         __sort()
         FREE(arr);
     }else{
-        void *arr[len];
+        void **arr = alloca(len * sizeof(void*));
         __sort()
     }
 #undef __sort

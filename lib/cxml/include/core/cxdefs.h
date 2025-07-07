@@ -345,4 +345,10 @@ void _cxml_unset_parent(void *node);
 
 int _cxml_cmp_node(const void *n1, const void *n2);
 
+#ifdef WIN32
+#define alloca _alloca
+#else
+#include <alloca.h>
+#endif
+
 #endif //CXML_CXDEFS_H

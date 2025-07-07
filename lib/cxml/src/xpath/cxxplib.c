@@ -240,7 +240,7 @@ static cxml_attr_node *_xml_lang_attr(cxml_elem_node *elem){
 }
 
 static void _normalize_lang(cxml_string *str, cxml_string *n_str){
-    char buff[cxml_string_len(str)];
+    char *buff = alloca(cxml_string_len(str));
     for (size_t i=0; i<sizeof(buff); i++){
         buff[i] = tolower((unsigned char)str->_raw_chars[i]);
     }

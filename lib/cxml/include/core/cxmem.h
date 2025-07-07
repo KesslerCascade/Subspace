@@ -8,6 +8,7 @@
 
 #include "cxcomm.h"
 #include <stdarg.h>
+#include <cx/xalloc.h>
 
 #define ALLOC(type, length)                     _cxml_allocate((sizeof (type) * length))
 #define CALLOC(type, length)                     _cxml_callocate((length), sizeof(type))
@@ -17,7 +18,7 @@
 #define CALLOCR(type, length, ...)               _cxml_callocate_r((length), sizeof(type), __VA_ARGS__)
 #define RALLOCR(type, ptr, length, ...)         _cxml_rallocate_r(ptr, (sizeof(type) * length), __VA_ARGS__)
 
-#define FREE(ptr)                               (free(ptr))
+#define FREE(ptr)                               (xa_free(ptr))
 
 #if defined(__STDC__)
     #if defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 201112L)

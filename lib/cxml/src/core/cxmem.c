@@ -5,6 +5,8 @@
 
 #include "core/cxmem.h"
 
+#include <cx/xalloc.h>
+
 #define _CXML_FATAL_ERROR   "CXMLFatalError... Not enough memory.\n"
 
 _CX_ATR_NORETURN void cxml_error(char *fmt, ...){
@@ -16,7 +18,7 @@ _CX_ATR_NORETURN void cxml_error(char *fmt, ...){
 }
 
 void* _cxml_allocate_r(size_t len, char* fmt, ...){
-    void* ptr = malloc(len);
+    void* ptr = xa_malloc(len);
     if (ptr == NULL){
         va_list ap;
         va_start(ap, fmt);
@@ -28,7 +30,7 @@ void* _cxml_allocate_r(size_t len, char* fmt, ...){
 }
 
 void* _cxml_callocate_r(size_t nitems, size_t size, char* fmt, ...){
-    void* ptr = calloc(nitems, size);
+    void* ptr = xa_calloc(nitems, size);
     if (ptr == NULL){
         va_list ap;
         va_start(ap, fmt);
@@ -40,7 +42,7 @@ void* _cxml_callocate_r(size_t nitems, size_t size, char* fmt, ...){
 }
 
 void* _cxml_rallocate_r(void* ptr, size_t len, char* fmt, ...){
-    void* new_ptr = realloc(ptr, len);
+    void* new_ptr = xa_realloc(ptr, len);
     if (new_ptr == NULL){
         va_list ap;
         va_start(ap, fmt);

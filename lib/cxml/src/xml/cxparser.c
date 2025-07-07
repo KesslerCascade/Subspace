@@ -801,7 +801,7 @@ static void x__wrap_elem(_cxml_parser *cxparser, cxml_elem_node *node) {
             _cxml_p__consume(cxparser, CXML_TOKEN_IDENTIFIER);
             _cxml_p__consume(cxparser, CXML_TOKEN_COLON);
             int len = pname.length + cxparser->current_tok.length + 1;
-            char buff[len + 1];
+            char *buff = alloca(len + 1);
             memcpy(buff, pname.start, pname.length);
             *(buff + pname.length) = ':';
             memcpy(buff + pname.length + 1, cxparser->current_tok.start,
@@ -863,7 +863,7 @@ static cxml_ns_node *_get_ns(
         const char* _name)
 {
     if (name){
-        char buff[name->pname_len + 1];
+        char *buff = alloca(name->pname_len + 1);
         memcpy(buff, name->pname, name->pname_len);
         buff[name->pname_len] = '\0';
         return _cxml_scope_table_lookup(parser->current_scope, buff);
