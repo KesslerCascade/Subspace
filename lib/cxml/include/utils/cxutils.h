@@ -6,6 +6,7 @@
 #ifndef CXML_CXUTILS_H
 #define CXML_CXUTILS_H
 #include <errno.h>
+#include <cx/fs.h>
 #include "core/cxmem.h"
 
 /*
@@ -13,8 +14,8 @@
  */
 
 
-int _cxml_read_file(const char *file_name, char **dest_buffer);
+int _cxml_read_file(VFS *vfs, strref file_name, char **dest_buffer);
 
-int _cxml_write_file(const char *file_name, const char *dest_buffer, size_t len);
+int _cxml_write_file(VFS *vfs, strref file_name, const char *dest_buffer, size_t len);
 
 #endif //CXML_CXUTILS_H

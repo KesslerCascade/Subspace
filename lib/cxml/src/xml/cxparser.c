@@ -33,14 +33,15 @@ static bool _cxml_p__is_whitespace(_cxml_token token);
 void _cxml_parser_init(
         _cxml_parser *parser,
         const char *src,
-        const char* file_name,
+        VFS *vfs,
+        strref file_name,
         bool stream)
 {
     cxml__assert(parser, "Expected cxml parser.")
     cxml__assert((src || file_name),
             "cxml parser couldn't find any file "
             "name or xml source string.")
-    _cxml_lexer_init(&parser->cxlexer, src, file_name, stream);
+    _cxml_lexer_init(&parser->cxlexer, src, vfs, file_name, stream);
     _cxml_token_init(&parser->current_tok);
     _cxml_token_init(&parser->prev_tok);
     parser->err_msg = NULL;
@@ -79,7 +80,7 @@ void _cxml_parser_free(_cxml_parser *cxparser) {
     cxml_list_free(&cxparser->attr_list);
     cxml_free_attr_checker(&cxparser->attr_checker);
     // make freed state definite
-    _cxml_parser_init(cxparser, "", NULL, false);
+    _cxml_parser_init(cxparser, "", NULL, NULL, false);
 }
 
 void cxml_free_attr_checker(cxml_table *attr_checker){
@@ -1218,13 +1219,13 @@ static void x__document(_cxml_parser *cxparser) {
 }
 
 
-cxml_root_node* cxml_parse_xml_lazy(const char *file_name) {
+cxml_root_node* cxml_parse_xml_lazy(VFS *vfs, strref file_name) {
     /*
      *  parse xml into a root node by streaming
      */
     cxml__assert(file_name, "Expected file name.")
     _cxml_parser cxparser;
-    _cxml_parser_init(&cxparser, NULL, file_name, true);
+    _cxml_parser_init(&cxparser, NULL, vfs, file_name, true);
     x__document(&cxparser);
     _cxml_lexer_close(&cxparser.cxlexer);
     cxml_root_node *root = cxparser.root_node;
@@ -1238,7 +1239,7 @@ cxml_root_node* cxml_parse_xml(const char *src) {
      */
     cxml__assert(src, "Expected source string.")
     _cxml_parser cxparser;
-    _cxml_parser_init(&cxparser, src, NULL, false);
+    _cxml_parser_init(&cxparser, src, NULL, NULL, false);
     x__document(&cxparser);
     _cxml_lexer_close(&cxparser.cxlexer);
     cxml_root_node *root = cxparser.root_node;

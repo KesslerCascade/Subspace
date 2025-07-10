@@ -20,7 +20,7 @@
     #include "sax/cxsax.h"
 #endif
 
-cxml_root_node* cxml_load_file(const char *fn, bool stream);
+cxml_root_node* cxml_load_file(VFS *vfs, strref fn, bool stream);
 cxml_root_node*  cxml_load_string(const char *str);
 
 #endif //CXML_CXML_H

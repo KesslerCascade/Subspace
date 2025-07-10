@@ -7,6 +7,7 @@
 #define CXML_CXSTREAM_H
 
 #include "core/cxmem.h"
+#include <cx/fs.h>
 
 typedef struct {
     // is the lexer in an open state?
@@ -26,10 +27,10 @@ typedef struct {
     size_t _nbytes_read_into_sbuff;
 
     // current file being processed.
-    FILE *_file;
+    VFSFile *_vfsfile;
 
     // name of current file being processed.
-    const char *file_name;
+    string file_name;
 } _cxml_stream;
 
 
@@ -39,11 +40,13 @@ typedef struct {
 
 void _cxml_stream_init(
         _cxml_stream *stream_obj,
+        VFS *vfs,
         const char *filename,
         size_t chunk_size);
 
 void _cxml__open_stream(
         _cxml_stream *stream,
+        VFS *vfs,
         const char *fn,
         size_t chunk_size);
 

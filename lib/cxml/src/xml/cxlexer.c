@@ -72,12 +72,13 @@ inline static bool has_utf8_bom(const char *str){
 void _cxml_lexer_init(
         _cxml_lexer *cxlexer,
         const char *source,
+        VFS *vfs,
         const char *filename,
         bool stream)
 {
     cxlexer->cfg = cxml_get_config();
     if (stream && filename){
-        _cxml_stream_init(&cxlexer->_stream_obj, filename, cxlexer->cfg.chunk_size);
+        _cxml_stream_init(&cxlexer->_stream_obj, vfs, filename, cxlexer->cfg.chunk_size);
         cxlexer->start = cxlexer->current = cxlexer->_stream_obj._stream_buff;
         // copy some (_cxml_config_gb.chunk_size) bytes into the buffer in preparation for lexing.
         _cxml__read(cxlexer);
@@ -105,7 +106,7 @@ void _cxml_lexer_close(_cxml_lexer *cxlexer){
     if (cxlexer->_stream){
         _cxml__close_stream(&cxlexer->_stream_obj);
     }
-    _cxml_lexer_init(cxlexer, NULL, NULL, 0);
+    _cxml_lexer_init(cxlexer, NULL, NULL, NULL, 0);
 }
 
 void _cxml_token_init(_cxml_token *token) {
@@ -282,16 +283,17 @@ static void _cxml__read(_cxml_lexer *cxlexer){
             _cxml__adjust_stream_buffer(cxlexer);
         }
 
-        if ((actual_byte_count = fread((stream_obj->_stream_buff + stream_obj->_nbytes_read_into_sbuff),
-                                       sizeof(char), byte_count, stream_obj->_file)) < byte_count)
-        {
-            if (feof(stream_obj->_file)){
-                stream_obj->_stream_buff[(stream_obj->_nbytes_read_into_sbuff + actual_byte_count)] = '\0';
-                cxlexer->_should_stream = 0;
-            }else{
-                cxml_error("CXML Error: Error occurred while streaming file\n");
-            }
+        if (!vfsRead(stream_obj->_vfsfile, stream_obj->_stream_buff + stream_obj->_nbytes_read_into_sbuff, byte_count, &actual_byte_count)){
+            //cxml_error("CXML Error: Error occurred while streaming file\n");
+            // TODO: Set some kind of error state?
+            return;
         }
+
+        if (actual_byte_count == 0){
+            stream_obj->_stream_buff[(stream_obj->_nbytes_read_into_sbuff + actual_byte_count)] = '\0';
+            cxlexer->_should_stream = 0;
+        }
+
         stream_obj->_nbytes_read_into_sbuff += actual_byte_count;
     }
 }
@@ -412,9 +414,10 @@ inline static void _space(_cxml_lexer *lexer){
     }
 }
 
-_CX_ATR_NORETURN inline static void _err(_cxml_lexer *lexer, const char *msg){
-    cxml_error("Error occurred at line %d\n%s\nSource: `%.*s`",
-            lexer->line, msg, 20, lexer->current);
+/*_CX_ATR_NORETURN*/ inline static void _err(_cxml_lexer *lexer, const char *msg){
+//    cxml_error("Error occurred at line %d\n%s\nSource: `%.*s`",
+//            lexer->line, msg, 20, lexer->current);
+    // TODO: error handling?????
 }
 
 inline static void _move(_cxml_lexer *lexer, int n){
@@ -1181,7 +1184,7 @@ char* cxml_token_type_as_str(_cxml_token_t type){
 void cxml_print_tokens(const char *src) {
     if (!src) return;
     _cxml_lexer lexer;
-    _cxml_lexer_init(&lexer, src, NULL, 0);
+    _cxml_lexer_init(&lexer, src, NULL, NULL, 0);
     _cxml_token token;
     int line = 0;
 

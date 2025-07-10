@@ -44,14 +44,15 @@ typedef struct _cxml_parser{
 void _cxml_parser_init(
         _cxml_parser *parser,
         const char *src,
-        const char* file_name,
+        VFS *vfs,
+        strref file_name,
         bool stream);
 
 cxml_root_node* create_root_node();
 
 cxml_root_node* cxml_parse_xml(const char *src);
 
-cxml_root_node* cxml_parse_xml_lazy(const char *file_name);
+cxml_root_node* cxml_parse_xml_lazy(VFS *vfs, strref file_name);
 
 void _cxml_parser_free(_cxml_parser *cxparser);
 

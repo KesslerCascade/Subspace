@@ -9,12 +9,12 @@
 
 #define _CXML_FATAL_ERROR   "CXMLFatalError... Not enough memory.\n"
 
-_CX_ATR_NORETURN void cxml_error(char *fmt, ...){
+/* _CX_ATR_NORETURN */ void cxml_error(char *fmt, ...){
     va_list ap;
     va_start(ap, fmt);
     vfprintf(stderr, fmt, ap);
     va_end(ap);
-    exit(EXIT_FAILURE);
+    //exit(EXIT_FAILURE);
 }
 
 void* _cxml_allocate_r(size_t len, char* fmt, ...){

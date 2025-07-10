@@ -5,40 +5,49 @@
 
 #include <errno.h>
 #include "xml/cxlexer.h"
+#include <cx/string.h>
+#include <cx/debug/error.h>
 
 #define _cxml__def_chunk_size   (0x100000)
 
 
-void _cxml__open_stream(_cxml_stream *stream, const char *fn, size_t chunk_size) {
-    FILE *file = fopen(fn, "r");
-    if (!file){
-        cxml_error("Could not open file (%s): <errno: %d>\n", fn, errno);
+void _cxml__open_stream(_cxml_stream *stream, VFS *vfs, strref fn, size_t chunk_size) {
+    VFSFile *vfsfile = vfsOpen(vfs, fn, FS_Read);
+    if (!vfsfile){
+        //cxml_error("Could not open file (%s): <Error: %s>\n", strC(fn), cxErrMsg(cxerr));
+        return;
     }
-    fseek(file, 0L, SEEK_SET);
-    stream->_file = file;
-    char* buff = CALLOCR(char, chunk_size, "Not enough memory to read file (%s)\n", fn);
+    vfsSeek(vfsfile, 0, FS_Set);
+    stream->_vfsfile = vfsfile;
+    char* buff = CALLOCR(char, chunk_size, "Not enough memory to read file (%s)\n", strC(fn));
     stream->_stream_buff = buff;
 }
 
 void _cxml_stream_init(_cxml_stream* stream_obj,
-                       const char *filename,
+                       VFS *vfs,
+                       strref filename,
                        size_t chunk_size)
 {
-    if (filename){
+    if (!strEmpty(filename)){
         // store the current chunk (starting) size, so that it can be used in resetting stream buffer
         stream_obj->_chunk_start_size = chunk_size < 10 ? _cxml__def_chunk_size : chunk_size;
         stream_obj->_chunk_curr_size = stream_obj->_chunk_start_size;
-        _cxml__open_stream(stream_obj, filename, stream_obj->_chunk_curr_size);
+        _cxml__open_stream(stream_obj, vfs, filename, stream_obj->_chunk_curr_size);
         stream_obj->_is_open = 1;
         stream_obj->_nbytes_read_into_sbuff = 0;
-        stream_obj->file_name = filename;
+        stream_obj->file_name = 0;
+        strDup(&stream_obj->file_name, filename);
     }
 }
 
 void _cxml__close_stream(_cxml_stream *stream) {
     stream->_is_open = 0;
     stream->_chunk_curr_size ? FREE(stream->_stream_buff) : (void)0;
-    stream->_file ? fclose(stream->_file) : 0;
+    if (stream->_vfsfile) {
+        vfsClose(stream->_vfsfile);
+        strDestroy(&stream->file_name);
+        stream->_vfsfile = NULL;
+    }
 }
 
 void _cxml__adjust_stream_buffer(_cxml_lexer *cxlexer) {
@@ -50,7 +59,7 @@ void _cxml__adjust_stream_buffer(_cxml_lexer *cxlexer) {
     size_t start_pos = (cxlexer->start - stream->_stream_buff);
     char* n_buff = RALLOCR(char, stream->_stream_buff, new_size,
                            "Not enough memory to continue "
-                           "streaming file: '%s'\n", stream->file_name);
+                           "streaming file: '%s'\n", strC(stream->file_name));
     stream->_stream_buff = n_buff;
     stream->_chunk_curr_size = new_size;
     // reassign lexer's `start` and `current` (char) pointer to its original

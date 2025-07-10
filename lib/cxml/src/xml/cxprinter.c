@@ -880,7 +880,8 @@ char* cxml_stringify(void *node){
 
 void cxml_element_to_file(
         cxml_elem_node *elem,
-        const char* file_name)
+        VFS *vfs,
+        strref file_name)
 {
     if (!elem || !file_name) return;
     cxml_string v = new_cxml_string();
@@ -888,37 +889,40 @@ void cxml_element_to_file(
     int level = 0;
     _cxml_node_tostring(&v, elem, &level, &cfg);
     _remove_newline(&v);
-    _cxml_write_file(file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
+    _cxml_write_file(vfs, file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
     cxml_string_free(&v);
 }
 
 void cxml_comment_to_file(
         cxml_comm_node *comment,
-        const char* file_name)
+        VFS *vfs,
+        strref file_name)
 {
     if (!comment || !file_name) return;
     cxml_string v = new_cxml_string();
     cxml_string_append(&v, "<!--", 4);  // opening
     cxml_string_str_append(&v, &comment->value);
     cxml_string_append(&v, "-->", 3);  // closing
-    _cxml_write_file(file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
+    _cxml_write_file(vfs, file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
     cxml_string_free(&v);
 }
 
 void cxml_pi_to_file(
         cxml_pi_node *pi,
-        const char* file_name)
+        VFS *vfs,
+        strref file_name)
 {
     if (!pi || !file_name) return;
     cxml_string v = new_cxml_string();
     _cxml_pi_print_hlpr(&v, pi);
-    _cxml_write_file(file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
+    _cxml_write_file(vfs, file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
     cxml_string_free(&v);
 }
 
 void cxml_text_to_file(
         cxml_text_node *text,
-        const char* file_name)
+        VFS *vfs,
+        strref file_name)
 {
     if (!text || !file_name) return;
     cxml_string v = new_cxml_string();
@@ -934,36 +938,39 @@ void cxml_text_to_file(
         // (to ensure that xml doc is well-defined)
         _text(text, &v, 1, &cfg);
     }
-    _cxml_write_file(file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
+    _cxml_write_file(vfs, file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
     cxml_string_free(&v);
 }
 
 void cxml_dtd_to_file(
         cxml_dtd_node *dtd,
-        const char* file_name)
+        VFS *vfs,
+        strref file_name)
 {
     if (!dtd || !file_name) return;
     cxml_string v = new_cxml_string();
     cxml_string_str_append(&v, &dtd->value);
-    _cxml_write_file(file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
+    _cxml_write_file(vfs, file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
     cxml_string_free(&v);
 }
 
 void cxml_xhdr_to_file(
         cxml_xhdr_node *xml_hdr,
-        const char* file_name)
+        VFS *vfs,
+        strref file_name)
 {
     if (!xml_hdr || !file_name) return;
     cxml_string v = new_cxml_string();
     cxml_config cfg = cxml_get_config();
     _cxml_xhdr_print_hlpr(&v, xml_hdr, &cfg);
-    _cxml_write_file(file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
+    _cxml_write_file(vfs, file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
     cxml_string_free(&v);
 }
 
 void cxml_document_to_file(
         cxml_root_node *root,
-        const char* file_name)
+        VFS *vfs,
+        strref file_name)
 {
     if (!root || !file_name) return;
     cxml_string v = new_cxml_string();
@@ -971,21 +978,21 @@ void cxml_document_to_file(
     int level = 0;
     _cxml_node_tostring(&v, root, &level, &cfg);
     _remove_newline(&v);
-    _cxml_write_file(file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
+    _cxml_write_file(vfs, file_name, cxml_string_as_raw(&v), cxml_string_len(&v));
     cxml_string_free(&v);
 }
 
-void cxml_node_to_file(void *node, const char* file_name){
+void cxml_node_to_file(void *node, VFS *vfs, strref file_name){
     // print self-contained nodes to file.
     switch(_cxml_get_node_type(node))
     {
-        case CXML_PI_NODE:        cxml_pi_to_file(node, file_name);         break;
-        case CXML_DTD_NODE:       cxml_dtd_to_file(node, file_name);        break;
-        case CXML_ROOT_NODE:      cxml_document_to_file(node, file_name);   break;
-        case CXML_ELEM_NODE:      cxml_element_to_file(node, file_name);    break;
-        case CXML_COMM_NODE:      cxml_comment_to_file(node, file_name);    break;
-        case CXML_TEXT_NODE:      cxml_text_to_file(node, file_name);       break;
-        case CXML_XHDR_NODE:      cxml_xhdr_to_file(node, file_name);       break;
-        default:                                                            break;
+        case CXML_PI_NODE:        cxml_pi_to_file(node, vfs, file_name);         break;
+        case CXML_DTD_NODE:       cxml_dtd_to_file(node, vfs, file_name);        break;
+        case CXML_ROOT_NODE:      cxml_document_to_file(node, vfs, file_name);   break;
+        case CXML_ELEM_NODE:      cxml_element_to_file(node, vfs, file_name);    break;
+        case CXML_COMM_NODE:      cxml_comment_to_file(node, vfs, file_name);    break;
+        case CXML_TEXT_NODE:      cxml_text_to_file(node, vfs, file_name);       break;
+        case CXML_XHDR_NODE:      cxml_xhdr_to_file(node, vfs, file_name);       break;
+        default:                                                                 break;
     }
 }

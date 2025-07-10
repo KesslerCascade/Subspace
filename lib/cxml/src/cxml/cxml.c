@@ -13,14 +13,14 @@
 /*
  * xml parsing helper functions
  */
-cxml_root_node* cxml_load_file(const char *fn, bool stream) {
+cxml_root_node* cxml_load_file(VFS *vfs, strref fn, bool stream) {
     if (!fn) return NULL;
     cxml_root_node *root = NULL;
     if (stream){
-        root = cxml_parse_xml_lazy(fn);
+        root = cxml_parse_xml_lazy(vfs, fn);
     }else{
         char* src_buff = NULL;
-        _cxml_read_file(fn, &src_buff);
+        _cxml_read_file(vfs, fn, &src_buff);
         root = cxml_parse_xml(src_buff);
         FREE(src_buff);
     }

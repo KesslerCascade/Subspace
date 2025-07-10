@@ -53,21 +53,21 @@ void cxml_node_to_string(void* node, cxml_string *str);
 
 char *cxml_node_to_rstring(void *node);
 
-void cxml_element_to_file(cxml_elem_node *elem, const char* file_name);
+void cxml_element_to_file(cxml_elem_node *elem, VFS *vfs, strref file_name);
 
-void cxml_comment_to_file(cxml_comm_node *comment, const char* file_name);
+void cxml_comment_to_file(cxml_comm_node *comment, VFS *vfs, strref file_name);
 
-void cxml_pi_to_file(cxml_pi_node *pi, const char* file_name);
+void cxml_pi_to_file(cxml_pi_node *pi, VFS *vfs, strref file_name);
 
-void cxml_text_to_file(cxml_text_node *text, const char* file_name);
+void cxml_text_to_file(cxml_text_node *text, VFS *vfs, strref file_name);
 
-void cxml_dtd_to_file(cxml_dtd_node *dtd, const char* file_name);
+void cxml_dtd_to_file(cxml_dtd_node *dtd, VFS *vfs, strref file_name);
 
-void cxml_xhdr_to_file(cxml_xhdr_node *xml_hdr, const char* file_name);
+void cxml_xhdr_to_file(cxml_xhdr_node *xml_hdr, VFS *vfs, strref file_name);
 
-void cxml_document_to_file(cxml_root_node *root, const char* file_name);
+void cxml_document_to_file(cxml_root_node *root, VFS *vfs, strref file_name);
 
-void cxml_node_to_file(void *node, const char* file_name);
+void cxml_node_to_file(void *node, VFS *vfs, strref file_name);
 
 
 #endif //CXML_CXPRINTER_H

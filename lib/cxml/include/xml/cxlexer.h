@@ -66,6 +66,7 @@ typedef struct {
 void _cxml_lexer_init(
         _cxml_lexer *cxlexer,
         const char *source,
+        VFS *vfs,
         const char *filename,
         bool stream);
 
