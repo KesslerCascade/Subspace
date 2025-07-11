@@ -17,6 +17,7 @@ _objfactory_guaranteed SaveManager* SaveManager_create(Subspace* ss)
 
     self->ss = ss;
     strDup(&self->name, _S"SaveManager");
+    self->hidden = true;   // Hide while this is WIP
 
     objInstInit(self);
     return self;

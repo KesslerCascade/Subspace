@@ -26,8 +26,8 @@ _objfactory_guaranteed FeaturesPage* FeaturesPage_create(SubspaceUI* ui)
     FeaturesPage* self;
     self = objInstCreate(FeaturesPage);
 
-    self->ui      = ui;
-    self->ss      = ui->ss;
+    self->ui = ui;
+    self->ss = ui->ss;
 
     self->name = _S"features";
     strDup(&self->title, langGet(self->ss, _S"settings_features"));
@@ -37,18 +37,29 @@ _objfactory_guaranteed FeaturesPage* FeaturesPage_create(SubspaceUI* ui)
     return self;
 }
 
-static void setPanelState(Ihandle* fpanel, bool available, bool enabled)
+static bool setPanelState(Ihandle* fpanel, bool available, bool enabled, bool optional, bool hidden)
 {
-    int curavail   = IupGetInt(fpanel, "PANEL_AVAILABLE");
-    int curenabled = IupGetInt(fpanel, "PANEL_ENABLED");
-    int newavail   = available ? 1 : 0;
-    int newenabled = enabled ? 1 : 0;
+    bool refreshlayout = false;
+    int curavail       = IupGetInt(fpanel, "PANEL_AVAILABLE");
+    int curenabled     = IupGetInt(fpanel, "PANEL_ENABLED");
+    int curhidden      = IupGetInt(fpanel, "PANEL_HIDDEN");
+    int newavail       = available ? 1 : 0;
+    int newenabled     = enabled ? 1 : 0;
+    int newhidden      = hidden || (!available && optional);
 
-    if (curavail != newavail || curenabled != newenabled) {
+    if (curavail != newavail || curenabled != newenabled || curhidden != newhidden) {
         IupSetInt(fpanel, "PANEL_AVAILABLE", newavail);
         IupSetInt(fpanel, "PANEL_ENABLED", newenabled);
+        IupSetInt(fpanel, "PANEL_HIDDEN", newhidden);
+        if (curhidden != newhidden) {
+            IupSetAttribute(fpanel, "FLOATING", newhidden ? "IGNORE" : "NO");
+            IupSetAttribute(fpanel, "VISIBLE", newhidden ? "NO" : "YES");
+            refreshlayout = true;
+        }
         IupUpdate(fpanel);
     }
+
+    return refreshlayout;
 }
 
 static int panel_button(Ihandle* ih, int button, int pressed, int x, int y, char* status)
@@ -282,10 +293,10 @@ bool FeaturesPage_make(_In_ FeaturesPage* self, Ihandle* list)
     self->h = IupScrollBox(vbox);
 
     iupLoadImage(self->ss,
-        _S"IMAGE_PUZZLE_PIECE_SMALL",
-        _S"svg",
-        _S"subspace:/puzzle-piece-small.svg",
-        list);
+                 _S"IMAGE_PUZZLE_PIECE_SMALL",
+                 _S"svg",
+                 _S"subspace:/puzzle-piece-small.svg",
+                 list);
 
     return true;
 }
@@ -295,19 +306,25 @@ extern bool SettingsPage_update(_In_ SettingsPage* self);   // parent
 bool FeaturesPage_update(_In_ FeaturesPage* self)
 {
     int idx = 0;
+    bool refreshlayout = false;
     foreach (sarray, idx, Ihandle*, fpanel, self->featpanels) {
         SubspaceFeature* feat = (SubspaceFeature*)IupGetAttribute(fpanel, "FEATURE");
 
         if (feat) {
-            bool avail, enabled;
+            bool avail, enabled, optional, hidden;
             withReadLock (&feat->lock) {
-                avail   = feat->available;
-                enabled = feat->enabled;
+                avail    = feat->available;
+                enabled  = feat->enabled;
+                optional = feat->optional;
+                hidden   = feat->hidden;
             }
 
-            setPanelState(fpanel, avail, enabled);
+            refreshlayout |= setPanelState(fpanel, avail, enabled, optional, hidden);
         }
     }
+
+    if (refreshlayout)
+        IupRefreshChildren(self->h);
 
     return true;
 }

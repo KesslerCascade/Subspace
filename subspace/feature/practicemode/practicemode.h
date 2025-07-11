@@ -50,6 +50,7 @@ typedef struct PracticeMode {
     string name;
     bool available;
     bool enabled;
+    bool hidden;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     SSDNode* settings;        // Settings that are synchronized with the game client
 } PracticeMode;
