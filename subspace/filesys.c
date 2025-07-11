@@ -106,6 +106,7 @@ bool subspaceMount(Subspace* ss)
                 PkgFS* pkgfs = pkgfsCreate(pkg);
                 vfsMountProvider(ss->fs, pkgfs, SSNS);
                 objRelease(&pkg);
+                objRelease(&pkgfs);
             }
         }
     }
