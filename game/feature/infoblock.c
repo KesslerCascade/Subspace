@@ -26,8 +26,10 @@ void infoBlockRender(void)
     char buf[128];
     basic_string tmp;
     Pointf sz;
-    float x = 1280 - 5;
-    float y = 5;
+    float x    = 1280 - 5;
+    float y    = 5;
+    float colw = 0;
+    int nrows  = 0;
 
     CSurface_GL_SetColor(COLOR_WHITE);
 
@@ -39,8 +41,11 @@ void infoBlockRender(void)
             snprintf(buf, sizeof(buf), "Subspace %s", subspace_version_str);
 #endif
             basic_string_set(&tmp, buf);
-            sz = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
-            y  = sz.y;
+            sz   = easy_measurePrintLines(INFOBLOCK_FONT, 0, 0, 999, &tmp);
+            colw = max(colw, sz.x);
+            sz   = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
+            y    = sz.y;
+            nrows++;
             basic_string_destroy(&tmp);
         }
 
@@ -52,8 +57,11 @@ void infoBlockRender(void)
                      g_version_minor,
                      g_version_rev);
             basic_string_set(&tmp, buf);
-            sz = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
-            y  = sz.y;
+            sz   = easy_measurePrintLines(INFOBLOCK_FONT, 0, 0, 999, &tmp);
+            colw = max(colw, sz.x);
+            sz   = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
+            y    = sz.y;
+            nrows++;
             basic_string_destroy(&tmp);
         }
 
@@ -66,8 +74,11 @@ void infoBlockRender(void)
                 snprintf(buf, sizeof(buf), "FPS: %d", gs.lastRender1s);
             }
             basic_string_set(&tmp, buf);
-            sz = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
-            y  = sz.y;
+            sz   = easy_measurePrintLines(INFOBLOCK_FONT, 0, 0, 999, &tmp);
+            colw = max(colw, sz.x);
+            sz   = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
+            y    = sz.y;
+            nrows++;
             basic_string_destroy(&tmp);
         }
 
@@ -84,9 +95,20 @@ void infoBlockRender(void)
             basic_string_destroy(&tmp);
 
             basic_string_set(&tmp, buf);
-            sz = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
-            y  = sz.y;
+            sz   = easy_measurePrintLines(INFOBLOCK_FONT, 0, 0, 999, &tmp);
+            colw = max(colw, sz.x);
+            sz   = easy_printRightAlign(INFOBLOCK_FONT, x, y, &tmp);
+            y    = sz.y;
+            nrows++;
             basic_string_destroy(&tmp);
+        }
+
+        if (nrows % 3 == 0) {
+            // only 3 rows can fit above the target box; if we have more, need to spill over into a
+            // new column
+            x -= colw + 20;
+            colw = 0;
+            y    = 5;
         }
     }
 }
@@ -112,6 +134,7 @@ SubspaceFeature InfoBlock_feature = {
     .settingsspec    = &InfoBlock_spec,
     .requiredPatches = InfoBlock_patches,
     .requiredSymbols = { &SYM(freetype_easy_printRightAlign),
+                        &SYM(freetype_easy_measurePrintLines),
                         &SYM(CSurface_GL_SetColor),
                         &SYM(version_major),
                         &SYM(version_minor),
