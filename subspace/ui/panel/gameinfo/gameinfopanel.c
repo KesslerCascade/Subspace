@@ -329,8 +329,8 @@ void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run, bool force)
         string temp = 0, temp2 = 0, temp3 = 0;
 
         IupSetStrAttribute(self->shipname, "TITLE", strC(run->shipName));
-        IupSetStrAttribute(self->shiptype, "TITLE",
-                           strC(run->shipType));   // TODO: Translate
+        strConcat(&temp, _S"ship_shortname_", run->shipType);
+        IupSetStrAttribute(self->shiptype, "TITLE", strC(langGetD(self->ss, temp, run->shipType)));
         if (saSize(run->sectors) > 0) {
             SectorInfo* last = run->sectors.a[saSize(run->sectors) - 1];
 
