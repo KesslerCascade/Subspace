@@ -62,6 +62,7 @@ typedef struct RunInfo_ClassIf {
     void (*processScrap)(_In_ void* self, _In_opt_ strref src, int amount, int rawamount);
     void (*processHullDamage)(_In_ void* self, _In_opt_ strref src, int amount);
     void (*processShip)(_In_ void* self, _In_opt_ strref name);
+    SectorInfo* (*getSector)(_In_ void* self, int64 sectorpoint);
     int32 (*score)(_In_ void* self);
     void (*finish)(_In_ void* self, RunResult result);
 } RunInfo_ClassIf;
@@ -159,6 +160,8 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoProcessHullDamage(self, src, amount) (self)->_->processHullDamage(RunInfo(self), src, amount)
 // void runinfoProcessShip(RunInfo* self, strref name);
 #define runinfoProcessShip(self, name) (self)->_->processShip(RunInfo(self), name)
+// SectorInfo* runinfoGetSector(RunInfo* self, int64 sectorpoint);
+#define runinfoGetSector(self, sectorpoint) (self)->_->getSector(RunInfo(self), sectorpoint)
 // int32 runinfoScore(RunInfo* self);
 #define runinfoScore(self) (self)->_->score(RunInfo(self))
 // void runinfoFinish(RunInfo* self, RunResult result);

@@ -43,7 +43,7 @@ bool LanguageDB_load(_In_ LanguageDB* self, StreamBuffer* sb, bool fallback)
     return jsonParse(sb, langParseCB, fallback ? &self->fallback : &self->primary);
 }
 
-strref LanguageDB_get(_In_ LanguageDB* self, _In_opt_ strref key)
+strref LanguageDB_get(_In_ LanguageDB* self, _In_opt_ strref key, _In_opt_ strref def)
 {
     htelem elem;
 
@@ -55,7 +55,7 @@ strref LanguageDB_get(_In_ LanguageDB* self, _In_opt_ strref key)
     if (elem)
         return hteVal(self->fallback, strref, elem);
 
-    return key;
+    return def;
 }
 
 string* LanguageDB__getPtr(_In_ LanguageDB* self, _In_opt_ strref key)

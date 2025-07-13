@@ -9,7 +9,7 @@ static LanguageDB_ClassIf _impl_LanguageDB_LanguageDB_ClassIf = {
     ._size = sizeof(LanguageDB_ClassIf),
     ._implements = (ObjIface*)&LanguageDB_ClassIf_tmpl,
     .load = (bool (*)(void*, StreamBuffer*, bool))LanguageDB_load,
-    .get = (strref (*)(void*, strref))LanguageDB_get,
+    .get = (strref (*)(void*, strref, strref))LanguageDB_get,
     ._getPtr = (string* (*)(void*, strref))LanguageDB__getPtr,
 };
 

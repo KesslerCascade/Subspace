@@ -55,15 +55,8 @@ extern bool Panel_make(_In_ Panel* self);   // parent
 #define parent_make() Panel_make((Panel*)(self))
 bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
 {
-    /*    Ihandle* lbl = IupLabel("No Data");
-        IupSetAttribute(lbl, "FONT", "Helvetica, 12");
-        IupSetAttribute(lbl, "FGCOLOR", "255 255 255");
-        IupSetAttribute(lbl, "EXPAND", "YES");
-        IupSetAttribute(lbl, "ALIGNMENT", "ACENTER:ACENTER"); */
     self->plot = IupPlot();
     IupPlotBegin(self->plot, 1);
-    // IupPlotAddStr(self->plot, "1", 55);
-    // IupPlotAddStr(self->plot, "2", 103);
     self->ds    = IupPlotEnd(self->plot);
     self->si    = 0;
     self->reset = true;
@@ -125,6 +118,25 @@ bool ScrapGraphPanel_update(_In_ ScrapGraphPanel* self)
 
         foreach (sarray, idx, ScrapData, ns, self->newscrap) {
             spointFormat(&temp, ns.sectorpoint);
+
+            RunInfo* run = subspaceRun(self->ss);
+            if (run) {
+                SectorInfo* sec = runinfoGetSector(run, ns.sectorpoint);
+                if (sec) {
+                    string skey = 0;
+                    strConcat(&skey, _S"sector_shortname_", sec->type);
+                    strref sname = langGetD(self->ss, skey, _S"");
+
+                    if (!strEmpty(sname)) {
+                        strNConcat(&temp, sname, _S" ", temp);
+                    }
+
+                    strDestroy(&skey);
+                    objRelease(&sec);
+                }
+                objRelease(&run);
+            }
+
             int32 idx = saFind(self->sdata, opaque, ns);   // this works because sdata custom
                                                            // compare only checks sectorpoint
             if (idx >= 0) {

@@ -73,6 +73,8 @@ class RunInfo {
     void processHullDamage(strref src, int amount);
     void processShip(strref name);
 
+    SectorInfo *getSector(int64 sectorpoint);
+
     int32 score();
 
     void finish(RunResult result);

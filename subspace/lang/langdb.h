@@ -17,7 +17,7 @@ typedef struct LanguageDB_ClassIf {
 
     // streambuffer must be in pull mode
     bool (*load)(_In_ void* self, StreamBuffer* sb, bool fallback);
-    strref (*get)(_In_ void* self, _In_opt_ strref key);
+    strref (*get)(_In_ void* self, _In_opt_ strref key, _In_opt_ strref def);
     // for internal use by langGetC ONLY
     string* (*_getPtr)(_In_ void* self, _In_opt_ strref key);
 } LanguageDB_ClassIf;
@@ -59,8 +59,8 @@ _objfactory_guaranteed LanguageDB* LanguageDB_create();
 //
 // streambuffer must be in pull mode
 #define languagedbLoad(self, sb, fallback) (self)->_->load(LanguageDB(self), sb, fallback)
-// strref languagedbGet(LanguageDB* self, strref key);
-#define languagedbGet(self, key) (self)->_->get(LanguageDB(self), key)
+// strref languagedbGet(LanguageDB* self, strref key, strref def);
+#define languagedbGet(self, key, def) (self)->_->get(LanguageDB(self), key, def)
 // string* languagedb_getPtr(LanguageDB* self, strref key);
 //
 // for internal use by langGetC ONLY

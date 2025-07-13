@@ -9,7 +9,12 @@ bool langLoad(Subspace* ss, strref lang);   // UI MUST NOT BE RUNNING!
 
 _meta_inline strref langGet(Subspace* ss, strref key)
 {
-    return languagedbGet(ss->lang, key);
+    return languagedbGet(ss->lang, key, key);
+}
+
+_meta_inline strref langGetD(Subspace* ss, strref key, strref def)
+{
+    return languagedbGet(ss->lang, key, def);
 }
 
 _meta_inline const char* langGetC(Subspace* ss, const char* key)

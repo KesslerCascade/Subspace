@@ -379,6 +379,22 @@ void RunInfo_enterSector(_In_ RunInfo* self, int num, int seed, _In_opt_ strref 
         ssuiUpdateMain(self->ss->ui, _S"gameinfo");
 }
 
+SectorInfo* RunInfo_getSector(_In_ RunInfo* self, int64 sectorpoint)
+{
+    SectorInfo* ret = NULL;
+
+    withReadLock (&self->lock) {
+        foreach (sarray, idx, SectorInfo*, sec, self->sectors) {
+            if (sec->sectorpoint == sectorpoint) {
+                ret = objAcquire(sec);
+                break;
+            }
+        }
+    }
+
+    return ret;
+}
+
 void RunInfo_updateStats(_In_ RunInfo* self, int ships, int beacons, int scrap, int crew)
 {
     if (self->recording) {

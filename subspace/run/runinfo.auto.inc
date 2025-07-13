@@ -25,6 +25,7 @@ static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     .processScrap = (void (*)(void*, strref, int, int))RunInfo_processScrap,
     .processHullDamage = (void (*)(void*, strref, int))RunInfo_processHullDamage,
     .processShip = (void (*)(void*, strref))RunInfo_processShip,
+    .getSector = (SectorInfo* (*)(void*, int64))RunInfo_getSector,
     .score = (int32 (*)(void*))RunInfo_score,
     .finish = (void (*)(void*, RunResult))RunInfo_finish,
 };
