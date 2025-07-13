@@ -34,6 +34,12 @@
             "configuration": "Debug"
         },
         {
+            "name": "game-dev-release",
+            "displayName": "Game (Dev Release)",
+            "configurePreset": "game-win32",
+            "configuration": "RelWithDebInfo"
+        },
+        {
             "name": "game-release",
             "displayName": "Game (Release)",
             "configurePreset": "game-win32",

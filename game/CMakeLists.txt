@@ -163,7 +163,7 @@ add_executable(subspacegame
     ${SHARED_SOURCE_DIR}/net.c
     ${GAME_OSDEP})
 target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
-target_compile_definitions(subspacegame PRIVATE SUBSPACE_GAME)
+target_compile_definitions(subspacegame PRIVATE SUBSPACE_GAME $<$<CONFIG:Release>:SUBSPACE_RELEASE>)
 target_link_libraries(subspacegame disasm minicrt)
 if (WIN32)
     target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/win32)

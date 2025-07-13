@@ -23,7 +23,6 @@
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe"
             }
-
         },
         {
             "name": "subspace-win64",
@@ -42,7 +41,6 @@
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe"
             }
-
         }
     ],
     "buildPresets": [
@@ -51,6 +49,12 @@
             "displayName": "Subspace Win32 (Debug)",
             "configurePreset": "subspace-win32",
             "configuration": "Debug"
+        },
+        {
+            "name": "subspace-win32-dev-release",
+            "displayName": "Subspace Win32 (Dev Release)",
+            "configurePreset": "subspace-win32",
+            "configuration": "RelWithDebInfo"
         },
         {
             "name": "subspace-win32-release",
@@ -63,6 +67,12 @@
             "displayName": "Subspace Win64 (Debug)",
             "configurePreset": "subspace-win64",
             "configuration": "Debug"
+        },
+        {
+            "name": "subspace-win64-dev-release",
+            "displayName": "Subspace Win64 (Dev Release)",
+            "configurePreset": "subspace-win64",
+            "configuration": "RelWithDebInfo"
         },
         {
             "name": "subspace-win64-release",

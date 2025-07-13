@@ -172,6 +172,7 @@ add_executable(subspace
     ${SHARED_SOURCE_DIR}/logentspec.c
     ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_SIDL})
+target_compile_definitions(subspace PRIVATE $<$<CONFIG:Release>:SUBSPACE_RELEASE>)
 target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast libpkg cxml)
 target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 

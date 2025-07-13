@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  subspace-win32:
+  win32:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -23,14 +23,14 @@ jobs:
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
           cd subspace
-          cmake --build --preset subspace-win32-release
+          cmake --build --preset subspace-win32-dev-release
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: subspace-win32-exe
-          path: build/subspace-win32/Release/*
+          path: build/subspace-win32/RelWithDebInfo/*
 
-  subspace-win64:
+  win64:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -46,14 +46,14 @@ jobs:
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars64.bat"
           cd subspace
-          cmake --build --preset subspace-win64-release
+          cmake --build --preset subspace-win64-dev-release
           cd ..
           copy "build\subspace-win64\tools\Release\mkdat.exe" "build\subspace-win64\Release\"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: subspace-win64-exe
-          path: build/subspace-win64/Release/*
+          path: build/subspace-win64/RelWithDebInfo/*
 
   game-win32:
     runs-on: windows-latest
@@ -71,14 +71,14 @@ jobs:
         run: |
           call "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\VC\Auxiliary\Build\vcvars32.bat"
           cd game
-          cmake --build --preset game-release
+          cmake --build --preset game-dev-release
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: game-win32-exe
-          path: build/game-win32/Release/*
+          path: build/game-win32/RelWithDebInfo/*
 
-  subspace-mkdat:
+  mkdat:
     runs-on: windows-latest
     needs: [subspace-win64]
     steps:
@@ -99,7 +99,7 @@ jobs:
 
   package:
     runs-on: windows-latest
-    needs: [subspace-win32, subspace-win64, game-win32, subspace-mkdat]
+    needs: [win32, win64, game-win32, mkdat]
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4

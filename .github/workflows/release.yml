@@ -5,7 +5,7 @@ on:
     tags: [ "v*" ]
 
 jobs:
-  subspace-win32:
+  win32:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -28,7 +28,7 @@ jobs:
           name: subspace-win32-exe
           path: build/subspace-win32/Release/*
 
-  subspace-win64:
+  win64:
     runs-on: windows-latest
     steps:
       - name: Checkout repository
@@ -76,7 +76,7 @@ jobs:
           name: game-win32-exe
           path: build/game-win32/Release/*
 
-  subspace-mkdat:
+  mkdat:
     runs-on: windows-latest
     needs: [subspace-win64]
     steps:
@@ -97,7 +97,7 @@ jobs:
 
   release:
     runs-on: windows-latest
-    needs: [subspace-win32, subspace-win64, game-win32, subspace-mkdat]
+    needs: [win32, win64, game-win32, mkdat]
     steps:
       - name: Download all artifacts
         uses: actions/download-artifact@v4
