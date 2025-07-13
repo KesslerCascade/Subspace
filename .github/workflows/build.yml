@@ -48,7 +48,7 @@ jobs:
           cd subspace
           cmake --build --preset subspace-win64-dev-release
           cd ..
-          copy "build\subspace-win64\tools\Release\mkdat.exe" "build\subspace-win64\Release\"
+          copy "build\subspace-win64\tools\RelWithDebInfo\mkdat.exe" "build\subspace-win64\RelWithDebInfo\"
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
