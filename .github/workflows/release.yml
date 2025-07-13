@@ -25,7 +25,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: subspace-win32-exe
+          name: win32-exe
           path: build/subspace-win32/Release/*
 
   win64:
@@ -50,7 +50,7 @@ jobs:
       - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: subspace-win64-exe
+          name: win64-exe
           path: build/subspace-win64/Release/*
 
   game-win32:
@@ -85,7 +85,7 @@ jobs:
       - name: Download win64 executables
         uses: actions/download-artifact@v4
         with:
-          name: subspace-win64-exe
+          name: win64-exe
       - name: Build subspace.dat
         shell: cmd
         run: mkdat subspace.dat data
@@ -104,13 +104,13 @@ jobs:
       - name: Assemble 64-bit package
         run: |
           mkdir package64
-          cp subspace-win64-exe/subspace.exe package64/
+          cp win64-exe/subspace.exe package64/
           cp game-win32-exe/subspacegame.exe package64/
           cp subspace-dat/subspace.dat package64/
       - name: Assemble 32-bit package
         run: |
           mkdir package32
-          cp subspace-win32-exe/subspace.exe package32/
+          cp win32-exe/subspace.exe package32/
           cp game-win32-exe/subspacegame.exe package32/
           cp subspace-dat/subspace.dat package32/
       - name: Create 64-bit package
