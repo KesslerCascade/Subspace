@@ -1,6 +1,8 @@
 #include "subspace.h"
+#include "gamedata/gamedata.sidl"
 #include "sectorinfo.sidl"
 #include "logentspec.h"
+#include <cx/taskqueue.sidl>
 
 // Do NOT change the ordering of these; the values are saved in the database as-is!
 typedef enum {
@@ -74,4 +76,15 @@ class RunInfo {
     int32 score();
 
     void finish(RunResult result);
+}
+
+class LogReplay extends ComplexTask
+{
+    Subspace *ss;
+    object:RunInfo run;
+    bool combat;
+    int64 savepoint;
+    int64 sectorpoint;
+
+    factory create(Subspace *ss, RunInfo *run, bool combat, int64 savepoint, int64 sectorpoint);
 }

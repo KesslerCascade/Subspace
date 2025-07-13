@@ -5,6 +5,11 @@ RunInfo_ClassIf RunInfo_ClassIf_tmpl = {
     ._size = sizeof(RunInfo_ClassIf),
 };
 
+LogReplay_ClassIf LogReplay_ClassIf_tmpl = {
+    ._size = sizeof(LogReplay_ClassIf),
+    ._parent = (ObjIface*)&ComplexTask_ClassIf_tmpl,
+};
+
 static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     ._size = sizeof(RunInfo_ClassIf),
     ._implements = (ObjIface*)&RunInfo_ClassIf_tmpl,
@@ -35,6 +40,25 @@ ObjClassInfo RunInfo_clsinfo = {
     .init = (bool(*)(void*))RunInfo_init,
     .destroy = (void(*)(void*))RunInfo_destroy,
     .ifimpl = _ifimpl_RunInfo,
+};
+
+static LogReplay_ClassIf _impl_LogReplay_LogReplay_ClassIf = {
+    ._size = sizeof(LogReplay_ClassIf),
+    ._implements = (ObjIface*)&LogReplay_ClassIf_tmpl,
+    .run = (uint32 (*)(void*, TaskQueue*, TQWorker*, TaskControl*))LogReplay_run,
+};
+
+static ObjIface* _ifimpl_LogReplay[] = {
+    (ObjIface*)&_impl_LogReplay_LogReplay_ClassIf,
+    NULL
+};
+
+ObjClassInfo LogReplay_clsinfo = {
+    .instsize = sizeof(LogReplay),
+    .classif = (ObjIface*)&LogReplay_ClassIf_tmpl,
+    .parent = &ComplexTask_clsinfo,
+    .destroy = (void(*)(void*))LogReplay_destroy,
+    .ifimpl = _ifimpl_LogReplay,
 };
 
 // ==================== Auto-generated section ends ======================

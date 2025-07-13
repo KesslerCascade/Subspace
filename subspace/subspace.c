@@ -4,6 +4,7 @@
 #include "control/controlserver.h"
 #include "db/database.h"
 #include "feature/featureregistry.h"
+#include "gamedata/gamedata.h"
 #include "gamemgr/gamemgr.h"
 #include "kbmgr/kbmgr.h"
 #include "lang/lang.h"
@@ -14,8 +15,6 @@
 #include <cx/log.h>
 #include <cx/settings.h>
 #include <cx/sys.h>
-
-#include <pkgfile/pkgfile.h>
 
 DEFINE_ENTRY_POINT
 
@@ -146,6 +145,34 @@ void subspaceClearRun(Subspace* ss, RunInfo* ifrun)
     }
 }
 
+GameData* subspaceData(Subspace* ss)
+{
+    GameData* ret = NULL;
+    withReadLock (&ss->lock) {
+        ret = objAcquire(ss->data);
+    }
+    return ret;
+}
+
+bool subspaceLoadData(Subspace* ss, strref ftldir)
+{
+    bool ret        = false;
+    GameData* ndata = gamedataCreate();
+
+    ret = gamedataLoad(ndata, ss, filesys, ftldir);
+
+    if (ret) {
+        withWriteLock (&ss->lock) {
+            objRelease(&ss->data);
+            ss->data = ndata;
+        }
+    } else {
+        objRelease(&ndata);
+    }
+
+    return ret;
+}
+
 void subspaceUpdateUI(Subspace* ss)
 {
     ssuiUpdate(ss->ui);
@@ -249,15 +276,26 @@ static void subspaceStartup(LogDest** pdeferredlogs)
     if (!cserverStart(subspace.svr)) {
         fatalError(_S"Failed to start control server.", false);
     }
+
+    // 14 -------- Game data
+    string ftldir = 0;
+    ssdStringOut(subspace.settings, _S"ftl/exe", &ftldir);
+    if (!strEmpty(ftldir)) {
+        pathParent(&ftldir, ftldir);
+        subspaceLoadData(&subspace, ftldir);
+    }
 }
 
 static void subspaceShutdown()
 {
-    // 14 -------- Running state
+    // 15 -------- Running state
     withWriteLock (&subspace.lock) {
         objRelease(&subspace.game);
         objRelease(&subspace.run);
     }
+
+    // 14 -------- Game data
+    objRelease(&subspace.data);
 
     // 13 -------- Control Server shutdown
     cserverStop(subspace.svr);

@@ -244,7 +244,6 @@ void GameInst_destroy(_In_ GameInst* self)
     rwlockDestroy(&self->lock);
     strDestroy(&self->exepath);
     htDestroy(&self->features);
-    objRelease(&self->data);
     objRelease(&self->activeRun);
     // Autogen ends -------
 }

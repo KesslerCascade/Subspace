@@ -13,10 +13,11 @@
 #define DATADIR_FILENAME     _S "/data"
 #define GAMEEXE_FILENAME     _S "/subspacegame.exe"
 #define GAMEEXE_DEV_FILENAME _S "/build/game-win32/Debug/subspacegame.exe"
+#define FTLDAT_FILENAME      _S "ftl.dat"
 #define LOG_FILENAME         _S "/log/subspace.log"
 #define LANGDIR_FILENAME     _S "subspace:/lang"
 #define LANGLIST_FILENAME    _S "subspace:/lang/languages.json"
-#define SAVEDIR_FILENAME     _S "/saves"
+#define RUNSDIR_FILENAME     _S "/runs"
 
 #define LUA_MAIN_FILENAME _S "subspace.lua"
 
@@ -33,6 +34,7 @@ typedef struct FeatureRegistry FeatureRegistry;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct LanguageDB LanguageDB;
 typedef struct GameInst GameInst;
+typedef struct GameData GameData;
 typedef struct RunInfo RunInfo;
 typedef struct Database Database;
 typedef struct LogRelay LogRelay;
@@ -43,11 +45,12 @@ typedef struct Subspace {
     string gamepath;
 
     SSDNode* settings;
-    Event notify;   // notification event for the main thread
+    Event notify;       // notification event for the main thread
 
-    RWLock lock;    // for volatile data (game, run)
-    GameInst* game;   // active game instance
-    RunInfo* run;     // run that is focused in the UI
+    RWLock lock;        // for volatile data (game, run, data)
+    GameInst* game;     // active game instance
+    RunInfo* run;       // run that is focused in the UI
+    GameData* data;     // data parsed from FTL xml files
     LogRelay* runlog;   // run log to UI connector
 
     TaskQueue* workq;
@@ -73,9 +76,9 @@ bool subspaceFindBaseDir(Subspace* ss, VFS* vfs);
 void subspaceSetBaseDir(Subspace* ss, VFS* vfs, strref path);
 bool subspaceMount(Subspace* ss);
 void subspaceUnmount(Subspace* ss);
-void subspaceUpdateUI(Subspace* ss);       // use sparingly, updates entire UI
+void subspaceUpdateUI(Subspace* ss);    // use sparingly, updates entire UI
 void spointFormat(string* out, int64 spoint);
-GameInst* subspaceGame(Subspace* ss);      // acquires gameinst, must release!
+GameInst* subspaceGame(Subspace* ss);   // acquires gameinst, must release!
 void subspaceSetGame(Subspace* ss, GameInst* game);
 bool subspaceIsGame(Subspace* ss, GameInst* game);
 void subspaceClearGame(Subspace* ss, GameInst* ifgame);
@@ -83,6 +86,8 @@ RunInfo* subspaceRun(Subspace* ss);   // acquires runinfo, must release!
 void subspaceSetRun(Subspace* ss, RunInfo* run);
 bool subspaceIsRun(Subspace* ss, RunInfo* run);
 void subspaceClearRun(Subspace* ss, RunInfo* ifrun);
+GameData* subspaceData(Subspace* ss);
+bool subspaceLoadData(Subspace* ss, strref ftldir);
 bool logOpen(VFS* vfs, string filename, LogDest** defer);
 bool logClose(void);
 void fatalError(strref msg, bool osdeperr);

@@ -11,6 +11,7 @@
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
 #include <iupcontrols.h>
+#include "gamedata/gamedata.h"
 #include "gamemgr/gamemgr.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iupsetobj.h"
@@ -318,10 +319,14 @@ void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run, bool force)
     if (run->modified == self->runupdate && !force)
         return;   // no changes, don't flicker!
 
+    GameData* data = subspaceData(self->ss);
+    if (!data)
+        return;
+
     self->runupdate = run->modified;
 
     withReadLock (&run->lock) {
-        string temp = 0, temp2 = 0;
+        string temp = 0, temp2 = 0, temp3 = 0;
 
         IupSetStrAttribute(self->shipname, "TITLE", strC(run->shipName));
         IupSetStrAttribute(self->shiptype, "TITLE",
@@ -330,10 +335,11 @@ void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run, bool force)
             SectorInfo* last = run->sectors.a[saSize(run->sectors) - 1];
 
             spointFormat(&temp2, last->sectorpoint);
+            strConcat(&temp3, _S"sectorname_", last->type);
             strFormat(&temp,
                       langGet(self->ss, _S"runinfo_sector_format"),
                       stvar(strref, temp2),
-                      stvar(strref, last->type));   // TODO: Translate
+                      stvar(strref, gamedataGetTextD(data, temp3, last->type)));
             IupSetStrAttribute(self->sector, "TITLE", strC(temp));
         } else {
             IupSetAttribute(self->sector, "TITLE", langGetC(self->ss, "runinfo_sector_unknown"));
@@ -506,7 +512,12 @@ void GameInfoPanel_updateRun(_In_ GameInfoPanel* self, RunInfo* run, bool force)
         saDestroy(&layout);
 
         IupRefreshChildren(self->info);
+
+        strDestroy(&temp);
+        strDestroy(&temp2);
+        strDestroy(&temp3);
     }
+    objRelease(&data);
 }
 
 extern bool Panel_update(_In_ Panel* self);   // parent

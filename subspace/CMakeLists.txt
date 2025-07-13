@@ -44,6 +44,7 @@ set(SUBSPACE_SIDL
     feature/tweaks/tweaks.sidl
     feature/tweaks/tweakspage.sidl
     gamedata/gamedata.sidl
+    gamedata/loadtext.sidl
     gamemgr/gameinst.sidl
     gamemgr/gamemgr.sidl
     kbmgr/kbmgr.sidl
@@ -116,6 +117,7 @@ add_executable(subspace
     feature/tweaks/tweaks.c
     feature/tweaks/tweakspage.c
     gamedata/gamedata.c
+    gamedata/loadtext.c
     gamemgr/gameinst.c
     gamemgr/gamemgr.c
     kbmgr/kbmgr.c

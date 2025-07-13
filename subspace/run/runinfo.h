@@ -4,15 +4,35 @@
 // clang-format off
 #include <cx/obj.h>
 #include "subspace.h"
+#include "gamedata/gamedata.h"
 #include "sectorinfo.h"
 #include "logentspec.h"
+#include <cx/taskqueue.h>
 
+typedef struct TaskQueue TaskQueue;
+typedef struct TaskQueue_WeakRef TaskQueue_WeakRef;
+typedef struct TQWorker TQWorker;
+typedef struct TQWorker_WeakRef TQWorker_WeakRef;
+typedef struct ComplexTask ComplexTask;
+typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
+typedef struct ComplexTask ComplexTask;
+typedef struct ComplexTask_WeakRef ComplexTask_WeakRef;
+typedef struct TRGate TRGate;
+typedef struct TRGate_WeakRef TRGate_WeakRef;
+typedef struct ComplexTaskQueue ComplexTaskQueue;
+typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
 typedef struct LogEnt LogEnt;
 typedef struct LogEnt_WeakRef LogEnt_WeakRef;
+typedef struct VFSDir VFSDir;
+typedef struct TaskControl TaskControl;
 typedef struct RunInfo RunInfo;
 typedef struct RunInfo_WeakRef RunInfo_WeakRef;
+typedef struct LogReplay LogReplay;
+typedef struct LogReplay_WeakRef LogReplay_WeakRef;
 saDeclarePtr(RunInfo);
 saDeclarePtr(RunInfo_WeakRef);
+saDeclarePtr(LogReplay);
+saDeclarePtr(LogReplay_WeakRef);
 
 typedef enum {
     RUN_Active = 0,
@@ -46,6 +66,21 @@ typedef struct RunInfo_ClassIf {
     void (*finish)(_In_ void* self, RunResult result);
 } RunInfo_ClassIf;
 extern RunInfo_ClassIf RunInfo_ClassIf_tmpl;
+
+typedef struct LogReplay_ClassIf {
+    ObjIface* _implements;
+    ObjIface* _parent;
+    size_t _size;
+
+    uint32 (*run)(_In_ void* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon);
+    void (*runCancelled)(_In_ void* self, _In_ TaskQueue* tq, _In_ TQWorker* worker);
+    bool (*cancel)(_In_ void* self);
+    bool (*reset)(_In_ void* self);
+    bool (*wait)(_In_ void* self, int64 timeout);
+    intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
+    uint32 (*hash)(_In_ void* self, uint32 flags);
+} LogReplay_ClassIf;
+extern LogReplay_ClassIf LogReplay_ClassIf_tmpl;
 
 typedef struct RunInfo {
     union {
@@ -128,4 +163,128 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoScore(self) (self)->_->score(RunInfo(self))
 // void runinfoFinish(RunInfo* self, RunResult result);
 #define runinfoFinish(self, result) (self)->_->finish(RunInfo(self), result)
+
+typedef struct LogReplay {
+    union {
+        LogReplay_ClassIf* _;
+        void* _is_LogReplay;
+        void* _is_ComplexTask;
+        void* _is_Task;
+        void* _is_BasicTask;
+        void* _is_ObjInst;
+    };
+    ObjClassInfo* _clsinfo;
+    atomic(uintptr) _ref;
+    atomic(ptr) _weakref;
+
+    atomic(uint32) state;
+    string name;        // task name to be shown in monitor output
+    int64 last;        // the last time this task was moved between queues and/or run
+    cchain oncomplete;        // functions that are called when this task has completed
+    int64 nextrun;        // next time for this task to run when scheduled
+    int64 lastprogress;        // timestamp of last progress change
+    Weak(ComplexTaskQueue)* lastq;        // The last queue this task ran on before it was deferred
+    sa_TaskRequires _requires;        // list of requirements that must be satisfied
+    uint16 flags;        // flags to customize task behavior
+    uint16 _intflags;        // internal flags reserved for use by the scheduler
+    atomic(uint32) _advcount;        // number of times this task has been advanced
+    Subspace* ss;
+    RunInfo* run;
+    bool combat;
+    int64 savepoint;
+    int64 sectorpoint;
+} LogReplay;
+extern ObjClassInfo LogReplay_clsinfo;
+#define LogReplay(inst) ((LogReplay*)(unused_noeval((inst) && &((inst)->_is_LogReplay)), (inst)))
+#define LogReplayNone ((LogReplay*)NULL)
+
+typedef struct LogReplay_WeakRef {
+    union {
+        ObjInst* _inst;
+        void* _is_LogReplay_WeakRef;
+        void* _is_ComplexTask_WeakRef;
+        void* _is_Task_WeakRef;
+        void* _is_BasicTask_WeakRef;
+        void* _is_ObjInst_WeakRef;
+    };
+    atomic(uintptr) _ref;
+    RWLock _lock;
+} LogReplay_WeakRef;
+#define LogReplay_WeakRef(inst) ((LogReplay_WeakRef*)(unused_noeval((inst) && &((inst)->_is_LogReplay_WeakRef)), (inst)))
+
+_objfactory_guaranteed LogReplay* LogReplay_create(Subspace* ss, RunInfo* run, bool combat, int64 savepoint, int64 sectorpoint);
+// LogReplay* logreplayCreate(Subspace* ss, RunInfo* run, bool combat, int64 savepoint, int64 sectorpoint);
+#define logreplayCreate(ss, run, combat, savepoint, sectorpoint) LogReplay_create(ss, RunInfo(run), combat, savepoint, sectorpoint)
+
+// void logreplayRequireTask(LogReplay* self, Task* dep, bool failok);
+//
+// Wrapper around require() to depend on a task completing
+#define logreplayRequireTask(self, dep, failok) ComplexTask_requireTask(ComplexTask(self), Task(dep), failok)
+
+// void logreplayRequireTaskTimeout(LogReplay* self, Task* dep, bool failok, int64 timeout);
+#define logreplayRequireTaskTimeout(self, dep, failok, timeout) ComplexTask_requireTaskTimeout(ComplexTask(self), Task(dep), failok, timeout)
+
+// void logreplayRequireResource(LogReplay* self, TaskResource* res);
+//
+// Wrapper around require() to depend on acquiring a resource
+#define logreplayRequireResource(self, res) ComplexTask_requireResource(ComplexTask(self), TaskResource(res))
+
+// void logreplayRequireResourceTimeout(LogReplay* self, TaskResource* res, int64 timeout);
+#define logreplayRequireResourceTimeout(self, res, timeout) ComplexTask_requireResourceTimeout(ComplexTask(self), TaskResource(res), timeout)
+
+// void logreplayRequireGate(LogReplay* self, TRGate* gate);
+//
+// Wrapper around require() to depend on a gate being opened
+#define logreplayRequireGate(self, gate) ComplexTask_requireGate(ComplexTask(self), TRGate(gate))
+
+// void logreplayRequireGateTimeout(LogReplay* self, TRGate* gate, int64 timeout);
+#define logreplayRequireGateTimeout(self, gate, timeout) ComplexTask_requireGateTimeout(ComplexTask(self), TRGate(gate), timeout)
+
+// void logreplayRequire(LogReplay* self, TaskRequires* req);
+//
+// Add a requirement for the task to run
+#define logreplayRequire(self, req) ComplexTask_require(ComplexTask(self), TaskRequires(req))
+
+// bool logreplayAdvance(LogReplay* self);
+//
+// advance a deferred task to run as soon as possible
+#define logreplayAdvance(self) ComplexTask_advance(ComplexTask(self))
+
+// uint32 logreplayCheckRequires(LogReplay* self, bool updateProgress, int64* expires);
+//
+// check if this task can run because all requirements are satisfied
+#define logreplayCheckRequires(self, updateProgress, expires) ComplexTask_checkRequires(ComplexTask(self), updateProgress, expires)
+
+// void logreplayCancelRequires(LogReplay* self);
+//
+// cascade a task cancellation to any requirements
+#define logreplayCancelRequires(self) ComplexTask_cancelRequires(ComplexTask(self))
+
+// bool logreplayAcquireRequires(LogReplay* self, sa_TaskRequires* acquired);
+//
+// try to acquire required resources
+#define logreplayAcquireRequires(self, acquired) ComplexTask_acquireRequires(ComplexTask(self), acquired)
+
+// bool logreplayReleaseRequires(LogReplay* self, sa_TaskRequires resources);
+//
+// release a list of acquired resources
+#define logreplayReleaseRequires(self, resources) ComplexTask_releaseRequires(ComplexTask(self), resources)
+
+// bool logreplay_setState(LogReplay* self, uint32 newstate);
+#define logreplay_setState(self, newstate) BasicTask__setState(BasicTask(self), newstate)
+
+// uint32 logreplayRun(LogReplay* self, TaskQueue* tq, TQWorker* worker, TaskControl* tcon);
+#define logreplayRun(self, tq, worker, tcon) (self)->_->run(LogReplay(self), TaskQueue(tq), TQWorker(worker), tcon)
+// void logreplayRunCancelled(LogReplay* self, TaskQueue* tq, TQWorker* worker);
+#define logreplayRunCancelled(self, tq, worker) (self)->_->runCancelled(LogReplay(self), TaskQueue(tq), TQWorker(worker))
+// bool logreplayCancel(LogReplay* self);
+#define logreplayCancel(self) (self)->_->cancel(LogReplay(self))
+// bool logreplayReset(LogReplay* self);
+#define logreplayReset(self) (self)->_->reset(LogReplay(self))
+// bool logreplayWait(LogReplay* self, int64 timeout);
+#define logreplayWait(self, timeout) (self)->_->wait(LogReplay(self), timeout)
+// intptr logreplayCmp(LogReplay* self, LogReplay* other, uint32 flags);
+#define logreplayCmp(self, other, flags) (self)->_->cmp(LogReplay(self), other, flags)
+// uint32 logreplayHash(LogReplay* self, uint32 flags);
+#define logreplayHash(self, flags) (self)->_->hash(LogReplay(self), flags)
 

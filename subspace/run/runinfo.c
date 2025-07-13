@@ -621,60 +621,9 @@ void RunInfo_processShip(_In_ RunInfo* self, _In_opt_ strref name)
 
 void RunInfo_replayLog(_In_ RunInfo* self, bool combat, int64 savepoint, int64 sectorpoint)
 {
-    string sql = combat ? _S
-        "SELECT savepoint, sectorpoint, time, id, param1, param2, param3, param4 FROM combatlog WHERE runid = ?" :
-                          _S
-        "SELECT savepoint, sectorpoint, time, id, param1, param2, param3, param4 FROM log WHERE runid = ?";
-
-    if (savepoint > 0)
-        strAppend(&sql, _S" AMD savepoint = ?");
-    if (sectorpoint > 0)
-        strAppend(&sql, _S" AND sectorpoint = ?");
-
-    DbStmt* stmt = dbPrepare(self->ss->db, sql);
-    if (!stmt)
-        goto out;
-
-    int nb = 1;
-    dbstmtBind(stmt, nb++, stvar(int64, self->runid));
-    if (savepoint > 0)
-        dbstmtBind(stmt, nb++, stvar(int64, savepoint));
-    if (sectorpoint > 0)
-        dbstmtBind(stmt, nb++, stvar(int64, sectorpoint));
-
-    LogRelay* runlog = self->ss->runlog;
-    logrelayReset(runlog);
-
-    while (dbstmtExec(stmt) && saSize(stmt->row) == 8) {
-        int64 savepoint              = 0;
-        int64 sectorpoint            = 0;
-        int64 time                   = 0;
-        string id                    = 0;
-        stvar params[LOG_MAX_PARAMS] = { 0 };
-
-        stConvert(int64, &savepoint, stvar, stmt->row.a[0]);
-        stConvert(int64, &sectorpoint, stvar, stmt->row.a[1]);
-        stConvert(int64, &time, stvar, stmt->row.a[2]);
-        stConvert(string, &id, stvar, stmt->row.a[3]);
-        params[0] = stmt->row.a[4];
-        params[1] = stmt->row.a[5];
-        params[2] = stmt->row.a[6];
-        params[3] = stmt->row.a[7];
-
-        LogEnt* nent = logentCreate(sectorpoint, savepoint, time, id, params);
-        if (nent) {
-            logrelaySend(runlog, nent, true);
-            objRelease(&nent);
-        }
-
-        strDestroy(&id);
-    }
-
-    logrelayReplayComplete(runlog);
-
-out:
-    strDestroy(&sql);
-    objRelease(&stmt);
+    // run this as a separate task so that it can wait for data if needed
+    LogReplay* replay = logreplayCreate(self->ss, self, combat, savepoint, sectorpoint);
+    tqRun(self->ss->workq, &replay);
 }
 
 void RunInfo_beacon(_In_ RunInfo* self, int sector, int beacons, int visit, int x, int y,
@@ -719,6 +668,100 @@ void RunInfo_beacon(_In_ RunInfo* self, int sector, int beacons, int visit, int 
         }
         objRelease(&stmt);
     }
+}
+
+_objfactory_guaranteed LogReplay*
+LogReplay_create(Subspace* ss, RunInfo* run, bool combat, int64 savepoint, int64 sectorpoint)
+{
+    LogReplay* self;
+    self = objInstCreate(LogReplay);
+
+    self->ss          = ss;
+    self->run         = objAcquire(run);
+    self->combat      = combat;
+    self->savepoint   = savepoint;
+    self->sectorpoint = sectorpoint;
+
+    objInstInit(self);
+
+    // defer the replay until game data is finished loading
+    GameData* data = subspaceData(ss);
+    if (data) {
+        gamedataWait(data, self);
+        objRelease(&data);
+    }
+
+    return self;
+}
+
+uint32 LogReplay_run(_In_ LogReplay* self, _In_ TaskQueue* tq, _In_ TQWorker* worker,
+                     _Inout_ TaskControl* tcon)
+{
+    string sql = self->combat ? _S
+        "SELECT savepoint, sectorpoint, time, id, param1, param2, param3, param4 FROM combatlog WHERE runid = ?" :
+                                _S
+        "SELECT savepoint, sectorpoint, time, id, param1, param2, param3, param4 FROM log WHERE runid = ?";
+
+    if (self->savepoint > 0)
+        strAppend(&sql, _S" AMD savepoint = ?");
+    if (self->sectorpoint > 0)
+        strAppend(&sql, _S" AND sectorpoint = ?");
+
+    DbStmt* stmt = dbPrepare(self->ss->db, sql);
+    if (!stmt)
+        goto out;
+
+    RunInfo* run = self->run;
+
+    int nb = 1;
+    dbstmtBind(stmt, nb++, stvar(int64, run->runid));
+    if (self->savepoint > 0)
+        dbstmtBind(stmt, nb++, stvar(int64, self->savepoint));
+    if (self->sectorpoint > 0)
+        dbstmtBind(stmt, nb++, stvar(int64, self->sectorpoint));
+
+    LogRelay* runlog = self->ss->runlog;
+    logrelayReset(runlog);
+
+    while (dbstmtExec(stmt) && saSize(stmt->row) == 8) {
+        int64 savepoint              = 0;
+        int64 sectorpoint            = 0;
+        int64 time                   = 0;
+        string id                    = 0;
+        stvar params[LOG_MAX_PARAMS] = { 0 };
+
+        stConvert(int64, &savepoint, stvar, stmt->row.a[0]);
+        stConvert(int64, &sectorpoint, stvar, stmt->row.a[1]);
+        stConvert(int64, &time, stvar, stmt->row.a[2]);
+        stConvert(string, &id, stvar, stmt->row.a[3]);
+        params[0] = stmt->row.a[4];
+        params[1] = stmt->row.a[5];
+        params[2] = stmt->row.a[6];
+        params[3] = stmt->row.a[7];
+
+        LogEnt* nent = logentCreate(sectorpoint, savepoint, time, id, params);
+        if (nent) {
+            logrelaySend(runlog, nent, true);
+            objRelease(&nent);
+        }
+
+        strDestroy(&id);
+    }
+
+    logrelayReplayComplete(runlog);
+
+out:
+    strDestroy(&sql);
+    objRelease(&stmt);
+
+    return TASK_Result_Success;
+}
+
+void LogReplay_destroy(_In_ LogReplay* self)
+{
+    // Autogen begins -----
+    objRelease(&self->run);
+    // Autogen ends -------
 }
 
 // Autogen begins -----

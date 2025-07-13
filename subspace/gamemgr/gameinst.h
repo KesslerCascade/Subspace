@@ -78,7 +78,6 @@ typedef struct GameInst {
     GameInstState state;
     hashtable features;
     int32 ver[3];
-    GameData* data;
     float loadPct;
     int failReason;
     RunInfo* activeRun;        // run that is being updated by this instance

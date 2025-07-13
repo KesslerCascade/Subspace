@@ -130,13 +130,13 @@ bool PkgFS_searchNext(_In_ PkgFS* self, _Inout_ FSSearchIter* iter)
     string path  = 0;
     pathJoin(&path, search->path, name);
     PkgDirEnt* ent;
-    if (htFind(pkg->files, strref, name, object, &ent)) {
+    if (htFind(pkg->files, strref, path, object, &ent)) {
         iter->type = FS_File;
         strDup(&iter->name, name);
         iter->stat.size = ent->size;
         ret             = true;
         objRelease(&ent);
-    } else if (htHasKey(pkg->dircache, strref, name)) {
+    } else if (htHasKey(pkg->dircache, strref, path)) {
         iter->type = FS_Directory;
         strDup(&iter->name, name);
         iter->stat.size = 0;

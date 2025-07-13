@@ -37,7 +37,6 @@ typedef enum GameInstState {
     GameInstState state;
     hashtable:string:object features;
     int32 ver[3];
-    object:GameData data;
 
     float loadPct;
     int failReason;
