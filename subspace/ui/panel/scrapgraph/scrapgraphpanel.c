@@ -128,7 +128,7 @@ bool ScrapGraphPanel_update(_In_ ScrapGraphPanel* self)
                     strref sname = langGetD(self->ss, skey, _S"");
 
                     if (!strEmpty(sname)) {
-                        strNConcat(&temp, sname, _S" ", temp);
+                        strDup(&temp, sname);
                     }
 
                     strDestroy(&skey);
