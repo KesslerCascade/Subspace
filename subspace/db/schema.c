@@ -259,6 +259,40 @@ bool dbCreateSchema(sqlite3* db)
     return ret;
 }
 
+static bool dbUpgradeV2RunLog(sqlite3* db)
+{
+    bool ret = true;
+
+    // schema versions before V2 didn't have the Start runlog entry, but it can be synthesized from
+    // the run data
+    if (sqlite3_exec(
+            db,
+            "INSERT INTO log SELECT runid, 256 AS savepoint, 256 as sectorpoint, start AS time, "
+            "'Start' AS id, "
+            "shiptype AS param1, shipname AS param2, seed AS param3, difficulty AS "
+            "param4 FROM runs",
+            NULL,
+            NULL,
+            NULL) != SQLITE_OK)
+        ret = false;
+
+    // schema versions before V2 didn't have the Sector runlog entry, but it can be synthesized from
+    // the sector data
+    if (sqlite3_exec(
+            db,
+            "INSERT INTO log SELECT l.runid, min(l.savepoint) as savepoint, l.sectorpoint, s.time, "
+            "'Sector' AS id, s.type AS param1, s.seed AS param2, NULL as param3, NULL as param4 FROM log l "
+            "JOIN sectors s ON (s.runid = l.runid AND s.sectorpoint = l.sectorpoint) "
+            "WHERE l.savepoint > 0 "
+            "GROUP BY l.runid, l.sectorpoint",
+            NULL,
+            NULL,
+            NULL) != SQLITE_OK)
+        ret = false;
+
+    return ret;
+}
+
 static bool updateVer(sqlite3* db, int newver)
 {
     bool ret = false;
@@ -295,6 +329,11 @@ static bool dbUpgradeFromV1(sqlite3* db, int* destver)
     return dbUpgradeV1Beacons(db);
 }
 
+static bool dbUpgradeFromV2(sqlite3* db, int* destver)
+{
+    return dbUpgradeV2RunLog(db);
+}
+
 static bool dbUpgradeOnce(sqlite3* db, int* ver)
 {
     bool ret    = true;
@@ -307,6 +346,9 @@ static bool dbUpgradeOnce(sqlite3* db, int* ver)
         break;
     case 1:
         ret = dbUpgradeFromV1(db, &destver);
+        break;
+    case 2:
+        ret = dbUpgradeFromV2(db, &destver);
         break;
     default:
         ret = false;

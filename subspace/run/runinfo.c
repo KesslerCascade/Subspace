@@ -723,6 +723,8 @@ uint32 LogReplay_run(_In_ LogReplay* self, _In_ TaskQueue* tq, _In_ TQWorker* wo
     if (self->sectorpoint > 0)
         strAppend(&sql, _S" AND sectorpoint = ?");
 
+    strAppend(&sql, _S" ORDER BY savepoint, time, rowid");
+
     DbStmt* stmt = dbPrepare(self->ss->db, sql);
     if (!stmt)
         goto out;

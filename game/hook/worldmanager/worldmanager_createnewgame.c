@@ -1,4 +1,5 @@
 #include "control/controlclient.h"
+#include "control/runlog.h"
 #include "ftl/blueprintmanager.h"
 #include "ftl/capp.h"
 #include "ftl/completeship.h"
@@ -37,6 +38,8 @@ void subspace_WorldManager_CreateNewGame_post(WorldManager* self)
             msg = controlNewMsg("GameState", 1);
             controlMsgInt(msg, 0, "state", GAME_RUN);
             controlClientQueue(msg);
+
+            runLogSend(&Log_Start, shipType->buf, shipName->data.buf, seed, g_Settings_difficulty);
         }
     } else {
         ControlMsg* msg = controlNewMsg("GameState", 1);

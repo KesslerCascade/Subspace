@@ -19,7 +19,8 @@ bool runLogSend(LogEntSpec* spec, ...)
 
     WorldManager* world = CApp_world(theApp);
     controlMsgInt(msg, 1, "sector", WorldManager_worldLevel(world) + 1);
-    controlMsgInt(msg, 2, "beacons", ScoreKeeper_stats(SKeeper)[1].current);
+    int beacons = ScoreKeeper_stats(SKeeper)[1].current;
+    controlMsgInt(msg, 2, "beacons", MAX(beacons, 1));
 
     va_list args;
     va_start(args, spec);

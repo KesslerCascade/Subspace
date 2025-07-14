@@ -1,4 +1,5 @@
 #include "control/controlclient.h"
+#include "control/runlog.h"
 #include "ftl/starmap.h"
 #include "ftl/worldmanager.h"
 #include "hook/hook.h"
@@ -20,6 +21,11 @@ subspace_StarMap_GenerateMap_post(Location* ret, StarMap* self, bool bTutorial, 
         controlMsgBool(msg, 3, "secret", StarMap_bSecretSector(self));
         msg->priority = 1;   // make sure this gets sent after NewGame
         controlClientQueue(msg);
+
+        if (!gc.loadingGame)
+            runLogSend(&Log_Sector,
+                       Sector_description_type(cur)->buf,
+                       StarMap_currentSectorSeed(self));
     }
 
     return ret;

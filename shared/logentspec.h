@@ -22,5 +22,7 @@ extern LogEntSpec Log_Abandon;
 extern LogEntSpec Log_HullDamage;
 extern LogEntSpec Log_Jump;
 extern LogEntSpec Log_Wait;
+extern LogEntSpec Log_Sector;
 extern LogEntSpec Log_Event;
 extern LogEntSpec Log_Ship;
+extern LogEntSpec Log_Start;

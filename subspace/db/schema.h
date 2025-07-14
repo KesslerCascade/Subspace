@@ -3,7 +3,7 @@
 #include "subspace.h"
 typedef struct Database Database;
 
-#define DB_CURRENT_SCHEMA_VER 2
+#define DB_CURRENT_SCHEMA_VER 3
 
 // these are all SYNCHRONOUS functions that must be run single-threaded
 

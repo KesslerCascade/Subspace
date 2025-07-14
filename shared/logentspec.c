@@ -25,8 +25,8 @@ LogEntSpec Log_Abandon = { .id         = "Abandon",
                            .paramTypes = { LP_STRING },
                            .paramNames = { "reason" } };
 
-LogEntSpec Log_Jump = { .id = "Jump", .numParams = 0 };
-LogEntSpec Log_Wait = { .id = "Wait", .numParams = 0 };
+LogEntSpec Log_Jump = { .id = "Jump", .priority = 2, .numParams = 0 };
+LogEntSpec Log_Wait = { .id = "Wait", .priority = 2, .numParams = 0 };
 
 LogEntSpec Log_Event = {
     .id         = "Event",
@@ -41,3 +41,19 @@ LogEntSpec Log_Ship = { .id         = "Ship",
                         .priority   = 11,   // should always be sent AFTER the Event
                         .paramTypes = { LP_STRING },
                         .paramNames = { "name" } };
+
+LogEntSpec Log_Sector = {
+    .id         = "Sector",
+    .numParams  = 2,
+    .priority   = 1, // before Jump / Wait
+    .paramTypes = { LP_STRING, LP_INT },
+    .paramNames = { "type",    "seed" }
+};
+
+LogEntSpec Log_Start = {
+    .id         = "Start",
+    .numParams  = 4,
+    .priority   = 0,
+    .paramTypes = { LP_STRING, LP_STRING, LP_INT, LP_INT       },
+    .paramNames = { "ship",    "name",    "seed", "difficulty" }
+};
