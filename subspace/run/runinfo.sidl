@@ -66,7 +66,7 @@ class RunInfo {
 
     void enterSector(int num, int seed, strref type, bool secret);
     void updateStats(int ships, int beacons, int scrap, int crew);
-    void runLog(int sector, int beacons, int64 time, strref id, stvar params[LOG_MAX_PARAMS]);
+    void runLog(int sector, int beacons, int64 time, float64 gametime, strref id, stvar params[LOG_MAX_PARAMS]);
     void beacon(int sector, int beacons, int visit, int x, int y, int64 time, strref event);
     void processLog(LogEnt* ent);
     void processScrap(strref src, int amount, int rawamount);

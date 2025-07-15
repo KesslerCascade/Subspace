@@ -16,6 +16,7 @@ Patch* Base_patches[] = {
     &patch_MainMenu_Open,
     &patch_WorldManager_CreateNewGame,
     &patch_WorldManager_LoadGame,
+    &patch_WorldManager_OnLoop,
     &patch_StarMap_GenerateMap,
     0
 };

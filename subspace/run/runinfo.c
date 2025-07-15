@@ -476,8 +476,8 @@ int32 RunInfo_score(_In_ RunInfo* self)
                    diffScale);
 }
 
-void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, _In_opt_ strref id,
-                    stvar params[LOG_MAX_PARAMS])
+void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, float64 gametime,
+                    _In_opt_ strref id, stvar params[LOG_MAX_PARAMS])
 {
     // normalize sectorpoint / savepoint
     int64 savepoint, sectorpoint;
@@ -489,7 +489,7 @@ void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, _In
         recording   = self->recording;
     }
 
-    LogEnt* ent = logentCreate(sectorpoint, savepoint, time, id, params);
+    LogEnt* ent = logentCreate(sectorpoint, savepoint, time, gametime, id, params);
     if (!ent)
         return;
 
@@ -505,12 +505,12 @@ void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, _In
     // save in database
     if (recording) {
         string sql = ent->spec->combat ? _S"INSERT INTO combatlog " : _S"INSERT INTO log ";
-        strAppend(&sql, _S"(runid, savepoint, sectorpoint, time, id");
+        strAppend(&sql, _S"(runid, savepoint, sectorpoint, time, gametime, id");
         for (int i = 0; i < spec->numParams; i++) {
             strFormat(&temp, _S", param${int}", stvar(int32, i + 1));
             strAppend(&sql, temp);
         }
-        strAppend(&sql, _S") VALUES (?, ?, ?, ?, ?");
+        strAppend(&sql, _S") VALUES (?, ?, ?, ?, ?, ?");
         for (int i = 0; i < spec->numParams; i++) {
             strAppend(&sql, _S", ?");
         }
@@ -525,9 +525,10 @@ void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, _In
         dbstmtBind(stmt, 2, stvar(int64, savepoint));
         dbstmtBind(stmt, 3, stvar(int64, sectorpoint));
         dbstmtBind(stmt, 4, stvar(int64, time));
-        dbstmtBind(stmt, 5, stvar(strref, id));
+        dbstmtBind(stmt, 5, stvar(float64, gametime));
+        dbstmtBind(stmt, 6, stvar(strref, id));
         for (int i = 0; i < spec->numParams; i++) {
-            dbstmtBind(stmt, 6 + i, params[i]);
+            dbstmtBind(stmt, 7 + i, params[i]);
         }
 
         if (!dbstmtExec(stmt))
@@ -714,9 +715,9 @@ uint32 LogReplay_run(_In_ LogReplay* self, _In_ TaskQueue* tq, _In_ TQWorker* wo
                      _Inout_ TaskControl* tcon)
 {
     string sql = self->combat ? _S
-        "SELECT savepoint, sectorpoint, time, id, param1, param2, param3, param4 FROM combatlog WHERE runid = ?" :
+        "SELECT savepoint, sectorpoint, time, gametime, id, param1, param2, param3, param4 FROM combatlog WHERE runid = ?" :
                                 _S
-        "SELECT savepoint, sectorpoint, time, id, param1, param2, param3, param4 FROM log WHERE runid = ?";
+        "SELECT savepoint, sectorpoint, time, gametime, id, param1, param2, param3, param4 FROM log WHERE runid = ?";
 
     if (self->savepoint > 0)
         strAppend(&sql, _S" AMD savepoint = ?");
@@ -741,23 +742,25 @@ uint32 LogReplay_run(_In_ LogReplay* self, _In_ TaskQueue* tq, _In_ TQWorker* wo
     LogRelay* runlog = self->ss->runlog;
     logrelayReset(runlog);
 
-    while (dbstmtExec(stmt) && saSize(stmt->row) == 8) {
+    while (dbstmtExec(stmt) && saSize(stmt->row) == 9) {
         int64 savepoint              = 0;
         int64 sectorpoint            = 0;
         int64 time                   = 0;
+        float64 gametime             = 0;
         string id                    = 0;
         stvar params[LOG_MAX_PARAMS] = { 0 };
 
         stConvert(int64, &savepoint, stvar, stmt->row.a[0]);
         stConvert(int64, &sectorpoint, stvar, stmt->row.a[1]);
         stConvert(int64, &time, stvar, stmt->row.a[2]);
-        stConvert(string, &id, stvar, stmt->row.a[3]);
-        params[0] = stmt->row.a[4];
-        params[1] = stmt->row.a[5];
-        params[2] = stmt->row.a[6];
-        params[3] = stmt->row.a[7];
+        stConvert(float64, &gametime, stvar, stmt->row.a[3]);
+        stConvert(string, &id, stvar, stmt->row.a[4]);
+        params[0] = stmt->row.a[5];
+        params[1] = stmt->row.a[6];
+        params[2] = stmt->row.a[7];
+        params[3] = stmt->row.a[8];
 
-        LogEnt* nent = logentCreate(sectorpoint, savepoint, time, id, params);
+        LogEnt* nent = logentCreate(sectorpoint, savepoint, time, gametime, id, params);
         if (nent) {
             logrelaySend(runlog, nent, true);
             objRelease(&nent);

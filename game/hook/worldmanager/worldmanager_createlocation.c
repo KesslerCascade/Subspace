@@ -10,10 +10,15 @@
 #include "patch/patchlist.h"
 #include "subspacegame.h"
 
-void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
+int WorldManager_CreateLocation_pre(WorldManager* self, Location* loc)
 {
     gs.waitInProgress = false;
+    gs.gameTime       = 0;
+    return 1;
+}
 
+void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
+{
     if (gc.loadingGame)
         return;   // don't do this while loading the game
 
@@ -50,7 +55,10 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
-    return hookFunction(base, WorldManager_CreateLocation, NULL, WorldManager_CreateLocation_post);
+    return hookFunction(base,
+                        WorldManager_CreateLocation,
+                        WorldManager_CreateLocation_pre,
+                        WorldManager_CreateLocation_post);
 }
 
 Patch patch_WorldManager_CreateLocation = {

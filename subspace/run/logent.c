@@ -53,8 +53,9 @@ _objinit_guaranteed bool LogEnt_init(_In_ LogEnt* self)
     // Autogen ends -------
 }
 
-_objfactory_check LogEnt* LogEnt_create(int64 sectorpoint, int64 savepoint, int64 time,
-                                        _In_opt_ strref id, stvar params[LOG_MAX_PARAMS])
+_objfactory_check LogEnt*
+LogEnt_create(int64 sectorpoint, int64 savepoint, int64 time, float64 gametime, _In_opt_ strref id,
+              stvar params[LOG_MAX_PARAMS])
 {
     lazyInit(&specinitstate, specinit, NULL);
 
@@ -64,9 +65,10 @@ _objfactory_check LogEnt* LogEnt_create(int64 sectorpoint, int64 savepoint, int6
     self->sectorpoint = sectorpoint;
     self->savepoint   = savepoint;
     self->time        = time;
+    self->gametime    = gametime;
     strDup(&self->id, id);
     htFind(spechash, strref, id, ptr, &self->spec);
-    
+
     if (!self->spec) {
         xaFree(self);
         return NULL;

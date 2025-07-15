@@ -150,6 +150,7 @@ add_executable(subspacegame
     hook/worldmanager/worldmanager_createnewgame.c
     hook/worldmanager/worldmanager_createship.c
     hook/worldmanager/worldmanager_loadgame.c
+    hook/worldmanager/worldmanager_onloop.c
     hook/worldmanager/worldmanager_savegame.c
     hook/worldmanager/worldmanager_updatelocation.c
     input/keybinds.c

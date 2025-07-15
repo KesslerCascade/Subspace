@@ -158,6 +158,7 @@ static bool dbCreateLog(sqlite3* db)
                      "savepoint INTEGER NOT NULL,"
                      "sectorpoint INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
+                     "gametime REAL NOT NULL,"
                      "id TEXT NOT NULL,"
                      "param1,"
                      "param2,"
@@ -206,6 +207,7 @@ static bool dbCreateCombatLog(sqlite3* db)
                      "savepoint INTEGER NOT NULL,"
                      "sectorpoint INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
+                     "gametime REAL NOT NULL,"
                      "id TEXT NOT NULL,"
                      "param1,"
                      "param2,"
@@ -289,6 +291,36 @@ static bool dbUpgradeV2RunLog(sqlite3* db)
             NULL,
             NULL) != SQLITE_OK)
         ret = false;
+
+    // add gametime column, default it to 0
+    if (sqlite3_exec(db, "ALTER TABLE log RENAME TO log_old", NULL, NULL, NULL) != SQLITE_OK)
+        ret = false;
+
+    // renaming the table won't rename the indicies; drop them so that dbCreateLog won't fail
+    if (sqlite3_exec(db, "DROP INDEX log_runid", NULL, NULL, NULL) != SQLITE_OK ||
+        sqlite3_exec(db, "DROP INDEX log_runid_savepoint", NULL, NULL, NULL) != SQLITE_OK ||
+        sqlite3_exec(db, "DROP INDEX log_runid_sectorpoint", NULL, NULL, NULL) != SQLITE_OK ||
+        sqlite3_exec(db, "DROP INDEX log_id", NULL, NULL, NULL) != SQLITE_OK)
+        ret = false;
+
+    // create new log table
+    ret &= dbCreateLog(db);
+
+    if (sqlite3_exec(
+            db,
+            "INSERT INTO log SELECT runid, savepoint, sectorpoint, time, 0, id, param1, param2, param3, param4 FROM log_old ORDER BY runid, savepoint, time, rowid",
+            NULL,
+            NULL,
+            NULL) != SQLITE_OK)
+        ret = false;
+
+    if (sqlite3_exec(db, "DROP TABLE log_old", NULL, NULL, NULL) != SQLITE_OK)
+        ret = false;
+
+    // just drop combatlog, it isn't used by anything yet
+    if (sqlite3_exec(db, "DROP TABLE combatlog", NULL, NULL, NULL) != SQLITE_OK)
+        ret = false;
+    ret &= dbCreateCombatLog(db);
 
     return ret;
 }

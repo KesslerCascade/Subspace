@@ -41,3 +41,4 @@ extern Patch patch_ShipSystem_GetExploded;
 extern Patch patch_WorldManager_LoadGame;
 extern Patch patch_WorldManager_SaveGame;
 extern Patch patch_WorldManager_UpdateLocation;
+extern Patch patch_WorldManager_OnLoop;

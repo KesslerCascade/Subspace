@@ -23,6 +23,7 @@ typedef struct LogEnt {
     int64 sectorpoint;
     int64 savepoint;
     int64 time;
+    float64 gametime;
     string id;
     LogEntSpec* spec;
     sa_stvar rawparams;
@@ -43,8 +44,8 @@ typedef struct LogEnt_WeakRef {
 } LogEnt_WeakRef;
 #define LogEnt_WeakRef(inst) ((LogEnt_WeakRef*)(unused_noeval((inst) && &((inst)->_is_LogEnt_WeakRef)), (inst)))
 
-_objfactory_check LogEnt* LogEnt_create(int64 sectorpoint, int64 savepoint, int64 time, _In_opt_ strref id, stvar params[LOG_MAX_PARAMS]);
-// LogEnt* logentCreate(int64 sectorpoint, int64 savepoint, int64 time, strref id, stvar params[LOG_MAX_PARAMS]);
-#define logentCreate(sectorpoint, savepoint, time, id, params) LogEnt_create(sectorpoint, savepoint, time, id, params)
+_objfactory_check LogEnt* LogEnt_create(int64 sectorpoint, int64 savepoint, int64 time, float64 gametime, _In_opt_ strref id, stvar params[LOG_MAX_PARAMS]);
+// LogEnt* logentCreate(int64 sectorpoint, int64 savepoint, int64 time, float64 gametime, strref id, stvar params[LOG_MAX_PARAMS]);
+#define logentCreate(sectorpoint, savepoint, time, gametime, id, params) LogEnt_create(sectorpoint, savepoint, time, gametime, id, params)
 
 

@@ -12,6 +12,7 @@ void cmdRunLog(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable
     strref id     = cfieldString(fields, _S"id");
     int32 sector  = cfieldValD(int32, fields, _S"sector", 0);
     int32 beacons = cfieldValD(int32, fields, _S"beacons", 0);
+    float64 gametime = cfieldValD(float64, fields, _S"gametime", 0);
 
     if (strEmpty(id) || sector == 0 || beacons == 0)
         goto out;
@@ -27,7 +28,7 @@ void cmdRunLog(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable
         }
     }
 
-    runinfoRunLog(run, sector, beacons, msg->hdr.timestamp, id, params);
+    runinfoRunLog(run, sector, beacons, msg->hdr.timestamp, gametime, id, params);
 
 out:
     objRelease(&run);

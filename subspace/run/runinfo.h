@@ -56,7 +56,7 @@ typedef struct RunInfo_ClassIf {
     void (*replayLog)(_In_ void* self, bool combat, int64 savepoint, int64 sectorpoint);
     void (*enterSector)(_In_ void* self, int num, int seed, _In_opt_ strref type, bool secret);
     void (*updateStats)(_In_ void* self, int ships, int beacons, int scrap, int crew);
-    void (*runLog)(_In_ void* self, int sector, int beacons, int64 time, _In_opt_ strref id, stvar params[LOG_MAX_PARAMS]);
+    void (*runLog)(_In_ void* self, int sector, int beacons, int64 time, float64 gametime, _In_opt_ strref id, stvar params[LOG_MAX_PARAMS]);
     void (*beacon)(_In_ void* self, int sector, int beacons, int visit, int x, int y, int64 time, _In_opt_ strref event);
     void (*processLog)(_In_ void* self, LogEnt* ent);
     void (*processScrap)(_In_ void* self, _In_opt_ strref src, int amount, int rawamount);
@@ -148,8 +148,8 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoEnterSector(self, num, seed, type, secret) (self)->_->enterSector(RunInfo(self), num, seed, type, secret)
 // void runinfoUpdateStats(RunInfo* self, int ships, int beacons, int scrap, int crew);
 #define runinfoUpdateStats(self, ships, beacons, scrap, crew) (self)->_->updateStats(RunInfo(self), ships, beacons, scrap, crew)
-// void runinfoRunLog(RunInfo* self, int sector, int beacons, int64 time, strref id, stvar params[LOG_MAX_PARAMS]);
-#define runinfoRunLog(self, sector, beacons, time, id, params) (self)->_->runLog(RunInfo(self), sector, beacons, time, id, params)
+// void runinfoRunLog(RunInfo* self, int sector, int beacons, int64 time, float64 gametime, strref id, stvar params[LOG_MAX_PARAMS]);
+#define runinfoRunLog(self, sector, beacons, time, gametime, id, params) (self)->_->runLog(RunInfo(self), sector, beacons, time, gametime, id, params)
 // void runinfoBeacon(RunInfo* self, int sector, int beacons, int visit, int x, int y, int64 time, strref event);
 #define runinfoBeacon(self, sector, beacons, visit, x, y, time, event) (self)->_->beacon(RunInfo(self), sector, beacons, visit, x, y, time, event)
 // void runinfoProcessLog(RunInfo* self, LogEnt* ent);

@@ -6,6 +6,7 @@
 #include "control.h"
 #include "controlclient.h"
 #include "osdep.h"
+#include "subspacegame.h"
 
 bool runLogSend(LogEntSpec* spec, ...)
 {
@@ -13,14 +14,14 @@ bool runLogSend(LogEntSpec* spec, ...)
     if (spec->combat && !controlClientConnected())
         return false;
 
-    ControlMsg* msg = controlNewMsg("RunLog", 3 + spec->numParams);
+    ControlMsg* msg = controlNewMsg("RunLog", 4 + spec->numParams);
     controlMsgStr(msg, 0, "id", spec->id);
-    uint64_t frametime;
 
     WorldManager* world = CApp_world(theApp);
     controlMsgInt(msg, 1, "sector", WorldManager_worldLevel(world) + 1);
     int beacons = ScoreKeeper_stats(SKeeper)[1].current;
     controlMsgInt(msg, 2, "beacons", MAX(beacons, 1));
+    controlMsgFloat64(msg, 3, "gametime", gs.gameTime);
 
     va_list args;
     va_start(args, spec);
@@ -28,9 +29,9 @@ bool runLogSend(LogEntSpec* spec, ...)
     for (int i = 0; i < spec->numParams; i++) {
         tmpbuf[1] = '1' + i;
         if (spec->paramTypes[i] == LP_INT)
-            controlMsgInt(msg, 3 + i, tmpbuf, va_arg(args, int));
+            controlMsgInt(msg, 4 + i, tmpbuf, va_arg(args, int));
         else if (spec->paramTypes[i] == LP_STRING)
-            controlMsgStr(msg, 3 + i, tmpbuf, va_arg(args, const char*));
+            controlMsgStr(msg, 4 + i, tmpbuf, va_arg(args, const char*));
         else
             va_arg(args, int);
     }

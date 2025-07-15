@@ -97,6 +97,8 @@ typedef struct GameGlobalState {
     int lastFrame1s;    // number of frames processed in the previous second
     int lastRender1s;   // number of frames rendered in the previous second
 
+    double gameTime;    // real (unpaused) time elapsed at current beacon
+
     // Tweaks
     bool tweaksOverrideFPS;
     bool ignoreFileDeletion;
