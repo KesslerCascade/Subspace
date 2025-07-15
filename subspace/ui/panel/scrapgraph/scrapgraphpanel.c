@@ -73,6 +73,7 @@ bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
 
     // register to receive all scrap events
     logrelaySubscribe(self->ss->runlog, self, _S"Scrap");
+    logrelaySubscribe(self->ss->runlog, self, _S"Sector");
 
     return parent_make();
 }
@@ -163,21 +164,32 @@ bool ScrapGraphPanel_update(_In_ ScrapGraphPanel* self)
 
 void ScrapGraphPanel_logNotify(_In_ ScrapGraphPanel* self, LogEnt* ent, bool replay)
 {
-    strref source = cfieldString(ent->params, _S"source");
-    int amount    = cfieldValD(int32, ent->params, _S"amount", 0);
+    if (strEq(ent->id, _S"Scrap")) {
+        strref source = cfieldString(ent->params, _S"source");
+        int amount    = cfieldValD(int32, ent->params, _S"amount", 0);
 
-    if (strEq(source, _S"Event") && amount > 0) {
-        // we're only interested in graphing scrap rewards
+        if (strEq(source, _S"Event") && amount > 0) {
+            // we're only interested in graphing scrap rewards
 
-        ScrapData sdn = { .amount = amount, .sectorpoint = ent->sectorpoint };
+            ScrapData sdn = { .amount = amount, .sectorpoint = ent->sectorpoint };
+            withMutex (&self->lock) {
+                saPush(&self->newscrap, opaque, sdn);
+                if (!replay)
+                    self->redraw = true;
+            }
+
+            // this function could be running in any thread; signal the UI thread to pick up the
+            // data and process it
+            ssuiUpdateMain(self->ss->ui, _S"scrapgraph");
+        }
+    } else if (strEq(ent->id, _S"Sector")) {
+        ScrapData sdn = { .amount = 0, .sectorpoint = ent->sectorpoint };
         withMutex (&self->lock) {
             saPush(&self->newscrap, opaque, sdn);
             if (!replay)
                 self->redraw = true;
         }
 
-        // this function could be running in any thread; signal the UI thread to pick up the data
-        // and process it
         ssuiUpdateMain(self->ss->ui, _S"scrapgraph");
     }
 }
