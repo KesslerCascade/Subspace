@@ -20,6 +20,12 @@ bool runLogSend(LogEntSpec* spec, ...)
     WorldManager* world = CApp_world(theApp);
     controlMsgInt(msg, 1, "sector", WorldManager_worldLevel(world) + 1);
     int beacons = ScoreKeeper_stats(SKeeper)[1].current;
+
+    // special case because the hook that detects a new sector happens before the number of beacons
+    // explored stat is updated
+    if (spec == &Log_Sector)
+        beacons++;
+
     controlMsgInt(msg, 2, "beacons", MAX(beacons, 1));
     controlMsgFloat64(msg, 3, "gametime", gs.gameTime);
 

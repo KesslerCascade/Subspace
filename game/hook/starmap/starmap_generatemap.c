@@ -12,6 +12,7 @@ Location*
 subspace_StarMap_GenerateMap_post(Location* ret, StarMap* self, bool bTutorial, bool useOldSeed)
 {
     Sector* cur = self ? StarMap_currentSector(self) : NULL;
+    gs.gameTime = 0;
 
     if (cur) {
         ControlMsg* msg = controlNewMsg("Sector", 4);
