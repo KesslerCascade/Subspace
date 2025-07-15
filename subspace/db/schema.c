@@ -373,9 +373,18 @@ static bool dbUpgradeOnce(sqlite3* db, int* ver)
 
 bool dbUpgradeSchema(sqlite3* db, int from)
 {
+    if (sqlite3_exec(db, "BEGIN", NULL, NULL, NULL) != SQLITE_OK)
+        return false;
+
     while (from < DB_CURRENT_SCHEMA_VER) {
-        if (!dbUpgradeOnce(db, &from))
+        if (!dbUpgradeOnce(db, &from)) {
+            sqlite3_exec(db, "ROLLBACK", NULL, NULL, NULL);
             return false;
+        }
     }
+
+    if (sqlite3_exec(db, "COMMIT", NULL, NULL, NULL) != SQLITE_OK)
+        return false;
+
     return true;
 }
