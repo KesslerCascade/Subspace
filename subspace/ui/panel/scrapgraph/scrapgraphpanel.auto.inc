@@ -14,19 +14,27 @@ static LogSubscriber _impl_ScrapGraphPanel_LogSubscriber = {
     .logReplayComplete = (void (*)(void*))ScrapGraphPanel_logReplayComplete,
 };
 
+static UINotifyListener _impl_ScrapGraphPanel_UINotifyListener = {
+    ._size = sizeof(UINotifyListener),
+    ._implements = (ObjIface*)&UINotifyListener_tmpl,
+    .uiNotify = (void (*)(void*, strref, stvlist*))ScrapGraphPanel_uiNotify,
+};
+
 static ScrapGraphPanel_ClassIf _impl_ScrapGraphPanel_ScrapGraphPanel_ClassIf = {
     ._size = sizeof(ScrapGraphPanel_ClassIf),
     ._implements = (ObjIface*)&ScrapGraphPanel_ClassIf_tmpl,
     .clear = (void (*)(void*))ScrapGraphPanel_clear,
+    .handleUpdate = (void (*)(void*, int64, bool))ScrapGraphPanel_handleUpdate,
     .make = (bool (*)(void*))ScrapGraphPanel_make,
-    .update = (bool (*)(void*))ScrapGraphPanel_update,
     .logNotify = (void (*)(void*, LogEnt*, bool))ScrapGraphPanel_logNotify,
     .logReset = (void (*)(void*))ScrapGraphPanel_logReset,
     .logReplayComplete = (void (*)(void*))ScrapGraphPanel_logReplayComplete,
+    .uiNotify = (void (*)(void*, strref, stvlist*))ScrapGraphPanel_uiNotify,
 };
 
 static ObjIface* _ifimpl_ScrapGraphPanel[] = {
     (ObjIface*)&_impl_ScrapGraphPanel_LogSubscriber,
+    (ObjIface*)&_impl_ScrapGraphPanel_UINotifyListener,
     (ObjIface*)&_impl_ScrapGraphPanel_ScrapGraphPanel_ClassIf,
     NULL
 };

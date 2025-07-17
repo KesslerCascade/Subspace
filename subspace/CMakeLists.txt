@@ -53,6 +53,7 @@ set(SUBSPACE_SIDL
     run/logent.sidl
     run/logrelay.sidl
     run/runinfo.sidl
+    run/scraptracker.sidl
     run/sectorinfo.sidl
     ui/mainwin.sidl
     ui/settingswin.sidl
@@ -128,6 +129,7 @@ add_executable(subspace
     run/logent.c
     run/logrelay.c
     run/runinfo.c
+    run/scraptracker.c
     run/sectorinfo.c
     ui/about.c
     ui/mainwin.c

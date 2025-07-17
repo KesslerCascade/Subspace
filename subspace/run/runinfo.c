@@ -17,6 +17,7 @@
 #include "ui/subspaceui.h"
 #include "logent.h"
 #include "logrelay.h"
+#include "scraptracker.h"
 
 _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss)
 {
@@ -36,17 +37,6 @@ _objinit_guaranteed bool RunInfo_init(_In_ RunInfo* self)
     rwlockInit(&self->lock);
     saInit(&self->sectors, object, 1, SA_Sorted);
     return true;
-    // Autogen ends -------
-}
-
-void RunInfo_destroy(_In_ RunInfo* self)
-{
-    // Autogen begins -----
-    rwlockDestroy(&self->lock);
-    strDestroy(&self->shipType);
-    strDestroy(&self->shipName);
-    strDestroy(&self->savePath);
-    saDestroy(&self->sectors);
     // Autogen ends -------
 }
 
@@ -308,7 +298,7 @@ void RunInfo_finish(_In_ RunInfo* self, RunResult result)
         self->modified  = clockWall();
     }
 
-    if (subspaceIsRun(self->ss, self))
+    if (self->focused)
         ssuiUpdateMain(self->ss->ui, _S"gameinfo");
 }
 
@@ -375,7 +365,7 @@ void RunInfo_enterSector(_In_ RunInfo* self, int num, int seed, _In_opt_ strref 
         self->modified = clockWall();
     }
 
-    if (subspaceIsRun(self->ss, self))
+    if (self->focused)
         ssuiUpdateMain(self->ss->ui, _S"gameinfo");
 }
 
@@ -384,12 +374,22 @@ SectorInfo* RunInfo_getSector(_In_ RunInfo* self, int64 sectorpoint)
     SectorInfo* ret = NULL;
 
     withReadLock (&self->lock) {
-        foreach (sarray, idx, SectorInfo*, sec, self->sectors) {
+        foreach (sarray, i, SectorInfo*, sec, self->sectors) {
             if (sec->sectorpoint == sectorpoint) {
                 ret = objAcquire(sec);
                 break;
             }
         }
+    }
+
+    return ret;
+}
+
+ScrapTracker* RunInfo_getScrap(_In_ RunInfo* self)
+{
+    ScrapTracker* ret = NULL;
+    withReadLock (&self->lock) {
+        ret = objAcquire(self->scrap);
     }
 
     return ret;
@@ -465,7 +465,7 @@ void RunInfo_updateStats(_In_ RunInfo* self, int ships, int beacons, int scrap, 
         self->modified = clockWall();
     }
 
-    if (subspaceIsRun(self->ss, self))
+    if (self->focused)
         ssuiUpdateMain(self->ss->ui, _S"gameinfo");
 }
 
@@ -481,12 +481,13 @@ void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, flo
 {
     // normalize sectorpoint / savepoint
     int64 savepoint, sectorpoint;
-    bool recording;
+    bool recording, focused;
     withReadLock (&self->lock) {
         savepoint   = max(SPOINT(beacons, 0), self->savepoint);
         sectorpoint = max(SPOINT(sector, 0), self->sectorpoint);
         // remember this now because runinfoProcessLog may change it for run-ending events
         recording   = self->recording;
+        focused     = self->focused;
     }
 
     LogEnt* ent = logentCreate(sectorpoint, savepoint, time, gametime, id, params);
@@ -496,7 +497,8 @@ void RunInfo_runLog(_In_ RunInfo* self, int sector, int beacons, int64 time, flo
     LogEntSpec* spec = ent->spec;
 
     // relay to interested UI elements
-    logrelaySend(self->ss->runlog, ent, false);
+    if (focused)
+        logrelaySend(self->ss->runlog, ent, false);
 
     // do any top-level processing for the run info itself
     runinfoProcessLog(self, ent);
@@ -583,7 +585,7 @@ void RunInfo_processScrap(_In_ RunInfo* self, _In_opt_ strref src, int amount, i
             objRelease(&stmt);
         }
 
-        if (subspaceIsRun(self->ss, self))
+        if (self->focused)
             ssuiUpdateMain(self->ss->ui, _S"gameinfo");
     }
 }
@@ -609,7 +611,7 @@ void RunInfo_processHullDamage(_In_ RunInfo* self, _In_opt_ strref src, int amou
             objRelease(&stmt);
         }
 
-        if (subspaceIsRun(self->ss, self))
+        if (self->focused)
             ssuiUpdateMain(self->ss->ui, _S"gameinfo");
     }
 }
@@ -685,6 +687,32 @@ void RunInfo_beacon(_In_ RunInfo* self, int sector, int beacons, int visit, int 
         }
         objRelease(&stmt);
     }
+}
+
+void RunInfo_setFocused(_In_ RunInfo* self, bool focused)
+{
+    withWriteLock (&self->lock) {
+        if (self->focused != focused) {
+            if (focused) {
+                self->scrap = scraptrackerCreate(self);
+            } else {
+                objRelease(&self->scrap);
+            }
+            self->focused = focused;
+        }
+    }
+}
+
+void RunInfo_destroy(_In_ RunInfo* self)
+{
+    // Autogen begins -----
+    rwlockDestroy(&self->lock);
+    strDestroy(&self->shipType);
+    strDestroy(&self->shipName);
+    strDestroy(&self->savePath);
+    saDestroy(&self->sectors);
+    objRelease(&self->scrap);
+    // Autogen ends -------
 }
 
 _objfactory_guaranteed LogReplay*

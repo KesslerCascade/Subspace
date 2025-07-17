@@ -21,6 +21,8 @@ typedef struct TRGate TRGate;
 typedef struct TRGate_WeakRef TRGate_WeakRef;
 typedef struct ComplexTaskQueue ComplexTaskQueue;
 typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
+typedef struct ScrapTracker ScrapTracker;
+typedef struct ScrapTracker_WeakRef ScrapTracker_WeakRef;
 typedef struct LogEnt LogEnt;
 typedef struct LogEnt_WeakRef LogEnt_WeakRef;
 typedef struct VFSDir VFSDir;
@@ -62,7 +64,9 @@ typedef struct RunInfo_ClassIf {
     void (*processScrap)(_In_ void* self, _In_opt_ strref src, int amount, int rawamount);
     void (*processHullDamage)(_In_ void* self, _In_opt_ strref src, int amount);
     void (*processShip)(_In_ void* self, _In_opt_ strref name);
+    void (*setFocused)(_In_ void* self, bool focused);
     SectorInfo* (*getSector)(_In_ void* self, int64 sectorpoint);
+    ScrapTracker* (*getScrap)(_In_ void* self);
     int32 (*score)(_In_ void* self);
     void (*finish)(_In_ void* self, RunResult result);
 } RunInfo_ClassIf;
@@ -116,6 +120,8 @@ typedef struct RunInfo {
     string savePath;
     sa_SectorInfo sectors;
     bool recording;        // is this run being currently recorded (i.e. not a historical run)
+    bool focused;        // is focused by the UI
+    ScrapTracker* scrap;        // Trackers
 } RunInfo;
 extern ObjClassInfo RunInfo_clsinfo;
 #define RunInfo(inst) ((RunInfo*)(unused_noeval((inst) && &((inst)->_is_RunInfo)), (inst)))
@@ -160,8 +166,12 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoProcessHullDamage(self, src, amount) (self)->_->processHullDamage(RunInfo(self), src, amount)
 // void runinfoProcessShip(RunInfo* self, strref name);
 #define runinfoProcessShip(self, name) (self)->_->processShip(RunInfo(self), name)
+// void runinfoSetFocused(RunInfo* self, bool focused);
+#define runinfoSetFocused(self, focused) (self)->_->setFocused(RunInfo(self), focused)
 // SectorInfo* runinfoGetSector(RunInfo* self, int64 sectorpoint);
 #define runinfoGetSector(self, sectorpoint) (self)->_->getSector(RunInfo(self), sectorpoint)
+// ScrapTracker* runinfoGetScrap(RunInfo* self);
+#define runinfoGetScrap(self) (self)->_->getScrap(RunInfo(self))
 // int32 runinfoScore(RunInfo* self);
 #define runinfoScore(self) (self)->_->score(RunInfo(self))
 // void runinfoFinish(RunInfo* self, RunResult result);

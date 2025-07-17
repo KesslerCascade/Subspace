@@ -14,18 +14,9 @@
 #include "control/controlserver.h"
 #include "run/logrelay.h"
 #include "run/runinfo.h"
+#include "run/scraptracker.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iupsetobj.h"
-
-static intptr ScrapData_cmp(stype st, _In_ stgeneric gen1, _In_ stgeneric gen2, flags_t flags)
-{
-    ScrapData* s1 = (ScrapData*)gen1.st_opaque;
-    ScrapData* s2 = (ScrapData*)gen2.st_opaque;
-
-    return s1->sectorpoint - s2->sectorpoint;
-}
-
-STypeOps ScrapData_ops = { .cmp = ScrapData_cmp };
 
 _objfactory_guaranteed ScrapGraphPanel* ScrapGraphPanel_create(SubspaceUI* ui)
 {
@@ -43,10 +34,8 @@ _objfactory_guaranteed ScrapGraphPanel* ScrapGraphPanel_create(SubspaceUI* ui)
 
 _objinit_guaranteed bool ScrapGraphPanel_init(_In_ ScrapGraphPanel* self)
 {
-    saInit(&self->newscrap, opaque(ScrapData), 1);
-    saInit(&self->sdata, custom(opaque(ScrapData), ScrapData_ops), 8, SA_Sorted);
     // Autogen begins -----
-    mutexInit(&self->lock);
+    saInit(&self->sectoridx, int64, 1, SA_Sorted);
     return true;
     // Autogen ends -------
 }
@@ -57,9 +46,7 @@ bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
 {
     self->plot = IupPlot();
     IupPlotBegin(self->plot, 1);
-    self->ds    = IupPlotEnd(self->plot);
-    self->si    = 0;
-    self->reset = true;
+    self->ds = IupPlotEnd(self->plot);
     IupSetAttribute(self->plot, "FGCOLOR", "255 255 255");
     IupSetAttribute(self->plot, "AXS_YAUTOMIN", "NO");
     IupSetAttribute(self->plot, "AXS_XTICKAUTO", "NO");
@@ -71,9 +58,12 @@ bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
     IupSetAttribute(self->h, "BGCOLOR", panelbg);
     iupSetObj(self->h, self, ObjNone, self->ui);
 
-    // register to receive all scrap events
-    logrelaySubscribe(self->ss->runlog, self, _S"Scrap");
-    logrelaySubscribe(self->ss->runlog, self, _S"Sector");
+    // get UI updates from the scrap tracker
+    ssuiListen(self->ui, self, _S"Scrap_Update");
+    ssuiListen(self->ui, self, _S"Scrap_Reset");
+    ssuiListen(self->ui, self, _S"Scrap_Refresh");
+    // register to receive new sector events
+    logrelaySubscribeUI(self->ss->runlog, self, _S"Sector");
 
     return parent_make();
 }
@@ -82,143 +72,112 @@ void ScrapGraphPanel_clear(_In_ ScrapGraphPanel* self)
 {
     string temp = 0;
 
-    saClear(&self->sdata);
+    saClear(&self->sectoridx);
     IupSetAttribute(self->plot, "CLEAR", "1");
 
     IupPlotBegin(self->plot, 1);
     for (int i = 1; i <= 8; i++) {
-        ScrapData sd = { .amount = 0, .sectorpoint = SPOINT(i, 0) };
-        saPush(&self->sdata, opaque, sd);
+        saPush(&self->sectoridx, int64, SPOINT(i, 0));
         strFromInt32(&temp, i, 10);
         IupPlotAddStr(self->plot, strC(temp), 0);
     }
     self->ds = IupPlotEnd(self->plot);
-    self->si = 8;
     IupSetAttribute(self->plot, "DS_NAME", "Scrap");
     IupSetAttribute(self->plot, "DS_COLOR", "200 40 40");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
     IupSetAttribute(self->plot, "DS_BARSPACING", "30");
-    self->reset  = false;
-    self->redraw = true;
 
     strDestroy(&temp);
 }
 
-extern bool Panel_update(_In_ Panel* self);   // parent
-#define parent_update() Panel_update((Panel*)(self))
-bool ScrapGraphPanel_update(_In_ ScrapGraphPanel* self)
+void ScrapGraphPanel_logNotify(_In_ ScrapGraphPanel* self, LogEnt* ent, bool replay)
+{
+    if (strEq(ent->id, _S"Sector"))
+        scrapgraphpanelHandleUpdate(self, ent->sectorpoint, true);
+}
+
+void ScrapGraphPanel_logReset(_In_ ScrapGraphPanel* self)
+{
+    return;
+}
+
+void ScrapGraphPanel_logReplayComplete(_In_ ScrapGraphPanel* self)
+{
+    return;
+}
+
+void ScrapGraphPanel_uiNotify(_In_ ScrapGraphPanel* self, _In_opt_ strref event, stvlist* params)
+{
+    if (strEq(event, _S"Scrap_Update")) {
+        int64 savepoint = 0, sectorpoint = 0;
+        bool replay = false;
+        stvlNext(params, int64, &savepoint);
+        stvlNext(params, int64, &sectorpoint);
+        stvlNext(params, bool, &replay);
+
+        scrapgraphpanelHandleUpdate(self, sectorpoint, !replay);
+    } else if (strEq(event, _S"Scrap_Reset")) {
+        scrapgraphpanelClear(self);
+    } else if (strEq(event, _S"Scrap_Refresh")) {
+        IupSetAttribute(self->plot, "REDRAW", NULL);
+    }
+}
+
+// This must be called from the UI thread!
+void ScrapGraphPanel_handleUpdate(_In_ ScrapGraphPanel* self, int64 sectorpoint, bool redraw)
 {
     string temp = 0;
-    bool redraw = false;
-    ScrapData* cur;
 
-    withMutex (&self->lock) {
-        if (self->reset)
-            scrapgraphpanelClear(self);
+    RunInfo* run = subspaceRun(self->ss);
+    if (!run)
+        return;
 
-        foreach (sarray, idx, ScrapData, ns, self->newscrap) {
-            spointFormat(&temp, ns.sectorpoint);
+    spointFormat(&temp, sectorpoint);
 
-            RunInfo* run = subspaceRun(self->ss);
-            if (run) {
-                SectorInfo* sec = runinfoGetSector(run, ns.sectorpoint);
-                if (sec) {
-                    string skey = 0;
-                    strConcat(&skey, _S"sector_shortname_", sec->type);
-                    strref sname = langGetD(self->ss, skey, _S"");
+    SectorInfo* sec = runinfoGetSector(run, sectorpoint);
+    if (!sec)
+        goto out;
 
-                    if (!strEmpty(sname)) {
-                        strDup(&temp, sname);
-                    }
+    // see if there's a translation for the sector name abbreviation
+    string skey = 0;
+    strConcat(&skey, _S"sector_shortname_", sec->type);
+    strref sname = langGetD(self->ss, skey, _S"");
+    if (!strEmpty(sname)) {
+        strDup(&temp, sname);
+    }
+    strDestroy(&skey);
 
-                    strDestroy(&skey);
-                    objRelease(&sec);
-                }
-                objRelease(&run);
-            }
+    ScrapTracker* tracker = runinfoGetScrap(run);
+    if (tracker) {
+        ScrapTotals total = { 0 };
+        scraptrackerGetSector(tracker, sectorpoint, &total);
 
-            int32 idx = saFind(self->sdata, opaque, ns);   // this works because sdata custom
-                                                           // compare only checks sectorpoint
-            if (idx >= 0) {
-                cur = &self->sdata.a[idx];
-                cur->amount += ns.amount;
-                IupPlotSetSampleStr(self->plot, self->ds, idx, strC(temp), cur->amount);
-            } else {
-                idx = saPush(&self->sdata, opaque, ns);
-                IupPlotInsertStr(self->plot, self->ds, idx, strC(temp), ns.amount);
-            }
+        // get the index of the plot sample for the sector's bar
+        int32 idx = saFind(self->sectoridx, int64, sectorpoint);
+        if (idx >= 0) {
+            IupPlotSetSampleStr(self->plot, self->ds, idx, strC(temp), total.rewards);
+        } else {
+            // new sector we haven't seen before, probably crystal
+            idx = saPush(&self->sectoridx, int64, sectorpoint);
+            IupPlotInsertStr(self->plot, self->ds, idx, strC(temp), total.rewards);
         }
-        saClear(&self->newscrap);
-
-        redraw       = self->redraw;
-        self->redraw = false;
+        objRelease(&tracker);
     }
 
     if (redraw)
         IupSetAttribute(self->plot, "REDRAW", NULL);
 
+out:
     strDestroy(&temp);
-    return true;
-}
-
-void ScrapGraphPanel_logNotify(_In_ ScrapGraphPanel* self, LogEnt* ent, bool replay)
-{
-    if (strEq(ent->id, _S"Scrap")) {
-        strref source = cfieldString(ent->params, _S"source");
-        int amount    = cfieldValD(int32, ent->params, _S"amount", 0);
-
-        if (strEq(source, _S"Event") && amount > 0) {
-            // we're only interested in graphing scrap rewards
-
-            ScrapData sdn = { .amount = amount, .sectorpoint = ent->sectorpoint };
-            withMutex (&self->lock) {
-                saPush(&self->newscrap, opaque, sdn);
-                if (!replay)
-                    self->redraw = true;
-            }
-
-            // this function could be running in any thread; signal the UI thread to pick up the
-            // data and process it
-            ssuiUpdateMain(self->ss->ui, _S"scrapgraph");
-        }
-    } else if (strEq(ent->id, _S"Sector")) {
-        ScrapData sdn = { .amount = 0, .sectorpoint = ent->sectorpoint };
-        withMutex (&self->lock) {
-            saPush(&self->newscrap, opaque, sdn);
-            if (!replay)
-                self->redraw = true;
-        }
-
-        ssuiUpdateMain(self->ss->ui, _S"scrapgraph");
-    }
-}
-
-void ScrapGraphPanel_logReset(_In_ ScrapGraphPanel* self)
-{
-    withMutex (&self->lock) {
-        saClear(&self->newscrap);
-        self->reset = true;
-    }
-
-    ssuiUpdateMain(self->ss->ui, _S"scrapgraph");
-}
-
-void ScrapGraphPanel_logReplayComplete(_In_ ScrapGraphPanel* self)
-{
-    withMutex (&self->lock) {
-        self->redraw = true;
-    }
-
-    ssuiUpdateMain(self->ss->ui, _S"scrapgraph");
+    objRelease(&sec);
+    objRelease(&run);
 }
 
 void ScrapGraphPanel_destroy(_In_ ScrapGraphPanel* self)
 {
     // Autogen begins -----
-    mutexDestroy(&self->lock);
-    saDestroy(&self->newscrap);
-    saDestroy(&self->sdata);
+    saDestroy(&self->sectoridx);
     // Autogen ends -------
 }
 

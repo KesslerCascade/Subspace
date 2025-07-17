@@ -1,26 +1,16 @@
+#include <cx/taskqueue.sidl>
+#include "ui/subspaceui.sidl"
 #include "ui/panel/panel.sidl"
 #include "run/logrelay.sidl"
 
-typedef struct ScrapData {
-    int sectorpoint;
-    int amount;
-} ScrapData;
-saDeclare(ScrapData);
-
-class ScrapGraphPanel extends Panel implements LogSubscriber {
+class ScrapGraphPanel extends Panel implements LogSubscriber implements UINotifyListener {
     Ihandle *plot;
     int ds;
-    int si;
-
-    Mutex lock;
-    bool reset;
-    bool redraw;
-    [noinit] sarray:ScrapData newscrap;
-    [noinit] sarray:ScrapData sdata;
+    [sorted] sarray:int64 sectoridx;
 
     void clear();
+    void handleUpdate(int64 sectorpoint, bool redraw);
 
     factory create(SubspaceUI *ui);
     override make;
-    override update;
 }

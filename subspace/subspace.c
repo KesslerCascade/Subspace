@@ -107,10 +107,18 @@ void subspaceClearGame(Subspace* ss, GameInst* ifgame)
 
 void subspaceSetRun(Subspace* ss, RunInfo* run)
 {
+    RunInfo* oldrun = NULL;
+
     withWriteLock (&ss->lock) {
-        objRelease(&ss->run);
+        oldrun  = ss->run;
         ss->run = objAcquire(run);
     }
+
+    if (oldrun) {
+        runinfoSetFocused(oldrun, false);
+        objRelease(&oldrun);
+    }
+    runinfoSetFocused(run, true);
 
     logrelayReset(ss->runlog);
 
@@ -129,12 +137,19 @@ bool subspaceIsRun(Subspace* ss, RunInfo* run)
 
 void subspaceClearRun(Subspace* ss, RunInfo* ifrun)
 {
+    RunInfo* oldrun = NULL;
     bool cleared = false;
     withWriteLock (&ss->lock) {
         if (ss->run && (ss->run == ifrun || !ifrun)) {
-            objRelease(&ss->run);
+            oldrun  = ss->run;
+            ss->run = NULL;
             cleared = true;
         }
+    }
+
+    if (oldrun) {
+        runinfoSetFocused(oldrun, false);
+        objRelease(&oldrun);
     }
 
     logrelayReset(ss->runlog);

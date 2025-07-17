@@ -22,6 +22,8 @@ typedef enum {
 #define SPOINT_NUM(spoint) (int32)(((spoint) >> 8))
 #define SPOINT_EXTRA(spoint) ((int32)((spoint) & 0xff))
 
+class ScrapTracker;
+
 class LogEnt;
 class RunInfo {
     Subspace *ss;
@@ -56,6 +58,10 @@ class RunInfo {
     [sorted] sarray:object:SectorInfo sectors;
 
     bool recording;     // is this run being currently recorded (i.e. not a historical run)
+    bool focused;       // is focused by the UI
+
+    // Trackers
+    object:ScrapTracker scrap;
 
     factory create(Subspace *ss);
     void newGame(int seed, strref shipType, strref shipName, int difficulty);
@@ -73,7 +79,10 @@ class RunInfo {
     void processHullDamage(strref src, int amount);
     void processShip(strref name);
 
+    void setFocused(bool focused);
+    
     SectorInfo *getSector(int64 sectorpoint);
+    ScrapTracker *getScrap();
 
     int32 score();
 
