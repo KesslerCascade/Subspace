@@ -2,6 +2,12 @@
 #include "subspace.h"
 #include "lang/lang.h"
 
+interface UINotifyListener {
+    void uiNotify(strref event, stvlist *params);
+}
+
+#define ssuiNotify(self, event, ...) SubspaceUI__notify(self, event, count_macro_args(__VA_ARGS__), (stvar[]){ __VA_ARGS__ })
+
 class MainWin;
 class SettingsWin;
 [methodprefix ssui] class SubspaceUI {
@@ -12,8 +18,11 @@ class SettingsWin;
     object:MainWin mainw;
     object:SettingsWin settingsw;
 
+    RWLock listenerlock;
+    hashtable:string:sarray listeners;
+
     factory create(Subspace *subspace);
-    bool init();
+    bool initialize();
     bool shutdown();
 
     void start();
@@ -22,4 +31,15 @@ class SettingsWin;
     void update();
     void updateMain(strref panel);
     void updateSettings(strref page);
+
+    bool listen(ObjInst* listener, strref event);
+    unbound void _notify(strref event, int n, stvar params[]);
+}
+
+class UINotifyDispatch extends ComplexTask
+{
+    object:SubspaceUI ui;
+    string event;
+    [noinit] sarray:stvar params;
+    factory create(SubspaceUI* ui, strref event, int n, stvar params[]);
 }

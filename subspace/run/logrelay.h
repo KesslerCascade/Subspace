@@ -22,14 +22,18 @@ typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
 typedef struct RunInfo RunInfo;
 typedef struct RunInfo_WeakRef RunInfo_WeakRef;
 typedef struct TaskControl TaskControl;
+typedef struct SubscriberInfo SubscriberInfo;
+typedef struct SubscriberInfo_WeakRef SubscriberInfo_WeakRef;
 typedef struct LogRelay LogRelay;
 typedef struct LogRelay_WeakRef LogRelay_WeakRef;
-typedef struct LogDispatcher LogDispatcher;
-typedef struct LogDispatcher_WeakRef LogDispatcher_WeakRef;
+typedef struct LogDispatch LogDispatch;
+typedef struct LogDispatch_WeakRef LogDispatch_WeakRef;
+saDeclarePtr(SubscriberInfo);
+saDeclarePtr(SubscriberInfo_WeakRef);
 saDeclarePtr(LogRelay);
 saDeclarePtr(LogRelay_WeakRef);
-saDeclarePtr(LogDispatcher);
-saDeclarePtr(LogDispatcher_WeakRef);
+saDeclarePtr(LogDispatch);
+saDeclarePtr(LogDispatch_WeakRef);
 
 typedef struct LogSubscriber {
     ObjIface* _implements;
@@ -42,19 +46,30 @@ typedef struct LogSubscriber {
 } LogSubscriber;
 extern LogSubscriber LogSubscriber_tmpl;
 
+typedef struct SubscriberInfo_ClassIf {
+    ObjIface* _implements;
+    ObjIface* _parent;
+    size_t _size;
+
+    intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
+    uint32 (*hash)(_In_ void* self, uint32 flags);
+} SubscriberInfo_ClassIf;
+extern SubscriberInfo_ClassIf SubscriberInfo_ClassIf_tmpl;
+
 typedef struct LogRelay_ClassIf {
     ObjIface* _implements;
     ObjIface* _parent;
     size_t _size;
 
     bool (*subscribe)(_In_ void* self, ObjInst* subscriber, _In_opt_ strref id);
+    bool (*subscribeUI)(_In_ void* self, ObjInst* subscriber, _In_opt_ strref id);
     void (*reset)(_In_ void* self);
     void (*replayComplete)(_In_ void* self);
     bool (*send)(_In_ void* self, LogEnt* ent, bool replay);
 } LogRelay_ClassIf;
 extern LogRelay_ClassIf LogRelay_ClassIf_tmpl;
 
-typedef struct LogDispatcher_ClassIf {
+typedef struct LogDispatch_ClassIf {
     ObjIface* _implements;
     ObjIface* _parent;
     size_t _size;
@@ -66,8 +81,45 @@ typedef struct LogDispatcher_ClassIf {
     bool (*wait)(_In_ void* self, int64 timeout);
     intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
     uint32 (*hash)(_In_ void* self, uint32 flags);
-} LogDispatcher_ClassIf;
-extern LogDispatcher_ClassIf LogDispatcher_ClassIf_tmpl;
+} LogDispatch_ClassIf;
+extern LogDispatch_ClassIf LogDispatch_ClassIf_tmpl;
+
+typedef struct SubscriberInfo {
+    union {
+        SubscriberInfo_ClassIf* _;
+        void* _is_SubscriberInfo;
+        void* _is_ObjInst;
+    };
+    ObjClassInfo* _clsinfo;
+    atomic(uintptr) _ref;
+    atomic(ptr) _weakref;
+
+    Weak(ObjInst)* subscriber;
+    bool ui;
+} SubscriberInfo;
+extern ObjClassInfo SubscriberInfo_clsinfo;
+#define SubscriberInfo(inst) ((SubscriberInfo*)(unused_noeval((inst) && &((inst)->_is_SubscriberInfo)), (inst)))
+#define SubscriberInfoNone ((SubscriberInfo*)NULL)
+
+typedef struct SubscriberInfo_WeakRef {
+    union {
+        ObjInst* _inst;
+        void* _is_SubscriberInfo_WeakRef;
+        void* _is_ObjInst_WeakRef;
+    };
+    atomic(uintptr) _ref;
+    RWLock _lock;
+} SubscriberInfo_WeakRef;
+#define SubscriberInfo_WeakRef(inst) ((SubscriberInfo_WeakRef*)(unused_noeval((inst) && &((inst)->_is_SubscriberInfo_WeakRef)), (inst)))
+
+_objfactory_guaranteed SubscriberInfo* SubscriberInfo_create(ObjInst* subscriber, bool ui);
+// SubscriberInfo* subscriberinfoCreate(ObjInst* subscriber, bool ui);
+#define subscriberinfoCreate(subscriber, ui) SubscriberInfo_create(ObjInst(subscriber), ui)
+
+// intptr subscriberinfoCmp(SubscriberInfo* self, SubscriberInfo* other, uint32 flags);
+#define subscriberinfoCmp(self, other, flags) (self)->_->cmp(SubscriberInfo(self), other, flags)
+// uint32 subscriberinfoHash(SubscriberInfo* self, uint32 flags);
+#define subscriberinfoHash(self, flags) (self)->_->hash(SubscriberInfo(self), flags)
 
 typedef struct LogRelay {
     union {
@@ -106,6 +158,8 @@ _objfactory_guaranteed LogRelay* LogRelay_create(Subspace* ss);
 
 // bool logrelaySubscribe(LogRelay* self, ObjInst* subscriber, strref id);
 #define logrelaySubscribe(self, subscriber, id) (self)->_->subscribe(LogRelay(self), ObjInst(subscriber), id)
+// bool logrelaySubscribeUI(LogRelay* self, ObjInst* subscriber, strref id);
+#define logrelaySubscribeUI(self, subscriber, id) (self)->_->subscribeUI(LogRelay(self), ObjInst(subscriber), id)
 // void logrelayReset(LogRelay* self);
 #define logrelayReset(self) (self)->_->reset(LogRelay(self))
 // void logrelayReplayComplete(LogRelay* self);
@@ -113,10 +167,10 @@ _objfactory_guaranteed LogRelay* LogRelay_create(Subspace* ss);
 // bool logrelaySend(LogRelay* self, LogEnt* ent, bool replay);
 #define logrelaySend(self, ent, replay) (self)->_->send(LogRelay(self), LogEnt(ent), replay)
 
-typedef struct LogDispatcher {
+typedef struct LogDispatch {
     union {
-        LogDispatcher_ClassIf* _;
-        void* _is_LogDispatcher;
+        LogDispatch_ClassIf* _;
+        void* _is_LogDispatch;
         void* _is_ComplexTask;
         void* _is_Task;
         void* _is_BasicTask;
@@ -140,15 +194,17 @@ typedef struct LogDispatcher {
     ObjInst* subscriber;
     LogEnt* ent;
     bool replay;
-} LogDispatcher;
-extern ObjClassInfo LogDispatcher_clsinfo;
-#define LogDispatcher(inst) ((LogDispatcher*)(unused_noeval((inst) && &((inst)->_is_LogDispatcher)), (inst)))
-#define LogDispatcherNone ((LogDispatcher*)NULL)
+    bool reset;
+    bool complete;
+} LogDispatch;
+extern ObjClassInfo LogDispatch_clsinfo;
+#define LogDispatch(inst) ((LogDispatch*)(unused_noeval((inst) && &((inst)->_is_LogDispatch)), (inst)))
+#define LogDispatchNone ((LogDispatch*)NULL)
 
-typedef struct LogDispatcher_WeakRef {
+typedef struct LogDispatch_WeakRef {
     union {
         ObjInst* _inst;
-        void* _is_LogDispatcher_WeakRef;
+        void* _is_LogDispatch_WeakRef;
         void* _is_ComplexTask_WeakRef;
         void* _is_Task_WeakRef;
         void* _is_BasicTask_WeakRef;
@@ -156,82 +212,86 @@ typedef struct LogDispatcher_WeakRef {
     };
     atomic(uintptr) _ref;
     RWLock _lock;
-} LogDispatcher_WeakRef;
-#define LogDispatcher_WeakRef(inst) ((LogDispatcher_WeakRef*)(unused_noeval((inst) && &((inst)->_is_LogDispatcher_WeakRef)), (inst)))
+} LogDispatch_WeakRef;
+#define LogDispatch_WeakRef(inst) ((LogDispatch_WeakRef*)(unused_noeval((inst) && &((inst)->_is_LogDispatch_WeakRef)), (inst)))
 
-_objfactory_guaranteed LogDispatcher* LogDispatcher_create(ObjInst* subscriber, LogEnt* ent, bool replay);
-// LogDispatcher* logdispatcherCreate(ObjInst* subscriber, LogEnt* ent, bool replay);
-#define logdispatcherCreate(subscriber, ent, replay) LogDispatcher_create(ObjInst(subscriber), LogEnt(ent), replay)
+_objfactory_guaranteed LogDispatch* LogDispatch_create(ObjInst* subscriber, LogEnt* ent, bool replay);
+// LogDispatch* logdispatchCreate(ObjInst* subscriber, LogEnt* ent, bool replay);
+#define logdispatchCreate(subscriber, ent, replay) LogDispatch_create(ObjInst(subscriber), LogEnt(ent), replay)
 
-// void logdispatcherRequireTask(LogDispatcher* self, Task* dep, bool failok);
+_objfactory_guaranteed LogDispatch* LogDispatch_createReplay(ObjInst* subscriber, bool reset, bool complete);
+// LogDispatch* logdispatchCreateReplay(ObjInst* subscriber, bool reset, bool complete);
+#define logdispatchCreateReplay(subscriber, reset, complete) LogDispatch_createReplay(ObjInst(subscriber), reset, complete)
+
+// void logdispatchRequireTask(LogDispatch* self, Task* dep, bool failok);
 //
 // Wrapper around require() to depend on a task completing
-#define logdispatcherRequireTask(self, dep, failok) ComplexTask_requireTask(ComplexTask(self), Task(dep), failok)
+#define logdispatchRequireTask(self, dep, failok) ComplexTask_requireTask(ComplexTask(self), Task(dep), failok)
 
-// void logdispatcherRequireTaskTimeout(LogDispatcher* self, Task* dep, bool failok, int64 timeout);
-#define logdispatcherRequireTaskTimeout(self, dep, failok, timeout) ComplexTask_requireTaskTimeout(ComplexTask(self), Task(dep), failok, timeout)
+// void logdispatchRequireTaskTimeout(LogDispatch* self, Task* dep, bool failok, int64 timeout);
+#define logdispatchRequireTaskTimeout(self, dep, failok, timeout) ComplexTask_requireTaskTimeout(ComplexTask(self), Task(dep), failok, timeout)
 
-// void logdispatcherRequireResource(LogDispatcher* self, TaskResource* res);
+// void logdispatchRequireResource(LogDispatch* self, TaskResource* res);
 //
 // Wrapper around require() to depend on acquiring a resource
-#define logdispatcherRequireResource(self, res) ComplexTask_requireResource(ComplexTask(self), TaskResource(res))
+#define logdispatchRequireResource(self, res) ComplexTask_requireResource(ComplexTask(self), TaskResource(res))
 
-// void logdispatcherRequireResourceTimeout(LogDispatcher* self, TaskResource* res, int64 timeout);
-#define logdispatcherRequireResourceTimeout(self, res, timeout) ComplexTask_requireResourceTimeout(ComplexTask(self), TaskResource(res), timeout)
+// void logdispatchRequireResourceTimeout(LogDispatch* self, TaskResource* res, int64 timeout);
+#define logdispatchRequireResourceTimeout(self, res, timeout) ComplexTask_requireResourceTimeout(ComplexTask(self), TaskResource(res), timeout)
 
-// void logdispatcherRequireGate(LogDispatcher* self, TRGate* gate);
+// void logdispatchRequireGate(LogDispatch* self, TRGate* gate);
 //
 // Wrapper around require() to depend on a gate being opened
-#define logdispatcherRequireGate(self, gate) ComplexTask_requireGate(ComplexTask(self), TRGate(gate))
+#define logdispatchRequireGate(self, gate) ComplexTask_requireGate(ComplexTask(self), TRGate(gate))
 
-// void logdispatcherRequireGateTimeout(LogDispatcher* self, TRGate* gate, int64 timeout);
-#define logdispatcherRequireGateTimeout(self, gate, timeout) ComplexTask_requireGateTimeout(ComplexTask(self), TRGate(gate), timeout)
+// void logdispatchRequireGateTimeout(LogDispatch* self, TRGate* gate, int64 timeout);
+#define logdispatchRequireGateTimeout(self, gate, timeout) ComplexTask_requireGateTimeout(ComplexTask(self), TRGate(gate), timeout)
 
-// void logdispatcherRequire(LogDispatcher* self, TaskRequires* req);
+// void logdispatchRequire(LogDispatch* self, TaskRequires* req);
 //
 // Add a requirement for the task to run
-#define logdispatcherRequire(self, req) ComplexTask_require(ComplexTask(self), TaskRequires(req))
+#define logdispatchRequire(self, req) ComplexTask_require(ComplexTask(self), TaskRequires(req))
 
-// bool logdispatcherAdvance(LogDispatcher* self);
+// bool logdispatchAdvance(LogDispatch* self);
 //
 // advance a deferred task to run as soon as possible
-#define logdispatcherAdvance(self) ComplexTask_advance(ComplexTask(self))
+#define logdispatchAdvance(self) ComplexTask_advance(ComplexTask(self))
 
-// uint32 logdispatcherCheckRequires(LogDispatcher* self, bool updateProgress, int64* expires);
+// uint32 logdispatchCheckRequires(LogDispatch* self, bool updateProgress, int64* expires);
 //
 // check if this task can run because all requirements are satisfied
-#define logdispatcherCheckRequires(self, updateProgress, expires) ComplexTask_checkRequires(ComplexTask(self), updateProgress, expires)
+#define logdispatchCheckRequires(self, updateProgress, expires) ComplexTask_checkRequires(ComplexTask(self), updateProgress, expires)
 
-// void logdispatcherCancelRequires(LogDispatcher* self);
+// void logdispatchCancelRequires(LogDispatch* self);
 //
 // cascade a task cancellation to any requirements
-#define logdispatcherCancelRequires(self) ComplexTask_cancelRequires(ComplexTask(self))
+#define logdispatchCancelRequires(self) ComplexTask_cancelRequires(ComplexTask(self))
 
-// bool logdispatcherAcquireRequires(LogDispatcher* self, sa_TaskRequires* acquired);
+// bool logdispatchAcquireRequires(LogDispatch* self, sa_TaskRequires* acquired);
 //
 // try to acquire required resources
-#define logdispatcherAcquireRequires(self, acquired) ComplexTask_acquireRequires(ComplexTask(self), acquired)
+#define logdispatchAcquireRequires(self, acquired) ComplexTask_acquireRequires(ComplexTask(self), acquired)
 
-// bool logdispatcherReleaseRequires(LogDispatcher* self, sa_TaskRequires resources);
+// bool logdispatchReleaseRequires(LogDispatch* self, sa_TaskRequires resources);
 //
 // release a list of acquired resources
-#define logdispatcherReleaseRequires(self, resources) ComplexTask_releaseRequires(ComplexTask(self), resources)
+#define logdispatchReleaseRequires(self, resources) ComplexTask_releaseRequires(ComplexTask(self), resources)
 
-// bool logdispatcher_setState(LogDispatcher* self, uint32 newstate);
-#define logdispatcher_setState(self, newstate) BasicTask__setState(BasicTask(self), newstate)
+// bool logdispatch_setState(LogDispatch* self, uint32 newstate);
+#define logdispatch_setState(self, newstate) BasicTask__setState(BasicTask(self), newstate)
 
-// uint32 logdispatcherRun(LogDispatcher* self, TaskQueue* tq, TQWorker* worker, TaskControl* tcon);
-#define logdispatcherRun(self, tq, worker, tcon) (self)->_->run(LogDispatcher(self), TaskQueue(tq), TQWorker(worker), tcon)
-// void logdispatcherRunCancelled(LogDispatcher* self, TaskQueue* tq, TQWorker* worker);
-#define logdispatcherRunCancelled(self, tq, worker) (self)->_->runCancelled(LogDispatcher(self), TaskQueue(tq), TQWorker(worker))
-// bool logdispatcherCancel(LogDispatcher* self);
-#define logdispatcherCancel(self) (self)->_->cancel(LogDispatcher(self))
-// bool logdispatcherReset(LogDispatcher* self);
-#define logdispatcherReset(self) (self)->_->reset(LogDispatcher(self))
-// bool logdispatcherWait(LogDispatcher* self, int64 timeout);
-#define logdispatcherWait(self, timeout) (self)->_->wait(LogDispatcher(self), timeout)
-// intptr logdispatcherCmp(LogDispatcher* self, LogDispatcher* other, uint32 flags);
-#define logdispatcherCmp(self, other, flags) (self)->_->cmp(LogDispatcher(self), other, flags)
-// uint32 logdispatcherHash(LogDispatcher* self, uint32 flags);
-#define logdispatcherHash(self, flags) (self)->_->hash(LogDispatcher(self), flags)
+// uint32 logdispatchRun(LogDispatch* self, TaskQueue* tq, TQWorker* worker, TaskControl* tcon);
+#define logdispatchRun(self, tq, worker, tcon) (self)->_->run(LogDispatch(self), TaskQueue(tq), TQWorker(worker), tcon)
+// void logdispatchRunCancelled(LogDispatch* self, TaskQueue* tq, TQWorker* worker);
+#define logdispatchRunCancelled(self, tq, worker) (self)->_->runCancelled(LogDispatch(self), TaskQueue(tq), TQWorker(worker))
+// bool logdispatchCancel(LogDispatch* self);
+#define logdispatchCancel(self) (self)->_->cancel(LogDispatch(self))
+// bool logdispatchReset(LogDispatch* self);
+#define logdispatchReset(self) (self)->_->reset(LogDispatch(self))
+// bool logdispatchWait(LogDispatch* self, int64 timeout);
+#define logdispatchWait(self, timeout) (self)->_->wait(LogDispatch(self), timeout)
+// intptr logdispatchCmp(LogDispatch* self, LogDispatch* other, uint32 flags);
+#define logdispatchCmp(self, other, flags) (self)->_->cmp(LogDispatch(self), other, flags)
+// uint32 logdispatchHash(LogDispatch* self, uint32 flags);
+#define logdispatchHash(self, flags) (self)->_->hash(LogDispatch(self), flags)
 

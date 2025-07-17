@@ -267,7 +267,7 @@ static void subspaceStartup(LogDest** pdeferredlogs)
 
     // 12 -------- UI setup
     subspace.ui = ssuiCreate(&subspace);
-    if (!ssuiInit(subspace.ui)) {
+    if (!ssuiInitialize(subspace.ui)) {
         fatalError(_S"Failed to initialize UI.", false);
     }
 

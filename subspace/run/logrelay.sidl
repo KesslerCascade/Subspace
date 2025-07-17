@@ -8,6 +8,12 @@ interface LogSubscriber {
     void logReplayComplete();
 }
 
+class SubscriberInfo implements Sortable implements Hashable {
+    weak:ObjInst subscriber;
+    bool ui;
+    factory create(ObjInst* subscriber, bool ui);
+}
+
 class RunInfo;
 class LogRelay
 {
@@ -16,9 +22,10 @@ class LogRelay
     RWLock lock;
 
     hashtable:string:sarray logsubs;
-    hashtable:ptr:none subscribers;
+    hashtable:object:none subscribers;
 
     bool subscribe(ObjInst* subscriber, strref id);
+    bool subscribeUI(ObjInst* subscriber, strref id);
     void reset();
     void replayComplete();
     bool send(LogEnt* ent, bool replay);
@@ -26,10 +33,13 @@ class LogRelay
     factory create(Subspace *ss);
 }
 
-class LogDispatcher extends ComplexTask
+class LogDispatch extends ComplexTask
 {
     object:ObjInst subscriber;
     object:LogEnt ent;
     bool replay;
+    bool reset;
+    bool complete;
     factory create(ObjInst *subscriber, LogEnt *ent, bool replay);
+    factory createReplay(ObjInst *subscriber, bool reset, bool complete);
 }

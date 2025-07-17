@@ -9,9 +9,9 @@
 #include "logrelay.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include <cx/utils/murmur.h>
+#include "ui/subspaceui.h"
 #include "runinfo.h"
-
-saDeclarePtr(ObjInst);
 
 _objfactory_guaranteed LogRelay* LogRelay_create(Subspace* ss)
 {
@@ -30,7 +30,7 @@ _objinit_guaranteed bool LogRelay_init(_In_ LogRelay* self)
     // Autogen begins -----
     rwlockInit(&self->lock);
     htInit(&self->logsubs, string, sarray, 16);
-    htInit(&self->subscribers, ptr, none, 16);
+    htInit(&self->subscribers, object, none, 16);
     return true;
     // Autogen ends -------
 }
@@ -45,7 +45,8 @@ void LogRelay_destroy(_In_ LogRelay* self)
     // Autogen ends -------
 }
 
-bool LogRelay_subscribe(_In_ LogRelay* self, ObjInst* subscriber, _In_opt_ strref id)
+static bool _LogRelay_subscribe(_In_ LogRelay* self, ObjInst* subscriber, _In_opt_ strref id,
+                                bool ui)
 {
     // check if the subscriber implements the proper interface
     if (!objInstIf(subscriber, LogSubscriber))
@@ -54,43 +55,89 @@ bool LogRelay_subscribe(_In_ LogRelay* self, ObjInst* subscriber, _In_opt_ strre
     withWriteLock (&self->lock) {
         htelem elem = htFind(self->logsubs, strref, id, none, NULL);
         if (!elem) {
-            sa_ObjInst newlist;
+            sa_SubscriberInfo newlist;
             saInit(&newlist, object, 1);
             elem = htInsertC(&self->logsubs, strref, id, sarray, &newlist);
         }
-        sa_ObjInst* list = (sa_ObjInst*)hteValPtr(self->logsubs, sarray, elem);
-        saPush(list, object, subscriber);
+        sa_SubscriberInfo* list = (sa_SubscriberInfo*)hteValPtr(self->logsubs, sarray, elem);
+
+        SubscriberInfo* si = subscriberinfoCreate(subscriber, ui);
+        saPush(list, object, si);
 
         // insert into set of subscribers (they might be subscribed to more than one log ID)
-        htInsert(&self->subscribers, ptr, subscriber, none, NULL);
+        htInsert(&self->subscribers, object, si, none, NULL);
+
+        objRelease(&si);
     }
 
     return true;
+}
+
+bool LogRelay_subscribe(_In_ LogRelay* self, ObjInst* subscriber, _In_opt_ strref id)
+{
+    return _LogRelay_subscribe(self, subscriber, id, false);
+}
+
+bool LogRelay_subscribeUI(_In_ LogRelay* self, ObjInst* subscriber, _In_opt_ strref id)
+{
+    return _LogRelay_subscribe(self, subscriber, id, true);
 }
 
 bool LogRelay_send(_In_ LogRelay* self, LogEnt* ent, bool replay)
 {
     bool ret = false;
 
+    sa_SubscriberInfo removed;
+    saInit(&removed, object, 1);
+
     withReadLock (&self->lock) {
         htelem elem = htFind(self->logsubs, strref, ent->id, none, NULL);
         if (elem) {
-            sa_ObjInst* list = (sa_ObjInst*)hteValPtr(self->logsubs, sarray, elem);
+            sa_SubscriberInfo* list = (sa_SubscriberInfo*)hteValPtr(self->logsubs, sarray, elem);
 
             // dispatch the events in separate threads
-            foreach (sarray, idx, ObjInst*, sub, *list) {
-                LogDispatcher* ndisp = logdispatcherCreate(sub, ent, replay);
+            foreach (sarray, idx, SubscriberInfo*, sub, *list) {
+                ObjInst* subscriber = objAcquireFromWeak(ObjInst, sub->subscriber);
+                if (subscriber) {
+                    LogDispatch* ndisp = logdispatchCreate(subscriber, ent, replay);
 
-                // If we're replaying, can't depend on temporal separation of events. Put them in a
-                // FIFO to ensure they're processed in order.
-                if (replay)
-                    ctaskRequireResource(ndisp, self->replayqueue);
+                    // If we're replaying, can't depend on temporal separation of events. Put them
+                    // in a FIFO to ensure they're processed in order.
+                    if (replay)
+                        ctaskRequireResource(ndisp, self->replayqueue);
 
-                tqRun(self->ss->workq, &ndisp);
-                ret = true;
+                    // put it in the correct queue based on of it's a UI subscriber or not
+                    if (sub->ui)
+                        tqRun(self->ss->ui->uiq, &ndisp);
+                    else
+                        tqRun(self->ss->workq, &ndisp);
+                    ret = true;
+
+                    objRelease(&subscriber);
+                } else {
+                    // remember subscribers that no longer exist to remove them
+                    saPush(&removed, object, sub);
+                }
             }
         }
     }
+
+    // clean up any subscribers that don't exist anymore
+    if (saSize(removed) > 0) {
+        foreach (sarray, idx, SubscriberInfo*, sub, removed) {
+            withWriteLock (&self->lock) {
+                htelem elem = htFind(self->logsubs, strref, ent->id, none, NULL);
+                if (elem) {
+                    sa_SubscriberInfo* list = (sa_SubscriberInfo*)
+                        hteValPtr(self->logsubs, sarray, elem);
+
+                    saFindRemove(list, object, sub);
+                    htRemove(&self->subscribers, object, sub);
+                }
+            }
+        }
+    }
+    saDestroy(&removed);
 
     return ret;
 }
@@ -99,11 +146,21 @@ void LogRelay_reset(_In_ LogRelay* self)
 {
     withReadLock (&self->lock) {
         foreach (hashtable, iter, self->subscribers) {
-            ObjInst* sub = htiKey(ptr, iter);
+            SubscriberInfo* sub = (SubscriberInfo*)htiKey(object, iter);
 
             // tell all subscribers to reset their info; either for a fresh run or a replay
-            LogSubscriber* subif = objInstIf(sub, LogSubscriber);
-            subif->logReset(sub);
+            ObjInst* subscriber = objAcquireFromWeak(ObjInst, sub->subscriber);
+            if (subscriber) {
+                LogDispatch* ndisp = logdispatchCreateReplay(subscriber, true, false);
+                ctaskRequireResource(ndisp, self->replayqueue);
+
+                // put it in the correct queue based on of it's a UI subscriber or not
+                if (sub->ui)
+                    tqRun(self->ss->ui->uiq, &ndisp);
+                else
+                    tqRun(self->ss->workq, &ndisp);
+                objRelease(&subscriber);
+            }
         }
     }
 }
@@ -112,46 +169,109 @@ void LogRelay_replayComplete(_In_ LogRelay* self)
 {
     withReadLock (&self->lock) {
         foreach (hashtable, iter, self->subscribers) {
-            ObjInst* sub = htiKey(ptr, iter);
+            SubscriberInfo* sub = (SubscriberInfo*)htiKey(object, iter);
 
             // tell all subscribers to reset their info; either for a fresh run or a replay
-            LogSubscriber* subif = objInstIf(sub, LogSubscriber);
-            subif->logReplayComplete(sub);
+            ObjInst* subscriber = objAcquireFromWeak(ObjInst, sub->subscriber);
+            if (subscriber) {
+                LogDispatch* ndisp = logdispatchCreateReplay(subscriber, false, true);
+                ctaskRequireResource(ndisp, self->replayqueue);
+
+                // put it in the correct queue based on of it's a UI subscriber or not
+                if (sub->ui)
+                    tqRun(self->ss->ui->uiq, &ndisp);
+                else
+                    tqRun(self->ss->workq, &ndisp);
+                objRelease(&subscriber);
+            }
         }
     }
 }
 
-// -------- Event Dispatcher
+// -------- Log Dispatcher
 
-_objfactory_guaranteed LogDispatcher* LogDispatcher_create(ObjInst* subscriber, LogEnt* ent, bool replay)
+_objfactory_guaranteed LogDispatch*
+LogDispatch_create(ObjInst* subscriber, LogEnt* ent, bool replay)
 {
-    LogDispatcher* self;
-    self = objInstCreate(LogDispatcher);
+    LogDispatch* self;
+    self = objInstCreate(LogDispatch);
 
     self->subscriber = objAcquire(subscriber);
-    self->ent         = objAcquire(ent);
+    self->ent        = objAcquire(ent);
     self->replay     = replay;
 
     objInstInit(self);
-
     return self;
 }
 
-uint32 LogDispatcher_run(_In_ LogDispatcher* self, _In_ TaskQueue* tq, _In_ TQWorker* worker, _Inout_ TaskControl* tcon)
+_objfactory_guaranteed LogDispatch*
+LogDispatch_createReplay(ObjInst* subscriber, bool reset, bool complete)
+{
+    LogDispatch* self;
+    self = objInstCreate(LogDispatch);
+
+    self->subscriber = objAcquire(subscriber);
+    self->replay     = true;   // implied
+    self->reset      = reset;
+    self->complete   = complete;
+
+    objInstInit(self);
+    return self;
+}
+
+uint32 LogDispatch_run(_In_ LogDispatch* self, _In_ TaskQueue* tq, _In_ TQWorker* worker,
+                       _Inout_ TaskControl* tcon)
 {
     LogSubscriber* subif = objInstIf(self->subscriber, LogSubscriber);
     if (!subif)
         return TASK_Result_Failure;
-    subif->logNotify(self->subscriber, self->ent, self->replay);
+
+    if (!self->reset && !self->complete)
+        subif->logNotify(self->subscriber, self->ent, self->replay);
+    else if (self->reset)
+        subif->logReset(self->subscriber);
+    else if (self->complete)
+        subif->logReplayComplete(self->subscriber);
+
     return TASK_Result_Success;
 }
 
-void LogDispatcher_destroy(_In_ LogDispatcher* self)
+void LogDispatch_destroy(_In_ LogDispatch* self)
 {
     // Autogen begins -----
     objRelease(&self->subscriber);
     objRelease(&self->ent);
     // Autogen ends -------
+}
+
+_objfactory_guaranteed SubscriberInfo* SubscriberInfo_create(ObjInst* subscriber, bool ui)
+{
+    SubscriberInfo* self;
+    self = objInstCreate(SubscriberInfo);
+
+    self->subscriber = objGetWeak(ObjInst, subscriber);
+    self->ui         = ui;
+
+    objInstInit(self);
+    return self;
+}
+
+intptr SubscriberInfo_cmp(_In_ SubscriberInfo* self, SubscriberInfo* other, uint32 flags)
+{
+    devAssert(objClsInfo(self) == objClsInfo(other));
+    return self->subscriber - other->subscriber;
+}
+
+void SubscriberInfo_destroy(_In_ SubscriberInfo* self)
+{
+    // Autogen begins -----
+    objDestroyWeak(&self->subscriber);
+    // Autogen ends -------
+}
+
+uint32 SubscriberInfo_hash(_In_ SubscriberInfo* self, uint32 flags)
+{
+    return hashMurmur3((uint8*)&self->subscriber, sizeof(void*));
 }
 
 // Autogen begins -----

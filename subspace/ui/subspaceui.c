@@ -23,6 +23,8 @@
 #include <windows.h>
 #endif
 
+saDeclarePtr(Weak(ObjInst));
+
 static bool uicb(TaskQueue* tq)
 {
     IupLoopStep();
@@ -66,7 +68,16 @@ _objfactory_guaranteed SubspaceUI* SubspaceUI_create(Subspace* subspace)
     return self;
 }
 
-bool SubspaceUI_init(_In_ SubspaceUI* self)
+_objinit_guaranteed bool SubspaceUI_init(_In_ SubspaceUI* self)
+{
+    // Autogen begins -----
+    rwlockInit(&self->listenerlock);
+    htInit(&self->listeners, string, sarray, 16);
+    return true;
+    // Autogen ends -------
+}
+
+bool SubspaceUI_initialize(_In_ SubspaceUI* self)
 {
     // ui queue is a special task queue with only a single worker thread
     TaskQueueConfig conf;
@@ -184,6 +195,8 @@ void SubspaceUI_destroy(_In_ SubspaceUI* self)
     objRelease(&self->uiq);
     objRelease(&self->mainw);
     objRelease(&self->settingsw);
+    rwlockDestroy(&self->listenerlock);
+    htDestroy(&self->listeners);
     // Autogen ends -------
 }
 
@@ -203,6 +216,117 @@ void SubspaceUI_updateSettings(_In_ SubspaceUI* self, _In_opt_ strref page)
 {
     UIUpdateDispatch* disp = uiupdatedispatchSettings(self, page);
     tqRun(self->uiq, &disp);
+}
+
+bool SubspaceUI_listen(_In_ SubspaceUI* self, ObjInst* listener, _In_opt_ strref event)
+{
+    // check if the listener implements the proper interface
+    if (!objInstIf(listener, UINotifyListener))
+        return false;
+
+    withWriteLock (&self->listenerlock) {
+        htelem elem = htFind(self->listeners, strref, event, none, NULL);
+        if (!elem) {
+            sa_ObjInst_WeakRef newlist;
+            saInit(&newlist, weakref, 1);
+            elem = htInsertC(&self->listeners, strref, event, sarray, &newlist);
+        }
+        sa_ObjInst_WeakRef* list = (sa_ObjInst_WeakRef*)hteValPtr(self->listeners, sarray, elem);
+        Weak(ObjInst)* lsnrref   = objGetWeak(ObjInst, listener);
+        saPushC(list, weakref, &lsnrref);
+    }
+
+    return true;
+}
+
+void SubspaceUI__notify(_In_ SubspaceUI* self, _In_opt_ strref event, int n, stvar params[])
+{
+    bool ret = false;
+
+    // create a single dispatch event since all UI notifies run serially anyway
+    UINotifyDispatch* ndisp = uinotifydispatchCreate(self, event, n, params);
+    tqRun(self->uiq, &ndisp);
+}
+
+/* ---------- Notify Dispatch ---------- */
+
+_objfactory_guaranteed UINotifyDispatch*
+UINotifyDispatch_create(SubspaceUI* ui, _In_opt_ strref event, int n, stvar params[])
+{
+    UINotifyDispatch* self;
+    self = objInstCreate(UINotifyDispatch);
+
+    self->ui = objAcquire(ui);
+    strDup(&self->event, event);
+    saInit(&self->params, stvar, n);
+    for (int i = 0; i < n; i++) {
+        saPush(&self->params, stvar, params[i]);
+    }
+
+    objInstInit(self);
+
+    return self;
+}
+
+uint32 UINotifyDispatch_run(_In_ UINotifyDispatch* self, _In_ TaskQueue* tq, _In_ TQWorker* worker,
+                            _Inout_ TaskControl* tcon)
+
+{
+    SubspaceUI* ui = self->ui;
+
+    sa_ObjInst_WeakRef removed;
+    saInit(&removed, weakref, 1);
+
+    withReadLock (&ui->listenerlock) {
+        htelem elem = htFind(ui->listeners, strref, self->event, none, NULL);
+        if (elem) {
+            sa_ObjInst_WeakRef* list = (sa_ObjInst_WeakRef*)hteValPtr(ui->listeners, sarray, elem);
+
+            // dispatch the events in separate threads
+            foreach (sarray, idx, ObjInst_WeakRef*, subref, *list) {
+                ObjInst* sub = objAcquireFromWeak(ObjInst, subref);
+                if (sub) {
+                    UINotifyListener* lstn = objInstIf(sub, UINotifyListener);
+                    if (!lstn)
+                        continue;
+
+                    stvlist params;
+                    stvlInitSA(&params, self->params);
+                    lstn->uiNotify(sub, self->event, &params);
+                    objRelease(&sub);
+                } else {
+                    saPush(&removed, weakref, subref);
+                }
+            }
+        }
+    }
+
+    // clean up any listeners that don't exist anymore
+    if (saSize(removed) > 0) {
+        foreach (sarray, idx, ObjInst_WeakRef*, subref, removed) {
+            withWriteLock (&ui->listenerlock) {
+                htelem elem = htFind(ui->listeners, strref, self->event, none, NULL);
+                if (elem) {
+                    sa_ObjInst_WeakRef* list = (sa_ObjInst_WeakRef*)
+                        hteValPtr(ui->listeners, sarray, elem);
+
+                    saFindRemove(list, weakref, subref);
+                }
+            }
+        }
+    }
+    saDestroy(&removed);
+
+    return TASK_Result_Success;
+}
+
+void UINotifyDispatch_destroy(_In_ UINotifyDispatch* self)
+{
+    // Autogen begins -----
+    objRelease(&self->ui);
+    strDestroy(&self->event);
+    saDestroy(&self->params);
+    // Autogen ends -------
 }
 
 // Autogen begins -----
