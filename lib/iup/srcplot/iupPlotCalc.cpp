@@ -216,7 +216,7 @@ void iupPlot::CalculateXRange(double &outXMin, double &outXMax) const
       theXMin = -1;
       theXMax = 1;
     }
-    else if (!theXData->CalculateRange(theXMin, theXMax))
+    else if (!theXData->CalculateRange(theXMin, theXMax, NULL, NULL))
       return;
     
     if (theFirst) 
@@ -238,6 +238,7 @@ void iupPlot::CalculateYRange(double &outYMin, double &outYMax) const
   outYMin = 0;
   outYMax = 0;
 
+  Iarray *state = iupArrayCreate(10, sizeof(double));
   for (int ds = 0; ds < mDataSetListCount; ds++)
   {
     const iupPlotData *theYData = mDataSetList[ds]->GetDataY();
@@ -249,7 +250,7 @@ void iupPlot::CalculateYRange(double &outYMin, double &outYMax) const
       theYMin = -1;
       theYMax = 1;
     }
-    else if (!theYData->CalculateRange(theYMin, theYMax))
+    else if (!theYData->CalculateRange(theYMin, theYMax, mDataSetList[ds], state))
       return;
     
     if (theFirst) 
@@ -263,6 +264,7 @@ void iupPlot::CalculateYRange(double &outYMin, double &outYMax) const
     if (theYMax>outYMax)
       outYMax = theYMax;
   }
+  iupArrayDestroy(state);
 }
 
 bool iupPlot::CalculateAxisRange() 

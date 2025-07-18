@@ -19,19 +19,44 @@ static inline bool iPlotCheckInsideBox(double x, double y, double boxMinX, doubl
 /************************************************************************************************/
 
 
-bool iupPlotDataReal::CalculateRange(double &outMin, double &outMax) const
+bool iupPlotDataReal::CalculateRange(double &outMin, double &outMax, iupPlotDataSet* ds, Iarray* stateArray) const
 {
   int theCount = iupArrayCount(mArray);
   if (theCount > 0)
   {
     double* theData = (double*)iupArrayGetData(mArray);
-    outMax = outMin = theData[0];
+    double* accum = NULL;
+    double value;
+    bool stack = false;
+
+    // special handling for stacked bar graphs; they need to take all of the datasets into account
+    if (stateArray && ds && ds->mMode == IUP_PLOT_BAR && ds->mBarStacked) {
+      if (iupArrayCount(stateArray) < theCount)
+        iupArrayAdd(stateArray, theCount - iupArrayCount(stateArray));
+      accum = (double*)iupArrayGetData(stateArray);
+      stack = true;
+    }
+
+    value = theData[0];
+    if (stack) {
+      accum[0] += value;
+      value = accum[0];
+    }
+    outMax = outMin = value;
+
     for (int i = 1; i < theCount; i++)
     {
-      if (theData[i] > outMax)
-        outMax = theData[i];
-      if (theData[i] < outMin)
-        outMin = theData[i];
+      value = theData[i];
+      if (stack) {
+        // in stacked mode we need to accumulate the Y value for ALL datasets
+        accum[i] += value;
+        value = accum[i];
+      }
+
+      if (value > outMax)
+        outMax = value;
+      if (value < outMin)
+        outMin = value;
     }
     return true;
   }
@@ -45,7 +70,7 @@ iupPlotDataString::~iupPlotDataString()
     free(mData[i]);
 }
 
-bool iupPlotDataString::CalculateRange(double &outMin, double &outMax) const
+bool iupPlotDataString::CalculateRange(double &outMin, double &outMax, iupPlotDataSet* ds, Iarray* stateArray) const
 {
   if (mCount > 0)
   {
@@ -57,7 +82,7 @@ bool iupPlotDataString::CalculateRange(double &outMin, double &outMax) const
   return false;
 }
 
-bool iupPlotDataBool::CalculateRange(double &outMin, double &outMax) const
+bool iupPlotDataBool::CalculateRange(double &outMin, double &outMax, iupPlotDataSet* ds, Iarray* stateArray) const
 {
   if (mCount > 0)
   {
@@ -77,7 +102,7 @@ iupPlotDataSet::iupPlotDataSet(bool strXdata)
 : mColor(CD_BLACK), mLineStyle(CD_CONTINUOUS), mLineWidth(1), mAreaTransparency(255), mMarkStyle(CD_X), mMarkSize(7),
   mMultibarIndex(-1), mMultibarCount(0), mBarOutlineColor(0), mBarShowOutline(false), mBarSpacingPercent(10),
   mPieStartAngle(0), mPieRadius(0.95), mPieContour(false), mPieHole(0), mPieSliceLabelPos(0.95),
-  mHighlightedSample(-1), mHighlightedCurve(false), mBarMulticolor(false), mBarLabel(false), mOrderedX(false),
+  mHighlightedSample(-1), mHighlightedCurve(false), mBarMulticolor(false), mBarLabel(false), mBarStacked(false), mOrderedX(false),
   mSelectedCurve(false), mPieSliceLabel(IUP_PLOT_NONE), mMode(IUP_PLOT_LINE), mName(NULL), mHasSelected(false), mUserData(0)
 {
   if (strXdata)
@@ -106,14 +131,14 @@ iupPlotDataSet::~iupPlotDataSet()
 }
 
 bool iupPlotDataSet::FindSample(iupPlotTrafo *inTrafoX, iupPlotTrafo *inTrafoY, double inScreenX, double inScreenY, double inScreenTolerance,
-                                int &outSampleIndex, double &outX, double &outY) const
+                                int &outSampleIndex, double &outX, double &outY, Iarray *stateArray) const
 {
   switch (mMode)
   {
   case IUP_PLOT_MULTIBAR:
     return this->FindMultipleBarSample(inTrafoX, inTrafoY, inScreenX, inScreenY, outSampleIndex, outX, outY);
   case IUP_PLOT_BAR:
-    return this->FindBarSample(inTrafoX, inTrafoY, inScreenX, inScreenY, outSampleIndex, outX, outY);
+    return this->FindBarSample(inTrafoX, inTrafoY, inScreenX, inScreenY, outSampleIndex, outX, outY, stateArray);
   case IUP_PLOT_HORIZONTALBAR:
     return this->FindHorizontalBarSample(inTrafoX, inTrafoY, inScreenX, inScreenY, outSampleIndex, outX, outY);
   case IUP_PLOT_PIE:
@@ -204,7 +229,7 @@ bool iupPlotDataSet::FindMultipleBarSample(iupPlotTrafo *inTrafoX, iupPlotTrafo 
 }
 
 bool iupPlotDataSet::FindBarSample(iupPlotTrafo *inTrafoX, iupPlotTrafo *inTrafoY, double inScreenX, double inScreenY,
-                                   int &outSampleIndex, double &outX, double &outY) const
+                                   int &outSampleIndex, double &outX, double &outY, Iarray *stateArray) const
 {
   double theX, theY, theScreenX, theScreenY;
 
@@ -220,12 +245,26 @@ bool iupPlotDataSet::FindBarSample(iupPlotTrafo *inTrafoX, iupPlotTrafo *inTrafo
   double theBarWidth = (theScreenMaxX - theScreenMinX) / (theCount - 1);
   theBarWidth *= 1 - (double)mBarSpacingPercent / 100.0;
 
+  double *accum = NULL;
+  if (stateArray && mBarStacked) {
+    if (iupArrayCount(stateArray) < theCount)
+      iupArrayAdd(stateArray, theCount - iupArrayCount(stateArray));
+    accum = (double*)iupArrayGetData(stateArray);
+  }
+
   for (int i = 0; i < theCount; i++)
   {
     theX = mDataX->GetSample(i);
     theY = mDataY->GetSample(i);
+    double theYadj = theY;
+    if (accum) {
+      // if accum array exists, we are in stacked bar mode
+      theScreenY0 = inTrafoY->Transform(accum[i]);
+      accum[i] += theY;
+      theYadj = accum[i];
+    }
     theScreenX = inTrafoX->Transform(theX);
-    theScreenY = inTrafoY->Transform(theY);
+    theScreenY = inTrafoY->Transform(theYadj);
 
     double theBarX = theScreenX - theBarWidth / 2;
     double theBarHeight = theScreenY - theScreenY0;
@@ -1175,7 +1214,7 @@ void iupPlotDataSet::DrawDataArea(const iupPlotTrafo *inTrafoX, const iupPlotTra
     iPlotDrawHighlightedCurve(canvas, theCount, mDataX, mDataY, mSegment, inTrafoX, inTrafoY, false, true);
 }
 
-void iupPlotDataSet::DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, const iupPlotAxis& inAxisY) const
+void iupPlotDataSet::DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, const iupPlotAxis& inAxisY, Iarray* stateArray) const
 {
   int theCount = mDataX->GetCount();
   double theScreenY0 = inTrafoY->Transform(0);
@@ -1188,12 +1227,26 @@ void iupPlotDataSet::DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTraf
   double theBarWidth = (theScreenMaxX - theScreenMinX) / (theCount - 1);
   theBarWidth *= 1 - (double)mBarSpacingPercent / 100.0;
 
+  double *accum = NULL;
+  if (stateArray && mBarStacked) {
+    if (iupArrayCount(stateArray) < theCount)
+      iupArrayAdd(stateArray, theCount - iupArrayCount(stateArray));
+    accum = (double*)iupArrayGetData(stateArray);
+  }
+
   for (int i = 0; i < theCount; i++)
   {
     double theX = mDataX->GetSample(i);
     double theY = mDataY->GetSample(i);
+    double theYadj = theY;
+    if (accum) {
+      // if accum array exists, we are in stacked bar mode
+      theScreenY0 = inTrafoY->Transform(accum[i]);
+      accum[i] += theY;
+      theYadj = accum[i];
+    }
     double theScreenX = inTrafoX->Transform(theX);
-    double theScreenY = inTrafoY->Transform(theY);
+    double theScreenY = inTrafoY->Transform(theYadj);
 
     double theBarX = theScreenX - theBarWidth / 2;
     double theBarHeight = theScreenY - theScreenY0;
@@ -1581,7 +1634,7 @@ void iupPlotDataSet::DrawSelection(const iupPlotTrafo *inTrafoX, const iupPlotTr
   }
 }
 
-void iupPlotDataSet::DrawData(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, const iupPlotAxis& inAxisY) const
+void iupPlotDataSet::DrawData(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *inTrafoY, cdCanvas* canvas, const iupPlotSampleNotify* inNotify, const iupPlotAxis& inAxisY, Iarray *stateArray) const
 {
   int theXCount = mDataX->GetCount();
   int theYCount = mDataY->GetCount();
@@ -1617,7 +1670,7 @@ void iupPlotDataSet::DrawData(const iupPlotTrafo *inTrafoX, const iupPlotTrafo *
     DrawDataArea(inTrafoX, inTrafoY, canvas, inNotify);
     break;
   case IUP_PLOT_BAR:
-    DrawDataBar(inTrafoX, inTrafoY, canvas, inNotify, inAxisY);
+    DrawDataBar(inTrafoX, inTrafoY, canvas, inNotify, inAxisY, stateArray);
     break;
   case IUP_PLOT_PIE: /* handled outside DrawData */
     break;

@@ -230,12 +230,42 @@ bool iupPlot::FindDataSetSample(double inScreenX, double inScreenY, int &outInde
   if (!mAxisX.mTrafo || !mAxisY.mTrafo)
     return false;
 
-  /* search for datasets in the inverse order they are drawn */
+  Iarray* state = iupArrayCreate(10, sizeof(double));
+  /* stacked bar datasets need to be searched in dataset order in order to accumulate the bar height */
+  for (int ds = 0; ds < mDataSetListCount; ds++)
+  {
+    iupPlotDataSet* dataset = mDataSetList[ds];
+    if (dataset->mMode != IUP_PLOT_BAR || !dataset->mBarStacked)
+      continue;
+
+    if (dataset->FindSample(mAxisX.mTrafo, mAxisY.mTrafo, inScreenX, inScreenY, mScreenTolerance, outSampleIndex, outX, outY, state))
+    {
+      const iupPlotData *theXData = dataset->GetDataX();
+      if (theXData->IsString())
+      {
+        const iupPlotDataString *theStringXData = (const iupPlotDataString *)(theXData);
+        outStrX = theStringXData->GetSampleString(outSampleIndex);
+      }
+      else
+        outStrX = NULL;
+
+      outIndex = ds;
+      outName = dataset->GetName();
+
+      iupArrayDestroy(state);
+      return true;
+    }
+  }
+  iupArrayDestroy(state);
+
+  /* otherwise, search for datasets in the inverse order they are drawn */
   for (int ds = mDataSetListCount - 1; ds >= 0; ds--)
   {
     iupPlotDataSet* dataset = mDataSetList[ds];
+    if (dataset->mMode == IUP_PLOT_BAR && dataset->mBarStacked)
+      continue;
 
-    if (dataset->FindSample(mAxisX.mTrafo, mAxisY.mTrafo, inScreenX, inScreenY, mScreenTolerance, outSampleIndex, outX, outY))
+    if (dataset->FindSample(mAxisX.mTrafo, mAxisY.mTrafo, inScreenX, inScreenY, mScreenTolerance, outSampleIndex, outX, outY, NULL))
     {
       const iupPlotData *theXData = dataset->GetDataX();
       if (theXData->IsString())
@@ -539,6 +569,7 @@ bool iupPlot::Render(cdCanvas* canvas)
   IFniiddi drawsample_cb = (IFniiddi)IupGetCallback(ih, "DRAWSAMPLE_CB");
 
   iupPlotDataSet* pie_dataset = HasPie();
+  Iarray *state = iupArrayCreate(10, sizeof(double));
 
   for (int ds = 0; ds < mDataSetListCount; ds++)
   {
@@ -553,8 +584,9 @@ bool iupPlot::Render(cdCanvas* canvas)
         dataset->DrawDataPie(mAxisX.mTrafo, mAxisY.mTrafo, canvas, &theNotify, mAxisY, mBack.mColor);
     }
 
-    dataset->DrawData(mAxisX.mTrafo, mAxisY.mTrafo, canvas, &theNotify, mAxisY);
+    dataset->DrawData(mAxisX.mTrafo, mAxisY.mTrafo, canvas, &theNotify, mAxisY, state);
   }
+  iupArrayDestroy(state);
 
   // draw the legend, crosshair and selection restricted to the dataset area
   cdCanvasClipArea(canvas, theDataSetArea.mX, theDataSetArea.mX + theDataSetArea.mWidth - 1, theDataSetArea.mY, theDataSetArea.mY + theDataSetArea.mHeight - 1);
