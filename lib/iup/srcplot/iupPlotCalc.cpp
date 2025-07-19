@@ -431,3 +431,62 @@ bool iupPlot::CalculateTickSpacing(const iupPlotRect &inRect, cdCanvas* canvas)
   return true;
 }
 
+bool iupPlot::CalculateLegendSize(const iupPlotRect &inRect, cdCanvas* canvas, iupPlotRect &ioPos) const
+{
+  if (mLegend.mShow)
+  {
+    int ds;
+    int theFontHeight;
+
+    SetFont(canvas, mLegend.mFontStyle, mLegend.mFontSize);
+    cdCanvasGetFontDim(canvas, NULL, &theFontHeight, NULL, NULL);
+
+    int theMargin = theFontHeight / 2;
+    if (mLegend.mPosition == IUP_PLOT_BOTTOMCENTER)
+      theMargin = 0;
+    int theTotalHeight = mDataSetListCount*theFontHeight + 2 * theMargin;
+    int theLineSpace = 20;
+
+    int theWidth, theMaxWidth = 0;
+    for (ds = 0; ds < mDataSetListCount; ds++)
+    {
+      iupPlotDataSet* dataset = mDataSetList[ds];
+
+      cdCanvasGetTextSize(canvas, dataset->GetName(), &theWidth, NULL);
+
+      if (dataset->mMode == IUP_PLOT_MARK || dataset->mMode == IUP_PLOT_MARKLINE)
+      {
+        if (dataset->mMarkSize + 6 > theLineSpace)
+          theLineSpace = dataset->mMarkSize + 6;
+      }
+
+      theWidth += theLineSpace;
+
+      if (theWidth > theMaxWidth)
+        theMaxWidth = theWidth;
+    }
+
+    if (theMaxWidth == 0)
+      return false;
+
+    theMaxWidth += 2 * theMargin;
+
+    if (mLegend.mPosition != IUP_PLOT_XY)
+    {
+      int theScreenX = inRect.mX;
+      int theScreenY = inRect.mY;
+    
+      theScreenX += inRect.mWidth - theMaxWidth - 2;
+      theScreenY += inRect.mHeight - theTotalHeight - 2;
+
+      ioPos.mX = theScreenX;
+      ioPos.mY = theScreenY;
+    }
+
+    ioPos.mWidth = theMaxWidth;
+    ioPos.mHeight = theTotalHeight;
+    return true;
+  }
+
+  return false;
+}

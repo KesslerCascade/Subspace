@@ -18,7 +18,7 @@
 
 
 enum iupPlotMode { IUP_PLOT_LINE, IUP_PLOT_MARK, IUP_PLOT_MARKLINE, IUP_PLOT_AREA, IUP_PLOT_BAR, IUP_PLOT_STEM, IUP_PLOT_MARKSTEM, IUP_PLOT_HORIZONTALBAR, IUP_PLOT_MULTIBAR, IUP_PLOT_STEP, IUP_PLOT_ERRORBAR, IUP_PLOT_PIE };
-enum iupPlotLegendPosition { IUP_PLOT_TOPRIGHT, IUP_PLOT_TOPLEFT, IUP_PLOT_BOTTOMRIGHT, IUP_PLOT_BOTTOMLEFT, IUP_PLOT_BOTTOMCENTER, IUP_PLOT_XY };
+enum iupPlotLegendPosition { IUP_PLOT_TOPRIGHT, IUP_PLOT_TOPLEFT, IUP_PLOT_BOTTOMRIGHT, IUP_PLOT_BOTTOMLEFT, IUP_PLOT_BOTTOMCENTER, IUP_PLOT_XY, IUP_PLOT_RIGHTMARGIN };
 enum iupPlotSliceLabel { IUP_PLOT_NONE, IUP_PLOT_X, IUP_PLOT_Y, IUP_PLOT_PERCENT };
 enum iupPlotHighlight { IUP_PLOT_HIGHLIGHT_NONE, IUP_PLOT_HIGHLIGHT_SAMPLE, IUP_PLOT_HIGHLIGHT_CURVE, IUP_PLOT_HIGHLIGHT_BOTH };
 enum iupPlotClipping { IUP_PLOT_CLIPNONE, IUP_PLOT_CLIPAREA, IUP_PLOT_CLIPAREAOFFSET };
@@ -784,6 +784,7 @@ protected:
   bool CalculateLogTransformation(int inBegin, int inEnd, const iupPlotAxis& inAxis, iupPlotTrafoLog* outTrafo);
   bool CalculateTickSpacing(const iupPlotRect &inRect, cdCanvas* canvas);
   void CalculateTickSize(cdCanvas* canvas, iupPlotTick &ioTick);
+  bool CalculateLegendSize(const iupPlotRect &inRect, cdCanvas* canvas, iupPlotRect &ioPos) const;
 
   int CalcYTickVerticalMargin(cdCanvas* canvas, bool start) const;
   int CalcXTickHorizontalMargin(cdCanvas* canvas, bool start) const;

@@ -304,6 +304,8 @@ static int iPlotSetLegendPosAttrib(Ihandle* ih, const char* value)
     ih->data->current_plot->mLegend.mPosition = IUP_PLOT_TOPRIGHT;
   else if (iupStrEqualNoCase(value, "XY"))
     ih->data->current_plot->mLegend.mPosition = IUP_PLOT_XY;
+  else if (iupStrEqualNoCase(value, "RIGHTMARGIN"))
+    ih->data->current_plot->mLegend.mPosition = IUP_PLOT_RIGHTMARGIN;
 
   ih->data->current_plot->mRedraw = true;
   return 0;

@@ -521,10 +521,17 @@ bool iupPlot::Render(cdCanvas* canvas)
   cdCanvasNativeFont(canvas, IupGetAttribute(ih, "FONT"));
 
   iupPlotRect theDataSetArea;  /* Viewport - Margin (size only, no need for viewport offset) */
+  iupPlotRect origDataSetArea;  /* For legend-in-margin purposes */
   theDataSetArea.mX = mBack.mMargin.mLeft + mBack.mHorizPadding;
   theDataSetArea.mY = mBack.mMargin.mBottom + mBack.mVertPadding;
   theDataSetArea.mWidth = mViewport.mWidth - mBack.mMargin.mLeft - mBack.mMargin.mRight - 2 * mBack.mHorizPadding;
   theDataSetArea.mHeight = mViewport.mHeight - mBack.mMargin.mTop - mBack.mMargin.mBottom - 2 * mBack.mVertPadding;
+  origDataSetArea = theDataSetArea;
+
+  if (mLegend.mShow && mLegend.mPosition == IUP_PLOT_RIGHTMARGIN) {
+    if (CalculateLegendSize(theDataSetArea, canvas, mLegend.mPos))
+      theDataSetArea.mWidth -= mLegend.mPos.mWidth + mBack.mHorizPadding;
+  }
 
   if (!CalculateTickSpacing(theDataSetArea, canvas))
     return false;
@@ -622,7 +629,7 @@ bool iupPlot::Render(cdCanvas* canvas)
 
   if (pie_dataset)
     DrawSampleColorLegend(pie_dataset, theDataSetArea, canvas, mLegend.mPos);
-  else if (!DrawLegend(theDataSetArea, canvas, mLegend.mPos))
+  else if (!DrawLegend(origDataSetArea, canvas, mLegend.mPos))
     return false;
 
   // Draw title restricted only by the viewport
