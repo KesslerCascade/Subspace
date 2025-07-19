@@ -1,11 +1,11 @@
 #include <cx/taskqueue.sidl>
 #include "ui/subspaceui.sidl"
 #include "ui/panel/panel.sidl"
-#include "run/logrelay.sidl"
 
-class ScrapGraphPanel extends Panel implements LogSubscriber implements UINotifyListener {
+class ScrapGraphPanel extends Panel implements UINotifyListener {
     Ihandle *plot;
     int ds;
+    int ds2;
     [sorted] sarray:int64 sectoridx;
 
     void clear();

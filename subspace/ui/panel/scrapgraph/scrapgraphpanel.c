@@ -45,14 +45,13 @@ extern bool Panel_make(_In_ Panel* self);   // parent
 bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
 {
     self->plot = IupPlot();
-    IupPlotBegin(self->plot, 1);
-    self->ds = IupPlotEnd(self->plot);
+
     IupSetAttribute(self->plot, "FGCOLOR", "255 255 255");
     IupSetAttribute(self->plot, "AXS_YAUTOMIN", "NO");
     IupSetAttribute(self->plot, "AXS_XTICKAUTO", "NO");
     IupSetAttribute(self->plot, "AXS_XTICKMINORDIVISION", "1");
     IupSetAttribute(self->plot, "AXS_YTIPFORMAT", "%.0f");
-    IupSetAttribute(self->plot, "TIPFORMAT", "%.0s%.0s%s");
+    IupSetAttribute(self->plot, "TIPFORMAT", "%s: %.0s%s");
 
     self->h = IupBackgroundBox(self->plot);
     IupSetAttribute(self->h, "BGCOLOR", panelbg);
@@ -62,8 +61,6 @@ bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
     ssuiListen(self->ui, self, _S"Scrap_Update");
     ssuiListen(self->ui, self, _S"Scrap_Reset");
     ssuiListen(self->ui, self, _S"Scrap_Refresh");
-    // register to receive new sector events
-    logrelaySubscribeUI(self->ss->runlog, self, _S"Sector");
 
     return parent_make();
 }
@@ -89,22 +86,6 @@ void ScrapGraphPanel_clear(_In_ ScrapGraphPanel* self)
     IupSetAttribute(self->plot, "DS_BARSPACING", "30");
 
     strDestroy(&temp);
-}
-
-void ScrapGraphPanel_logNotify(_In_ ScrapGraphPanel* self, LogEnt* ent, bool replay)
-{
-    if (strEq(ent->id, _S"Sector"))
-        scrapgraphpanelHandleUpdate(self, ent->sectorpoint, true);
-}
-
-void ScrapGraphPanel_logReset(_In_ ScrapGraphPanel* self)
-{
-    return;
-}
-
-void ScrapGraphPanel_logReplayComplete(_In_ ScrapGraphPanel* self)
-{
-    return;
 }
 
 void ScrapGraphPanel_uiNotify(_In_ ScrapGraphPanel* self, _In_opt_ strref event, stvlist* params)
