@@ -1,6 +1,7 @@
 #include "control/controlclient.h"
 #include "control/runlog.h"
 #include "feature/feature.h"
+#include "feature/runtracker.h"
 #include "ftl/capp.h"
 #include "ftl/location.h"
 #include "ftl/scorekeeper.h"
@@ -10,10 +11,18 @@
 #include "patch/patchlist.h"
 #include "subspacegame.h"
 
+static DamageSource eventsrc;
+
 int WorldManager_CreateLocation_pre(WorldManager* self, Location* loc)
 {
     gs.waitInProgress = false;
     gs.gameTime       = 0;
+
+    if (RunTracker_feature.enabled && !gc.loadingGame) {
+        // any damage that happens during this call is event damage
+        damageSourceSet(&eventsrc, "Event");
+    }
+
     return 1;
 }
 
@@ -21,6 +30,8 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
 {
     if (gc.loadingGame)
         return;   // don't do this while loading the game
+
+    damageSourceFinish(&eventsrc);
 
     LocationEvent* event    = loc ? Location_event(loc) : NULL;
     basic_string* eventname = event ? LocationEvent_eventName(event) : NULL;
