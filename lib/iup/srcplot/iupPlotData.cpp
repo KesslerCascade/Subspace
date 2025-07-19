@@ -103,7 +103,8 @@ iupPlotDataSet::iupPlotDataSet(bool strXdata)
   mMultibarIndex(-1), mMultibarCount(0), mBarOutlineColor(0), mBarShowOutline(false), mBarSpacingPercent(10),
   mPieStartAngle(0), mPieRadius(0.95), mPieContour(false), mPieHole(0), mPieSliceLabelPos(0.95),
   mHighlightedSample(-1), mHighlightedCurve(false), mBarMulticolor(false), mBarLabel(false), mBarStacked(false), mOrderedX(false),
-  mSelectedCurve(false), mPieSliceLabel(IUP_PLOT_NONE), mMode(IUP_PLOT_LINE), mName(NULL), mHasSelected(false), mUserData(0)
+  mSelectedCurve(false), mPieSliceLabel(IUP_PLOT_NONE), mMode(IUP_PLOT_LINE), mName(NULL), mHasSelected(false), mUserData(0),
+  mBarLabelFormatString("")
 {
   if (strXdata)
     mDataX = (iupPlotData*)(new iupPlotDataString());
@@ -1283,7 +1284,8 @@ void iupPlotDataSet::DrawDataBar(const iupPlotTrafo *inTrafoX, const iupPlotTraf
         cdCanvasSetForeground(canvas, inAxisY.mColor);
         double px = theBarX + theBarWidth/2;
         double py = theScreenY0 + theBarHeight/2;
-        iupStrPrintfDoubleLocale(theBuf, inAxisY.mTick.mFormatString, theY, IupGetGlobal("DEFAULTDECIMALSYMBOL"));
+        const char *theLabelFormat = mBarLabelFormatString[0] ? mBarLabelFormatString:  inAxisY.mTick.mFormatString;
+        iupStrPrintfDoubleLocale(theBuf, theLabelFormat, theY, IupGetGlobal("DEFAULTDECIMALSYMBOL"));
         iupPlotDrawText(canvas, px, py, CD_CENTER, theBuf);
         if (!mBarMulticolor)
           cdCanvasSetForeground(canvas, mColor);

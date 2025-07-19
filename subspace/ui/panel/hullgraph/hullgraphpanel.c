@@ -98,6 +98,7 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "200 40 40");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "40");
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 
@@ -110,6 +111,7 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "160 160 160");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "40");
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 
@@ -122,6 +124,7 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "100 100 240");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "40");
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 
@@ -134,6 +137,7 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "40 200 200");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "40");
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 
@@ -146,6 +150,7 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "200 120 120");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "40");
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 
@@ -158,6 +163,7 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "200 40 200");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "40");
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 
@@ -170,6 +176,7 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "240 120 40");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "40");
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 
@@ -182,6 +189,7 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "200 200 0");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "40");
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 
@@ -194,6 +202,7 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "255 170 255");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "40");
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 

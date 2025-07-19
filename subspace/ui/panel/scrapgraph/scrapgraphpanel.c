@@ -83,6 +83,7 @@ void ScrapGraphPanel_clear(_In_ ScrapGraphPanel* self)
     IupSetAttribute(self->plot, "DS_COLOR", "200 40 40");
     IupSetAttribute(self->plot, "DS_MODE", "BAR");
     IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
     IupSetAttribute(self->plot, "DS_BARSPACING", "30");
 
     strDestroy(&temp);

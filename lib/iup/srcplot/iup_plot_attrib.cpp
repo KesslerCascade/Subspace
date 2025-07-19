@@ -1879,6 +1879,32 @@ static char* iPlotGetDSBarLabelAttrib(Ihandle* ih)
   return iupStrReturnBoolean(dataset->mBarLabel ? 1 : 0);
 }
 
+static int iPlotSetDSBarLabelFormatAttrib(Ihandle* ih, const char* value)
+{
+  if (ih->data->current_plot->mCurrentDataSet < 0 ||
+      ih->data->current_plot->mCurrentDataSet >= ih->data->current_plot->mDataSetListCount)
+      return NULL;
+
+  iupPlotDataSet* dataset = ih->data->current_plot->mDataSetList[ih->data->current_plot->mCurrentDataSet];
+
+  if (value)
+    strcpy(dataset->mBarLabelFormatString, value);
+  else
+    strcpy(dataset->mBarLabelFormatString, "");
+
+  return 0;
+}
+
+static char* iPlotGetDSBarLabelFormatAttrib(Ihandle* ih)
+{
+    if (ih->data->current_plot->mCurrentDataSet < 0 ||
+      ih->data->current_plot->mCurrentDataSet >= ih->data->current_plot->mDataSetListCount)
+      return NULL;
+
+  iupPlotDataSet* dataset = ih->data->current_plot->mDataSetList[ih->data->current_plot->mCurrentDataSet];
+  return iupStrReturnStr(dataset->mBarLabelFormatString);
+}
+
 static int iPlotSetDSBarStackedAttrib(Ihandle* ih, const char* value)
 {
   if (ih->data->current_plot->mCurrentDataSet < 0 ||
@@ -3732,6 +3758,7 @@ void iupPlotRegisterAttributes(Iclass* ic)
   iupClassRegisterAttribute(ic, "DS_BAROUTLINECOLOR", iPlotGetDSBarOutlineColorAttrib, iPlotSetDSBarOutlineColorAttrib, NULL, NULL, IUPAF_NOT_MAPPED | IUPAF_NO_INHERIT);
   iupClassRegisterAttribute(ic, "DS_BARMULTICOLOR", iPlotGetDSBarMulticolorAttrib, iPlotSetDSBarMulticolorAttrib, NULL, NULL, IUPAF_NOT_MAPPED | IUPAF_NO_INHERIT);
   iupClassRegisterAttribute(ic, "DS_BARLABEL", iPlotGetDSBarLabelAttrib, iPlotSetDSBarLabelAttrib, NULL, NULL, IUPAF_NOT_MAPPED | IUPAF_NO_INHERIT);
+  iupClassRegisterAttribute(ic, "DS_BARLABELFORMAT", iPlotGetDSBarLabelFormatAttrib, iPlotSetDSBarLabelFormatAttrib, NULL, NULL, IUPAF_NOT_MAPPED | IUPAF_NO_INHERIT);
   iupClassRegisterAttribute(ic, "DS_BARSPACING", iPlotGetDSBarSpacingAttrib, iPlotSetDSBarSpacingAttrib, IUPAF_SAMEASSYSTEM, "1", IUPAF_NOT_MAPPED | IUPAF_NO_INHERIT);
   iupClassRegisterAttribute(ic, "DS_BARSTACKED", iPlotGetDSBarStackedAttrib, iPlotSetDSBarStackedAttrib, NULL, NULL, IUPAF_NOT_MAPPED | IUPAF_NO_INHERIT);
   iupClassRegisterAttribute(ic, "DS_PIERADIUS", iPlotGetDSPieRadiusAttrib, iPlotSetDSPieRadiusAttrib, IUPAF_SAMEASSYSTEM, "0.95", IUPAF_NOT_MAPPED | IUPAF_NO_INHERIT);

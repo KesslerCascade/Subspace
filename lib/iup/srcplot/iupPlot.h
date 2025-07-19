@@ -322,6 +322,7 @@ public:
   void* mUserData;
   bool mOrderedX;
   bool mSelectedCurve;
+  char mBarLabelFormatString[30];
 
   // Aux
   int mHighlightedSample;
