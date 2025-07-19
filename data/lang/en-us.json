@@ -58,6 +58,7 @@
     "panel_runsummary": "Run Summmary",
     "panel_scrapgraph": "Scrap per Sector",
     "panel_sectordetail": "Sector Detail",
+    "panel_hullgraph": "Hull Damage",
     "settings_features": "Features",
     "menu_exit": "E&xit",
     "menu_about": "&About",
@@ -191,5 +192,15 @@
     "sector_shortname_ROCK_HOME": "RockH",
     "sector_shortname_CRYSTAL_HOME": "Crystal",
     "sector_shortname_LANIUS_SECTOR": "Abandon",
-    "sector_shortname_FINAL": "LastSt"
+    "sector_shortname_FINAL": "LastSt",
+    "damagesource_projectile": "Laser/Flak",
+    "damagesource_missile": "Missile",
+    "damagesource_beam": "Beam",
+    "damagesource_asteroid": "Asteroid",
+    "damagesource_asb": "ASB",
+    "damagesource_solarflare": "Solar Flare",
+    "damagesource_systemdestroyed": "System Destroyed",
+    "damagesource_event": "Event",
+    "damagesource_other": "Other",
+    "damagesource_repair": "Hull Repairs"
 }

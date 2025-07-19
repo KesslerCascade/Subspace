@@ -1,0 +1,17 @@
+#include <cx/taskqueue.sidl>
+#include "ui/subspaceui.sidl"
+#include "ui/panel/panel.sidl"
+#include "run/logrelay.sidl"
+
+class HullGraphPanel extends Panel implements UINotifyListener {
+    Ihandle *plot;
+    int ds[9];
+    int repairds;
+    [sorted] sarray:int64 sectoridx;
+
+    void clear();
+    void handleUpdate(int64 sectorpoint, bool redraw);
+
+    factory create(SubspaceUI *ui);
+    override make;
+}

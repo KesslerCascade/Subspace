@@ -15,6 +15,7 @@
 #include "db/database.h"
 #include "feature/featureregistry.h"
 #include "ui/subspaceui.h"
+#include "hulltracker.h"
 #include "logent.h"
 #include "logrelay.h"
 #include "scraptracker.h"
@@ -385,6 +386,16 @@ SectorInfo* RunInfo_getSector(_In_ RunInfo* self, int64 sectorpoint)
     return ret;
 }
 
+HullTracker* RunInfo_getHull(_In_ RunInfo* self)
+{
+    HullTracker* ret = NULL;
+    withReadLock (&self->lock) {
+        ret = objAcquire(self->hull);
+    }
+
+    return ret;
+}
+
 ScrapTracker* RunInfo_getScrap(_In_ RunInfo* self)
 {
     ScrapTracker* ret = NULL;
@@ -694,8 +705,10 @@ void RunInfo_setFocused(_In_ RunInfo* self, bool focused)
     withWriteLock (&self->lock) {
         if (self->focused != focused) {
             if (focused) {
+                self->hull  = hulltrackerCreate(self);
                 self->scrap = scraptrackerCreate(self);
             } else {
+                objRelease(&self->hull);
                 objRelease(&self->scrap);
             }
             self->focused = focused;
@@ -711,6 +724,7 @@ void RunInfo_destroy(_In_ RunInfo* self)
     strDestroy(&self->shipName);
     strDestroy(&self->savePath);
     saDestroy(&self->sectors);
+    objRelease(&self->hull);
     objRelease(&self->scrap);
     // Autogen ends -------
 }

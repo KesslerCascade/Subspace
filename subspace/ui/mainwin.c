@@ -12,6 +12,7 @@
 #include <cx/format.h>
 #include "gamemgr/gamemgr.h"
 #include "panel/gameinfo/gameinfopanel.h"
+#include "panel/hullgraph/hullgraphpanel.h"
 #include "panel/runsummary/runsummarypanel.h"
 #include "panel/scrapgraph/scrapgraphpanel.h"
 #include "panel/sectordetail/sectordetailpanel.h"
@@ -37,6 +38,7 @@ static void MainWin_registerPanels(MainWin* self, SubspaceUI* ui)
     htInit(&tpanels, string, object, 8);
 
     REGISTERPANEL(gameinfopanel);
+    REGISTERPANEL(hullgraphpanel);
     REGISTERPANEL(runsummarypanel);
     REGISTERPANEL(scrapgraphpanel);
     REGISTERPANEL(sectordetailpanel);

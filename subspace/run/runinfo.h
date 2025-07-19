@@ -23,6 +23,8 @@ typedef struct ComplexTaskQueue ComplexTaskQueue;
 typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
 typedef struct ScrapTracker ScrapTracker;
 typedef struct ScrapTracker_WeakRef ScrapTracker_WeakRef;
+typedef struct HullTracker HullTracker;
+typedef struct HullTracker_WeakRef HullTracker_WeakRef;
 typedef struct LogEnt LogEnt;
 typedef struct LogEnt_WeakRef LogEnt_WeakRef;
 typedef struct VFSDir VFSDir;
@@ -66,6 +68,7 @@ typedef struct RunInfo_ClassIf {
     void (*processShip)(_In_ void* self, _In_opt_ strref name);
     void (*setFocused)(_In_ void* self, bool focused);
     SectorInfo* (*getSector)(_In_ void* self, int64 sectorpoint);
+    HullTracker* (*getHull)(_In_ void* self);
     ScrapTracker* (*getScrap)(_In_ void* self);
     int32 (*score)(_In_ void* self);
     void (*finish)(_In_ void* self, RunResult result);
@@ -121,7 +124,8 @@ typedef struct RunInfo {
     sa_SectorInfo sectors;
     bool recording;        // is this run being currently recorded (i.e. not a historical run)
     bool focused;        // is focused by the UI
-    ScrapTracker* scrap;        // Trackers
+    HullTracker* hull;        // Trackers
+    ScrapTracker* scrap;
 } RunInfo;
 extern ObjClassInfo RunInfo_clsinfo;
 #define RunInfo(inst) ((RunInfo*)(unused_noeval((inst) && &((inst)->_is_RunInfo)), (inst)))
@@ -170,6 +174,8 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoSetFocused(self, focused) (self)->_->setFocused(RunInfo(self), focused)
 // SectorInfo* runinfoGetSector(RunInfo* self, int64 sectorpoint);
 #define runinfoGetSector(self, sectorpoint) (self)->_->getSector(RunInfo(self), sectorpoint)
+// HullTracker* runinfoGetHull(RunInfo* self);
+#define runinfoGetHull(self) (self)->_->getHull(RunInfo(self))
 // ScrapTracker* runinfoGetScrap(RunInfo* self);
 #define runinfoGetScrap(self) (self)->_->getScrap(RunInfo(self))
 // int32 runinfoScore(RunInfo* self);

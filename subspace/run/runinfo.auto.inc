@@ -27,6 +27,7 @@ static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     .processShip = (void (*)(void*, strref))RunInfo_processShip,
     .setFocused = (void (*)(void*, bool))RunInfo_setFocused,
     .getSector = (SectorInfo* (*)(void*, int64))RunInfo_getSector,
+    .getHull = (HullTracker* (*)(void*))RunInfo_getHull,
     .getScrap = (ScrapTracker* (*)(void*))RunInfo_getScrap,
     .score = (int32 (*)(void*))RunInfo_score,
     .finish = (void (*)(void*, RunResult))RunInfo_finish,

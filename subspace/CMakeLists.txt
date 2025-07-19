@@ -50,6 +50,7 @@ set(SUBSPACE_SIDL
     kbmgr/kbmgr.sidl
     kbmgr/keybind.sidl
     lang/langdb.sidl
+    run/hulltracker.sidl
     run/logent.sidl
     run/logrelay.sidl
     run/runinfo.sidl
@@ -68,6 +69,7 @@ set(SUBSPACE_SIDL
     ui/panel/panel.sidl
     ui/panel/gameinfo/gameinfopanel.sidl
     ui/panel/gameinfo/statlayoutinfo.sidl
+    ui/panel/hullgraph/hullgraphpanel.sidl
     ui/panel/runsummary/runsummarypanel.sidl
     ui/panel/scrapgraph/scrapgraphpanel.sidl
     ui/panel/sectordetail/sectordetailpanel.sidl
@@ -126,6 +128,7 @@ add_executable(subspace
     kbmgr/keymap.c
     lang/lang.c
     lang/langdb.c
+    run/hulltracker.c
     run/logent.c
     run/logrelay.c
     run/runinfo.c
@@ -150,6 +153,7 @@ add_executable(subspace
     ui/panel/panel.c
     ui/panel/gameinfo/gameinfopanel.c
     ui/panel/gameinfo/statlayoutinfo.c
+    ui/panel/hullgraph/hullgraphpanel.c
     ui/panel/runsummary/runsummarypanel.c
     ui/panel/scrapgraph/scrapgraphpanel.c
     ui/panel/sectordetail/sectordetailpanel.c
