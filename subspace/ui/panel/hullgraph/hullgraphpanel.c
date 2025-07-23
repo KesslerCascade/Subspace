@@ -39,6 +39,90 @@ _objinit_guaranteed bool HullGraphPanel_init(_In_ HullGraphPanel* self)
     // Autogen ends -------
 }
 
+void HullGraphPanel_onHullUpdate(_In_ HullGraphPanel* self, _In_opt_ strref event, stvlist* params)
+{
+    int64 savepoint = 0, sectorpoint = 0;
+    bool replay = false;
+
+    stvlNext(params, int64, &savepoint);
+    stvlNext(params, int64, &sectorpoint);
+    stvlNext(params, bool, &replay);
+
+    string temp = 0;
+
+    RunInfo* run = subspaceRun(self->ss);
+    if (!run)
+        return;
+
+    spointFormat(&temp, sectorpoint);
+
+    SectorInfo* sec = runinfoGetSector(run, sectorpoint);
+    if (!sec)
+        goto out;
+
+    // see if there's a translation for the sector name abbreviation
+    string skey = 0;
+    strConcat(&skey, _S"sector_shortname_", sec->type);
+    strref sname = langGetD(self->ss, skey, _S"");
+    if (!strEmpty(sname)) {
+        strDup(&temp, sname);
+    }
+    strDestroy(&skey);
+
+    HullTracker* tracker = runinfoGetHull(run);
+    if (tracker) {
+        HullTotals total = { 0 };
+        hulltrackerGetSector(tracker, sectorpoint, &total);
+
+        // get the index of the plot sample for the sector's bar
+        int32 idx = saFind(self->sectoridx, int64, sectorpoint);
+        if (idx >= 0) {
+            IupPlotSetSampleStr(self->plot, self->repairds, idx, strC(temp), total.repair);
+            IupPlotSetSampleStr(self->plot, self->ds[0], idx, "", total.projectile);
+            IupPlotSetSampleStr(self->plot, self->ds[1], idx, "", total.missile);
+            IupPlotSetSampleStr(self->plot, self->ds[2], idx, "", total.beam);
+            IupPlotSetSampleStr(self->plot, self->ds[3], idx, "", total.asteroid);
+            IupPlotSetSampleStr(self->plot, self->ds[4], idx, "", total.solarflare);
+            IupPlotSetSampleStr(self->plot, self->ds[5], idx, "", total.asb);
+            IupPlotSetSampleStr(self->plot, self->ds[6], idx, "", total.systemdestroyed);
+            IupPlotSetSampleStr(self->plot, self->ds[7], idx, "", total.event);
+            IupPlotSetSampleStr(self->plot, self->ds[8], idx, "", total.other);
+        } else {
+            // new sector we haven't seen before, probably crystal
+            idx = saPush(&self->sectoridx, int64, sectorpoint);
+            IupPlotInsertStr(self->plot, self->repairds, idx, strC(temp), total.repair);
+            IupPlotInsertStr(self->plot, self->ds[0], idx, "", total.projectile);
+            IupPlotInsertStr(self->plot, self->ds[1], idx, "", total.missile);
+            IupPlotInsertStr(self->plot, self->ds[2], idx, "", total.beam);
+            IupPlotInsertStr(self->plot, self->ds[3], idx, "", total.asteroid);
+            IupPlotInsertStr(self->plot, self->ds[4], idx, "", total.solarflare);
+            IupPlotInsertStr(self->plot, self->ds[5], idx, "", total.asb);
+            IupPlotInsertStr(self->plot, self->ds[6], idx, "", total.systemdestroyed);
+            IupPlotInsertStr(self->plot, self->ds[7], idx, "", total.event);
+            IupPlotInsertStr(self->plot, self->ds[8], idx, "", total.other);
+        }
+        objRelease(&tracker);
+    }
+
+    if (!replay)
+        IupSetAttribute(self->plot, "REDRAW", NULL);
+
+out:
+    strDestroy(&temp);
+    objRelease(&sec);
+    objRelease(&run);
+}
+
+void HullGraphPanel_onHullReset(_In_ HullGraphPanel* self, _In_opt_ strref event, stvlist* params)
+{
+    hullgraphpanelClear(self);
+}
+
+void HullGraphPanel_onHullRefresh(_In_ HullGraphPanel* self, _In_opt_ strref event, stvlist* params)
+{
+    IupSetAttribute(self->plot, "REDRAW", NULL);
+}
+
 extern bool Panel_make(_In_ Panel* self);   // parent
 #define parent_make() Panel_make((Panel*)(self))
 bool HullGraphPanel_make(_In_ HullGraphPanel* self)
@@ -60,9 +144,9 @@ bool HullGraphPanel_make(_In_ HullGraphPanel* self)
     iupSetObj(self->h, self, ObjNone, self->ui);
 
     // get UI updates from the hull tracker
-    ssuiListen(self->ui, self, _S"Hull_Update");
-    ssuiListen(self->ui, self, _S"Hull_Reset");
-    ssuiListen(self->ui, self, _S"Hull_Refresh");
+    ssuiListen(self->ui, self, HullGraphPanel_onHullUpdate, _S"Hull_Update");
+    ssuiListen(self->ui, self, HullGraphPanel_onHullReset, _S"Hull_Reset");
+    ssuiListen(self->ui, self, HullGraphPanel_onHullRefresh, _S"Hull_Refresh");
 
     return parent_make();
 }
@@ -207,91 +291,6 @@ void HullGraphPanel_clear(_In_ HullGraphPanel* self)
     IupSetAttribute(self->plot, "DS_BARSTACKED", "YES");
 
     strDestroy(&temp);
-}
-
-void HullGraphPanel_handleUpdate(_In_ HullGraphPanel* self, int64 sectorpoint, bool redraw)
-{
-    string temp = 0;
-
-    RunInfo* run = subspaceRun(self->ss);
-    if (!run)
-        return;
-
-    spointFormat(&temp, sectorpoint);
-
-    SectorInfo* sec = runinfoGetSector(run, sectorpoint);
-    if (!sec)
-        goto out;
-
-    // see if there's a translation for the sector name abbreviation
-    string skey = 0;
-    strConcat(&skey, _S"sector_shortname_", sec->type);
-    strref sname = langGetD(self->ss, skey, _S"");
-    if (!strEmpty(sname)) {
-        strDup(&temp, sname);
-    }
-    strDestroy(&skey);
-
-    HullTracker* tracker = runinfoGetHull(run);
-    if (tracker) {
-        HullTotals total = { 0 };
-        hulltrackerGetSector(tracker, sectorpoint, &total);
-
-        // get the index of the plot sample for the sector's bar
-        int32 idx = saFind(self->sectoridx, int64, sectorpoint);
-        if (idx >= 0) {
-            IupPlotSetSampleStr(self->plot, self->repairds, idx, strC(temp), total.repair);
-            IupPlotSetSampleStr(self->plot, self->ds[0], idx, "", total.projectile);
-            IupPlotSetSampleStr(self->plot, self->ds[1], idx, "", total.missile);
-            IupPlotSetSampleStr(self->plot, self->ds[2], idx, "", total.beam);
-            IupPlotSetSampleStr(self->plot, self->ds[3], idx, "", total.asteroid);
-            IupPlotSetSampleStr(self->plot, self->ds[4], idx, "", total.solarflare);
-            IupPlotSetSampleStr(self->plot, self->ds[5], idx, "", total.asb);
-            IupPlotSetSampleStr(self->plot, self->ds[6], idx, "", total.systemdestroyed);
-            IupPlotSetSampleStr(self->plot, self->ds[7], idx, "", total.event);
-            IupPlotSetSampleStr(self->plot, self->ds[8], idx, "", total.other);
-        } else {
-            // new sector we haven't seen before, probably crystal
-            idx = saPush(&self->sectoridx, int64, sectorpoint);
-            IupPlotInsertStr(self->plot, self->repairds, idx, strC(temp), total.repair);
-            IupPlotInsertStr(self->plot, self->ds[0], idx, "", total.projectile);
-            IupPlotInsertStr(self->plot, self->ds[1], idx, "", total.missile);
-            IupPlotInsertStr(self->plot, self->ds[2], idx, "", total.beam);
-            IupPlotInsertStr(self->plot, self->ds[3], idx, "", total.asteroid);
-            IupPlotInsertStr(self->plot, self->ds[4], idx, "", total.solarflare);
-            IupPlotInsertStr(self->plot, self->ds[5], idx, "", total.asb);
-            IupPlotInsertStr(self->plot, self->ds[6], idx, "", total.systemdestroyed);
-            IupPlotInsertStr(self->plot, self->ds[7], idx, "", total.event);
-            IupPlotInsertStr(self->plot, self->ds[8], idx, "", total.other);
-        }
-        objRelease(&tracker);
-    }
-
-    if (redraw)
-        IupSetAttribute(self->plot, "REDRAW", NULL);
-
-out:
-    strDestroy(&temp);
-    objRelease(&sec);
-    objRelease(&run);
-}
-
-void HullGraphPanel_uiNotify(_In_ HullGraphPanel* self, _In_opt_ strref event, stvlist* params)
-{
-    int64 savepoint = 0, sectorpoint = 0;
-    bool replay = false;
-
-    if (strEq(event, _S"Hull_Update")) {
-        stvlNext(params, int64, &savepoint);
-        stvlNext(params, int64, &sectorpoint);
-        stvlNext(params, bool, &replay);
-
-        hullgraphpanelHandleUpdate(self, sectorpoint, !replay);
-    } else if (strEq(event, _S"Hull_Reset")) {
-        hullgraphpanelClear(self);
-    } else if (strEq(event, _S"Hull_Refresh")) {
-        IupSetAttribute(self->plot, "REDRAW", NULL);
-    }
 }
 
 void HullGraphPanel_destroy(_In_ HullGraphPanel* self)

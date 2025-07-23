@@ -1,15 +1,17 @@
 #include <cx/taskqueue.sidl>
-#include "ui/subspaceui.sidl"
 #include "ui/panel/panel.sidl"
 
-class ScrapGraphPanel extends Panel implements UINotifyListener {
+class ScrapGraphPanel extends Panel {
     Ihandle *plot;
     int ds;
     int ds2;
     [sorted] sarray:int64 sectoridx;
 
     void clear();
-    void handleUpdate(int64 sectorpoint, bool redraw);
+
+    void onScrapUpdate(strref event, stvlist *params);
+    void onScrapReset(strref event, stvlist *params);
+    void onScrapRefresh(strref event, stvlist *params);
 
     factory create(SubspaceUI *ui);
     override make;

@@ -2,9 +2,7 @@
 #include "subspace.h"
 #include "lang/lang.h"
 
-interface UINotifyListener {
-    void uiNotify(strref event, stvlist *params);
-}
+typedef void (*uiNotifyCallback)(void *self, strref event, stvlist *params);
 
 #define ssuiNotify(self, event, ...) SubspaceUI__notify(self, event, count_macro_args(__VA_ARGS__), (stvar[]){ __VA_ARGS__ })
 
@@ -32,7 +30,7 @@ class SettingsWin;
     void updateMain(strref panel);
     void updateSettings(strref page);
 
-    bool listen(ObjInst* listener, strref event);
+    bool listen(ObjInst* listener, uiNotifyCallback func, strref event);
     unbound void _notify(strref event, int n, stvar params[]);
 }
 

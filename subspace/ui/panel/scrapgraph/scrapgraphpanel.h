@@ -4,7 +4,6 @@
 // clang-format off
 #include <cx/obj.h>
 #include <cx/taskqueue.h>
-#include "ui/subspaceui.h"
 #include "ui/panel/panel.h"
 
 typedef struct TaskQueue TaskQueue;
@@ -19,10 +18,6 @@ typedef struct TRGate TRGate;
 typedef struct TRGate_WeakRef TRGate_WeakRef;
 typedef struct ComplexTaskQueue ComplexTaskQueue;
 typedef struct ComplexTaskQueue_WeakRef ComplexTaskQueue_WeakRef;
-typedef struct MainWin MainWin;
-typedef struct MainWin_WeakRef MainWin_WeakRef;
-typedef struct SettingsWin SettingsWin;
-typedef struct SettingsWin_WeakRef SettingsWin_WeakRef;
 typedef struct SubspaceUI SubspaceUI;
 typedef struct SubspaceUI_WeakRef SubspaceUI_WeakRef;
 typedef struct TaskControl TaskControl;
@@ -41,8 +36,9 @@ typedef struct ScrapGraphPanel_ClassIf {
     void (*remap)(_In_ void* self);
     intptr (*cmp)(_In_ void* self, void* other, uint32 flags);
     void (*clear)(_In_ void* self);
-    void (*handleUpdate)(_In_ void* self, int64 sectorpoint, bool redraw);
-    void (*uiNotify)(_In_ void* self, _In_opt_ strref event, stvlist* params);
+    void (*onScrapUpdate)(_In_ void* self, _In_opt_ strref event, stvlist* params);
+    void (*onScrapReset)(_In_ void* self, _In_opt_ strref event, stvlist* params);
+    void (*onScrapRefresh)(_In_ void* self, _In_opt_ strref event, stvlist* params);
 } ScrapGraphPanel_ClassIf;
 extern ScrapGraphPanel_ClassIf ScrapGraphPanel_ClassIf_tmpl;
 
@@ -98,8 +94,10 @@ _objfactory_guaranteed ScrapGraphPanel* ScrapGraphPanel_create(SubspaceUI* ui);
 #define scrapgraphpanelCmp(self, other, flags) (self)->_->cmp(ScrapGraphPanel(self), other, flags)
 // void scrapgraphpanelClear(ScrapGraphPanel* self);
 #define scrapgraphpanelClear(self) (self)->_->clear(ScrapGraphPanel(self))
-// void scrapgraphpanelHandleUpdate(ScrapGraphPanel* self, int64 sectorpoint, bool redraw);
-#define scrapgraphpanelHandleUpdate(self, sectorpoint, redraw) (self)->_->handleUpdate(ScrapGraphPanel(self), sectorpoint, redraw)
-// void scrapgraphpanelUiNotify(ScrapGraphPanel* self, strref event, stvlist* params);
-#define scrapgraphpanelUiNotify(self, event, params) (self)->_->uiNotify(ScrapGraphPanel(self), event, params)
+// void scrapgraphpanelOnScrapUpdate(ScrapGraphPanel* self, strref event, stvlist* params);
+#define scrapgraphpanelOnScrapUpdate(self, event, params) (self)->_->onScrapUpdate(ScrapGraphPanel(self), event, params)
+// void scrapgraphpanelOnScrapReset(ScrapGraphPanel* self, strref event, stvlist* params);
+#define scrapgraphpanelOnScrapReset(self, event, params) (self)->_->onScrapReset(ScrapGraphPanel(self), event, params)
+// void scrapgraphpanelOnScrapRefresh(ScrapGraphPanel* self, strref event, stvlist* params);
+#define scrapgraphpanelOnScrapRefresh(self, event, params) (self)->_->onScrapRefresh(ScrapGraphPanel(self), event, params)
 

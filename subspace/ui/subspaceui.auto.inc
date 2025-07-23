@@ -1,10 +1,6 @@
 // ==================== Auto-generated section begins ====================
 // clang-format off
 // Do not modify the contents of this section; any changes will be lost!
-UINotifyListener UINotifyListener_tmpl = {
-    ._size = sizeof(UINotifyListener),
-};
-
 SubspaceUI_ClassIf SubspaceUI_ClassIf_tmpl = {
     ._size = sizeof(SubspaceUI_ClassIf),
 };
@@ -24,7 +20,7 @@ static SubspaceUI_ClassIf _impl_SubspaceUI_SubspaceUI_ClassIf = {
     .update = (void (*)(void*))SubspaceUI_update,
     .updateMain = (void (*)(void*, strref))SubspaceUI_updateMain,
     .updateSettings = (void (*)(void*, strref))SubspaceUI_updateSettings,
-    .listen = (bool (*)(void*, ObjInst*, strref))SubspaceUI_listen,
+    .listen = (bool (*)(void*, ObjInst*, uiNotifyCallback, strref))SubspaceUI_listen,
 };
 
 static ObjIface* _ifimpl_SubspaceUI[] = {

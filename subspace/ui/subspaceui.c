@@ -23,7 +23,41 @@
 #include <windows.h>
 #endif
 
-saDeclarePtr(Weak(ObjInst));
+typedef struct ListenerInfo {
+    Weak(ObjInst)* obj;
+    uiNotifyCallback cb;
+} ListenerInfo;
+
+void ListenerInfo_dtor(stype st, stgeneric* gen, flags_t flags)
+{
+    ListenerInfo* l = (ListenerInfo*)gen->st_opaque;
+    objDestroyWeak(&l->obj);
+}
+
+intptr ListenerInfo_cmp(stype st, stgeneric gen1, stgeneric gen2, flags_t flags)
+{
+    ListenerInfo* l1 = (ListenerInfo*)gen1.st_opaque;
+    ListenerInfo* l2 = (ListenerInfo*)gen2.st_opaque;
+
+    if (l1->obj->_inst != l2->obj->_inst)
+        return l1->obj->_inst - l2->obj->_inst;
+
+    return (intptr_t)l1->cb - (intptr_t)l2->cb;
+}
+
+void ListenerInfo_copy(stype st, stgeneric* dest, stgeneric src, flags_t flags)
+{
+    ListenerInfo* d = (ListenerInfo*)dest->st_opaque;
+    ListenerInfo* s = (ListenerInfo*)src.st_opaque;
+
+    d->obj = objCloneWeak(s->obj);
+    d->cb  = s->cb;
+}
+
+STypeOps ListenerInfo_ops = { .dtor = ListenerInfo_dtor,
+                              .cmp  = ListenerInfo_cmp,
+                              .copy = ListenerInfo_copy };
+saDeclare(ListenerInfo);
 
 static bool uicb(TaskQueue* tq)
 {
@@ -218,22 +252,21 @@ void SubspaceUI_updateSettings(_In_ SubspaceUI* self, _In_opt_ strref page)
     tqRun(self->uiq, &disp);
 }
 
-bool SubspaceUI_listen(_In_ SubspaceUI* self, ObjInst* listener, _In_opt_ strref event)
+bool SubspaceUI_listen(_In_ SubspaceUI* self, ObjInst* listener, uiNotifyCallback func,
+                       _In_opt_ strref event)
 {
-    // check if the listener implements the proper interface
-    if (!objInstIf(listener, UINotifyListener))
-        return false;
-
     withWriteLock (&self->listenerlock) {
         htelem elem = htFind(self->listeners, strref, event, none, NULL);
         if (!elem) {
-            sa_ObjInst_WeakRef newlist;
-            saInit(&newlist, weakref, 1);
+            sa_ListenerInfo newlist;
+            saInit(&newlist, custom(opaque(ListenerInfo), ListenerInfo_ops), 1);
             elem = htInsertC(&self->listeners, strref, event, sarray, &newlist);
         }
-        sa_ObjInst_WeakRef* list = (sa_ObjInst_WeakRef*)hteValPtr(self->listeners, sarray, elem);
-        Weak(ObjInst)* lsnrref   = objGetWeak(ObjInst, listener);
-        saPushC(list, weakref, &lsnrref);
+        sa_ListenerInfo* list = (sa_ListenerInfo*)hteValPtr(self->listeners, sarray, elem);
+        ListenerInfo ninfo    = { 0 };
+        ninfo.obj             = objGetWeak(ObjInst, listener);
+        ninfo.cb              = func;
+        saPushC(list, opaque, &ninfo);
     }
 
     return true;
@@ -274,28 +307,25 @@ uint32 UINotifyDispatch_run(_In_ UINotifyDispatch* self, _In_ TaskQueue* tq, _In
 {
     SubspaceUI* ui = self->ui;
 
-    sa_ObjInst_WeakRef removed;
-    saInit(&removed, weakref, 1);
+    sa_ListenerInfo removed;
+    saInit(&removed, custom(opaque(ListenerInfo), ListenerInfo_ops), 1);
 
     withReadLock (&ui->listenerlock) {
         htelem elem = htFind(ui->listeners, strref, self->event, none, NULL);
         if (elem) {
-            sa_ObjInst_WeakRef* list = (sa_ObjInst_WeakRef*)hteValPtr(ui->listeners, sarray, elem);
+            sa_ListenerInfo* list = (sa_ListenerInfo*)hteValPtr(ui->listeners, sarray, elem);
 
             // dispatch the events in separate threads
-            foreach (sarray, idx, ObjInst_WeakRef*, subref, *list) {
-                ObjInst* sub = objAcquireFromWeak(ObjInst, subref);
+            for (int i = 0, imax = saSize(*list); i < imax; i++) {
+                ListenerInfo* lent = &list->a[i];
+                ObjInst* sub       = objAcquireFromWeak(ObjInst, lent->obj);
                 if (sub) {
-                    UINotifyListener* lstn = objInstIf(sub, UINotifyListener);
-                    if (!lstn)
-                        continue;
-
                     stvlist params;
                     stvlInitSA(&params, self->params);
-                    lstn->uiNotify(sub, self->event, &params);
+                    lent->cb(sub, self->event, &params);
                     objRelease(&sub);
                 } else {
-                    saPush(&removed, weakref, subref);
+                    saPush(&removed, opaque, *lent);
                 }
             }
         }
@@ -303,14 +333,14 @@ uint32 UINotifyDispatch_run(_In_ UINotifyDispatch* self, _In_ TaskQueue* tq, _In
 
     // clean up any listeners that don't exist anymore
     if (saSize(removed) > 0) {
-        foreach (sarray, idx, ObjInst_WeakRef*, subref, removed) {
+        for (int i = 0, imax = saSize(removed); i < imax; i++) {
             withWriteLock (&ui->listenerlock) {
                 htelem elem = htFind(ui->listeners, strref, self->event, none, NULL);
                 if (elem) {
-                    sa_ObjInst_WeakRef* list = (sa_ObjInst_WeakRef*)
+                    sa_ListenerInfo* list = (sa_ListenerInfo*)
                         hteValPtr(ui->listeners, sarray, elem);
 
-                    saFindRemove(list, weakref, subref);
+                    saFindRemove(list, opaque, removed.a[i]);
                 }
             }
         }

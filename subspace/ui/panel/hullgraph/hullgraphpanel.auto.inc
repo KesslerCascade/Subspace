@@ -6,23 +6,17 @@ HullGraphPanel_ClassIf HullGraphPanel_ClassIf_tmpl = {
     ._parent = (ObjIface*)&Panel_ClassIf_tmpl,
 };
 
-static UINotifyListener _impl_HullGraphPanel_UINotifyListener = {
-    ._size = sizeof(UINotifyListener),
-    ._implements = (ObjIface*)&UINotifyListener_tmpl,
-    .uiNotify = (void (*)(void*, strref, stvlist*))HullGraphPanel_uiNotify,
-};
-
 static HullGraphPanel_ClassIf _impl_HullGraphPanel_HullGraphPanel_ClassIf = {
     ._size = sizeof(HullGraphPanel_ClassIf),
     ._implements = (ObjIface*)&HullGraphPanel_ClassIf_tmpl,
     .clear = (void (*)(void*))HullGraphPanel_clear,
-    .handleUpdate = (void (*)(void*, int64, bool))HullGraphPanel_handleUpdate,
+    .onHullUpdate = (void (*)(void*, strref, stvlist*))HullGraphPanel_onHullUpdate,
+    .onHullReset = (void (*)(void*, strref, stvlist*))HullGraphPanel_onHullReset,
+    .onHullRefresh = (void (*)(void*, strref, stvlist*))HullGraphPanel_onHullRefresh,
     .make = (bool (*)(void*))HullGraphPanel_make,
-    .uiNotify = (void (*)(void*, strref, stvlist*))HullGraphPanel_uiNotify,
 };
 
 static ObjIface* _ifimpl_HullGraphPanel[] = {
-    (ObjIface*)&_impl_HullGraphPanel_UINotifyListener,
     (ObjIface*)&_impl_HullGraphPanel_HullGraphPanel_ClassIf,
     NULL
 };

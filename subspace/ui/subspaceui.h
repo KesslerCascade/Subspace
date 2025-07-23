@@ -33,16 +33,9 @@ saDeclarePtr(SubspaceUI_WeakRef);
 saDeclarePtr(UINotifyDispatch);
 saDeclarePtr(UINotifyDispatch_WeakRef);
 
+typedef void (*uiNotifyCallback)(void *self, strref event, stvlist *params);
+
 #define ssuiNotify(self, event, ...) SubspaceUI__notify(self, event, count_macro_args(__VA_ARGS__), (stvar[]){ __VA_ARGS__ })
-
-typedef struct UINotifyListener {
-    ObjIface* _implements;
-    ObjIface* _parent;
-    size_t _size;
-
-    void (*uiNotify)(_In_ void* self, _In_opt_ strref event, stvlist* params);
-} UINotifyListener;
-extern UINotifyListener UINotifyListener_tmpl;
 
 typedef struct SubspaceUI_ClassIf {
     ObjIface* _implements;
@@ -56,7 +49,7 @@ typedef struct SubspaceUI_ClassIf {
     void (*update)(_In_ void* self);
     void (*updateMain)(_In_ void* self, _In_opt_ strref panel);
     void (*updateSettings)(_In_ void* self, _In_opt_ strref page);
-    bool (*listen)(_In_ void* self, ObjInst* listener, _In_opt_ strref event);
+    bool (*listen)(_In_ void* self, ObjInst* listener, uiNotifyCallback func, _In_opt_ strref event);
 } SubspaceUI_ClassIf;
 extern SubspaceUI_ClassIf SubspaceUI_ClassIf_tmpl;
 
@@ -130,8 +123,8 @@ void SubspaceUI__notify(_In_ SubspaceUI* self, _In_opt_ strref event, int n, stv
 #define ssuiUpdateMain(self, panel) (self)->_->updateMain(SubspaceUI(self), panel)
 // void ssuiUpdateSettings(SubspaceUI* self, strref page);
 #define ssuiUpdateSettings(self, page) (self)->_->updateSettings(SubspaceUI(self), page)
-// bool ssuiListen(SubspaceUI* self, ObjInst* listener, strref event);
-#define ssuiListen(self, listener, event) (self)->_->listen(SubspaceUI(self), ObjInst(listener), event)
+// bool ssuiListen(SubspaceUI* self, ObjInst* listener, uiNotifyCallback func, strref event);
+#define ssuiListen(self, listener, func, event) (self)->_->listen(SubspaceUI(self), ObjInst(listener), func, event)
 
 typedef struct UINotifyDispatch {
     union {

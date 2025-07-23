@@ -6,23 +6,17 @@ ScrapGraphPanel_ClassIf ScrapGraphPanel_ClassIf_tmpl = {
     ._parent = (ObjIface*)&Panel_ClassIf_tmpl,
 };
 
-static UINotifyListener _impl_ScrapGraphPanel_UINotifyListener = {
-    ._size = sizeof(UINotifyListener),
-    ._implements = (ObjIface*)&UINotifyListener_tmpl,
-    .uiNotify = (void (*)(void*, strref, stvlist*))ScrapGraphPanel_uiNotify,
-};
-
 static ScrapGraphPanel_ClassIf _impl_ScrapGraphPanel_ScrapGraphPanel_ClassIf = {
     ._size = sizeof(ScrapGraphPanel_ClassIf),
     ._implements = (ObjIface*)&ScrapGraphPanel_ClassIf_tmpl,
     .clear = (void (*)(void*))ScrapGraphPanel_clear,
-    .handleUpdate = (void (*)(void*, int64, bool))ScrapGraphPanel_handleUpdate,
+    .onScrapUpdate = (void (*)(void*, strref, stvlist*))ScrapGraphPanel_onScrapUpdate,
+    .onScrapReset = (void (*)(void*, strref, stvlist*))ScrapGraphPanel_onScrapReset,
+    .onScrapRefresh = (void (*)(void*, strref, stvlist*))ScrapGraphPanel_onScrapRefresh,
     .make = (bool (*)(void*))ScrapGraphPanel_make,
-    .uiNotify = (void (*)(void*, strref, stvlist*))ScrapGraphPanel_uiNotify,
 };
 
 static ObjIface* _ifimpl_ScrapGraphPanel[] = {
-    (ObjIface*)&_impl_ScrapGraphPanel_UINotifyListener,
     (ObjIface*)&_impl_ScrapGraphPanel_ScrapGraphPanel_ClassIf,
     NULL
 };

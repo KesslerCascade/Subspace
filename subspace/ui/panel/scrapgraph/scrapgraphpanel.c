@@ -40,75 +40,15 @@ _objinit_guaranteed bool ScrapGraphPanel_init(_In_ ScrapGraphPanel* self)
     // Autogen ends -------
 }
 
-extern bool Panel_make(_In_ Panel* self);   // parent
-#define parent_make() Panel_make((Panel*)(self))
-bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
+void ScrapGraphPanel_onScrapUpdate(_In_ ScrapGraphPanel* self, _In_opt_ strref event,
+                                   stvlist* params)
 {
-    self->plot = IupPlot();
+    int64 savepoint = 0, sectorpoint = 0;
+    bool replay = false;
+    stvlNext(params, int64, &savepoint);
+    stvlNext(params, int64, &sectorpoint);
+    stvlNext(params, bool, &replay);
 
-    IupSetAttribute(self->plot, "FGCOLOR", "255 255 255");
-    IupSetAttribute(self->plot, "AXS_YAUTOMIN", "NO");
-    IupSetAttribute(self->plot, "AXS_XTICKAUTO", "NO");
-    IupSetAttribute(self->plot, "AXS_XTICKMINORDIVISION", "1");
-    IupSetAttribute(self->plot, "AXS_YTIPFORMAT", "%.0f");
-    IupSetAttribute(self->plot, "TIPFORMAT", "%s: %.0s%s");
-
-    self->h = IupBackgroundBox(self->plot);
-    IupSetAttribute(self->h, "BGCOLOR", panelbg);
-    iupSetObj(self->h, self, ObjNone, self->ui);
-
-    // get UI updates from the scrap tracker
-    ssuiListen(self->ui, self, _S"Scrap_Update");
-    ssuiListen(self->ui, self, _S"Scrap_Reset");
-    ssuiListen(self->ui, self, _S"Scrap_Refresh");
-
-    return parent_make();
-}
-
-void ScrapGraphPanel_clear(_In_ ScrapGraphPanel* self)
-{
-    string temp = 0;
-
-    saClear(&self->sectoridx);
-    IupSetAttribute(self->plot, "CLEAR", "1");
-
-    IupPlotBegin(self->plot, 1);
-    for (int i = 1; i <= 8; i++) {
-        saPush(&self->sectoridx, int64, SPOINT(i, 0));
-        strFromInt32(&temp, i, 10);
-        IupPlotAddStr(self->plot, strC(temp), 0);
-    }
-    self->ds = IupPlotEnd(self->plot);
-    IupSetAttribute(self->plot, "DS_NAME", "Scrap");
-    IupSetAttribute(self->plot, "DS_COLOR", "200 40 40");
-    IupSetAttribute(self->plot, "DS_MODE", "BAR");
-    IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
-    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
-    IupSetAttribute(self->plot, "DS_BARSPACING", "30");
-
-    strDestroy(&temp);
-}
-
-void ScrapGraphPanel_uiNotify(_In_ ScrapGraphPanel* self, _In_opt_ strref event, stvlist* params)
-{
-    if (strEq(event, _S"Scrap_Update")) {
-        int64 savepoint = 0, sectorpoint = 0;
-        bool replay = false;
-        stvlNext(params, int64, &savepoint);
-        stvlNext(params, int64, &sectorpoint);
-        stvlNext(params, bool, &replay);
-
-        scrapgraphpanelHandleUpdate(self, sectorpoint, !replay);
-    } else if (strEq(event, _S"Scrap_Reset")) {
-        scrapgraphpanelClear(self);
-    } else if (strEq(event, _S"Scrap_Refresh")) {
-        IupSetAttribute(self->plot, "REDRAW", NULL);
-    }
-}
-
-// This must be called from the UI thread!
-void ScrapGraphPanel_handleUpdate(_In_ ScrapGraphPanel* self, int64 sectorpoint, bool redraw)
-{
     string temp = 0;
 
     RunInfo* run = subspaceRun(self->ss);
@@ -147,13 +87,74 @@ void ScrapGraphPanel_handleUpdate(_In_ ScrapGraphPanel* self, int64 sectorpoint,
         objRelease(&tracker);
     }
 
-    if (redraw)
+    if (!replay)
         IupSetAttribute(self->plot, "REDRAW", NULL);
 
 out:
     strDestroy(&temp);
     objRelease(&sec);
     objRelease(&run);
+}
+
+void ScrapGraphPanel_onScrapReset(_In_ ScrapGraphPanel* self, _In_opt_ strref event,
+                                  stvlist* params)
+{
+    scrapgraphpanelClear(self);
+}
+
+void ScrapGraphPanel_onScrapRefresh(_In_ ScrapGraphPanel* self, _In_opt_ strref event,
+                                    stvlist* params)
+{
+    IupSetAttribute(self->plot, "REDRAW", NULL);
+}
+
+extern bool Panel_make(_In_ Panel* self);   // parent
+#define parent_make() Panel_make((Panel*)(self))
+bool ScrapGraphPanel_make(_In_ ScrapGraphPanel* self)
+{
+    self->plot = IupPlot();
+
+    IupSetAttribute(self->plot, "FGCOLOR", "255 255 255");
+    IupSetAttribute(self->plot, "AXS_YAUTOMIN", "NO");
+    IupSetAttribute(self->plot, "AXS_XTICKAUTO", "NO");
+    IupSetAttribute(self->plot, "AXS_XTICKMINORDIVISION", "1");
+    IupSetAttribute(self->plot, "AXS_YTIPFORMAT", "%.0f");
+    IupSetAttribute(self->plot, "TIPFORMAT", "%s: %.0s%s");
+
+    self->h = IupBackgroundBox(self->plot);
+    IupSetAttribute(self->h, "BGCOLOR", panelbg);
+    iupSetObj(self->h, self, ObjNone, self->ui);
+
+    // get UI updates from the scrap tracker
+    ssuiListen(self->ui, self, ScrapGraphPanel_onScrapUpdate, _S"Scrap_Update");
+    ssuiListen(self->ui, self, ScrapGraphPanel_onScrapReset, _S"Scrap_Reset");
+    ssuiListen(self->ui, self, ScrapGraphPanel_onScrapRefresh, _S"Scrap_Refresh");
+
+    return parent_make();
+}
+
+void ScrapGraphPanel_clear(_In_ ScrapGraphPanel* self)
+{
+    string temp = 0;
+
+    saClear(&self->sectoridx);
+    IupSetAttribute(self->plot, "CLEAR", "1");
+
+    IupPlotBegin(self->plot, 1);
+    for (int i = 1; i <= 8; i++) {
+        saPush(&self->sectoridx, int64, SPOINT(i, 0));
+        strFromInt32(&temp, i, 10);
+        IupPlotAddStr(self->plot, strC(temp), 0);
+    }
+    self->ds = IupPlotEnd(self->plot);
+    IupSetAttribute(self->plot, "DS_NAME", "Scrap");
+    IupSetAttribute(self->plot, "DS_COLOR", "200 40 40");
+    IupSetAttribute(self->plot, "DS_MODE", "BAR");
+    IupSetAttribute(self->plot, "DS_BARLABEL", "YES");
+    IupSetAttribute(self->plot, "DS_BARLABELFORMAT", "%.0f");
+    IupSetAttribute(self->plot, "DS_BARSPACING", "30");
+
+    strDestroy(&temp);
 }
 
 void ScrapGraphPanel_destroy(_In_ ScrapGraphPanel* self)
