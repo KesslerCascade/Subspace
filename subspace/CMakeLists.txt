@@ -56,8 +56,6 @@ set(SUBSPACE_SIDL
     run/runinfo.sidl
     run/scraptracker.sidl
     run/sectorinfo.sidl
-    ui/mainwin.sidl
-    ui/settingswin.sidl
     ui/subspaceui.sidl
     ui/image/image.sidl
     ui/image/imageload.sidl
@@ -78,6 +76,8 @@ set(SUBSPACE_SIDL
     ui/util/iuprefreshdispatch.sidl
     ui/util/iupsetimagedispatch.sidl
     ui/util/uiupdatedispatch.sidl
+    ui/win/mainwin.sidl
+    ui/win/settingswin.sidl
     )
 
 add_sidl(${SUBSPACE_SIDL})
@@ -134,11 +134,6 @@ add_executable(subspace
     run/runinfo.c
     run/scraptracker.c
     run/sectorinfo.c
-    ui/about.c
-    ui/mainwin.c
-    ui/mainwinlayout.c
-    ui/mainwinmenu.c
-    ui/settingswin.c
     ui/subspaceui.c
     ui/image/image.c
     ui/image/imageload.c
@@ -164,6 +159,11 @@ add_executable(subspace
     ui/util/iupsetimagedispatch.c
     ui/util/settip.c
     ui/util/uiupdatedispatch.c
+    ui/win/about.c
+    ui/win/mainwin.c
+    ui/win/mainwinlayout.c
+    ui/win/mainwinmenu.c
+    ui/win/settingswin.c
     win32/process.c
     win32/subspace.manifest
     win32/subspace.rc

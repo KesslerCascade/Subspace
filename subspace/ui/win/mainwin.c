@@ -11,16 +11,16 @@
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
 #include "gamemgr/gamemgr.h"
-#include "panel/gameinfo/gameinfopanel.h"
-#include "panel/hullgraph/hullgraphpanel.h"
-#include "panel/runsummary/runsummarypanel.h"
-#include "panel/scrapgraph/scrapgraphpanel.h"
-#include "panel/sectordetail/sectordetailpanel.h"
-#include "panel/welcome/welcomepanel.h"
+#include "ui/panel/gameinfo/gameinfopanel.h"
+#include "ui/panel/hullgraph/hullgraphpanel.h"
+#include "ui/panel/runsummary/runsummarypanel.h"
+#include "ui/panel/scrapgraph/scrapgraphpanel.h"
+#include "ui/panel/sectordetail/sectordetailpanel.h"
+#include "ui/panel/welcome/welcomepanel.h"
+#include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
 #include "settingswin.h"
-#include "subspaceui.h"
 
 #define REGISTERPANEL(mprefix)         \
     p = Panel(mprefix##Create(ui));    \
@@ -216,7 +216,7 @@ void MainWin_show(_In_ MainWin* self)
 
 void MainWin_update(_In_ MainWin* self)
 {
-    string tmp = 0;
+    string tmp   = 0;
     bool haveexe = false, pbenabled = false;
     ;
     if (ssdStringOut(self->ss->settings, _S"ftl/exe", &tmp)) {
@@ -278,9 +278,9 @@ void MainWin_finish(_In_ MainWin* self)
         IupDestroy(self->menu);
     if (self->layoutmenu)
         IupDestroy(self->layoutmenu);
-    self->win   = NULL;
-    self->timer = NULL;
-    self->menu  = NULL;
+    self->win        = NULL;
+    self->timer      = NULL;
+    self->menu       = NULL;
     self->layoutmenu = NULL;
 }
 

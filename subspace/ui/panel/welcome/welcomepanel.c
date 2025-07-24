@@ -9,10 +9,10 @@
 #include "welcomepanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "ui/settingswin.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
+#include "ui/win/settingswin.h"
 
 _objfactory_guaranteed WelcomePanel* WelcomePanel_create(SubspaceUI* ui)
 {

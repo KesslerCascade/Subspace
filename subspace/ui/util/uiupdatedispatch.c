@@ -9,8 +9,8 @@
 #include "uiupdatedispatch.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "ui/mainwin.h"
-#include "ui/settingswin.h"
+#include "ui/win/mainwin.h"
+#include "ui/win/settingswin.h"
 
 _objfactory_guaranteed UIUpdateDispatch*
 UIUpdateDispatch_mainWin(SubspaceUI* ui, _In_opt_ strref panelname)

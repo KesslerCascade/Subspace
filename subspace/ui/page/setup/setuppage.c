@@ -12,9 +12,9 @@
 #include <cx/format.h>
 #include "feature/featureregistry.h"
 #include "gamemgr/gamemgr.h"
-#include "ui/settingswin.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
+#include "ui/win/settingswin.h"
 
 _objfactory_guaranteed SetupPage* SetupPage_create(SubspaceUI* ui)
 {

@@ -11,8 +11,8 @@
 // ==================== Auto-generated section ends ======================
 
 #include "ui/util/uiupdatedispatch.h"
-#include "mainwin.h"
-#include "settingswin.h"
+#include "win/mainwin.h"
+#include "win/settingswin.h"
 
 #include <cd.h>
 #include <iup.h>

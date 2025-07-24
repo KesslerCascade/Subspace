@@ -1,10 +1,10 @@
+#include "about.h"
 #include <cx/format.h>
 #include <iup.h>
+#include "ui/subspaceui.h"
 #include "version.h"
-#include "about.h"
-#include "subspaceui.h"
 
-static int ok_action(Ihandle *ih)
+static int ok_action(Ihandle* ih)
 {
     Ihandle* aboutwin = IupGetAttributeHandle(ih, "ABOUTWIN");
     if (aboutwin)
@@ -13,13 +13,13 @@ static int ok_action(Ihandle *ih)
     return IUP_DEFAULT;
 }
 
-void showAbout(Subspace *ss)
+void showAbout(Subspace* ss)
 {
     Ihandle* sslbl = IupLabel(langGetC(ss, "subspace_title"));
     IupSetAttribute(sslbl, "FONT", "Helvetica, Bold 11");
-    string verstr  = 0;
+    string verstr = 0;
     strNConcat(&verstr, langGet(ss, _S"version"), _S" ", (strref)subspace_version_str);
-    Ihandle *verlbl = IupLabel(strC(verstr));
+    Ihandle* verlbl = IupLabel(strC(verstr));
 
     Ihandle* spc1 = IupSpace();
     IupSetAttribute(spc1, "SIZE", "1x12");
@@ -42,7 +42,16 @@ void showAbout(Subspace *ss)
     IupSetAttribute(okbutton, "SIZE", "60x20");
     IupSetCallback(okbutton, "ACTION", (Icallback)ok_action);
 
-    Ihandle* vbox = IupVbox(sslbl, verlbl, spc1, copyrightlbl, contactlbl, spc2, licenselbl, spc3, okbutton, NULL);
+    Ihandle* vbox = IupVbox(sslbl,
+                            verlbl,
+                            spc1,
+                            copyrightlbl,
+                            contactlbl,
+                            spc2,
+                            licenselbl,
+                            spc3,
+                            okbutton,
+                            NULL);
     IupSetAttribute(vbox, "ALIGNMENT", "ACENTER");
     IupSetAttribute(vbox, "CMARGIN", "18x18");
     IupSetAttribute(vbox, "CGAP", "3");
