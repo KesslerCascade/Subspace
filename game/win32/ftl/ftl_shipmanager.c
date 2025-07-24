@@ -283,9 +283,22 @@ DisasmTrace ShipManager_DamageArea_trace = {
     .out  = { &SYM(ShipManager_DamageArea) }
 };
 
+// alternate form found in some versions
+DisasmTrace ShipManager_DamageArea_trace_2 = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "ACH_CRYSTAL_SHARD",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = { DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 28, .imax = 38 },
+             { I_LEA, .argf = { 0, ARG_ADDR }, .argsym = { 0, &SYM(ShipManager_ship_offset) } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_DamageArea) }
+};
+
 Symbol SYM(ShipManager_DamageArea) = {
     SYMNAME("ShipManager::DamageArea"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DamageArea_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DamageArea_trace_2 },
              { .type = SYMBOL_FIND_EXPORT, .name = "" },
              { 0 } }
 };
@@ -342,7 +355,7 @@ DisasmTrace ShipManager_OnLoop_trace = {
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ESP } },
                 .argstr = { 0, "reactor" } },
-             { DT_OP(SKIP), .imin = 0, .imax = 500 },
+             { DT_OP(SKIP), .imin = 300, .imax = 650 },
              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL ShipSystem::GetExploded
               { I_TEST, .args = { ARG_REG, ARG_REG }, .args = { { REG_AL }, { REG_AL } } },
              { DT_OP(SKIP), .imin = 1, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
