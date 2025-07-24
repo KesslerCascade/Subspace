@@ -9,6 +9,7 @@ RunTracker_ClassIf RunTracker_ClassIf_tmpl = {
 static RunTracker_ClassIf _impl_RunTracker_RunTracker_ClassIf = {
     ._size = sizeof(RunTracker_ClassIf),
     ._implements = (ObjIface*)&RunTracker_ClassIf_tmpl,
+    .updateLockState = (void (*)(void*))RunTracker_updateLockState,
     .createSettingsPage = (SettingsPage* (*)(void*, SubspaceUI*))RunTracker_createSettingsPage,
     .applyDefaultSettings = (void (*)(void*))RunTracker_applyDefaultSettings,
     .enable = (void (*)(void*, bool))RunTracker_enable,

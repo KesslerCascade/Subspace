@@ -13,6 +13,7 @@
 #include "control/controlclient.h"
 #include "control/controlserver.h"
 #include "feature/featureregistry.h"
+#include "feature/runtracker/runtracker.h"
 #include "kbmgr/kbmgr.h"
 #include "ui/subspaceui.h"
 #include "gamemgr.h"
@@ -159,6 +160,11 @@ void GameInst_setStateLocked(_In_ GameInst* self, GameInstState state)
             ssuiUpdateMain(self->ss->ui, NULL);
             ssuiUpdateMain(self->ss->ui, _S"gameinfo");
         }
+
+        // update RunTracker feature lock state
+        RunTracker* tracker = fregGet(RunTracker, self->ss->freg);
+        if (tracker)
+            runtrackerUpdateLockState(tracker);
     }
 }
 

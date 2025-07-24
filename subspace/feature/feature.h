@@ -29,6 +29,7 @@ typedef struct SubspaceFeature_ClassIf {
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
+    bool (*isLocked)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
     void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
@@ -56,6 +57,7 @@ typedef struct SubspaceFeature {
     bool enabled;
     bool hidden;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    bool locked;        // cannot be enabled or disabled currently
     SSDNode* settings;        // Settings that are synchronized with the game client
 } SubspaceFeature;
 extern ObjClassInfo SubspaceFeature_clsinfo;
@@ -79,6 +81,8 @@ typedef struct SubspaceFeature_WeakRef {
 #define featureIsEnabled(self) (self)->_->isEnabled(SubspaceFeature(self))
 // bool featureIsAvailable(SubspaceFeature* self);
 #define featureIsAvailable(self) (self)->_->isAvailable(SubspaceFeature(self))
+// bool featureIsLocked(SubspaceFeature* self);
+#define featureIsLocked(self) (self)->_->isLocked(SubspaceFeature(self))
 // void featureEnable(SubspaceFeature* self, bool enabled);
 #define featureEnable(self, enabled) (self)->_->enable(SubspaceFeature(self), enabled)
 // void featureSetAvailable(SubspaceFeature* self, bool available);

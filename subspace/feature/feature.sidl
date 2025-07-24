@@ -13,12 +13,14 @@ class SubspaceUI;
     bool enabled;
     bool hidden;
     bool optional;   // Features that are expected to be unavailable, e.g. version-specific
+    bool locked;     // cannot be enabled or disabled currently
 
     object:SSDNode settings;    // Settings that are synchronized with the game client
 
     SettingsPage *createSettingsPage(SubspaceUI *ui);
     bool isEnabled();
     bool isAvailable();
+    bool isLocked();
     void enable(bool enabled);
     void setAvailable(bool available);
     void applyDefaultSettings();

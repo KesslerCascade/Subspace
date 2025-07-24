@@ -24,6 +24,7 @@ typedef struct RunTracker_ClassIf {
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
+    bool (*isLocked)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
     void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
@@ -31,6 +32,7 @@ typedef struct RunTracker_ClassIf {
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
     // update curinst when a settings changes
     void (*sendSettingCur)(_In_ void* self, _In_opt_ strref name);
+    void (*updateLockState)(_In_ void* self);
 } RunTracker_ClassIf;
 extern RunTracker_ClassIf RunTracker_ClassIf_tmpl;
 
@@ -52,6 +54,7 @@ typedef struct RunTracker {
     bool enabled;
     bool hidden;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    bool locked;        // cannot be enabled or disabled currently
     SSDNode* settings;        // Settings that are synchronized with the game client
 } RunTracker;
 extern ObjClassInfo RunTracker_clsinfo;
@@ -80,6 +83,8 @@ _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss);
 #define runtrackerIsEnabled(self) (self)->_->isEnabled(RunTracker(self))
 // bool runtrackerIsAvailable(RunTracker* self);
 #define runtrackerIsAvailable(self) (self)->_->isAvailable(RunTracker(self))
+// bool runtrackerIsLocked(RunTracker* self);
+#define runtrackerIsLocked(self) (self)->_->isLocked(RunTracker(self))
 // void runtrackerEnable(RunTracker* self, bool enabled);
 #define runtrackerEnable(self, enabled) (self)->_->enable(RunTracker(self), enabled)
 // void runtrackerSetAvailable(RunTracker* self, bool available);
@@ -94,4 +99,6 @@ _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss);
 //
 // update curinst when a settings changes
 #define runtrackerSendSettingCur(self, name) (self)->_->sendSettingCur(RunTracker(self), name)
+// void runtrackerUpdateLockState(RunTracker* self);
+#define runtrackerUpdateLockState(self) (self)->_->updateLockState(RunTracker(self))
 

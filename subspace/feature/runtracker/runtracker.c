@@ -10,6 +10,7 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "gamemgr/gameinst.h"
+#include "ui/subspaceui.h"
 
 _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss)
 {
@@ -43,15 +44,28 @@ extern void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled);   
 #define parent_enable(enabled) SubspaceFeature_enable((SubspaceFeature*)(self), enabled)
 void RunTracker_enable(_In_ RunTracker* self, bool enabled)
 {
-    GameInst* inst = subspaceGame(self->ss);
-    if (!inst || ginstGetState(inst) == GI_Menu) {
-        // can change this if the game isn't running or is at the menu
+    if (!featureIsLocked(self))
         parent_enable(enabled);
-        objRelease(&inst);
-        return;
+}
+
+void RunTracker_updateLockState(_In_ RunTracker* self)
+{
+    bool locked    = false;
+    GameInst* inst = subspaceGame(self->ss);
+    // NOTE: this is only ever called with the GameInst lock already held
+    if (inst && inst->state != GI_Menu) {
+        // can't change this if the game isn't running or is at the menu
+        locked = true;
     }
 
-    // otherwise do nothing; can't enable or disable
+    bool oldlocked;
+    withWriteLock (&self->lock) {
+        oldlocked    = self->locked;
+        self->locked = locked;
+    }
+
+    if (oldlocked != locked)
+        ssuiUpdateSettings(self->ss->ui, _S"features");
     objRelease(&inst);
     return;
 }

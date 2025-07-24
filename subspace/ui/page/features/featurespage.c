@@ -37,20 +37,25 @@ _objfactory_guaranteed FeaturesPage* FeaturesPage_create(SubspaceUI* ui)
     return self;
 }
 
-static bool setPanelState(Ihandle* fpanel, bool available, bool enabled, bool optional, bool hidden)
+static bool setPanelState(Ihandle* fpanel, bool available, bool enabled, bool optional, bool hidden,
+                          bool locked)
 {
     bool refreshlayout = false;
     int curavail       = IupGetInt(fpanel, "PANEL_AVAILABLE");
     int curenabled     = IupGetInt(fpanel, "PANEL_ENABLED");
     int curhidden      = IupGetInt(fpanel, "PANEL_HIDDEN");
+    int curlocked      = IupGetInt(fpanel, "PANEL_LOCKED");
     int newavail       = available ? 1 : 0;
     int newenabled     = enabled ? 1 : 0;
+    int newlocked      = locked ? 1 : 0;
     int newhidden      = hidden || (!available && optional);
 
-    if (curavail != newavail || curenabled != newenabled || curhidden != newhidden) {
+    if (curavail != newavail || curenabled != newenabled || curhidden != newhidden ||
+        curlocked != newlocked) {
         IupSetInt(fpanel, "PANEL_AVAILABLE", newavail);
         IupSetInt(fpanel, "PANEL_ENABLED", newenabled);
         IupSetInt(fpanel, "PANEL_HIDDEN", newhidden);
+        IupSetInt(fpanel, "PANEL_LOCKED", newlocked);
         if (curhidden != newhidden) {
             IupSetAttribute(fpanel, "FLOATING", newhidden ? "IGNORE" : "NO");
             IupSetAttribute(fpanel, "VISIBLE", newhidden ? "NO" : "YES");
@@ -130,7 +135,9 @@ static int panel_draw(Ihandle* ih, float posx, float posy)
     bool enabled           = IupGetInt(ih, "PANEL_ENABLED");
     bool focus             = IupGetInt(ih, "PANEL_FOCUS");
     bool hover             = IupGetInt(ih, "PANEL_HOVER");
-    bool drawhover         = avail && (focus || hover);
+    bool locked            = IupGetInt(ih, "PANEL_LOCKED");
+    bool drawhover         = avail && !locked && (focus || hover);
+    Ihandle* lockimg       = NULL;
     const char* paneltitle = IupGetAttribute(ih, "PANEL_TITLE");
     const char* paneldesc  = IupGetAttribute(ih, "PANEL_DESC");
     int w, h, charw, charh;
@@ -165,12 +172,21 @@ static int panel_draw(Ihandle* ih, float posx, float posy)
 
     int ew  = 0;   // enabled text width
     int ewm = 0;   // ew with margin
+    int liw  = 0;   // lock icon width
+    int liwm = 0;   // lock icon with margin
     int dummy;
     if (enabled && avail) {
         IupSetAttribute(ih, "DRAWFONT", panelfontenabled);
         IupDrawGetTextSize(ih, langGetC(ss, "feature_enabled"), -1, &ew, &dummy);
         ew++;
         ewm = ew + 6;
+    }
+    if (locked) {
+        lockimg = IupGetHandle("IMAGE_LOCK");
+        if (lockimg) {
+            liw  = IupGetInt(lockimg, "WIDTH");
+            liwm = liw + 6;
+        }
     }
 
     IupSetAttribute(ih, "DRAWCOLOR", avail ? paneltext : paneltextunavail);
@@ -182,15 +198,18 @@ static int panel_draw(Ihandle* ih, float posx, float posy)
                 -1,
                 2 + xmargin,
                 2 + ymargin,
-                w - ewm - xmargin * 2 - 4,
+                w - ewm - liwm - xmargin * 2 - 4,
                 h - ymargin * 2 - 4);
 
+    if (locked && lockimg) {
+        IupDrawImage(ih, "IMAGE_LOCK", w - liw - xmargin - 2, 2 + ymargin, 0, 0);
+    }
     if (enabled && avail) {
         IupSetAttribute(ih, "DRAWFONT", panelfontenabled);
         IupDrawText(ih,
                     langGetC(ss, "feature_enabled"),
                     -1,
-                    w - ew - xmargin - 2,
+                    w - ew - liwm - xmargin - 2,
                     2 + ymargin,
                     ew,
                     h - ymargin * 2 - 4);
@@ -292,6 +311,7 @@ bool FeaturesPage_make(_In_ FeaturesPage* self, Ihandle* list)
 
     self->h = IupScrollBox(vbox);
 
+    iupLoadImage(self->ss, _S"IMAGE_LOCK", _S"svg", _S"subspace:/lock.svg", self->h);
     iupLoadImage(self->ss,
                  _S"IMAGE_PUZZLE_PIECE_SMALL",
                  _S"svg",
@@ -311,15 +331,16 @@ bool FeaturesPage_update(_In_ FeaturesPage* self)
         SubspaceFeature* feat = (SubspaceFeature*)IupGetAttribute(fpanel, "FEATURE");
 
         if (feat) {
-            bool avail, enabled, optional, hidden;
+            bool avail, enabled, optional, hidden, locked;
             withReadLock (&feat->lock) {
                 avail    = feat->available;
                 enabled  = feat->enabled;
                 optional = feat->optional;
                 hidden   = feat->hidden;
+                locked   = feat->locked;
             }
 
-            refreshlayout |= setPanelState(fpanel, avail, enabled, optional, hidden);
+            refreshlayout |= setPanelState(fpanel, avail, enabled, optional, hidden, locked);
         }
     }
 

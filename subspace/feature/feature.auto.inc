@@ -11,6 +11,7 @@ static SubspaceFeature_ClassIf _impl_SubspaceFeature_SubspaceFeature_ClassIf = {
     .createSettingsPage = (SettingsPage* (*)(void*, SubspaceUI*))SubspaceFeature_createSettingsPage,
     .isEnabled = (bool (*)(void*))SubspaceFeature_isEnabled,
     .isAvailable = (bool (*)(void*))SubspaceFeature_isAvailable,
+    .isLocked = (bool (*)(void*))SubspaceFeature_isLocked,
     .enable = (void (*)(void*, bool))SubspaceFeature_enable,
     .setAvailable = (void (*)(void*, bool))SubspaceFeature_setAvailable,
     .applyDefaultSettings = (void (*)(void*))SubspaceFeature_applyDefaultSettings,

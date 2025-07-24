@@ -222,6 +222,15 @@ bool SubspaceFeature_isAvailable(_In_ SubspaceFeature* self)
     return ret;
 }
 
+bool SubspaceFeature_isLocked(_In_ SubspaceFeature* self)
+{
+    bool ret = false;
+    withReadLock (&self->lock) {
+        ret = self->locked;
+    }
+    return ret;
+}
+
 // Autogen begins -----
 #include "feature.auto.inc"
 // Autogen ends -------
