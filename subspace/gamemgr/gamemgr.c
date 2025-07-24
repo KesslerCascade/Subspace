@@ -10,6 +10,7 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/subspaceui.h"
+#include "version.h"
 
 _objfactory_guaranteed GameMgr* GameMgr_create(Subspace* subspace)
 {
@@ -132,6 +133,22 @@ bool GameMgr_validate(_In_ GameMgr* self, _In_opt_ strref ftlexe, GameInst** out
         *out = objAcquire(ninst);
     objRelease(&ninst);
     return ret;
+}
+
+void GameMgr_checkStartupValidate(_In_ GameMgr* self)
+{
+    Subspace* ss     = self->ss;
+    string lastcheck = 0, exepath = 0;
+    ssdStringOut(ss->settings, _S"ftl/compatcheck", &lastcheck);
+    ssdStringOut(ss->settings, _S"ftl/exe", &exepath);
+
+    // if the current vrsion is different than the last time we checked, kick off a validation
+    if (!strEmpty(exepath) && !strEq(lastcheck, (strref)subspace_version_str)) {
+        gmgrValidate(self, NULL, NULL);
+    }
+
+    strDestroy(&lastcheck);
+    strDestroy(&exepath);
 }
 
 // Autogen begins -----

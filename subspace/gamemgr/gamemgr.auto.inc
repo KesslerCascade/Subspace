@@ -13,6 +13,7 @@ static GameMgr_ClassIf _impl_GameMgr_GameMgr_ClassIf = {
     .acquireByCookie = (GameInst* (*)(void*, uint32))GameMgr_acquireByCookie,
     .play = (bool (*)(void*, GameInst**))GameMgr_play,
     .validate = (bool (*)(void*, strref, GameInst**))GameMgr_validate,
+    .checkStartupValidate = (void (*)(void*))GameMgr_checkStartupValidate,
     .genCookie = (uint32 (*)(void*))GameMgr_genCookie,
 };
 

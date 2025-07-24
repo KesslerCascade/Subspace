@@ -52,6 +52,7 @@ typedef struct GameMgr_ClassIf {
     GameInst* (*acquireByCookie)(_In_ void* self, uint32 cookie);
     bool (*play)(_In_ void* self, GameInst** out);
     bool (*validate)(_In_ void* self, _In_opt_ strref ftlexe, GameInst** out);
+    void (*checkStartupValidate)(_In_ void* self);
     uint32 (*genCookie)(_In_ void* self);
 } GameMgr_ClassIf;
 extern GameMgr_ClassIf GameMgr_ClassIf_tmpl;
@@ -101,6 +102,8 @@ _objfactory_guaranteed GameMgr* GameMgr_create(Subspace* subspace);
 #define gmgrPlay(self, out) (self)->_->play(GameMgr(self), out)
 // bool gmgrValidate(GameMgr* self, strref ftlexe, GameInst** out);
 #define gmgrValidate(self, ftlexe, out) (self)->_->validate(GameMgr(self), ftlexe, out)
+// void gmgrCheckStartupValidate(GameMgr* self);
+#define gmgrCheckStartupValidate(self) (self)->_->checkStartupValidate(GameMgr(self))
 // uint32 gmgrGenCookie(GameMgr* self);
 #define gmgrGenCookie(self) (self)->_->genCookie(GameMgr(self))
 

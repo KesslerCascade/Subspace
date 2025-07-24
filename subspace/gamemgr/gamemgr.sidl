@@ -18,6 +18,7 @@
 
     bool play(GameInst **out);
     bool validate(strref ftlexe, GameInst **out);
+    void checkStartupValidate();
 
     uint32 genCookie();
 }

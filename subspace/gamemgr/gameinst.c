@@ -17,6 +17,7 @@
 #include "ui/subspaceui.h"
 #include "gamemgr.h"
 #include "process.h"
+#include "version.h"
 
 _objfactory_guaranteed GameInst*
 GameInst_create(GameMgr* mgr, _In_opt_ strref exepath, LaunchMode mode)
@@ -279,6 +280,10 @@ void GameInst_onValidate(_In_ GameInst* self, ControlClient* client)
                    true,
                    stvar(string, (nmatch < ntotal) ? _S"partial" : _S"full"));
             ssdSet(self->ss->settings, _S"ftl/ver", true, stvar(string, verstr));
+            ssdSet(self->ss->settings,
+                   _S"ftl/compatcheck",
+                   true,
+                   stvar(strref, (strref)subspace_version_str));
 
             // cache feature availability
             foreach (hashtable, hti, self->ss->freg->features) {
