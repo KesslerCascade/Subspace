@@ -166,7 +166,7 @@ static int panel_draw(Ihandle* ih, float posx, float posy)
     int ew  = 0;   // enabled text width
     int ewm = 0;   // ew with margin
     int dummy;
-    if (enabled) {
+    if (enabled && avail) {
         IupSetAttribute(ih, "DRAWFONT", panelfontenabled);
         IupDrawGetTextSize(ih, langGetC(ss, "feature_enabled"), -1, &ew, &dummy);
         ew++;
@@ -185,7 +185,7 @@ static int panel_draw(Ihandle* ih, float posx, float posy)
                 w - ewm - xmargin * 2 - 4,
                 h - ymargin * 2 - 4);
 
-    if (enabled) {
+    if (enabled && avail) {
         IupSetAttribute(ih, "DRAWFONT", panelfontenabled);
         IupDrawText(ih,
                     langGetC(ss, "feature_enabled"),
