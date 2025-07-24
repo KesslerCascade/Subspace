@@ -5,10 +5,6 @@ class SetupPage extends SettingsPage {
     sarray:string langids;
     [sorted] sarray:string langnames;
 
-    string compatimg;
-    string verstr;
-    string overrideloc;
-
     Ihandle *langselect;
     Ihandle *ftlloctext;
     Ihandle *ftlcompatimg;
@@ -19,8 +15,9 @@ class SetupPage extends SettingsPage {
     Ihandle *saveoverridetext;
     Ihandle *saveoverridehbox;
 
-    object:GameInst validateinst;
-    bool vpending;  // validated instance should be saved to settings
+    void updateCompatState();
+    void onValidateStart(strref event, stvlist* params);
+    void onValidateFinish(strref event, stvlist* params);
 
     factory create(SubspaceUI *ui);
     override make;

@@ -248,6 +248,64 @@ void GameInst_destroy(_In_ GameInst* self)
     // Autogen ends -------
 }
 
+void GameInst_onValidate(_In_ GameInst* self, ControlClient* client)
+{
+    withReadLock (&self->lock) {
+        if (self->state == GI_Validated) {
+            string verstr = 0;
+            strFormat(&verstr,
+                      _S"${int}.${int}.${int}",
+                      stvar(int32, self->ver[0]),
+                      stvar(int32, self->ver[1]),
+                      stvar(int32, self->ver[2]));
+
+            // determine compatibility level by how many non-optional features were reported
+            int nmatch = 0;
+            int ntotal = 0;
+            foreach (hashtable, hti, self->ss->freg->features) {
+                SubspaceFeature* feat = (SubspaceFeature*)htiVal(object, hti);
+                if (!feat->optional) {
+                    ntotal++;
+                    if (htHasKey(self->features, string, feat->name))
+                        nmatch++;
+                }
+            }
+
+            // save to settings
+            ssdSet(self->ss->settings, _S"ftl/exe", true, stvar(string, self->exepath));
+            // cache validation status and version
+            ssdSet(self->ss->settings,
+                   _S"ftl/compat",
+                   true,
+                   stvar(string, (nmatch < ntotal) ? _S"partial" : _S"full"));
+            ssdSet(self->ss->settings, _S"ftl/ver", true, stvar(string, verstr));
+
+            // cache feature availability
+            foreach (hashtable, hti, self->ss->freg->features) {
+                SubspaceFeature* feat = (SubspaceFeature*)htiVal(object, hti);
+                ClientFeature* cfeat  = NULL;
+                bool avail            = false;
+                if (htFind(self->features, string, feat->name, object, &cfeat)) {
+                    avail = cfeat->available;
+                    objRelease(&cfeat);
+                }
+
+                featureSetAvailable(feat, avail);
+
+                string epath = 0;
+                strNConcat(&epath, _S"feature/", feat->name, _S"/available");
+                ssdSet(self->ss->settings, epath, true, stvar(bool, avail));
+                strDestroy(&epath);
+            }
+
+            strDestroy(&verstr);
+        }
+    }
+
+    // let UI know
+    ssuiNotify(self->ss->ui, _S"Validate_Finish", stvar(object, self));
+}
+
 // Autogen begins -----
 #include "gameinst.auto.inc"
 // Autogen ends -------

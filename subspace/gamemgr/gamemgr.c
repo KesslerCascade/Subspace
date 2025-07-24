@@ -9,6 +9,7 @@
 #include "gamemgr.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include "ui/subspaceui.h"
 
 _objfactory_guaranteed GameMgr* GameMgr_create(Subspace* subspace)
 {
@@ -77,13 +78,14 @@ uint32 GameMgr_genCookie(_In_ GameMgr* self)
     }
     return ret;
 }
-bool GameMgr_launchGame(_In_ GameMgr* self, LaunchMode mode, GameInst** out)
+
+bool GameMgr_play(_In_ GameMgr* self, GameInst** out)
 {
     Subspace* ss = self->ss;
 
     string exepath = 0;
     ssdStringOut(ss->settings, _S"ftl/exe", &exepath);
-    GameInst* ninst = ginstCreate(self, exepath, mode);
+    GameInst* ninst = ginstCreate(self, exepath, LAUNCH_PLAY);
     strDestroy(&exepath);
     gmgrReg(self, ninst);
     bool ret = ginstLaunch(ninst);
@@ -93,8 +95,37 @@ bool GameMgr_launchGame(_In_ GameMgr* self, LaunchMode mode, GameInst** out)
         gmgrUnreg(self, ninst);
 
     // if we're launching to play, set this as the focused instance
-    if (ret && mode == LAUNCH_PLAY) {
+    if (ret) {
         subspaceSetGame(ss, ninst);
+    }
+
+    if (out)
+        *out = objAcquire(ninst);
+    objRelease(&ninst);
+    return ret;
+}
+
+bool GameMgr_validate(_In_ GameMgr* self, _In_opt_ strref ftlexe, GameInst** out)
+{
+    Subspace* ss = self->ss;
+
+    string exepath = 0;
+    if (!strEmpty(ftlexe))
+        strDup(&exepath, ftlexe);
+    else
+        ssdStringOut(ss->settings, _S"ftl/exe", &exepath);
+
+    GameInst* ninst = ginstCreate(self, exepath, LAUNCH_VALIDATE);
+    strDestroy(&exepath);
+
+    gmgrReg(self, ninst);
+    bool ret = ginstLaunch(ninst);
+
+    if (ret) {
+        ssuiNotify(ss->ui, _S"Validate_Start", stvar(object, ninst));
+    } else {
+        // failed to launch, don't track it in gamemgr
+        gmgrUnreg(self, ninst);
     }
 
     if (out)

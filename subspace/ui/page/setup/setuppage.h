@@ -50,6 +50,9 @@ typedef struct SetupPage_ClassIf {
 
     bool (*make)(_In_ void* self, Ihandle* list);
     bool (*update)(_In_ void* self);
+    void (*updateCompatState)(_In_ void* self);
+    void (*onValidateStart)(_In_ void* self, _In_opt_ strref event, stvlist* params);
+    void (*onValidateFinish)(_In_ void* self, _In_opt_ strref event, stvlist* params);
 } SetupPage_ClassIf;
 extern SetupPage_ClassIf SetupPage_ClassIf_tmpl;
 
@@ -74,9 +77,6 @@ typedef struct SetupPage {
     string title;
     sa_string langids;
     sa_string langnames;
-    string compatimg;
-    string verstr;
-    string overrideloc;
     Ihandle* langselect;
     Ihandle* ftlloctext;
     Ihandle* ftlcompatimg;
@@ -86,8 +86,6 @@ typedef struct SetupPage {
     Ihandle* saveoverrideusercheck;
     Ihandle* saveoverridetext;
     Ihandle* saveoverridehbox;
-    GameInst* validateinst;
-    bool vpending;        // validated instance should be saved to settings
 } SetupPage;
 extern ObjClassInfo SetupPage_clsinfo;
 #define SetupPage(inst) ((SetupPage*)(unused_noeval((inst) && &((inst)->_is_SetupPage)), (inst)))
@@ -113,4 +111,10 @@ _objfactory_guaranteed SetupPage* SetupPage_create(SubspaceUI* ui);
 #define setuppageMake(self, list) (self)->_->make(SetupPage(self), list)
 // bool setuppageUpdate(SetupPage* self);
 #define setuppageUpdate(self) (self)->_->update(SetupPage(self))
+// void setuppageUpdateCompatState(SetupPage* self);
+#define setuppageUpdateCompatState(self) (self)->_->updateCompatState(SetupPage(self))
+// void setuppageOnValidateStart(SetupPage* self, strref event, stvlist* params);
+#define setuppageOnValidateStart(self, event, params) (self)->_->onValidateStart(SetupPage(self), event, params)
+// void setuppageOnValidateFinish(SetupPage* self, strref event, stvlist* params);
+#define setuppageOnValidateFinish(self, event, params) (self)->_->onValidateFinish(SetupPage(self), event, params)
 

@@ -9,6 +9,9 @@ SetupPage_ClassIf SetupPage_ClassIf_tmpl = {
 static SetupPage_ClassIf _impl_SetupPage_SetupPage_ClassIf = {
     ._size = sizeof(SetupPage_ClassIf),
     ._implements = (ObjIface*)&SetupPage_ClassIf_tmpl,
+    .updateCompatState = (void (*)(void*))SetupPage_updateCompatState,
+    .onValidateStart = (void (*)(void*, strref, stvlist*))SetupPage_onValidateStart,
+    .onValidateFinish = (void (*)(void*, strref, stvlist*))SetupPage_onValidateFinish,
     .make = (bool (*)(void*, Ihandle*))SetupPage_make,
     .update = (bool (*)(void*))SetupPage_update,
 };

@@ -43,9 +43,7 @@ static void setCompatState(SetupPage* gp, strref state)
     strConcat(&tmp, _S"IMAGE_COMPAT_", state);
     strUpper(&tmp);
 
-    // guarantee that a copy still exists in memory since IMAGE only stores a pointer...
-    strDup(&gp->compatimg, tmp);
-    IupSetAttribute(gp->ftlcompatimg, "IMAGE", strC(gp->compatimg));
+    IupSetStrAttribute(gp->ftlcompatimg, "IMAGE", strC(tmp));
     IupRefresh(gp->ftlcompatlabel);
 
     strDestroy(&tmp);
@@ -66,8 +64,8 @@ static int langselect_change(Ihandle* ih, char* text, int item, int state)
         IupSetAttributeHandle(imsg, "PARENTDIALOG", gp->ss->ui->settingsw->win);
         IupSetAttribute(imsg, "BUTTONS", "YESNO");
         IupSetAttribute(imsg, "DIALOGTYPE", "QUESTION");
-        IupSetAttribute(imsg, "TITLE", langGetC(gp->ss, "langconfirm_title"));
-        IupSetAttribute(imsg, "VALUE", langGetC(gp->ss, "langconfirm"));
+        IupSetStrAttribute(imsg, "TITLE", langGetC(gp->ss, "langconfirm_title"));
+        IupSetStrAttribute(imsg, "VALUE", langGetC(gp->ss, "langconfirm"));
         IupPopup(imsg, IUP_CENTER, IUP_CENTER);
 
         int resp = IupGetInt(imsg, "BUTTONRESPONSE");
@@ -92,35 +90,19 @@ static int browseforftl(Ihandle* ih)
     IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->settingsw->win);
     IupSetAttribute(idlg, "DIALOGTYPE", "OPEN");
     IupSetAttribute(idlg, "FILTER", "*.exe");
-    IupSetAttribute(idlg, "FILTERINFO", langGetC(gp->ss, "exe_files"));
-    IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, "ftl_browse_title"));
+    IupSetStrAttribute(idlg, "FILTERINFO", langGetC(gp->ss, "exe_files"));
+    IupSetStrAttribute(idlg, "TITLE", langGetC(gp->ss, "ftl_browse_title"));
 
     IupPopup(idlg, IUP_CENTER, IUP_CENTER);
 
     if (IupGetInt(idlg, "STATUS") == 0) {
         string ftlexe   = 0;
         const char* val = IupGetAttribute(idlg, "VALUE");
-        IupSetAttribute(gp->ftlloctext, "VALUE", val);
+        IupSetStrAttribute(gp->ftlloctext, "VALUE", val);
         pathFromPlatform(&ftlexe, (strref)val);
         pathNormalize(&ftlexe);
 
-        objRelease(&gp->validateinst);
-        gp->validateinst = ginstCreate(gp->ss->gmgr, ftlexe, LAUNCH_VALIDATE);
-        gmgrReg(gp->ss->gmgr, gp->validateinst);
-        bool ret = ginstLaunch(gp->validateinst);
-
-        IupSetAttribute(gp->ftlver, "TITLE", langGetC(gp->ss, "settings_ftl_ver_unknown"));
-        setCompatState(gp, _S"unknown");
-
-        // failed to launch, don't track it in gamemgr
-        if (!ret) {
-            gmgrUnreg(gp->ss->gmgr, gp->validateinst);
-            setCompatState(gp, _S"incompat");
-            objRelease(&gp->validateinst);
-        } else {
-            gp->vpending = true;
-        }
-
+        gmgrValidate(gp->ss->gmgr, ftlexe, NULL);
         strDestroy(&ftlexe);
     }
 
@@ -200,15 +182,15 @@ static int browseforsaveovr(Ihandle* ih)
     }
     IupSetAttributeHandle(idlg, "PARENTDIALOG", gp->ss->ui->settingsw->win);
     IupSetAttribute(idlg, "DIALOGTYPE", "DIR");
-    IupSetAttribute(idlg, "TITLE", langGetC(gp->ss, "settings_saveoverride_browse_title"));
+    IupSetStrAttribute(idlg, "TITLE", langGetC(gp->ss, "settings_saveoverride_browse_title"));
     if (!strEmpty(startdir))
-        IupSetAttribute(idlg, "DIRECTORY", strC(startdir));
+        IupSetStrAttribute(idlg, "DIRECTORY", strC(startdir));
 
     IupPopup(idlg, IUP_CENTER, IUP_CENTER);
 
     if (IupGetInt(idlg, "STATUS") == 0) {
         const char* val = IupGetAttribute(idlg, "VALUE");
-        IupSetAttribute(gp->saveoverridetext, "VALUE", val);
+        IupSetStrAttribute(gp->saveoverridetext, "VALUE", val);
 
         string ovrdir = 0;
         pathFromPlatform(&ovrdir, (strref)val);
@@ -220,6 +202,33 @@ static int browseforsaveovr(Ihandle* ih)
     strDestroy(&startdir);
 
     return IUP_DEFAULT;
+}
+
+void SetupPage_onValidateStart(_In_ SetupPage* self, _In_opt_ strref event, stvlist* params)
+{
+    IupSetStrAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
+    setCompatState(self, _S"unknown");
+}
+
+void SetupPage_onValidateFinish(_In_ SetupPage* self, _In_opt_ strref event, stvlist* params)
+{
+    GameInst* inst = stvlNextObj(params, GameInst);
+    if (!inst)
+        return;
+
+    GameInstState state = ginstGetState(inst);
+    // for failed and exited state, we want the dialog to show the results even though the settings
+    // weren't updated
+    if (state == GI_Failed) {
+        IupSetStrAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
+        setCompatState(self, _S"incompat");
+    } else if (state == GI_Exited) {
+        IupSetStrAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
+        setCompatState(self, _S"unknown");
+    } else {
+        // otherwise just read the results from settings to avoid duplicating code
+        setuppageUpdateCompatState(self);
+    }
 }
 
 static void fillLanguages(SetupPage* self, Ihandle* langselect)
@@ -237,7 +246,7 @@ static void fillLanguages(SetupPage* self, Ihandle* langselect)
     for (int i = 0; i < saSize(self->langnames); i++) {
         htelem elem = htFind(languages_rev, string, self->langnames.a[i], none, NULL);
         if (elem) {
-            IupSetAttributeId(langselect, "", i + 1, strC(self->langnames.a[i]));
+            IupSetStrAttributeId(langselect, "", i + 1, strC(self->langnames.a[i]));
 
             strref langid = hteVal(languages_rev, strref, elem);
             saPush(&self->langids, strref, langid);
@@ -400,7 +409,35 @@ bool SetupPage_make(_In_ SetupPage* self, Ihandle* list)
                  _S"svg",
                  _S"subspace:/compat-incompat.svg",
                  self->ftlcompatimg);
+
+    ssuiListen(self->ui, self, SetupPage_onValidateStart, _S"Validate_Start");
+    ssuiListen(self->ui, self, SetupPage_onValidateFinish, _S"Validate_Finish");
+
     return parent_make(list);
+}
+
+void SetupPage_updateCompatState(_In_ SetupPage* self)
+{
+    string ftlloc = 0, verstr = 0;
+    ssdStringOut(self->ss->settings, _S"ftl/exe", &ftlloc);
+    pathToPlatform(&ftlloc, ftlloc);
+    IupSetStrAttribute(self->ftlloctext, "VALUE", strC(ftlloc));
+
+    if (ssdStringOut(self->ss->settings, _S"ftl/ver", &verstr)) {
+        IupSetStrAttribute(self->ftlver, "TITLE", strC(verstr));
+    } else {
+        IupSetStrAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
+    }
+    string compat = 0;
+    if (ssdStringOut(self->ss->settings, _S"ftl/compat", &compat)) {
+        setCompatState(self, compat);
+        strDestroy(&compat);
+    } else {
+        setCompatState(self, _S"unknown");
+    }
+
+    strDestroy(&ftlloc);
+    strDestroy(&verstr);
 }
 
 extern bool SettingsPage_update(_In_ SettingsPage* self);   // parent
@@ -414,123 +451,7 @@ bool SetupPage_update(_In_ SetupPage* self)
         }
     }
 
-    if (self->validateinst) {
-        GameInstState state = GI_Init;
-        GameInst* inst      = self->validateinst;
-        string ftlloc       = 0;
-
-        withReadLock (&inst->lock) {
-            state = inst->state;
-            strDup(&ftlloc, inst->exepath);
-        }
-
-        // make sure the dialog box reflects the path of the exe being validated
-        pathToPlatform(&ftlloc, ftlloc);
-        IupSetAttribute(self->ftlloctext, "VALUE", strC(ftlloc));
-        strDestroy(&ftlloc);
-
-        if (state == GI_Validated) {
-            if (inst->ver[0] > 0) {
-                strFormat(&self->verstr,
-                          _S"${int}.${int}.${int}",
-                          stvar(int32, inst->ver[0]),
-                          stvar(int32, inst->ver[1]),
-                          stvar(int32, inst->ver[2]));
-                IupSetStrAttribute(self->ftlver, "TITLE", strC(self->verstr));
-            } else {
-                IupSetAttribute(self->ftlver,
-                                "TITLE",
-                                langGetC(self->ss, "settings_ftl_ver_unknown"));
-                strDestroy(&self->verstr);
-            }
-
-            // check features
-
-            int nmatch = 0;
-            int ntotal = 0;
-            foreach (hashtable, hti, self->ss->freg->features) {
-                SubspaceFeature* feat = (SubspaceFeature*)htiVal(object, hti);
-                if (!feat->optional) {
-                    ntotal++;
-                    if (htHasKey(inst->features, string, feat->name))
-                        nmatch++;
-                }
-            }
-
-            if (nmatch < ntotal) {
-                setCompatState(self, _S"partial");
-            } else {
-                setCompatState(self, _S"full");
-            }
-
-            if (self->vpending) {
-                // save this to settings
-                ssdSet(self->ss->settings, _S"ftl/exe", true, stvar(string, inst->exepath));
-                // cache validation status and version
-                ssdSet(self->ss->settings,
-                       _S"ftl/compat",
-                       true,
-                       stvar(string, (nmatch < ntotal) ? _S"partial" : _S"full"));
-                ssdSet(self->ss->settings, _S"ftl/ver", true, stvar(string, self->verstr));
-                subspaceUpdateUI(self->ss);
-
-                GameInst* curinst = subspaceGame(self->ss);
-                int rinststate    = curinst ? ginstGetState(curinst) : GI_Init;
-
-                // cache feature availability
-                foreach (hashtable, hti, self->ss->freg->features) {
-                    SubspaceFeature* feat = (SubspaceFeature*)htiVal(object, hti);
-                    ClientFeature* cfeat  = NULL;
-                    bool avail            = false;
-                    if (htFind(inst->features, string, feat->name, object, &cfeat)) {
-                        avail = cfeat->available;
-                        objRelease(&cfeat);
-                    }
-
-                    // don't update live feature availability if another instance is focused
-                    if (rinststate == GI_Init || rinststate == GI_Exited) {
-                        featureSetAvailable(feat, avail);
-                    }
-
-                    string epath = 0;
-                    strNConcat(&epath, _S"feature/", feat->name, _S"/available");
-                    ssdSet(self->ss->settings, epath, true, stvar(bool, avail));
-                    strDestroy(&epath);
-                }
-
-                objRelease(&curinst);
-
-                self->vpending = false;
-            }
-        } else if (state == GI_Failed) {
-            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
-            setCompatState(self, _S"incompat");
-        } else if (state == GI_Exited) {
-            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
-            setCompatState(self, _S"unknown");
-            objRelease(&self->validateinst);
-        }
-        // otherwise it's still checking
-    } else {
-        string ftlloc = 0;
-        ssdStringOut(self->ss->settings, _S"ftl/exe", &ftlloc);
-        pathToPlatform(&ftlloc, ftlloc);
-        IupSetAttribute(self->ftlloctext, "VALUE", strC(ftlloc));
-        strDestroy(&ftlloc);
-
-        if (ssdStringOut(self->ss->settings, _S"ftl/ver", &self->verstr)) {
-            IupSetAttribute(self->ftlver, "TITLE", strC(self->verstr));
-        } else {
-            IupSetAttribute(self->ftlver, "TITLE", langGetC(self->ss, "settings_ftl_ver_unknown"));
-        }
-        string compat = 0;
-        if (ssdStringOut(self->ss->settings, _S"ftl/compat", &compat)) {
-            setCompatState(self, compat);
-            strDestroy(&compat);
-        } else {
-            setCompatState(self, _S"unknown");
-        }
-    }
+    setuppageUpdateCompatState(self);
 
     string overrideloc = 0;
     if (ssdStringOut(self->ss->settings, _S"ftl/saveoverride", &overrideloc)) {
@@ -545,8 +466,8 @@ bool SetupPage_update(_In_ SetupPage* self)
             IupSetAttribute(self->saveoverrideusercheck, "VALUE", "OFF");
             IupSetAttribute(self->saveoverridehbox, "FLOATING", "NO");
             IupSetAttribute(self->saveoverridehbox, "VISIBLE", "YES");
-            pathToPlatform(&self->overrideloc, overrideloc);
-            IupSetAttribute(self->saveoverridetext, "VALUE", strC(self->overrideloc));
+            pathToPlatform(&overrideloc, overrideloc);
+            IupSetStrAttribute(self->saveoverridetext, "VALUE", strC(overrideloc));
         }
     } else {
         IupSetAttribute(self->saveoverridecheck, "VALUE", "OFF");
@@ -574,10 +495,6 @@ void SetupPage_destroy(_In_ SetupPage* self)
     // Autogen begins -----
     saDestroy(&self->langids);
     saDestroy(&self->langnames);
-    strDestroy(&self->compatimg);
-    strDestroy(&self->verstr);
-    strDestroy(&self->overrideloc);
-    objRelease(&self->validateinst);
     // Autogen ends -------
 }
 

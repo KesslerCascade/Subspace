@@ -55,4 +55,5 @@ typedef enum GameInstState {
     void clearRun();
 
     void onGameReady(ControlClient *client);
+    void onValidate(ControlClient *client);
 }

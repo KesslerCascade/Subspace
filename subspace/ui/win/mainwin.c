@@ -94,7 +94,7 @@ static int playbtn_action(Ihandle* ih)
     if (!ss)
         return IUP_IGNORE;
 
-    gmgrLaunchGame(ss->gmgr, LAUNCH_PLAY, NULL);
+    gmgrPlay(ss->gmgr, NULL);
     return IUP_DEFAULT;
 }
 

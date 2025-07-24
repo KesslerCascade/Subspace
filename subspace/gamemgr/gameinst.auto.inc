@@ -16,6 +16,7 @@ static GameInst_ClassIf _impl_GameInst_GameInst_ClassIf = {
     .setRun = (void (*)(void*, RunInfo*))GameInst_setRun,
     .clearRun = (void (*)(void*))GameInst_clearRun,
     .onGameReady = (void (*)(void*, ControlClient*))GameInst_onGameReady,
+    .onValidate = (void (*)(void*, ControlClient*))GameInst_onValidate,
 };
 
 static ObjIface* _ifimpl_GameInst[] = {

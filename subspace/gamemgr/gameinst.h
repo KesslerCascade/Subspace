@@ -72,6 +72,7 @@ typedef struct GameInst_ClassIf {
     void (*setRun)(_In_ void* self, RunInfo* run);
     void (*clearRun)(_In_ void* self);
     void (*onGameReady)(_In_ void* self, ControlClient* client);
+    void (*onValidate)(_In_ void* self, ControlClient* client);
 } GameInst_ClassIf;
 extern GameInst_ClassIf GameInst_ClassIf_tmpl;
 
@@ -143,4 +144,6 @@ _objfactory_guaranteed GameInst* GameInst_createForClient(GameMgr* mgr, ControlC
 #define ginstClearRun(self) (self)->_->clearRun(GameInst(self))
 // void ginstOnGameReady(GameInst* self, ControlClient* client);
 #define ginstOnGameReady(self, client) (self)->_->onGameReady(GameInst(self), ControlClient(client))
+// void ginstOnValidate(GameInst* self, ControlClient* client);
+#define ginstOnValidate(self, client) (self)->_->onValidate(GameInst(self), ControlClient(client))
 
