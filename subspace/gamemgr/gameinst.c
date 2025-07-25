@@ -320,6 +320,12 @@ void GameInst_onValidate(_In_ GameInst* self, ControlClient* client)
             }
 
             strDestroy(&verstr);
+
+            // load new game data for the selected exe
+            string ftldir = 0;
+            pathParent(&ftldir, self->exepath);
+            subspaceLoadData(self->ss, ftldir);
+            strDestroy(&ftldir);
         }
     }
 

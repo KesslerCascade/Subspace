@@ -299,6 +299,7 @@ static void subspaceStartup(LogDest** pdeferredlogs)
         pathParent(&ftldir, ftldir);
         subspaceLoadData(&subspace, ftldir);
     }
+    strDestroy(&ftldir);
 
     // Misc extra - startup validation
     gmgrCheckStartupValidate(subspace.gmgr);
