@@ -8,6 +8,7 @@ DECLCMD(EnableFeature);
 DECLCMD(FeatureSettings);
 DECLCMD(BindKey);
 DECLCMD(SaveAndQuit);
+DECLCMD(RunTrackerUpd);
 
 #define REGCMD(cmdname) controlClientRegister(#cmdname, cmd##cmdname)
 
@@ -18,4 +19,5 @@ void registerCmds()
     REGCMD(FeatureSettings);
     REGCMD(BindKey);
     REGCMD(SaveAndQuit);
+    REGCMD(RunTrackerUpd);
 }

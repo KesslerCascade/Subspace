@@ -1,4 +1,5 @@
 #include "feature/infoblock.h"
+#include "feature/runtracker.h"
 #include "ftl/ftlbutton.h"
 #include "hook/hook.h"
 #include "patch/patchlist.h"
@@ -7,6 +8,10 @@
 
 int subspace_FTLButton_OnRender_pre(FTLButton* self)
 {
+    // run tracker warning overrides the info block
+    if (RunTracker_feature.enabled && runTrackerRenderWarning())
+        return 1;
+
     if (InfoBlock_feature.enabled)
         infoBlockRender();
 

@@ -160,6 +160,7 @@ void GameInst_setStateLocked(_In_ GameInst* self, GameInstState state)
             if (self->activeRun)
                 runinfoSetRecording(self->activeRun, false);
             objRelease(&self->activeRun);
+        }
 
         if (subspaceIsGame(self->ss, self)) {
             ssuiUpdateMain(self->ss->ui, NULL);

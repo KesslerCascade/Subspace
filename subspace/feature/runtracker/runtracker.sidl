@@ -6,6 +6,7 @@ class RunTracker extends SubspaceFeature {
     bool paused;
     bool isPaused();
     void pause(bool paused);
+    void sendUpdate(bool recording);
 
     void updateLockState();
     override createSettingsPage;

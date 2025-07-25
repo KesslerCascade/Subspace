@@ -34,6 +34,7 @@ typedef struct RunTracker_ClassIf {
     void (*sendSettingCur)(_In_ void* self, _In_opt_ strref name);
     bool (*isPaused)(_In_ void* self);
     void (*pause)(_In_ void* self, bool paused);
+    void (*sendUpdate)(_In_ void* self, bool recording);
     void (*updateLockState)(_In_ void* self);
 } RunTracker_ClassIf;
 extern RunTracker_ClassIf RunTracker_ClassIf_tmpl;
@@ -58,6 +59,7 @@ typedef struct RunTracker {
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
     bool locked;        // cannot be enabled or disabled currently
     SSDNode* settings;        // Settings that are synchronized with the game client
+    bool paused;
 } RunTracker;
 extern ObjClassInfo RunTracker_clsinfo;
 #define RunTracker(inst) ((RunTracker*)(unused_noeval((inst) && &((inst)->_is_RunTracker)), (inst)))
@@ -105,6 +107,8 @@ _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss);
 #define runtrackerIsPaused(self) (self)->_->isPaused(RunTracker(self))
 // void runtrackerPause(RunTracker* self, bool paused);
 #define runtrackerPause(self, paused) (self)->_->pause(RunTracker(self), paused)
+// void runtrackerSendUpdate(RunTracker* self, bool recording);
+#define runtrackerSendUpdate(self, recording) (self)->_->sendUpdate(RunTracker(self), recording)
 // void runtrackerUpdateLockState(RunTracker* self);
 #define runtrackerUpdateLockState(self) (self)->_->updateLockState(RunTracker(self))
 

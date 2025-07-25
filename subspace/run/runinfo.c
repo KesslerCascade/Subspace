@@ -14,6 +14,7 @@
 #include <cx/utils/compare.h>
 #include "db/database.h"
 #include "feature/featureregistry.h"
+#include "feature/runtracker/runtracker.h"
 #include "ui/subspaceui.h"
 #include "hulltracker.h"
 #include "logent.h"
@@ -733,6 +734,9 @@ void RunInfo_setRecording(_In_ RunInfo* self, bool recording)
     // this is usually called while locked already, relatively harmless if it isn't
     self->recording = recording;
 
+    RunTracker* rt = fregGet(RunTracker, self->ss->freg);
+    if (rt)
+        runtrackerSendUpdate(rt, recording);
 }
 
 bool RunInfo_isRecording(_In_ RunInfo* self)

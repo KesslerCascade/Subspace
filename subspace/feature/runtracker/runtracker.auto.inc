@@ -11,6 +11,7 @@ static RunTracker_ClassIf _impl_RunTracker_RunTracker_ClassIf = {
     ._implements = (ObjIface*)&RunTracker_ClassIf_tmpl,
     .isPaused = (bool (*)(void*))RunTracker_isPaused,
     .pause = (void (*)(void*, bool))RunTracker_pause,
+    .sendUpdate = (void (*)(void*, bool))RunTracker_sendUpdate,
     .updateLockState = (void (*)(void*))RunTracker_updateLockState,
     .createSettingsPage = (SettingsPage* (*)(void*, SubspaceUI*))RunTracker_createSettingsPage,
     .applyDefaultSettings = (void (*)(void*))RunTracker_applyDefaultSettings,

@@ -18,3 +18,5 @@ extern DamageSource systemExplodedSrc;
 
 void damageSourceSet(DamageSource* ds, const char* src);
 void damageSourceFinish(DamageSource* ds);
+void runTrackerHandleUpdate(bool r);
+bool runTrackerRenderWarning(void);

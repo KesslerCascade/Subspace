@@ -9,6 +9,7 @@
 #include "runtracker.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include "control/controlserver.h"
 #include "gamemgr/gameinst.h"
 #include "ui/subspaceui.h"
 
@@ -65,6 +66,21 @@ void RunTracker_pause(_In_ RunTracker* self, bool paused)
 
     // update sidebar state
     ssuiUpdateMain(self->ss->ui, NULL);
+}
+
+void RunTracker_sendUpdate(_In_ RunTracker* self, bool recording)
+{
+    GameInst* inst        = subspaceGame(self->ss);
+    ControlClient* client = inst ? objAcquireFromWeak(ControlClient, inst->client) : NULL;
+
+    if (client) {
+        ControlMsg* msg = controlNewMsg("RunTrackerUpd", 1);
+        controlMsgBool(msg, 0, "recording", recording);
+        cclientQueue(client, msg);
+    }
+
+    objRelease(&client);
+    objRelease(&inst);
 }
 
 void RunTracker_updateLockState(_In_ RunTracker* self)
