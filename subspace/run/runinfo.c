@@ -83,7 +83,7 @@ static void RunInfo_newTracked(RunInfo* self, int seed, strref shipType, strref 
     if (dbstmtExec(stmt)) {
         withWriteLock (&self->lock) {
             self->runid     = dbLastId(self->ss->db);
-            self->recording = true;
+            runinfoSetRecording(self, true);
         }
         logFmt(Info,
                _S"Tracking new run [${int}]: ${string} (${string})",
@@ -166,7 +166,7 @@ static void RunInfo_findOrCreateTracked(RunInfo* self, int seed, strref shipType
             saDestroy(&self->sectors);
             self->sectors = loadsectors;
 
-            self->recording = true;
+            runinfoSetRecording(self, true);
         }
 
         logFmt(Info,
@@ -227,7 +227,7 @@ bool RunInfo_loadHistoric(_In_ RunInfo* self, int64 runid)
             saDestroy(&self->sectors);
             self->sectors = loadsectors;
 
-            self->recording = true;
+            runinfoSetRecording(self, true);
         }
 
         logFmt(Info,
@@ -246,7 +246,8 @@ bool RunInfo_loadHistoric(_In_ RunInfo* self, int64 runid)
 void RunInfo_newGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
                      _In_opt_ strref shipName, int difficulty)
 {
-    if (fregIsEnabled(self->ss->freg, _S"RunTracker"))
+    RunTracker* rt = fregGet(RunTracker, self->ss->freg);
+    if (featureIsEnabled(rt) && !runtrackerIsPaused(rt))
         RunInfo_newTracked(self, seed, shipType, shipName, difficulty);
     else
         RunInfo_newUntracked(self, seed, shipType, shipName, difficulty);
@@ -258,7 +259,8 @@ void RunInfo_newGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
 void RunInfo_loadGame(_In_ RunInfo* self, int seed, _In_opt_ strref shipType,
                       _In_opt_ strref shipName, int difficulty, int beacons)
 {
-    bool usetracker = fregIsEnabled(self->ss->freg, _S"RunTracker");
+    RunTracker* rt  = fregGet(RunTracker, self->ss->freg);
+    bool usetracker = featureIsEnabled(rt) && !runtrackerIsPaused(rt);
 
     if (usetracker)
         RunInfo_findOrCreateTracked(self, seed, shipType, shipName, difficulty, beacons);
@@ -295,7 +297,7 @@ void RunInfo_finish(_In_ RunInfo* self, RunResult result)
     withWriteLock (&self->lock) {
         self->result    = result;
         self->endTime   = now;
-        self->recording = false;
+        runinfoSetRecording(self, false);
         self->modified  = clockWall();
     }
 
@@ -724,6 +726,13 @@ bool RunInfo_isFocused(_In_ RunInfo* self)
     }
 
     return ret;
+}
+
+void RunInfo_setRecording(_In_ RunInfo* self, bool recording)
+{
+    // this is usually called while locked already, relatively harmless if it isn't
+    self->recording = recording;
+
 }
 
 bool RunInfo_isRecording(_In_ RunInfo* self)

@@ -10,6 +10,8 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
+#include "feature/featureregistry.h"
+#include "feature/runtracker/runtracker.h"
 #include "gamemgr/gamemgr.h"
 #include "run/runinfo.h"
 #include "ui/panel/gameinfo/gameinfopanel.h"
@@ -100,6 +102,24 @@ static int playbtn_action(Ihandle* ih)
     return IUP_DEFAULT;
 }
 
+static int runtrackerbtn_action(Ihandle* ih)
+{
+    Subspace* ss = iupGetSubspace(ih);
+    MainWin* win = iupGetParentObj(MainWin, ih);
+    if (!ss || !win)
+        return IUP_IGNORE;
+
+    RunTracker* rt = fregGet(RunTracker, ss->freg);
+
+    // same rules as feature enable/disable apply here; can't change it while the game is running
+    if (!featureIsLocked(rt)) {
+        runtrackerPause(rt, !runtrackerIsPaused(rt));
+        mainwinUpdate(win);
+    }
+
+    return IUP_DEFAULT;
+}
+
 static int menubtn_action(Ihandle* ih)
 {
     MainWin* win = iupGetParentObj(MainWin, ih);
@@ -131,11 +151,33 @@ bool MainWin_make(_In_ MainWin* self)
     iupLoadImage(self->ss, _S"IMAGE_SETTINGS_HOVER", _S"svg", _S"subspace:/settings-hover.svg", NULL);
     iupLoadImage(self->ss, _S"IMAGE_PLAY_HOVER", _S"svg", _S"subspace:/play-hover.svg", NULL);
     iupLoadImage(self->ss,
+                 _S"IMAGE_RUNTRACKER_HOVER",
+                 _S"svg",
+                 _S"subspace:/runtrackerbar-hover.svg",
+                 NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_RUNTRACKER_RECORDING",
+                 _S"svg",
+                 _S"subspace:/runtrackerbar-recording.svg",
+                 NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_RUNTRACKER_PAUSED",
+                 _S"svg",
+                 _S"subspace:/runtrackerbar-paused.svg",
+                 NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_RUNTRACKER_PAUSED_HOVER",
+                 _S"svg",
+                 _S"subspace:/runtrackerbar-paused-hover.svg",
+                 NULL);
+    iupLoadImage(self->ss, _S"IMAGE_PLAY_HOVER", _S"svg", _S"subspace:/play-hover.svg", NULL);
+    iupLoadImage(self->ss,
                  _S"IMAGE_PLAY_DISABLED",
                  _S"svg",
                  _S"subspace:/play-disabled.svg",
                  self->playbtn);
     // wait on these three
+    iupLoadImageWait(self->ss, _S"IMAGE_RUNTRACKER", _S"svg", _S"subspace:/runtrackerbar.svg");
     iupLoadImageWait(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg");
     iupLoadImageWait(self->ss, _S"IMAGE_SETTINGS", _S"svg", _S"subspace:/settings.svg");
     iupLoadImageWait(self->ss, _S"IMAGE_PLAY", _S"svg", _S"subspace:/play.svg");
@@ -171,7 +213,18 @@ bool MainWin_make(_In_ MainWin* self)
     iupSetObj(self->playbtn, ObjNone, self, self->ui);
     IupSetCallback(self->playbtn, "FLAT_ACTION", playbtn_action);
 
-    self->sidebar = IupVbox(self->menubtn, self->playbtn, settings, NULL);
+    self->runtrackerbtn = IupFlatButton(NULL);
+    IupSetAttribute(self->runtrackerbtn, "IMAGE", "IMAGE_RUNTRACKER");
+    IupSetAttribute(self->runtrackerbtn, "IMAGEHIGHLIGHT", "IMAGE_RUNTRACKER_HOVER");
+    IupSetAttribute(self->runtrackerbtn, "HLCOLOR", NULL);
+    IupSetAttribute(self->runtrackerbtn, "PSCOLOR", NULL);
+    IupSetAttribute(self->runtrackerbtn, "BORDERWIDTH", "0");
+    IupSetStrAttribute(self->runtrackerbtn, "TIP", langGetC(self->ss, "runtracker_ready"));
+    IupSetAttribute(self->runtrackerbtn, "VISIBLE", "NO");
+    iupSetObj(self->runtrackerbtn, ObjNone, self, self->ui);
+    IupSetCallback(self->runtrackerbtn, "FLAT_ACTION", runtrackerbtn_action);
+
+    self->sidebar = IupVbox(self->menubtn, self->playbtn, settings, self->runtrackerbtn, NULL);
     IupSetAttribute(self->sidebar, "CGAP", "2");
     IupSetAttribute(self->sidebar, "NCMARGIN", "2x2");
     iupSetObj(self->sidebar, ObjNone, self, self->ui);
@@ -229,7 +282,7 @@ void MainWin_update(_In_ MainWin* self)
     }
     strDestroy(&tmp);
 
-    // update play button status
+    // update play button state
     if (haveexe) {
         GameInst* inst = subspaceGame(self->ss);
         if (inst) {
@@ -241,6 +294,38 @@ void MainWin_update(_In_ MainWin* self)
             pbenabled = true;
         }
     }
+
+    // update run tracker button state
+    RunTracker* rt = fregGet(RunTracker, self->ss->freg);
+    if (!rt || !featureIsEnabled(rt)) {
+        IupSetAttribute(self->runtrackerbtn, "VISIBLE", "NO");
+    } else {
+        RunInfo* run = subspaceRun(self->ss);
+        if (run && runinfoIsRecording(run)) {
+            IupSetAttribute(self->runtrackerbtn, "IMAGE", "IMAGE_RUNTRACKER_RECORDING");
+            IupSetAttribute(self->runtrackerbtn, "IMAGEHIGHLIGHT", "IMAGE_RUNTRACKER_RECORDING");
+            IupSetStrAttribute(self->runtrackerbtn,
+                               "TIP",
+                               langGetC(self->ss, "runtracker_recording"));
+        } else if (runtrackerIsPaused(rt)) {
+            IupSetAttribute(self->runtrackerbtn, "IMAGE", "IMAGE_RUNTRACKER_PAUSED");
+            // only give hover feedback if feature is unlocked and can be toggled
+            if (!featureIsLocked(rt))
+                IupSetAttribute(self->runtrackerbtn,
+                                "IMAGEHIGHLIGHT",
+                                "IMAGE_RUNTRACKER_PAUSED_HOVER");
+            else
+                IupSetAttribute(self->runtrackerbtn, "IMAGEHIGHLIGHT", "IMAGE_RUNTRACKER_PAUSED");
+            IupSetStrAttribute(self->runtrackerbtn, "TIP", langGetC(self->ss, "runtracker_paused"));
+        } else {
+            IupSetAttribute(self->runtrackerbtn, "IMAGE", "IMAGE_RUNTRACKER");
+            IupSetAttribute(self->runtrackerbtn, "IMAGEHIGHLIGHT", "IMAGE_RUNTRACKER_HOVER");
+            IupSetStrAttribute(self->runtrackerbtn, "TIP", langGetC(self->ss, "runtracker_ready"));
+        }
+        IupSetAttribute(self->runtrackerbtn, "VISIBLE", "YES");
+        objRelease(&run);
+    }
+    IupUpdate(self->runtrackerbtn);
 
     IupSetAttribute(self->playbtn, "ACTIVE", pbenabled ? "YES" : "NO");
 

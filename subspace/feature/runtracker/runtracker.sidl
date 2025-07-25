@@ -2,6 +2,11 @@
 
 class RunTracker extends SubspaceFeature {
     factory create(Subspace *ss);
+
+    bool paused;
+    bool isPaused();
+    void pause(bool paused);
+
     void updateLockState();
     override createSettingsPage;
     override applyDefaultSettings;

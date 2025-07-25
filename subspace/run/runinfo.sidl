@@ -81,6 +81,7 @@ class RunInfo {
     void processHullDamage(strref src, int amount);
     void processShip(strref name);
 
+    void setRecording(bool recording);
     void setFocused(bool focused);
     bool isFocused();
     bool isRecording();

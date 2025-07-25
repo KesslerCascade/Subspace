@@ -207,5 +207,8 @@
     "quitconfirm": "Warning! FTL is still running and a tracked run is in progress.\nClosing Subspace will disrupt run tracking and may result in missing data.\n\nAre you sure?",
     "quitconfirm_stay": "Cancel (Do Not Close)",
     "quitconfirm_save": "Save && Quit FTL",
-    "quitconfirm_quit": "Close Anyway"
+    "quitconfirm_quit": "Close Anyway",
+    "runtracker_ready": "Run Tracker is ready - new runs will be recorded",
+    "runtracker_recording": "Run Tracker is recording data from a run",
+    "runtracker_paused": "Run Tracker is paused - new runs will NOT be recorded"
 }

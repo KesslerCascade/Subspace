@@ -25,6 +25,7 @@ static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     .processScrap = (void (*)(void*, strref, int, int))RunInfo_processScrap,
     .processHullDamage = (void (*)(void*, strref, int))RunInfo_processHullDamage,
     .processShip = (void (*)(void*, strref))RunInfo_processShip,
+    .setRecording = (void (*)(void*, bool))RunInfo_setRecording,
     .setFocused = (void (*)(void*, bool))RunInfo_setFocused,
     .isFocused = (bool (*)(void*))RunInfo_isFocused,
     .isRecording = (bool (*)(void*))RunInfo_isRecording,

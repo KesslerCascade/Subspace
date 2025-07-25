@@ -156,7 +156,9 @@ void GameInst_setStateLocked(_In_ GameInst* self, GameInstState state)
     if (self->state != state) {
         self->state = state;
 
-        if (state != GI_Run)
+        if (state != GI_Run) {
+            if (self->activeRun)
+                runinfoSetRecording(self->activeRun, false);
             objRelease(&self->activeRun);
 
         if (subspaceIsGame(self->ss, self)) {
@@ -230,7 +232,7 @@ void GameInst_setRun(_In_ GameInst* self, RunInfo* run)
 {
     withWriteLock (&self->lock) {
         if (self->activeRun)
-            self->activeRun->recording = false;
+            runinfoSetRecording(self->activeRun, false);
         objRelease(&self->activeRun);
         self->activeRun = objAcquire(run);
     }
@@ -240,7 +242,7 @@ void GameInst_clearRun(_In_ GameInst* self)
 {
     withWriteLock (&self->lock) {
         if (self->activeRun)
-            self->activeRun->recording = false;
+            runinfoSetRecording(self->activeRun, false);
         objRelease(&self->activeRun);
     }
 

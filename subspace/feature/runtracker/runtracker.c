@@ -48,6 +48,25 @@ void RunTracker_enable(_In_ RunTracker* self, bool enabled)
         parent_enable(enabled);
 }
 
+bool RunTracker_isPaused(_In_ RunTracker* self)
+{
+    bool ret = false;
+    withReadLock (&self->lock) {
+        ret = self->paused;
+    }
+    return ret;
+}
+
+void RunTracker_pause(_In_ RunTracker* self, bool paused)
+{
+    withWriteLock (&self->lock) {
+        self->paused = paused;
+    }
+
+    // update sidebar state
+    ssuiUpdateMain(self->ss->ui, NULL);
+}
+
 void RunTracker_updateLockState(_In_ RunTracker* self)
 {
     bool locked    = false;

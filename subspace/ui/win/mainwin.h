@@ -55,6 +55,7 @@ typedef struct MainWin {
     Ihandle* barsep;
     Ihandle* menubtn;
     Ihandle* playbtn;
+    Ihandle* runtrackerbtn;
     Ihandle* zbox;
     Ihandle* root;        // root of dynamic layout
     Ihandle* timer;

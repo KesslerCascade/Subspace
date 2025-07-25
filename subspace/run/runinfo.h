@@ -66,6 +66,7 @@ typedef struct RunInfo_ClassIf {
     void (*processScrap)(_In_ void* self, _In_opt_ strref src, int amount, int rawamount);
     void (*processHullDamage)(_In_ void* self, _In_opt_ strref src, int amount);
     void (*processShip)(_In_ void* self, _In_opt_ strref name);
+    void (*setRecording)(_In_ void* self, bool recording);
     void (*setFocused)(_In_ void* self, bool focused);
     bool (*isFocused)(_In_ void* self);
     bool (*isRecording)(_In_ void* self);
@@ -172,6 +173,8 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoProcessHullDamage(self, src, amount) (self)->_->processHullDamage(RunInfo(self), src, amount)
 // void runinfoProcessShip(RunInfo* self, strref name);
 #define runinfoProcessShip(self, name) (self)->_->processShip(RunInfo(self), name)
+// void runinfoSetRecording(RunInfo* self, bool recording);
+#define runinfoSetRecording(self, recording) (self)->_->setRecording(RunInfo(self), recording)
 // void runinfoSetFocused(RunInfo* self, bool focused);
 #define runinfoSetFocused(self, focused) (self)->_->setFocused(RunInfo(self), focused)
 // bool runinfoIsFocused(RunInfo* self);

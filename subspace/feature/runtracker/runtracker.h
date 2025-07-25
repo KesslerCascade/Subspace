@@ -32,6 +32,8 @@ typedef struct RunTracker_ClassIf {
     void (*sendAllSettings)(_In_ void* self, ControlClient* client);
     // update curinst when a settings changes
     void (*sendSettingCur)(_In_ void* self, _In_opt_ strref name);
+    bool (*isPaused)(_In_ void* self);
+    void (*pause)(_In_ void* self, bool paused);
     void (*updateLockState)(_In_ void* self);
 } RunTracker_ClassIf;
 extern RunTracker_ClassIf RunTracker_ClassIf_tmpl;
@@ -99,6 +101,10 @@ _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss);
 //
 // update curinst when a settings changes
 #define runtrackerSendSettingCur(self, name) (self)->_->sendSettingCur(RunTracker(self), name)
+// bool runtrackerIsPaused(RunTracker* self);
+#define runtrackerIsPaused(self) (self)->_->isPaused(RunTracker(self))
+// void runtrackerPause(RunTracker* self, bool paused);
+#define runtrackerPause(self, paused) (self)->_->pause(RunTracker(self), paused)
 // void runtrackerUpdateLockState(RunTracker* self);
 #define runtrackerUpdateLockState(self) (self)->_->updateLockState(RunTracker(self))
 
