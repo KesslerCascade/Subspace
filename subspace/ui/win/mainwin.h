@@ -16,8 +16,8 @@ typedef struct MainWin_WeakRef MainWin_WeakRef;
 saDeclarePtr(MainWin);
 saDeclarePtr(MainWin_WeakRef);
 
-#define MAINWIN_DEFAULT_WIDTH 600
-#define MAINWIN_DEFAULT_HEIGHT 300
+#define MAINWIN_DEFAULT_WIDTH 700
+#define MAINWIN_DEFAULT_HEIGHT 400
 
 typedef struct MainWin_ClassIf {
     ObjIface* _implements;

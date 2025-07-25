@@ -311,6 +311,11 @@ void MainWin_loadLayout(_In_ MainWin* self)
         IupAppend(tab, panel->h);
         objRelease(&panel);
 
+        if (htFind(self->panels, string, _S"hullgraph", object, &panel)) {
+            IupAppend(tab, panel->h);
+            objRelease(&panel);
+        }
+
         if (htFind(self->panels, string, _S"sectordetail", object, &panel)) {
             IupAppend(tab, panel->h);
             objRelease(&panel);
@@ -329,7 +334,7 @@ void MainWin_loadLayout(_In_ MainWin* self)
     }
     IupAppend(self->root, left);
     IupAppend(self->root, tab);
-    IupSetAttribute(self->root, "VALUE", "633");
+    IupSetAttribute(self->root, "VALUE", "700");
 }
 
 static void saveLayoutNode(MainWin* self, SSDNode* node, Ihandle* in,

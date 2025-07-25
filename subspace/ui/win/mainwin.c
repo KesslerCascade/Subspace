@@ -146,36 +146,6 @@ bool MainWin_make(_In_ MainWin* self)
     }
     panelMake(self->welcomepanel);
 
-    // load all the images needed
-    iupLoadImage(self->ss, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
-    iupLoadImage(self->ss, _S"IMAGE_SETTINGS_HOVER", _S"svg", _S"subspace:/settings-hover.svg", NULL);
-    iupLoadImage(self->ss, _S"IMAGE_PLAY_HOVER", _S"svg", _S"subspace:/play-hover.svg", NULL);
-    iupLoadImage(self->ss,
-                 _S"IMAGE_RUNTRACKER_HOVER",
-                 _S"svg",
-                 _S"subspace:/runtrackerbar-hover.svg",
-                 NULL);
-    iupLoadImage(self->ss,
-                 _S"IMAGE_RUNTRACKER_RECORDING",
-                 _S"svg",
-                 _S"subspace:/runtrackerbar-recording.svg",
-                 NULL);
-    iupLoadImage(self->ss,
-                 _S"IMAGE_RUNTRACKER_PAUSED",
-                 _S"svg",
-                 _S"subspace:/runtrackerbar-paused.svg",
-                 NULL);
-    iupLoadImage(self->ss,
-                 _S"IMAGE_RUNTRACKER_PAUSED_HOVER",
-                 _S"svg",
-                 _S"subspace:/runtrackerbar-paused-hover.svg",
-                 NULL);
-    iupLoadImage(self->ss, _S"IMAGE_PLAY_HOVER", _S"svg", _S"subspace:/play-hover.svg", NULL);
-    iupLoadImage(self->ss,
-                 _S"IMAGE_PLAY_DISABLED",
-                 _S"svg",
-                 _S"subspace:/play-disabled.svg",
-                 self->playbtn);
     // wait on these three
     iupLoadImageWait(self->ss, _S"IMAGE_RUNTRACKER", _S"svg", _S"subspace:/runtrackerbar.svg");
     iupLoadImageWait(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg");
@@ -267,6 +237,38 @@ void MainWin_show(_In_ MainWin* self)
 {
     IupShowXY(self->win, IUP_CENTER, IUP_CENTER);
     mainwinUpdateAll(self);
+
+    // Background load the images that aren't needed right away (must do this AFTER map for refresh
+    // to work)
+    iupLoadImage(self->ss, _S"IMAGE_HAMBURGER_HOVER", _S"svg", _S"subspace:/hamburger-hover.svg", NULL);
+    iupLoadImage(self->ss, _S"IMAGE_SETTINGS_HOVER", _S"svg", _S"subspace:/settings-hover.svg", NULL);
+    iupLoadImage(self->ss, _S"IMAGE_PLAY_HOVER", _S"svg", _S"subspace:/play-hover.svg", NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_RUNTRACKER_HOVER",
+                 _S"svg",
+                 _S"subspace:/runtrackerbar-hover.svg",
+                 NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_RUNTRACKER_RECORDING",
+                 _S"svg",
+                 _S"subspace:/runtrackerbar-recording.svg",
+                 NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_RUNTRACKER_PAUSED",
+                 _S"svg",
+                 _S"subspace:/runtrackerbar-paused.svg",
+                 NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_RUNTRACKER_PAUSED_HOVER",
+                 _S"svg",
+                 _S"subspace:/runtrackerbar-paused-hover.svg",
+                 NULL);
+    iupLoadImage(self->ss, _S"IMAGE_PLAY_HOVER", _S"svg", _S"subspace:/play-hover.svg", NULL);
+    iupLoadImage(self->ss,
+                 _S"IMAGE_PLAY_DISABLED",
+                 _S"svg",
+                 _S"subspace:/play-disabled.svg",
+                 self->playbtn);
 }
 
 void MainWin_update(_In_ MainWin* self)

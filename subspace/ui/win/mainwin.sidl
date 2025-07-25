@@ -2,8 +2,8 @@
 #include "subspace.h"
 #include "ui/panel/panel.sidl"
 
-#define MAINWIN_DEFAULT_WIDTH 600
-#define MAINWIN_DEFAULT_HEIGHT 300
+#define MAINWIN_DEFAULT_WIDTH 700
+#define MAINWIN_DEFAULT_HEIGHT 400
 
 class SubspaceUI;
 class MainWin {
