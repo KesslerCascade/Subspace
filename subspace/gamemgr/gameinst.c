@@ -331,6 +331,8 @@ void GameInst_onValidate(_In_ GameInst* self, ControlClient* client)
 
     // let UI know
     ssuiNotify(self->ss->ui, _S"Validate_Finish", stvar(object, self));
+    // update entire UI because feature availabilty may have changed
+    subspaceUpdateUI(self->ss);
 }
 
 // Autogen begins -----

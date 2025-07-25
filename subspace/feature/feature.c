@@ -106,9 +106,6 @@ void SubspaceFeature_setAvailable(_In_ SubspaceFeature* self, bool available)
     strNConcat(&epath, _S"feature/", self->name, _S"/available");
     ssdSet(self->ss->settings, epath, true, stvar(bool, available));
     strDestroy(&epath);
-
-    // update entire UI when feature state changes
-    subspaceUpdateUI(self->ss);
 }
 
 static bool sendSettingVal(ControlMsg* msg, int field, const char* fname, stvar* val)
