@@ -24,6 +24,7 @@ typedef struct InfoBlock_ClassIf {
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
+    bool (*isLocked)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
     void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
@@ -52,6 +53,7 @@ typedef struct InfoBlock {
     bool enabled;
     bool hidden;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    bool locked;        // cannot be enabled or disabled currently
     SSDNode* settings;        // Settings that are synchronized with the game client
 } InfoBlock;
 extern ObjClassInfo InfoBlock_clsinfo;
@@ -80,6 +82,8 @@ _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss);
 #define infoblockIsEnabled(self) (self)->_->isEnabled(InfoBlock(self))
 // bool infoblockIsAvailable(InfoBlock* self);
 #define infoblockIsAvailable(self) (self)->_->isAvailable(InfoBlock(self))
+// bool infoblockIsLocked(InfoBlock* self);
+#define infoblockIsLocked(self) (self)->_->isLocked(InfoBlock(self))
 // void infoblockEnable(InfoBlock* self, bool enabled);
 #define infoblockEnable(self, enabled) (self)->_->enable(InfoBlock(self), enabled)
 // void infoblockSetAvailable(InfoBlock* self, bool available);

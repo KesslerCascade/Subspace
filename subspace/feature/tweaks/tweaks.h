@@ -24,6 +24,7 @@ typedef struct Tweaks_ClassIf {
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
+    bool (*isLocked)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
     void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
@@ -52,6 +53,7 @@ typedef struct Tweaks {
     bool enabled;
     bool hidden;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    bool locked;        // cannot be enabled or disabled currently
     SSDNode* settings;        // Settings that are synchronized with the game client
 } Tweaks;
 extern ObjClassInfo Tweaks_clsinfo;
@@ -80,6 +82,8 @@ _objfactory_guaranteed Tweaks* Tweaks_create(Subspace* ss);
 #define tweaksIsEnabled(self) (self)->_->isEnabled(Tweaks(self))
 // bool tweaksIsAvailable(Tweaks* self);
 #define tweaksIsAvailable(self) (self)->_->isAvailable(Tweaks(self))
+// bool tweaksIsLocked(Tweaks* self);
+#define tweaksIsLocked(self) (self)->_->isLocked(Tweaks(self))
 // void tweaksEnable(Tweaks* self, bool enabled);
 #define tweaksEnable(self, enabled) (self)->_->enable(Tweaks(self), enabled)
 // void tweaksSetAvailable(Tweaks* self, bool available);

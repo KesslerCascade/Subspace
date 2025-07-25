@@ -24,6 +24,7 @@ typedef struct NumericHull_ClassIf {
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
+    bool (*isLocked)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
     void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
@@ -52,6 +53,7 @@ typedef struct NumericHull {
     bool enabled;
     bool hidden;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    bool locked;        // cannot be enabled or disabled currently
     SSDNode* settings;        // Settings that are synchronized with the game client
 } NumericHull;
 extern ObjClassInfo NumericHull_clsinfo;
@@ -80,6 +82,8 @@ _objfactory_guaranteed NumericHull* NumericHull_create(Subspace* ss);
 #define numerichullIsEnabled(self) (self)->_->isEnabled(NumericHull(self))
 // bool numerichullIsAvailable(NumericHull* self);
 #define numerichullIsAvailable(self) (self)->_->isAvailable(NumericHull(self))
+// bool numerichullIsLocked(NumericHull* self);
+#define numerichullIsLocked(self) (self)->_->isLocked(NumericHull(self))
 // void numerichullEnable(NumericHull* self, bool enabled);
 #define numerichullEnable(self, enabled) (self)->_->enable(NumericHull(self), enabled)
 // void numerichullSetAvailable(NumericHull* self, bool available);

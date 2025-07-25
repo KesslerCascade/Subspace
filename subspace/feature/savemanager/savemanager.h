@@ -24,6 +24,7 @@ typedef struct SaveManager_ClassIf {
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
+    bool (*isLocked)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
     void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
@@ -52,6 +53,7 @@ typedef struct SaveManager {
     bool enabled;
     bool hidden;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    bool locked;        // cannot be enabled or disabled currently
     SSDNode* settings;        // Settings that are synchronized with the game client
 } SaveManager;
 extern ObjClassInfo SaveManager_clsinfo;
@@ -80,6 +82,8 @@ _objfactory_guaranteed SaveManager* SaveManager_create(Subspace* ss);
 #define savemanagerIsEnabled(self) (self)->_->isEnabled(SaveManager(self))
 // bool savemanagerIsAvailable(SaveManager* self);
 #define savemanagerIsAvailable(self) (self)->_->isAvailable(SaveManager(self))
+// bool savemanagerIsLocked(SaveManager* self);
+#define savemanagerIsLocked(self) (self)->_->isLocked(SaveManager(self))
 // void savemanagerEnable(SaveManager* self, bool enabled);
 #define savemanagerEnable(self, enabled) (self)->_->enable(SaveManager(self), enabled)
 // void savemanagerSetAvailable(SaveManager* self, bool available);

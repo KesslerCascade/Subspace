@@ -24,6 +24,7 @@ typedef struct PracticeMode_ClassIf {
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
+    bool (*isLocked)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
     void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
@@ -52,6 +53,7 @@ typedef struct PracticeMode {
     bool enabled;
     bool hidden;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    bool locked;        // cannot be enabled or disabled currently
     SSDNode* settings;        // Settings that are synchronized with the game client
 } PracticeMode;
 extern ObjClassInfo PracticeMode_clsinfo;
@@ -80,6 +82,8 @@ _objfactory_guaranteed PracticeMode* PracticeMode_create(Subspace* ss);
 #define practicemodeIsEnabled(self) (self)->_->isEnabled(PracticeMode(self))
 // bool practicemodeIsAvailable(PracticeMode* self);
 #define practicemodeIsAvailable(self) (self)->_->isAvailable(PracticeMode(self))
+// bool practicemodeIsLocked(PracticeMode* self);
+#define practicemodeIsLocked(self) (self)->_->isLocked(PracticeMode(self))
 // void practicemodeEnable(PracticeMode* self, bool enabled);
 #define practicemodeEnable(self, enabled) (self)->_->enable(PracticeMode(self), enabled)
 // void practicemodeSetAvailable(PracticeMode* self, bool available);

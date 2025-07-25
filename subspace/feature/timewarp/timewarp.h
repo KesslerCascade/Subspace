@@ -24,6 +24,7 @@ typedef struct TimeWarp_ClassIf {
     SettingsPage* (*createSettingsPage)(_In_ void* self, SubspaceUI* ui);
     bool (*isEnabled)(_In_ void* self);
     bool (*isAvailable)(_In_ void* self);
+    bool (*isLocked)(_In_ void* self);
     void (*enable)(_In_ void* self, bool enabled);
     void (*setAvailable)(_In_ void* self, bool available);
     void (*applyDefaultSettings)(_In_ void* self);
@@ -52,6 +53,7 @@ typedef struct TimeWarp {
     bool enabled;
     bool hidden;
     bool optional;        // Features that are expected to be unavailable, e.g. version-specific
+    bool locked;        // cannot be enabled or disabled currently
     SSDNode* settings;        // Settings that are synchronized with the game client
 } TimeWarp;
 extern ObjClassInfo TimeWarp_clsinfo;
@@ -80,6 +82,8 @@ _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss);
 #define timewarpIsEnabled(self) (self)->_->isEnabled(TimeWarp(self))
 // bool timewarpIsAvailable(TimeWarp* self);
 #define timewarpIsAvailable(self) (self)->_->isAvailable(TimeWarp(self))
+// bool timewarpIsLocked(TimeWarp* self);
+#define timewarpIsLocked(self) (self)->_->isLocked(TimeWarp(self))
 // void timewarpEnable(TimeWarp* self, bool enabled);
 #define timewarpEnable(self, enabled) (self)->_->enable(TimeWarp(self), enabled)
 // void timewarpSetAvailable(TimeWarp* self, bool available);
