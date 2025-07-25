@@ -41,7 +41,8 @@ int Ship_DamageHull_post(int ret, Ship* self, int amount)
 
         if (amount != 0 && self == playerShip) {
             int deltaHull = pre_currentHull - Ship_hullIntegrity(self);
-            runLogSend(&Log_HullDamage, src, deltaHull);
+            if (deltaHull != 0)
+                runLogSend(&Log_HullDamage, src, deltaHull);
         }
     }
 

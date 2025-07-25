@@ -43,7 +43,8 @@ void Ship_ProjectileStrike_post(Ship* self, int roomId, float damage)
 
         if (damage > 0 && self == playerShip) {
             int deltaHull = pre_currentHull - MAX(Ship_hullIntegrity(self), 0);
-            runLogSend(&Log_HullDamage, src, deltaHull);
+            if (deltaHull != 0)
+                runLogSend(&Log_HullDamage, src, deltaHull);
         }
     }
 }
