@@ -82,6 +82,8 @@ class RunInfo {
     void processShip(strref name);
 
     void setFocused(bool focused);
+    bool isFocused();
+    bool isRecording();
     
     SectorInfo *getSector(int64 sectorpoint);
     HullTracker *getHull();

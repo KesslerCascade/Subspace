@@ -163,6 +163,7 @@ add_executable(subspace
     ui/win/mainwin.c
     ui/win/mainwinlayout.c
     ui/win/mainwinmenu.c
+    ui/win/quitconfirm.c
     ui/win/settingswin.c
     win32/process.c
     win32/subspace.manifest

@@ -103,6 +103,9 @@ typedef struct GameGlobalState {
     bool tweaksOverrideFPS;
     bool ignoreFileDeletion;
     char* saveFileOverride;   // temporary override for save file location
+
+    // Save & Quit flag
+    bool saveAndQuit;
 } GameGlobalState;
 
 // Game state that reflets the current context of the FTL client

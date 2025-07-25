@@ -202,5 +202,10 @@
     "damagesource_systemdestroyed": "System Destroyed",
     "damagesource_event": "Event",
     "damagesource_other": "Other",
-    "damagesource_repair": "Hull Repairs"
+    "damagesource_repair": "Hull Repairs",
+    "quitconfirm_title": "Close Subspace?",
+    "quitconfirm": "Warning! FTL is still running and a tracked run is in progress.\nClosing Subspace will disrupt run tracking and may result in missing data.\n\nAre you sure?",
+    "quitconfirm_stay": "Cancel (Do Not Close)",
+    "quitconfirm_save": "Save && Quit FTL",
+    "quitconfirm_quit": "Close Anyway"
 }

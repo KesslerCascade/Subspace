@@ -67,6 +67,8 @@ typedef struct RunInfo_ClassIf {
     void (*processHullDamage)(_In_ void* self, _In_opt_ strref src, int amount);
     void (*processShip)(_In_ void* self, _In_opt_ strref name);
     void (*setFocused)(_In_ void* self, bool focused);
+    bool (*isFocused)(_In_ void* self);
+    bool (*isRecording)(_In_ void* self);
     SectorInfo* (*getSector)(_In_ void* self, int64 sectorpoint);
     HullTracker* (*getHull)(_In_ void* self);
     ScrapTracker* (*getScrap)(_In_ void* self);
@@ -172,6 +174,10 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoProcessShip(self, name) (self)->_->processShip(RunInfo(self), name)
 // void runinfoSetFocused(RunInfo* self, bool focused);
 #define runinfoSetFocused(self, focused) (self)->_->setFocused(RunInfo(self), focused)
+// bool runinfoIsFocused(RunInfo* self);
+#define runinfoIsFocused(self) (self)->_->isFocused(RunInfo(self))
+// bool runinfoIsRecording(RunInfo* self);
+#define runinfoIsRecording(self) (self)->_->isRecording(RunInfo(self))
 // SectorInfo* runinfoGetSector(RunInfo* self, int64 sectorpoint);
 #define runinfoGetSector(self, sectorpoint) (self)->_->getSector(RunInfo(self), sectorpoint)
 // HullTracker* runinfoGetHull(RunInfo* self);

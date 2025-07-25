@@ -11,6 +11,7 @@
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
 #include "gamemgr/gamemgr.h"
+#include "run/runinfo.h"
 #include "ui/panel/gameinfo/gameinfopanel.h"
 #include "ui/panel/hullgraph/hullgraphpanel.h"
 #include "ui/panel/runsummary/runsummarypanel.h"
@@ -20,6 +21,7 @@
 #include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
+#include "quitconfirm.h"
 #include "settingswin.h"
 
 #define REGISTERPANEL(mprefix)         \
@@ -303,12 +305,22 @@ static void checkLayout(MainWin* self)
 
 int MainWin_onClose(Ihandle* ih)
 {
+    bool quit     = true;
     MainWin* self = iupGetObj(MainWin, ih);
     checkLayout(self);
-    self->ss->exit = true;
-    eventSignal(&self->ss->notify);
 
-    return IUP_DEFAULT;
+    // check if a recorded run is in progress
+    RunInfo* run = subspaceRun(self->ss);
+    if (run && runinfoIsRecording(run))
+        quit = confirmQuit(self->ss);
+    objRelease(&run);
+
+    if (quit) {
+        self->ss->exit = true;
+        eventSignal(&self->ss->notify);
+    }
+
+    return quit ? IUP_DEFAULT : IUP_IGNORE;
 }
 
 int MainWin_onResize(Ihandle* ih, int width, int height)

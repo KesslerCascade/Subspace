@@ -94,6 +94,7 @@ add_executable(subspacegame
     control/cmds/cmdcleartostart.c
     control/cmds/cmdenablefeature.c
     control/cmds/cmdfeaturesettings.c
+    control/cmds/cmdsaveandquit.c
     feature/base.c
     feature/feature.c
     feature/frameadv.c

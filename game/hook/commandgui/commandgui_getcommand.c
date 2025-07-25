@@ -2,11 +2,15 @@
 
 #include "hook/hook.h"
 #include "patch/patchlist.h"
+#include "subspacegame.h"
 
 // ---- Hooks ----------------
 
 int subspace_CommandGui_GetCommand_post(int ret, CommandGui* self)
 {
+    if (gs.saveAndQuit)
+        return 8;
+
     return ret;
 }
 

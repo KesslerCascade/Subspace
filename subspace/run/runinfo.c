@@ -716,6 +716,26 @@ void RunInfo_setFocused(_In_ RunInfo* self, bool focused)
     }
 }
 
+bool RunInfo_isFocused(_In_ RunInfo* self)
+{
+    bool ret;
+    withReadLock (&self->lock) {
+        ret = self->focused;
+    }
+
+    return ret;
+}
+
+bool RunInfo_isRecording(_In_ RunInfo* self)
+{
+    bool ret;
+    withReadLock (&self->lock) {
+        ret = self->recording;
+    }
+
+    return ret;
+}
+
 void RunInfo_destroy(_In_ RunInfo* self)
 {
     // Autogen begins -----

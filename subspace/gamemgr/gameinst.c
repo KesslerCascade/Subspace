@@ -74,6 +74,9 @@ static void instCloseCb(ProcessHandle* h, uint32 pid, void* userdata)
             objRelease(&gmgr);
         }
 
+        // unlink run that is being recorded
+        ginstClearRun(inst);
+
         subspaceClearGame(ss, inst);
 
         withWriteLock (&inst->lock) {
@@ -226,6 +229,8 @@ RunInfo* GameInst_run(_In_ GameInst* self)
 void GameInst_setRun(_In_ GameInst* self, RunInfo* run)
 {
     withWriteLock (&self->lock) {
+        if (self->activeRun)
+            self->activeRun->recording = false;
         objRelease(&self->activeRun);
         self->activeRun = objAcquire(run);
     }
@@ -234,6 +239,8 @@ void GameInst_setRun(_In_ GameInst* self, RunInfo* run)
 void GameInst_clearRun(_In_ GameInst* self)
 {
     withWriteLock (&self->lock) {
+        if (self->activeRun)
+            self->activeRun->recording = false;
         objRelease(&self->activeRun);
     }
 
