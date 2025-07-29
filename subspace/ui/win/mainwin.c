@@ -147,7 +147,10 @@ bool MainWin_make(_In_ MainWin* self)
     panelMake(self->welcomepanel);
 
     // wait on these three
-    iupLoadImageWait(self->ss, _S"IMAGE_RUNTRACKER", _S"svg", _S"subspace:/runtrackerbar.svg");
+    iupLoadImageWait(self->ss,
+                     _S"IMAGE_RUNTRACKER_SIDEBAR",
+                     _S"svg",
+                     _S"subspace:/runtrackerbar.svg");
     iupLoadImageWait(self->ss, _S"IMAGE_HAMBURGER", _S"svg", _S"subspace:/hamburger.svg");
     iupLoadImageWait(self->ss, _S"IMAGE_SETTINGS", _S"svg", _S"subspace:/settings.svg");
     iupLoadImageWait(self->ss, _S"IMAGE_PLAY", _S"svg", _S"subspace:/play.svg");
@@ -184,7 +187,7 @@ bool MainWin_make(_In_ MainWin* self)
     IupSetCallback(self->playbtn, "FLAT_ACTION", playbtn_action);
 
     self->runtrackerbtn = IupFlatButton(NULL);
-    IupSetAttribute(self->runtrackerbtn, "IMAGE", "IMAGE_RUNTRACKER");
+    IupSetAttribute(self->runtrackerbtn, "IMAGE", "IMAGE_RUNTRACKER_SIDEBAR");
     IupSetAttribute(self->runtrackerbtn, "IMAGEHIGHLIGHT", "IMAGE_RUNTRACKER_HOVER");
     IupSetAttribute(self->runtrackerbtn, "HLCOLOR", NULL);
     IupSetAttribute(self->runtrackerbtn, "PSCOLOR", NULL);
@@ -320,7 +323,7 @@ void MainWin_update(_In_ MainWin* self)
                 IupSetAttribute(self->runtrackerbtn, "IMAGEHIGHLIGHT", "IMAGE_RUNTRACKER_PAUSED");
             IupSetStrAttribute(self->runtrackerbtn, "TIP", langGetC(self->ss, "runtracker_paused"));
         } else {
-            IupSetAttribute(self->runtrackerbtn, "IMAGE", "IMAGE_RUNTRACKER");
+            IupSetAttribute(self->runtrackerbtn, "IMAGE", "IMAGE_RUNTRACKER_SIDEBAR");
             IupSetAttribute(self->runtrackerbtn, "IMAGEHIGHLIGHT", "IMAGE_RUNTRACKER_HOVER");
             IupSetStrAttribute(self->runtrackerbtn, "TIP", langGetC(self->ss, "runtracker_ready"));
         }

@@ -83,7 +83,7 @@ static void RunInfo_newTracked(RunInfo* self, int seed, strref shipType, strref 
     dbstmtBind(stmt, 5, stvar(int64, now));
     if (dbstmtExec(stmt)) {
         withWriteLock (&self->lock) {
-            self->runid     = dbLastId(self->ss->db);
+            self->runid = dbLastId(self->ss->db);
             runinfoSetRecording(self, true);
         }
         logFmt(Info,
@@ -126,7 +126,7 @@ static void RunInfo_findOrCreateTracked(RunInfo* self, int seed, strref shipType
     DbStmt* stmt = dbPrepare(
         self->ss->db,
         _S
-        "SELECT runid, start, savepoint, sectorpoint, beacons_explored, ships_defeated, scrap_collected, crew_hired, scrap_actual, damage_taken, savepath "
+        "SELECT runid, start, savepoint, sectorpoint, beacons_explored, ships_defeated, scrap_collected, crew_hired, scrap_actual, damage_taken, rundir "
         "FROM runs "
         "WHERE seed = ? AND shiptype = ? AND shipname = ? AND difficulty = ? AND beacons_explored <= ? AND result = 0 AND end = 0");
     if (!stmt)
@@ -162,7 +162,7 @@ static void RunInfo_findOrCreateTracked(RunInfo* self, int seed, strref shipType
             stConvert(int32, &self->crewHired, stvar, stmt->row.a[7]);
             stConvert(int32, &self->scrapActual, stvar, stmt->row.a[8]);
             stConvert(int32, &self->damageTaken, stvar, stmt->row.a[9]);
-            stConvert(string, &self->savePath, stvar, stmt->row.a[10]);
+            stConvert(string, &self->runDir, stvar, stmt->row.a[10]);
 
             saDestroy(&self->sectors);
             self->sectors = loadsectors;
@@ -190,7 +190,7 @@ bool RunInfo_loadHistoric(_In_ RunInfo* self, int64 runid)
         self->ss->db,
         _S
         "SELECT start, end, savepoint, sectorpoint, seed, shiptype, shipname, difficulty, result, beacons_explored, ships_defeated, "
-        "scrap_collected, crew_hired, scrap_actual, damage_taken, savepath "
+        "scrap_collected, crew_hired, scrap_actual, damage_taken, rundir "
         "FROM runs WHERE runid = ?");
     if (!stmt)
         return false;
@@ -223,7 +223,7 @@ bool RunInfo_loadHistoric(_In_ RunInfo* self, int64 runid)
             stConvert(int32, &self->crewHired, stvar, stmt->row.a[12]);
             stConvert(int32, &self->scrapActual, stvar, stmt->row.a[13]);
             stConvert(int32, &self->damageTaken, stvar, stmt->row.a[14]);
-            stConvert(string, &self->savePath, stvar, stmt->row.a[15]);
+            stConvert(string, &self->runDir, stvar, stmt->row.a[15]);
 
             saDestroy(&self->sectors);
             self->sectors = loadsectors;
@@ -755,7 +755,7 @@ void RunInfo_destroy(_In_ RunInfo* self)
     rwlockDestroy(&self->lock);
     strDestroy(&self->shipType);
     strDestroy(&self->shipName);
-    strDestroy(&self->savePath);
+    strDestroy(&self->runDir);
     saDestroy(&self->sectors);
     objRelease(&self->hull);
     objRelease(&self->scrap);
@@ -861,5 +861,6 @@ void LogReplay_destroy(_In_ LogReplay* self)
 }
 
 // Autogen begins -----
+bool RunInfo_getRunDir(_In_ RunInfo* self, string* out);
 #include "runinfo.auto.inc"
 // Autogen ends -------

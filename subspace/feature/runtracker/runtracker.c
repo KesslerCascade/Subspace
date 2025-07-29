@@ -12,6 +12,7 @@
 #include "control/controlserver.h"
 #include "gamemgr/gameinst.h"
 #include "ui/subspaceui.h"
+#include "runtrackerpage.h"
 
 _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss)
 {
@@ -27,11 +28,11 @@ _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss)
 
 extern SettingsPage*
 SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
-extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
-#define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
+#define parent_createSettingsPage(ui) \
+    SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
 SettingsPage* RunTracker_createSettingsPage(_In_ RunTracker* self, SubspaceUI* ui)
 {
-    return NULL;
+    return SettingsPage(runtrackerpageCreate(self, ui));
 }
 
 extern void SubspaceFeature_applyDefaultSettings(_In_ SubspaceFeature* self);   // parent

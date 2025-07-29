@@ -29,6 +29,7 @@ static RunInfo_ClassIf _impl_RunInfo_RunInfo_ClassIf = {
     .setFocused = (void (*)(void*, bool))RunInfo_setFocused,
     .isFocused = (bool (*)(void*))RunInfo_isFocused,
     .isRecording = (bool (*)(void*))RunInfo_isRecording,
+    .getRunDir = (bool (*)(void*, string*))RunInfo_getRunDir,
     .getSector = (SectorInfo* (*)(void*, int64))RunInfo_getSector,
     .getHull = (HullTracker* (*)(void*))RunInfo_getHull,
     .getScrap = (ScrapTracker* (*)(void*))RunInfo_getScrap,

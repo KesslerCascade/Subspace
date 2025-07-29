@@ -38,6 +38,7 @@ set(SUBSPACE_SIDL
     feature/numerichull/numerichull.sidl
     feature/practicemode/practicemode.sidl
     feature/runtracker/runtracker.sidl
+    feature/runtracker/runtrackerpage.sidl
     feature/savemanager/savemanager.sidl
     feature/timewarp/timewarp.sidl
     feature/timewarp/timewarppage.sidl
@@ -114,6 +115,7 @@ add_executable(subspace
     feature/numerichull/numerichull.c
     feature/practicemode/practicemode.c
     feature/runtracker/runtracker.c
+    feature/runtracker/runtrackerpage.c
     feature/savemanager/savemanager.c
     feature/timewarp/timewarp.c
     feature/timewarp/timewarppage.c
@@ -132,6 +134,7 @@ add_executable(subspace
     run/logent.c
     run/logrelay.c
     run/runinfo.c
+    run/runinforundir.c
     run/scraptracker.c
     run/sectorinfo.c
     ui/subspaceui.c
@@ -165,6 +168,8 @@ add_executable(subspace
     ui/win/mainwinmenu.c
     ui/win/quitconfirm.c
     ui/win/settingswin.c
+    util/pathfilter.c
+    util/pathsubst.c
     win32/process.c
     win32/subspace.manifest
     win32/subspace.rc

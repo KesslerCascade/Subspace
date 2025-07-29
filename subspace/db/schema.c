@@ -24,7 +24,7 @@ static bool dbCreateRuns(sqlite3* db)
                      "crew_hired INTEGER NOT NULL DEFAULT 0,"
                      "scrap_actual INTEGER NOT NULL DEFAULT 0,"
                      "damage_taken INTEGER NOT NULL DEFAULT 0,"
-                     "savepath TEXT"
+                     "rundir TEXT"
                      ")",
                      NULL,
                      NULL,
@@ -325,6 +325,19 @@ static bool dbUpgradeV2RunLog(sqlite3* db)
     return ret;
 }
 
+static bool dbUpgradeV3Runs(sqlite3* db)
+{
+    bool ret = true;
+
+    // schema versions before V2 didn't have the Start runlog entry, but it can be synthesized from
+    // the run data
+    if (sqlite3_exec(db, "ALTER TABLE runs RENAME COLUMN savepath TO rundir", NULL, NULL, NULL) !=
+        SQLITE_OK)
+        ret = false;
+
+    return ret;
+}
+
 static bool updateVer(sqlite3* db, int newver)
 {
     bool ret = false;
@@ -366,6 +379,11 @@ static bool dbUpgradeFromV2(sqlite3* db, int* destver)
     return dbUpgradeV2RunLog(db);
 }
 
+static bool dbUpgradeFromV3(sqlite3* db, int* destver)
+{
+    return dbUpgradeV3Runs(db);
+}
+
 static bool dbUpgradeOnce(sqlite3* db, int* ver)
 {
     bool ret    = true;
@@ -381,6 +399,9 @@ static bool dbUpgradeOnce(sqlite3* db, int* ver)
         break;
     case 2:
         ret = dbUpgradeFromV2(db, &destver);
+        break;
+    case 3:
+        ret = dbUpgradeFromV3(db, &destver);
         break;
     default:
         ret = false;

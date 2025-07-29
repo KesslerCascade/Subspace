@@ -70,6 +70,7 @@ typedef struct RunInfo_ClassIf {
     void (*setFocused)(_In_ void* self, bool focused);
     bool (*isFocused)(_In_ void* self);
     bool (*isRecording)(_In_ void* self);
+    bool (*getRunDir)(_In_ void* self, string* out);
     SectorInfo* (*getSector)(_In_ void* self, int64 sectorpoint);
     HullTracker* (*getHull)(_In_ void* self);
     ScrapTracker* (*getScrap)(_In_ void* self);
@@ -123,7 +124,7 @@ typedef struct RunInfo {
     int32 damageTaken;
     bool updatedBeaconShip;
     int64 modified;
-    string savePath;
+    string runDir;
     sa_SectorInfo sectors;
     bool recording;        // is this run being currently recorded (i.e. not a historical run)
     bool focused;        // is focused by the UI
@@ -181,6 +182,8 @@ _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss);
 #define runinfoIsFocused(self) (self)->_->isFocused(RunInfo(self))
 // bool runinfoIsRecording(RunInfo* self);
 #define runinfoIsRecording(self) (self)->_->isRecording(RunInfo(self))
+// bool runinfoGetRunDir(RunInfo* self, string* out);
+#define runinfoGetRunDir(self, out) (self)->_->getRunDir(RunInfo(self), out)
 // SectorInfo* runinfoGetSector(RunInfo* self, int64 sectorpoint);
 #define runinfoGetSector(self, sectorpoint) (self)->_->getSector(RunInfo(self), sectorpoint)
 // HullTracker* runinfoGetHull(RunInfo* self);

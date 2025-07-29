@@ -54,7 +54,7 @@ class RunInfo {
 
     int64 modified;
 
-    string savePath;
+    string runDir;
 
     [sorted] sarray:object:SectorInfo sectors;
 
@@ -86,6 +86,7 @@ class RunInfo {
     bool isFocused();
     bool isRecording();
     
+    [extern] bool getRunDir(string* out);
     SectorInfo *getSector(int64 sectorpoint);
     HullTracker *getHull();
     ScrapTracker *getScrap();

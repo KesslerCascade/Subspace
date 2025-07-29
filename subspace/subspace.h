@@ -17,7 +17,9 @@
 #define LOG_FILENAME         _S "/log/subspace.log"
 #define LANGDIR_FILENAME     _S "subspace:/lang"
 #define LANGLIST_FILENAME    _S "subspace:/lang/languages.json"
-#define RUNSDIR_FILENAME     _S "/runs"
+#define RUNDIR_FILENAME      _S "/runs"
+#define RUNDIRFMT_DEFAULT    _S "${year}-${month}-${day} ${hour}${minute}${second} - ${shipname}"
+#define SAVENAME_DEFAULT     _S "${beacon} ${event}"
 
 #define LUA_MAIN_FILENAME _S "subspace.lua"
 

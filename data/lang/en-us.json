@@ -118,7 +118,7 @@
     "feature_runtracker": "Run Tracker",
     "feature_runtracker_desc": "Records and saves detailed information about each run. Cannot be enabled or disabled while a run is in progress.",
     "feature_savemanager": "Save Manager",
-    "feature_savemanager_desc": "Copies the save file at each beacon, so that the copy can be loaded back in to practice mode later.",
+    "feature_savemanager_desc": "Copies the save file at each beacon, so that the copy can be loaded back in to practice mode later. Requires the Run Tracker feature.",
     "tweaks_savegame": "Saved Games",
     "tweaks_preserveload": "Don't Delete on Load",
     "tweaks_preserveload_tip": "Prevents the game from deleting the continue.sav file upon load a saved game from the menu.",
@@ -210,5 +210,8 @@
     "quitconfirm_quit": "Close Anyway",
     "runtracker_ready": "Run Tracker is ready - new runs will be recorded",
     "runtracker_recording": "Run Tracker is recording data from a run",
-    "runtracker_paused": "Run Tracker is paused - new runs will NOT be recorded"
+    "runtracker_paused": "Run Tracker is paused - new runs will NOT be recorded",
+    "settings_rundirfmt": "Run Folder Format",
+    "settings_rundirfmt_long": "Run folders are created underneath \"runs\" in the Subspace install folder and contain save files, run logs, etc.\n\nThis setting controls how the subfolder for each run is named.",
+    "settings_rundirvar_list": "Variables that may be used in the run folder format are: ${year}, ${month}, ${day}, ${hour}, ${minute}, ${second}, ${shipname}, ${shiptype}, ${difficulty}. and ${seed}."
 }
