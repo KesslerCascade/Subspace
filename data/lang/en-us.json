@@ -199,7 +199,7 @@
     "damagesource_asteroid": "Asteroid",
     "damagesource_asb": "ASB",
     "damagesource_solarflare": "Solar Flare",
-    "damagesource_systemdestroyed": "System Destroyed",
+    "damagesource_systemdestroyed": "System",
     "damagesource_event": "Event",
     "damagesource_other": "Other",
     "damagesource_repair": "Hull Repairs",
