@@ -21,3 +21,5 @@ void osExit(int retcode);
 // time format is OS-specific but can be up to 64 bits wide
 int64_t osFrameTime();
 void osNextFrame();
+
+bool osAbsolutePathUTF8(const char* fname, char* buf, size_t bufsz);

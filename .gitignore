@@ -3,6 +3,7 @@
 /build
 /db
 /log
+/runs
 /subspace.json
 /subspace.dat
 /subspace/.vs

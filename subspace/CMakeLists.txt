@@ -40,6 +40,7 @@ set(SUBSPACE_SIDL
     feature/runtracker/runtracker.sidl
     feature/runtracker/runtrackerpage.sidl
     feature/savemanager/savemanager.sidl
+    feature/savemanager/savemanagerpage.sidl
     feature/timewarp/timewarp.sidl
     feature/timewarp/timewarppage.sidl
     feature/tweaks/tweaks.sidl
@@ -89,6 +90,7 @@ add_executable(subspace
     control/controlfields.c
     control/controlserver.c
     control/controltask.c
+    control/cmds/cmdautosave.c
     control/cmds/cmdbeacon.c
     control/cmds/cmdfeaturestate.c
     control/cmds/cmdgameready.c
@@ -117,6 +119,7 @@ add_executable(subspace
     feature/runtracker/runtracker.c
     feature/runtracker/runtrackerpage.c
     feature/savemanager/savemanager.c
+    feature/savemanager/savemanagerpage.c
     feature/timewarp/timewarp.c
     feature/timewarp/timewarppage.c
     feature/tweaks/tweaks.c

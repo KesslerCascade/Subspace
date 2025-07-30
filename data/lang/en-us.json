@@ -213,5 +213,8 @@
     "runtracker_paused": "Run Tracker is paused - new runs will NOT be recorded",
     "settings_rundirfmt": "Run Folder Format",
     "settings_rundirfmt_long": "Run folders are created underneath \"runs\" in the Subspace install folder and contain save files, run logs, etc.\n\nThis setting controls how the subfolder for each run is named.",
-    "settings_rundirvar_list": "Variables that may be used in the run folder format are: ${year}, ${month}, ${day}, ${hour}, ${minute}, ${second}, ${shipname}, ${shiptype}, ${difficulty}. and ${seed}."
+    "settings_rundirvar_list": "Variables that may be used in the run folder format are: ${year}, ${month}, ${day}, ${hour}, ${minute}, ${second}, ${shipname}, ${shiptype}, ${difficulty}, and ${seed}.",
+    "settings_savenamefmt": "Save File Name Format",
+    "settings_savenamefmt_long": "This pattern is used to name the archived save files. It should NOT include the .sav file extension.",
+    "settings_savenamevar_list": "Variables that may be used in the save file name format are: ${year}, ${month}, ${day}, ${hour}, ${minute}, ${second}, ${shipname}, ${shiptype}, ${beacon}, ${sector}, ${event}, and ${othership}."
 }

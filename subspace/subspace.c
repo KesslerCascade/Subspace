@@ -174,7 +174,7 @@ bool subspaceLoadData(Subspace* ss, strref ftldir)
     bool ret        = false;
     GameData* ndata = gamedataCreate();
 
-    ret = gamedataLoad(ndata, ss, filesys, ftldir);
+    ret = gamedataLoad(ndata, ss, ss->rootfs, ftldir);
 
     if (ret) {
         withWriteLock (&ss->lock) {
@@ -218,9 +218,10 @@ static void subspaceStartup(LogDest** pdeferredlogs)
     eventInit(&subspace.notify);
 
     // 02 -------- Filesystem setup
+    subspace.rootfs = objAcquire(filesys);
     subspace.fs = vfsCreate(0);
     fsSetCurDir(subspace.basedir);   // for pathMakeAbsolute
-    vfsMountVFS(subspace.fs, _S"/", filesys, subspace.basedir);
+    vfsMountVFS(subspace.fs, _S"/", subspace.rootfs, subspace.basedir);
 
     // 03 -------- mount subspace:/ namespace
     if (!subspaceMount(&subspace)) {
@@ -353,6 +354,7 @@ static void subspaceShutdown()
 
     // 02 -------- Filesystem setup
     vfsDestroy(&subspace.fs);
+    objRelease(&subspace.rootfs);
 
     // 01 -------- event that workers can use to notify the main thread of something
     eventDestroy(&subspace.notify);

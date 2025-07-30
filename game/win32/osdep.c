@@ -58,3 +58,26 @@ void osNextFrame()
 
     curFrameTime = (int64_t)nft.v;   // dividing by 10 earlier ensures this will never be negative
 }
+
+bool osAbsolutePathUTF8(const char* fname, char* buf, size_t bufsz)
+{
+    bool ret       = false;
+    wchar_t* cbuf  = smalloc(bufsz * 2);
+    wchar_t* cbuf2 = smalloc(bufsz * 2);
+
+    if (MultiByteToWideChar(CP_UTF8, 0, fname, -1, cbuf, bufsz) == 0)
+        goto out;
+
+    if (GetFullPathNameW(cbuf, bufsz, cbuf2, NULL) >= bufsz)
+        goto out;
+
+    if (WideCharToMultiByte(CP_UTF8, 0, cbuf2, -1, buf, bufsz, NULL, NULL) == 0)
+        goto out;
+
+    ret = true;
+
+out:
+    sfree(cbuf);
+    sfree(cbuf2);
+    return ret;
+}

@@ -129,7 +129,6 @@ static bool dbCreateSaves(sqlite3* db)
                      "CREATE TABLE saves ("
                      "runid INTEGER NOT NULL,"
                      "savepoint INTEGER NOT NULL,"
-                     "sectorpoint INTEGER NOT NULL,"
                      "time INTEGER NOT NULL,"
                      "filename TEXT NOT NULL,"
                      "PRIMARY KEY (runid, savepoint))",
@@ -338,6 +337,18 @@ static bool dbUpgradeV3Runs(sqlite3* db)
     return ret;
 }
 
+static bool dbUpgradeV3Saves(sqlite3* db)
+{
+    bool ret = true;
+
+    // just drop saves table, it isn't used by anything yet
+    if (sqlite3_exec(db, "DROP TABLE saves", NULL, NULL, NULL) != SQLITE_OK)
+        ret = false;
+    ret &= dbCreateSaves(db);
+
+    return ret;
+}
+
 static bool updateVer(sqlite3* db, int newver)
 {
     bool ret = false;
@@ -381,7 +392,7 @@ static bool dbUpgradeFromV2(sqlite3* db, int* destver)
 
 static bool dbUpgradeFromV3(sqlite3* db, int* destver)
 {
-    return dbUpgradeV3Runs(db);
+    return dbUpgradeV3Runs(db) && dbUpgradeV3Saves(db);
 }
 
 static bool dbUpgradeOnce(sqlite3* db, int* ver)

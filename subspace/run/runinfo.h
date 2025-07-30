@@ -122,6 +122,8 @@ typedef struct RunInfo {
     int32 crewHired;
     int32 scrapActual;
     int32 damageTaken;
+    string initialEvent;        // first event that was triggered at this beacon
+    string otherShip;        // name of enemy ship that spawned at this beacon
     bool updatedBeaconShip;
     int64 modified;
     string runDir;

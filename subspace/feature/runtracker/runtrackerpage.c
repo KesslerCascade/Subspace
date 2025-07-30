@@ -36,9 +36,7 @@ static int rundirtextchange(Ihandle* ih, int c, char* new_value)
         return IUP_IGNORE;
 
     string rundirfmt = 0;
-    pathFromPlatform(&rundirfmt, (strref)new_value);
-    pathNormalize(&rundirfmt);
-
+    strCopy(&rundirfmt, (strref)new_value);
     if (strEmpty(rundirfmt))
         strDup(&rundirfmt, RUNDIRFMT_DEFAULT);
 

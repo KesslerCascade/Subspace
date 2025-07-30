@@ -634,6 +634,7 @@ void RunInfo_processShip(_In_ RunInfo* self, _In_opt_ strref name)
 {
     int64 runid, savepoint;
     withWriteLock (&self->lock) {
+        strDup(&self->otherShip, name);
         if (!self->recording || self->updatedBeaconShip)
             break;
         self->updatedBeaconShip = true;
@@ -672,6 +673,8 @@ void RunInfo_beacon(_In_ RunInfo* self, int sector, int beacons, int visit, int 
 
         self->savepoint         = savepoint;   // we've always jumped or waited to get here
         self->updatedBeaconShip = false;
+        strDup(&self->initialEvent, event);
+        strClear(&self->otherShip);
     }
 
     if (recording) {
@@ -755,6 +758,8 @@ void RunInfo_destroy(_In_ RunInfo* self)
     rwlockDestroy(&self->lock);
     strDestroy(&self->shipType);
     strDestroy(&self->shipName);
+    strDestroy(&self->initialEvent);
+    strDestroy(&self->otherShip);
     strDestroy(&self->runDir);
     saDestroy(&self->sectors);
     objRelease(&self->hull);

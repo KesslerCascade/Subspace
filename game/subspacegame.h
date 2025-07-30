@@ -106,6 +106,10 @@ typedef struct GameGlobalState {
 
     // Save & Quit flag
     bool saveAndQuit;
+
+    // Save Manager
+    bool autoSaveNext;         // the next autosave should be archived by the save manager
+    bool autoSaveInProgress;   // we are doing an autosave right now
 } GameGlobalState;
 
 // Game state that reflets the current context of the FTL client

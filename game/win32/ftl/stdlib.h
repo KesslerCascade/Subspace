@@ -14,10 +14,6 @@ typedef void (*FUNCTYPE(crt_free))(void* ptr);
 DECLFUNC(crt_free);
 #define free(p) FCALL(ftlbase, crt_free, p)
 
-typedef void* (*FUNCTYPE(crt_malloc))(size_t size);
-DECLFUNC(crt_malloc);
-#define malloc(sz) FCALL(ftlbase, crt_malloc, sz)
-
 typedef void* (*FUNCTYPE(crt_realloc))(void* ptr, size_t size);
 DECLFUNC(crt_realloc);
 #define realloc(ptr, sz) FCALL(ftlbase, crt_realloc, ptr, sz)

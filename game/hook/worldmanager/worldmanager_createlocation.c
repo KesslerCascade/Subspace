@@ -60,6 +60,10 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
             runLogSend(&Log_Event, eventname->buf, 1, MAX(visits, 1));
         }
     }
+
+    // if we're at a new location, flag the next autosave to be archived
+    if (SaveManager_feature.enabled)
+        gs.autoSaveNext = true;
 }
 
 // ---- Patch ----------------

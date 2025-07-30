@@ -47,6 +47,7 @@ DECLFUNC(WorldManager_LoadGame);
 
 typedef void (*FUNCTYPE(WorldManager_SaveGame))(WorldManager* self);
 DECLFUNC(WorldManager_SaveGame);
+#define WorldManager_SaveGame(self) FCALL(ftlbase, WorldManager_SaveGame, self)
 
 typedef void (*FUNCTYPE(WorldManager_PrepareAutoSave))(WorldManager* self);
 DECLFUNC(WorldManager_PrepareAutoSave);

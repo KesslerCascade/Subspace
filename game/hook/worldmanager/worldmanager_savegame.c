@@ -10,7 +10,7 @@
 
 int subspace_WorldManager_SaveGame_pre(WorldManager* self)
 {
-    if (Tweaks_feature.enabled)
+    if (Tweaks_feature.enabled && !gs.autoSaveInProgress)
         tweaksPrepareSave();
 
     return 1;
@@ -18,7 +18,7 @@ int subspace_WorldManager_SaveGame_pre(WorldManager* self)
 
 void subspace_WorldManager_SaveGame_post(WorldManager* self)
 {
-    if (Tweaks_feature.enabled)
+    if (Tweaks_feature.enabled && !gs.autoSaveInProgress)
         tweaksFinalizeSave();
 
     return;

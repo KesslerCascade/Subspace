@@ -19,7 +19,7 @@
 #define LANGLIST_FILENAME    _S "subspace:/lang/languages.json"
 #define RUNDIR_FILENAME      _S "/runs"
 #define RUNDIRFMT_DEFAULT    _S "${year}-${month}-${day} ${hour}${minute}${second} - ${shipname}"
-#define SAVENAME_DEFAULT     _S "${beacon} ${event}"
+#define SAVENAME_DEFAULT     _S "${sector}-${beacon} ${event}"
 
 #define LUA_MAIN_FILENAME _S "subspace.lua"
 
@@ -43,7 +43,8 @@ typedef struct LogRelay LogRelay;
 
 typedef struct Subspace {
     string basedir;
-    VFS* fs;
+    VFS* fs;       // Subspace install dir
+    VFS* rootfs;   // Native FS
     string gamepath;
 
     SSDNode* settings;

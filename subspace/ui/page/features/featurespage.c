@@ -79,7 +79,7 @@ static int panel_button(Ihandle* ih, int button, int pressed, int x, int y, char
 
     if (feat && fpage) {
         rwlockAcquireRead(&feat->lock);
-        if (feat->available) {
+        if (feat->available && !feat->locked) {
             bool enabled;
             enabled = feat->enabled;
             rwlockReleaseRead(&feat->lock);
@@ -103,7 +103,7 @@ static int panel_key(Ihandle* ih, int c, int press)
 
     if (feat && fpage) {
         rwlockAcquireRead(&feat->lock);
-        if (feat->available) {
+        if (feat->available && !feat->locked) {
             bool enabled;
             enabled = feat->enabled;
             rwlockReleaseRead(&feat->lock);

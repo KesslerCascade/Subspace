@@ -10,6 +10,8 @@
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "control/controlserver.h"
+#include "feature/featureregistry.h"
+#include "feature/savemanager/savemanager.h"
 #include "gamemgr/gameinst.h"
 #include "ui/subspaceui.h"
 #include "runtrackerpage.h"
@@ -46,8 +48,23 @@ extern void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled);   
 #define parent_enable(enabled) SubspaceFeature_enable((SubspaceFeature*)(self), enabled)
 void RunTracker_enable(_In_ RunTracker* self, bool enabled)
 {
-    if (!featureIsLocked(self))
+    if (!featureIsLocked(self)) {
+        SaveManager* smfeat = fregGet(SaveManager, self->ss->freg);
+        if (smfeat) {
+            if (enabled) {
+                withWriteLock (&smfeat->lock) {
+                    smfeat->locked = false;
+                }
+            } else {
+                featureEnable(smfeat, false);
+                withWriteLock (&smfeat->lock) {
+                    smfeat->locked = true;
+                }
+            }
+        }
+
         parent_enable(enabled);
+    }
 }
 
 bool RunTracker_isPaused(_In_ RunTracker* self)

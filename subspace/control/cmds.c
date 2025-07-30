@@ -17,6 +17,7 @@ DECLCMD(Sector);
 DECLCMD(Stats);
 DECLCMD(Validate);
 DECLCMD(Beacon);
+DECLCMD(AutoSave);
 
 #define REGCMD(cmdname) \
 cserverRegisterHandler(csvr, _S #cmdname, cmd ## cmdname, false, (TaskResource*)NULL)
@@ -44,4 +45,5 @@ void registerCmds(ControlServer* csvr)
     REGCMDREQI(Stats, csvr->gameEvents);
     REGCMDREQI(RunLog, csvr->gameEvents);
     REGCMDREQI(Beacon, csvr->gameEvents);
+    REGCMDREQI(AutoSave, csvr->gameEvents);
 }

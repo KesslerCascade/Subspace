@@ -1,3 +1,5 @@
+#include "ftl/stdlib.h"
+
 #include "ftl/blueprintmanager.h"
 #include "ftl/capp.h"
 #include "ftl/scorekeeper.h"
@@ -24,7 +26,12 @@ Patch* Base_patches[] = {
 SubspaceFeature Base_feature = {
     .name            = "Base",
     .requiredPatches = Base_patches,
-    .requiredSymbols = { &SYM(ShipBlueprint_blueprintName_offset),
+    .requiredSymbols = { &SYM(crt_malloc),
+                        &SYM(crt_free),
+                        &SYM(crt_realloc),
+                        &SYM(crt_rand),
+                        &SYM(crt_srand),
+                        &SYM(ShipBlueprint_blueprintName_offset),
                         &SYM(ShipBlueprint_name_offset),
                         &SYM(StarMap_sectorMapSeed_offset),
                         &SYM(CApp_world_offset),
