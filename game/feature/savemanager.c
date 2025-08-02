@@ -69,7 +69,6 @@ void saveManagerAutoSave(WorldManager* world)
 
 Patch* SaveManager_patches[] = { &patch_FileHelper_getSaveFile,
                                  &patch_WorldManager_CreateLocation,
-                                 &patch_WorldManager_PrepareAutoSave,
                                  0 };
 
 SubspaceFeature SaveManager_feature = { .name            = "SaveManager",

@@ -10,11 +10,6 @@
 
 void subspace_WorldManager_PrepareAutoSave_post(WorldManager* self)
 {
-    if (SaveManager_feature.enabled && gs.autoSaveNext) {
-        gs.autoSaveNext = false;
-        saveManagerAutoSave(self);
-    }
-
     return;
 }
 

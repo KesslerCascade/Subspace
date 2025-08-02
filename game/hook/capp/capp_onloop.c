@@ -1,7 +1,9 @@
 #include "control/controlclient.h"
 #include "feature/feature.h"
+#include "feature/savemanager.h"
 #include "ftl/capp.h"
 #include "ftl/scorekeeper.h"
+#include "ftl/worldmanager.h"
 #include "hook/hook.h"
 #include "patch/patchlist.h"
 #include "subspacegame.h"
@@ -59,6 +61,11 @@ void subspace_CApp_OnLoop_post(CApp* self)
     if (RunTracker_feature.enabled) {
         gc.curScrapSource = NULL;
         gc.curDamageSource = NULL;
+    }
+
+    if (SaveManager_feature.enabled && gs.autoSaveNow) {
+        gs.autoSaveNow = false;
+        saveManagerAutoSave(CApp_world(self));
     }
 
     controlClientProcessOutbound();
