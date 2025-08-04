@@ -116,6 +116,7 @@ typedef struct GameGlobalState {
 typedef struct GameGlobalContext {
     bool loadingGame;
     bool loadingBossShip;
+    bool inGameOverLoop;
     const char* curScrapSource;
     const char* curDamageSource;
 } GameGlobalContext;

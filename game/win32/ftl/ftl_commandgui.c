@@ -373,7 +373,7 @@ DisasmTrace CommandGui_CheckGameOver_trace = {
              { DT_OP(SKIP), .imin = 1, .imax = 3, .flow = DT_FLOW_JMP_BOTH },
              { I_LEA,
                 .argf   = { 0, ARG_REG },
-                .argout = { DT_OUT_SYM6 },
+                .argout = { 0, DT_OUT_SYM6 },
                 .argcap = { DT_CAPTURE3, DT_MATCH1 } },   // offset of gameOverScreen
               { DT_OP(SKIP), .imin = 3, .imax = 7 },
              { I_MOV,
@@ -582,4 +582,23 @@ DisasmTrace CommandGui_OnLoop_trace = {
 Symbol SYM(CommandGui_newLocation_offset) = {
     SYMNAME("CommandGui->newLocation"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_OnLoop_trace }, { 0 } }
+};
+
+DisasmTrace CommandGui_OnLoop_GameOverLoop_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CommandGui_OnLoop),
+    .ops  = { { DT_OP(SKIP), .imin = 7, .imax = 13 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // this pointer
+              { DT_OP(SKIP), .imin = 0, .imax = 1000 },
+             { I_LEA,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CommandGui_gameOverScreen_offset) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL GameOver::OnLoop
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(GameOver_OnLoop) }
 };

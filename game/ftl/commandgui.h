@@ -22,6 +22,7 @@ extern DisasmTrace CommandGui_Restart_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace_2;
 extern DisasmTrace CommandGui_OnLoop_trace;
+extern DisasmTrace CommandGui_OnLoop_GameOverLoop_trace;
 
 typedef void (*FUNCTYPE(CommandGui_KeyDown))(CommandGui* self, int key, bool shiftHeld);
 DECLFUNC(CommandGui_KeyDown);
