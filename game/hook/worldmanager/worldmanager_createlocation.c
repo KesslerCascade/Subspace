@@ -63,7 +63,7 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
 
     // if we're at a new location, flag the next autosave to be archived
     if (SaveManager_feature.enabled)
-        gs.autoSaveNext = true;
+        gs.autoSaveNow = true;
 }
 
 // ---- Patch ----------------

@@ -633,14 +633,20 @@ void RunInfo_processHullDamage(_In_ RunInfo* self, _In_opt_ strref src, int amou
 void RunInfo_processShip(_In_ RunInfo* self, _In_opt_ strref name)
 {
     int64 runid, savepoint;
+    bool ignore = false;
     withWriteLock (&self->lock) {
         strDup(&self->otherShip, name);
-        if (!self->recording || self->updatedBeaconShip)
+        if (!self->recording || self->updatedBeaconShip) {
+            ignore = true;
             break;
+        }
         self->updatedBeaconShip = true;
         runid                   = self->runid;
         savepoint               = self->savepoint;
     }
+
+    if (ignore)
+        return;
 
     DbStmt* stmt = dbPrepare(self->ss->db,
                              _S"UPDATE beacons SET other_ship=? WHERE runid=? AND savepoint=?");

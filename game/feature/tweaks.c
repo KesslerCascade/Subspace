@@ -5,11 +5,15 @@
 #include "feature/timewarp.h"
 #include "ftl/filehelper.h"
 #include "ftl/globals.h"
+#include "ftl/soundcontrol.h"
 #include "input/keybinds.h"
 #include "patch/patchlist.h"
 #include "tweaks.h"
 
 #include "minicrt.h"
+
+static basic_string creditsStr;
+static vector creditsVec;
 
 int tweaksGetTargetFPS()
 {
@@ -96,6 +100,23 @@ void tweaksFinalizeSave()
     }
 }
 
+bool tweaksOverrideGameOverMusic(SoundControl* sounds)
+{
+    if (gc.inGameOverLoop) {
+        if (creditsStr.len == 0) {
+            basic_string_set(&creditsStr, "credits");
+            creditsVec.start          = &creditsStr;
+            creditsVec.finish         = (unsigned char*)&creditsStr + sizeof(basic_string);
+            creditsVec.end_of_storage = creditsVec.finish;
+        }
+
+        SoundControl_StartPlaylist(sounds, &creditsVec);
+        return true;
+    }
+
+    return false;
+}
+
 // ---- Patching ----------------
 
 static bool tweaks_Enable(SubspaceFeature* feat, void* settings, bool enabled)
@@ -115,6 +136,8 @@ Patch* Tweaks_patches[] = {
     &patch_CFPS_TargetFrameTime,
     &patch_FileHelper_deleteFile,
     &patch_FileHelper_getSaveFile,
+    &patch_GameOver_OnLoop,
+    &patch_SoundControl_StartPlaylist,
     &patch_WorldManager_LoadGame,
     &patch_WorldManager_SaveGame,
     0
@@ -127,6 +150,9 @@ FeatureSettingsSpec Tweaks_spec = {
                 .type = CF_BOOL,
                 .off  = offsetof(TweaksSettings, preserveload) },
              { .name = "savecompat", .type = CF_BOOL, .off = offsetof(TweaksSettings, savecompat) },
+             { .name = "creditsmusic",
+                .type = CF_BOOL,
+                .off  = offsetof(TweaksSettings, creditsmusic) },
              { 0 } }
 };
 

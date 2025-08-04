@@ -108,7 +108,7 @@ typedef struct GameGlobalState {
     bool saveAndQuit;
 
     // Save Manager
-    bool autoSaveNext;         // the next autosave should be archived by the save manager
+    bool autoSaveNow;          // Create a save to archive at the end of the frame
     bool autoSaveInProgress;   // we are doing an autosave right now
 } GameGlobalState;
 
@@ -116,6 +116,7 @@ typedef struct GameGlobalState {
 typedef struct GameGlobalContext {
     bool loadingGame;
     bool loadingBossShip;
+    bool inGameOverLoop;
     const char* curScrapSource;
     const char* curDamageSource;
 } GameGlobalContext;

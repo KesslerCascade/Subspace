@@ -109,6 +109,17 @@ static int savecompat_action(Ihandle* ih, int state)
     return IUP_DEFAULT;
 }
 
+static int creditsmusic_action(Ihandle* ih, int state)
+{
+    TweaksPage* self = iupGetParentObj(TweaksPage, ih);
+    if (!self)
+        return IUP_DEFAULT;
+
+    ssdSet(self->feature->settings, _S"creditsmusic", true, stvar(bool, state ? true : false));
+    featureSendSettingCur(self->feature, _S"creditsmusic");
+    return IUP_DEFAULT;
+}
+
 extern bool SettingsPage_make(_In_ SettingsPage* self, Ihandle* list);   // parent
 #define parent_make(list) SettingsPage_make((SettingsPage*)(self), list)
 bool TweaksPage_make(_In_ TweaksPage* self, Ihandle* list)
@@ -182,7 +193,36 @@ bool TweaksPage_make(_In_ TweaksPage* self, Ihandle* list)
     Ihandle* savevbox = IupVbox(savesep, savelbl, self->preserveload, self->savecompat, NULL);
     IupSetAttribute(savevbox, "CMARGIN", "0x0");
 
-    Ihandle* vbox = IupVbox(fpslabel, fpsdesc, self->fpsradio, savespc, savevbox, IupFill(), NULL);
+    Ihandle* audspc = IupSpace();
+    IupSetAttribute(audspc, "SIZE", "1x6");
+
+    Ihandle* audsep = IupLabel("");
+    IupSetAttribute(audsep, "SEPARATOR", "HORIZONTAL");
+    IupSetAttribute(audsep, "EXPAND", "HORIZONTAL");
+
+    Ihandle* audlbl = IupLabel(langGetC(self->ss, "tweaks_audio"));
+    IupSetAttribute(audlbl, "FONT", "Helvetica, Bold 10");
+
+    self->creditsmusic = IupToggle(langGetC(self->ss, "tweaks_creditsmusic"), NULL);
+    iupSetObj(self->creditsmusic, ObjNone, self, self->ui);
+    IupSetCallback(self->creditsmusic, "ACTION", (Icallback)creditsmusic_action);
+    setTip(self->creditsmusic,
+           langGet(self->ss, _S"tweaks_creditsmusic_tip"),
+           langGet(self->ss, _S"tweaks_creditsmusic"),
+           0);
+
+    Ihandle* audvbox = IupVbox(audsep, audlbl, self->creditsmusic, NULL);
+    IupSetAttribute(audvbox, "CMARGIN", "0x0");
+
+    Ihandle* vbox = IupVbox(fpslabel,
+                            fpsdesc,
+                            self->fpsradio,
+                            savespc,
+                            savevbox,
+                            audspc,
+                            audvbox,
+                            IupFill(),
+                            NULL);
     IupSetAttribute(vbox, "CMARGIN", "6x6");
     IupSetAttribute(vbox, "CGAP", "4");
 
@@ -221,6 +261,10 @@ bool TweaksPage_update(_In_ TweaksPage* self)
     IupSetAttribute(self->savecompat,
                     "VALUE",
                     ssdVal(bool, self->feature->settings, _S"savecompat", false) ? "ON" : "OFF");
+
+    IupSetAttribute(self->creditsmusic,
+                    "VALUE",
+                    ssdVal(bool, self->feature->settings, _S"creditsmusic", false) ? "ON" : "OFF");
 
     return true;
 }

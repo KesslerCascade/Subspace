@@ -58,6 +58,7 @@ if(WIN32)
         win32/ftl/ftl_shipmanager.c
         win32/ftl/ftl_shipstatus.c
         win32/ftl/ftl_shipsystem.c
+        win32/ftl/ftl_soundcontrol.c
         win32/ftl/ftl_starmap.c
         win32/ftl/ftl_startup.c
         win32/ftl/ftl_stdlib.c
@@ -130,6 +131,7 @@ add_executable(subspacegame
     hook/filehelper/filehelper_getsavefile.c
     hook/filehelper/filehelper_getuserfolder.c
     hook/ftlbutton/ftlbutton_onrender.c
+    hook/gameover/gameover_onloop.c
     hook/gameover/gameover_setvictory.c
     hook/mainmenu/mainmenu_open.c
     hook/mousecontrol/mousecontrol_onrender.c
@@ -145,6 +147,7 @@ add_executable(subspacegame
     hook/shipstatus/shipstatus_renderhealth.c
     hook/shipstatus/shipstatus_onrender.c
     hook/shipsystem/shipsystem_getexploded.c
+    hook/soundcontrol/soundcontrol_startplaylist.c
     hook/starmap/starmap_generatemap.c
     hook/starmap/starmap_updatedangerzone.c
     hook/textlibrary/textlibrary_gettext.c

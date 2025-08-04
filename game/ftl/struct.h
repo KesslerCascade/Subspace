@@ -30,6 +30,12 @@ void basic_string_reset(basic_string* str);
 void basic_string_set(basic_string* str, const char* src);
 void basic_string_destroy(basic_string* str);
 
+typedef struct vector {
+    void* start;            // first element
+    void* finish;           // just past last element
+    void* end_of_storage;   // just past end of allocated space
+} vector;
+
 typedef struct TextString {
     basic_string data;
     bool isLiteral;
