@@ -462,7 +462,7 @@ DisasmTrace CommandGui_CheckGameOver_trace_2 = {
              { DT_OP(SKIP), .imin = 1, .imax = 15, .flow = DT_FLOW_JMP_BOTH },
              { I_LEA,
                 .argf   = { 0, ARG_REG },
-                .argout = { DT_OUT_SYM6 },
+                .argout = { 0, DT_OUT_SYM6 },
                 .argcap = { DT_CAPTURE3, DT_MATCH1 } },   // offset of gameOverScreen
               { DT_OP(SKIP), .imin = 1, .imax = 8 },
              { I_MOV,
