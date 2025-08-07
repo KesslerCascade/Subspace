@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqcomplex.h"
+#include "taskqueue/queue/tqcomplex.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -552,5 +552,5 @@ bool ComplexTaskQueue__queueMaint(_In_ ComplexTaskQueue* self)
 }
 
 // Autogen begins -----
-#include "tqcomplex.auto.inc"
+#include "taskqueue/queue/tqcomplex.auto.inc"
 // Autogen ends -------

@@ -11,10 +11,9 @@ set(FORMAT_SRCS
     format/formattable.c)
 set(FORMAT_INCLUDES
     format/format.h
-    format/format_private.h
-    format/formattable.h)
-set(FORMAT_SIDL
-    format/formattable.sidl)
+    format/format_private.h)
+set(FORMAT_AUTOGEN
+    format/formattable.cxh)
 
 set(CX_SRCS
     ${CX_SRCS}
@@ -24,9 +23,9 @@ set(CX_INCLUDES
     ${CX_INCLUDES}
     ${FORMAT_INCLUDES}
     PARENT_SCOPE)
-set(CX_SIDL
-    ${CX_SIDL}
-    ${FORMAT_SIDL}
+set(CX_AUTOGEN
+    ${CX_AUTOGEN}
+    ${FORMAT_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

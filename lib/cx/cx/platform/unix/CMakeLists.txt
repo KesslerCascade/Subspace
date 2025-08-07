@@ -19,8 +19,7 @@ if(CX_PLATFORM_IS_UNIX)
     set(PLATFORM_UNIX_INCLUDES
         platform/unix/unix_hostid.h
         platform/unix/unix_os.h
-        platform/unix/unix_sys_entry.h
-        platform/unix/unix_thread_threadobj.h)
+        platform/unix/unix_sys_entry.h)
 
     if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
         set(PLATFORM_UNIX_SRCS
@@ -38,8 +37,8 @@ if(CX_PLATFORM_IS_UNIX)
         PARENT_SCOPE)
 endif()
 
-set(PLATFORM_UNIX_SIDL
-    platform/unix/unix_thread_threadobj.sidl)
+set(PLATFORM_UNIX_AUTOGEN
+    platform/unix/unix_thread_threadobj.cxh)
 
 set(CX_SRCS
     ${CX_SRCS}
@@ -49,9 +48,9 @@ set(CX_INCLUDES
     ${CX_INCLUDES}
     ${PLATFORM_UNIX_INCLUDES}
     PARENT_SCOPE)
-set(CX_SIDL
-    ${CX_SIDL}
-    ${PLATFORM_UNIX_SIDL}
+set(CX_AUTOGEN
+    ${CX_AUTOGEN}
+    ${PLATFORM_UNIX_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

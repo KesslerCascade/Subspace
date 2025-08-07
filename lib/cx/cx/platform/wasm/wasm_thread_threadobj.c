@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "wasm_thread_threadobj.h"
+#include "platform/wasm/wasm_thread_threadobj.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -21,5 +21,5 @@ _objfactory_guaranteed UnixThread *UnixThread_create()
 }
 
 // Autogen begins -----
-#include "wasm_thread_threadobj.auto.inc"
+#include "platform/wasm/wasm_thread_threadobj.auto.inc"
 // Autogen ends -------

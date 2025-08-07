@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "complextask.h"
+#include "taskqueue/task/complextask.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/taskqueue.h>
@@ -275,5 +275,5 @@ bool ComplexTask_cancel(_In_ ComplexTask* self)
 }
 
 // Autogen begins -----
-#include "complextask.auto.inc"
+#include "taskqueue/task/complextask.auto.inc"
 // Autogen ends -------

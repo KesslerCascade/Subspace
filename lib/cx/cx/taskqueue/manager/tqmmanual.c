@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqmmanual.h"
+#include "taskqueue/manager/tqmmanual.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -81,5 +81,5 @@ void TQManualManager_destroy(_In_ TQManualManager* self)
 }
 
 // Autogen begins -----
-#include "tqmmanual.auto.inc"
+#include "taskqueue/manager/tqmmanual.auto.inc"
 // Autogen ends -------

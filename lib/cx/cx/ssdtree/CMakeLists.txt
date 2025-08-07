@@ -8,18 +8,13 @@ set(SSDTREE_SRCS
 set(SSDTREE_INCLUDES
     ssdtree/ssdnodes.h
     ssdtree/ssdshared.h
-    ssdtree/ssdtree.h
-    ssdtree/ssdtreeobj.h
-    ssdtree/node/ssdnode.h
-    ssdtree/node/ssdarraynode.h
-    ssdtree/node/ssdhashnode.h
-    ssdtree/node/ssdsinglenode.h)
-set(SSDTREE_SIDL
-    ssdtree/ssdtreeobj.sidl
-    ssdtree/node/ssdnode.sidl
-    ssdtree/node/ssdarraynode.sidl
-    ssdtree/node/ssdhashnode.sidl
-    ssdtree/node/ssdsinglenode.sidl)
+    ssdtree/ssdtree.h)
+set(SSDTREE_AUTOGEN
+    ssdtree/ssdtreeobj.cxh
+    ssdtree/node/ssdnode.cxh
+    ssdtree/node/ssdarraynode.cxh
+    ssdtree/node/ssdhashnode.cxh
+    ssdtree/node/ssdsinglenode.cxh)
 
 set(CX_SRCS
     ${CX_SRCS}
@@ -29,9 +24,9 @@ set(CX_INCLUDES
     ${CX_INCLUDES}
     ${SSDTREE_INCLUDES}
     PARENT_SCOPE)
-set(CX_SIDL
-    ${CX_SIDL}
-    ${SSDTREE_SIDL}
+set(CX_AUTOGEN
+    ${CX_AUTOGEN}
+    ${SSDTREE_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

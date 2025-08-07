@@ -4,30 +4,20 @@ set(TQ_TASK_SRCS
     taskqueue/task/mptask.c
     taskqueue/task/task.c
     )
-set(TQ_TASK_INCLUDES
-    taskqueue/task/basictask.h
-    taskqueue/task/complextask.h
-    taskqueue/task/mptask.h
-    taskqueue/task/task.h
-    )
-set(TQ_TASK_SIDL
-    taskqueue/task/basictask.sidl
-    taskqueue/task/complextask.sidl
-    taskqueue/task/mptask.sidl
-    taskqueue/task/task.sidl
+set(TQ_TASK_AUTOGEN
+    taskqueue/task/basictask.cxh
+    taskqueue/task/complextask.cxh
+    taskqueue/task/mptask.cxh
+    taskqueue/task/task.cxh
     )
 
 set(TASKQUEUE_SRCS
     ${TASKQUEUE_SRCS}
     ${TQ_TASK_SRCS}
     PARENT_SCOPE)
-set(TASKQUEUE_INCLUDES
-    ${TASKQUEUE_INCLUDES}
-    ${TQ_TASK_INCLUDES}
-    PARENT_SCOPE)
-set(TASKQUEUE_SIDL
-    ${TASKQUEUE_SIDL}
-    ${TQ_TASK_SIDL}
+set(TASKQUEUE_AUTOGEN
+    ${TASKQUEUE_AUTOGEN}
+    ${TQ_TASK_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

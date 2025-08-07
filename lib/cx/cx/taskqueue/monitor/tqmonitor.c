@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqmonitor.h"
+#include "taskqueue/monitor/tqmonitor.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -19,5 +19,5 @@ void TQMonitor_destroy(_In_ TQMonitor* self)
 }
 
 // Autogen begins -----
-#include "tqmonitor.auto.inc"
+#include "taskqueue/monitor/tqmonitor.auto.inc"
 // Autogen ends -------

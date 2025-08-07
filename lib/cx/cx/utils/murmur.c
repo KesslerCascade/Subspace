@@ -2,19 +2,19 @@
 // Code is in the public domain
 
 #include "murmur.h"
-#include "cx/utils/lazyinit.h"
 #include "cx/string.h"
+#include "cx/utils/lazyinit.h"
 
-#ifndef CX_BUILDING_CXOBJGEN
+#ifndef CX_BUILDING_CXAUTOGEN
 #include <mbedtls/entropy.h>
 #endif
 
 static LazyInitState msInit;
 static uint32 murmur_seed;
 
-static void initSeed(void *unused)
+static void initSeed(void* unused)
 {
-#ifndef CX_BUILDING_CXOBJGEN
+#ifndef CX_BUILDING_CXAUTOGEN
     mbedtls_entropy_context entropy;
     mbedtls_entropy_init(&entropy);
     mbedtls_entropy_func(&entropy, (unsigned char*)&murmur_seed, sizeof(murmur_seed));
@@ -43,7 +43,7 @@ uint32 hashMurmur3(const uint8* key, size_t len)
         } while (--i);
     }
     if (len & 3) {
-        size_t i = len & 3;
+        size_t i   = len & 3;
         uint32_t k = 0;
         do {
             k <<= 8;
@@ -90,7 +90,7 @@ uint32 hashMurmur3i(const uint8* key, size_t len)
         } while (--i);
     }
     if (len & 3) {
-        size_t i = len & 3;
+        size_t i   = len & 3;
         uint32_t k = 0;
         do {
             k <<= 8;
@@ -121,7 +121,7 @@ uint32 hashMurmur3Str(strref s)
 
     uint32_t h = murmur_seed;
     if (len > 3) {
-        size_t i = len >> 2;
+        size_t i   = len >> 2;
         uint32 off = 0;
         do {
             uint32_t k;
@@ -136,7 +136,7 @@ uint32 hashMurmur3Str(strref s)
         } while (--i);
     }
     if (len & 3) {
-        size_t i = len & 3;
+        size_t i   = len & 3;
         uint32_t k = 0;
         do {
             k <<= 8;
@@ -167,7 +167,7 @@ uint32 hashMurmur3Stri(strref s)
 
     uint32_t h = murmur_seed;
     if (len > 3) {
-        size_t i = len >> 2;
+        size_t i   = len >> 2;
         uint32 off = 0;
         do {
             uint32_t k;
@@ -183,7 +183,7 @@ uint32 hashMurmur3Stri(strref s)
         } while (--i);
     }
     if (len & 3) {
-        size_t i = len & 3;
+        size_t i   = len & 3;
         uint32_t k = 0;
         do {
             k <<= 8;

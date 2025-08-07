@@ -6,10 +6,10 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "formattable.h"
+#include "format/formattable.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
 // Autogen begins -----
-#include "formattable.auto.inc"
+#include "format/formattable.auto.inc"
 // Autogen ends -------

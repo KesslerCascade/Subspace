@@ -6,17 +6,17 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "vfsfs.h"
+#include "fs/vfsfs/vfsfs.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "cx/platform/base.h"
 #include "cx/fs/path.h"
 #include "cx/fs/vfs.h"
-#include "vfsfsfile.h"
+#include "cx/fs/vfsfs/vfsfsfile.h"
+#include "cx/platform/base.h"
 
 _objfactory_check VFSFS* VFSFS_create(_In_opt_ strref rootpath)
 {
-    VFSFS *ret;
+    VFSFS* ret;
 
     if (!pathIsAbsolute(rootpath))
         return NULL;
@@ -46,12 +46,12 @@ _Ret_opt_valid_ ObjInst* VFSFS_open(_In_ VFSFS* self, _In_opt_ strref path, flag
     string fspath = 0;
     pathJoin(&fspath, self->root, path);
 
-    FSFile *file = fsOpen(fspath, flags);
+    FSFile* file = fsOpen(fspath, flags);
     strDestroy(&fspath);
     if (!file)
         return NULL;
 
-    VFSFSFile *fileprov = vfsfsfileCreate(file);
+    VFSFSFile* fileprov = vfsfsfileCreate(file);
     return objInstBase(fileprov);
 }
 
@@ -75,7 +75,6 @@ bool VFSFS_setTimes(_In_ VFSFS* self, _In_opt_ strref path, int64 modified, int6
 
     strDestroy(&fspath);
     return ret;
-
 }
 
 bool VFSFS_createDir(_In_ VFSFS* self, _In_opt_ strref path)
@@ -124,7 +123,8 @@ bool VFSFS_rename(_In_ VFSFS* self, _In_opt_ strref oldpath, _In_opt_ strref new
     return ret;
 }
 
-bool VFSFS_searchInit(_In_ VFSFS* self, _Out_ FSSearchIter* iter, _In_opt_ strref path, _In_opt_ strref pattern, bool stat)
+bool VFSFS_searchInit(_In_ VFSFS* self, _Out_ FSSearchIter* iter, _In_opt_ strref path,
+                      _In_opt_ strref pattern, bool stat)
 {
     string fspath = 0;
 
@@ -163,5 +163,5 @@ void VFSFS_destroy(_In_ VFSFS* self)
 }
 
 // Autogen begins -----
-#include "vfsfs.auto.inc"
+#include "fs/vfsfs/vfsfs.auto.inc"
 // Autogen ends -------

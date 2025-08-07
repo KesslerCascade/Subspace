@@ -6,10 +6,10 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "taskresource.h"
+#include "taskqueue/resource/taskresource.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
 // Autogen begins -----
-#include "taskresource.auto.inc"
+#include "taskqueue/resource/taskresource.auto.inc"
 // Autogen ends -------

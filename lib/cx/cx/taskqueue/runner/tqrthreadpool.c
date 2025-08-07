@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqrthreadpool.h"
+#include "taskqueue/runner/tqrthreadpool.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -166,5 +166,5 @@ void TQThreadPoolRunner_destroy(_In_ TQThreadPoolRunner* self)
 }
 
 // Autogen begins -----
-#include "tqrthreadpool.auto.inc"
+#include "taskqueue/runner/tqrthreadpool.auto.inc"
 // Autogen ends -------

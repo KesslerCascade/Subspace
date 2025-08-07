@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqworker.h"
+#include "taskqueue/worker/tqworker.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -17,5 +17,5 @@ void TQWorker_onStop(_In_ TQWorker* self, _In_ TaskQueue* tq)
 {}
 
 // Autogen begins -----
-#include "tqworker.auto.inc"
+#include "taskqueue/worker/tqworker.auto.inc"
 // Autogen ends -------

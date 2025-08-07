@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "ssdtreeobj.h"
+#include "ssdtree/ssdtreeobj.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ssdnodes.h"
@@ -70,5 +70,5 @@ void SSDTree_destroy(_In_ SSDTree* self)
 }
 
 // Autogen begins -----
-#include "ssdtreeobj.auto.inc"
+#include "ssdtree/ssdtreeobj.auto.inc"
 // Autogen ends -------

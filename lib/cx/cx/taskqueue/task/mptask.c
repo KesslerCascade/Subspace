@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "mptask.h"
+#include "taskqueue/task/mptask.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -110,5 +110,5 @@ void MultiphaseTask__addPhases(_In_ MultiphaseTask* self, int32 num, MPTPhaseFun
 }
 
 // Autogen begins -----
-#include "mptask.auto.inc"
+#include "taskqueue/task/mptask.auto.inc"
 // Autogen ends -------

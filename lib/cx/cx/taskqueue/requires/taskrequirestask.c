@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "taskrequirestask.h"
+#include "taskqueue/requires/taskrequirestask.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/taskqueue/taskqueue.h>
@@ -76,5 +76,5 @@ void TaskRequiresTask_destroy(_In_ TaskRequiresTask* self)
 }
 
 // Autogen begins -----
-#include "taskrequirestask.auto.inc"
+#include "taskqueue/requires/taskrequirestask.auto.inc"
 // Autogen ends -------

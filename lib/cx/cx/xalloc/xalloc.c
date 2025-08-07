@@ -1,15 +1,15 @@
-#include <cx/cx.h>
 #include "xalloc_private.h"
+#include <cx/cx.h>
 
 #include <cx/debug/assert.h>
 #include <cx/utils/macros.h>
-#include <string.h>
 #include <errno.h>
+#include <string.h>
 
 LazyInitState _xaInitState;
 
 #ifndef XALLOC_USE_SYSTEM_MALLOC
-static void xaMimallocError(int err, void *arg)
+static void xaMimallocError(int err, void* arg)
 {
     if (err == EFAULT) {
         relFatalError("Heap corruption detected");
@@ -21,15 +21,15 @@ static void xaMimallocError(int err, void *arg)
 }
 #endif
 
-static void _xaInit(void *data)
+static void _xaInit(void* data)
 {
 #ifndef XALLOC_USE_SYSTEM_MALLOC
     mi_register_error(xaMimallocError, NULL);
 
-#ifndef CX_BUILDING_CXOBJGEN
+#ifndef CX_BUILDING_CXAUTOGEN
     _xaInitOutput();
 #endif
-#endif // XALLOC_USE_SYSTEM_MALLOC
+#endif   // XALLOC_USE_SYSTEM_MALLOC
 }
 
 #ifndef XALLOC_USE_SYSTEM_MALLOC
@@ -37,19 +37,19 @@ static void _xaInit(void *data)
 // default case -- use embedded mimalloc
 #define _xa_sys_zalloc_aligned mi_zalloc_aligned
 #define _xa_sys_malloc_aligned mi_malloc_aligned
-#define _xa_sys_zalloc mi_zalloc
-#define _xa_sys_malloc mi_malloc
+#define _xa_sys_zalloc         mi_zalloc
+#define _xa_sys_malloc         mi_malloc
 
 #define _xa_sys_rezalloc_aligned mi_rezalloc_aligned
-#define _xa_sys_realloc_aligned mi_realloc_aligned
-#define _xa_sys_rezalloc mi_rezalloc
-#define _xa_sys_realloc mi_realloc
+#define _xa_sys_realloc_aligned  mi_realloc_aligned
+#define _xa_sys_rezalloc         mi_rezalloc
+#define _xa_sys_realloc          mi_realloc
 
 #define _xa_sys_free mi_free
 
 #define _xa_sys_usable_size mi_usable_size
-#define _xa_sys_good_size mi_good_size
-#define _xa_sys_collect mi_collect
+#define _xa_sys_good_size   mi_good_size
+#define _xa_sys_collect     mi_collect
 
 #else
 
@@ -61,7 +61,7 @@ static void _xaInit(void *data)
 #include <malloc_np.h>
 #endif
 
-inline static void *_xa_sys_malloc_aligned(size_t size, size_t alignment)
+inline static void* _xa_sys_malloc_aligned(size_t size, size_t alignment)
 {
 #ifdef _COMPILER_MSVC
     // MSVCRT doesn't support aligned allocation without using a speical free(),
@@ -73,17 +73,17 @@ inline static void *_xa_sys_malloc_aligned(size_t size, size_t alignment)
 #endif
 }
 
-inline static void *_xa_sys_zalloc_aligned(size_t size, size_t alignment)
+inline static void* _xa_sys_zalloc_aligned(size_t size, size_t alignment)
 {
-    void *blk = _xa_sys_malloc_aligned(size, alignment);
-    if(!blk)
+    void* blk = _xa_sys_malloc_aligned(size, alignment);
+    if (!blk)
         return NULL;
 
     memset(blk, 0, size);
     return blk;
 }
 
-inline static void *_xa_sys_zalloc(size_t size)
+inline static void* _xa_sys_zalloc(size_t size)
 {
     return calloc(1, size);
 }
@@ -102,10 +102,10 @@ inline static void *_xa_sys_zalloc(size_t size)
 
 // standard malloc doesn't support any of these, have to always copy the data
 
-inline static void *_xa_sys_rezalloc_aligned(void *origblk, size_t size, size_t alignment)
+inline static void* _xa_sys_rezalloc_aligned(void* origblk, size_t size, size_t alignment)
 {
-    void *nblk = _xa_sys_zalloc_aligned(size, alignment);
-    if(!nblk)
+    void* nblk = _xa_sys_zalloc_aligned(size, alignment);
+    if (!nblk)
         return NULL;
 
     memcpy(nblk, origblk, _xa_sys_usable_size(origblk));
@@ -113,10 +113,10 @@ inline static void *_xa_sys_rezalloc_aligned(void *origblk, size_t size, size_t 
     return nblk;
 }
 
-inline static void *_xa_sys_realloc_aligned(void *origblk, size_t size, size_t alignment)
+inline static void* _xa_sys_realloc_aligned(void* origblk, size_t size, size_t alignment)
 {
-    void *nblk = _xa_sys_malloc_aligned(size, alignment);
-    if(!nblk)
+    void* nblk = _xa_sys_malloc_aligned(size, alignment);
+    if (!nblk)
         return NULL;
 
     memcpy(nblk, origblk, _xa_sys_usable_size(origblk));
@@ -124,10 +124,10 @@ inline static void *_xa_sys_realloc_aligned(void *origblk, size_t size, size_t a
     return nblk;
 }
 
-inline static void *_xa_sys_rezalloc(void *origblk, size_t size)
+inline static void* _xa_sys_rezalloc(void* origblk, size_t size)
 {
-    void *nblk = calloc(1, size);
-    if(!nblk)
+    void* nblk = calloc(1, size);
+    if (!nblk)
         return NULL;
 
     memcpy(nblk, origblk, _xa_sys_usable_size(origblk));
@@ -135,7 +135,10 @@ inline static void *_xa_sys_rezalloc(void *origblk, size_t size)
     return nblk;
 }
 
-inline static size_t _xa_sys_good_size(size_t size) { return size; }
+inline static size_t _xa_sys_good_size(size_t size)
+{
+    return size;
+}
 
 // no standard way of doing this
 inline static void _xa_sys_collect(bool unused) {}
@@ -143,15 +146,17 @@ inline static void _xa_sys_collect(bool unused) {}
 #endif
 
 _Use_decl_annotations_
-void *_xaAlloc(size_t size, unsigned int flags)
+void* _xaAlloc(size_t size, unsigned int flags)
 {
-    void *ret = NULL;
+    void* ret = NULL;
 
     lazyInit(&_xaInitState, _xaInit, NULL);
 
-    for (int oomphase = 0, oommaxphase = _xaMaxOOMPhase(flags); oomphase <= oommaxphase; oomphase++) {
+    for (int oomphase = 0, oommaxphase = _xaMaxOOMPhase(flags); oomphase <= oommaxphase;
+         oomphase++) {
         if (oomphase > 0)
-            _xaFreeUpMemory(oomphase, size);    // previous loop's allocation failed; try to free up some memory and try again
+            _xaFreeUpMemory(oomphase, size);   // previous loop's allocation failed; try to free up
+                                               // some memory and try again
 
         if (flags & XA_LG_ALIGN_MASK) {
             if (flags & XA_Zero) {
@@ -180,18 +185,20 @@ void *_xaAlloc(size_t size, unsigned int flags)
 // NOTE: Unlike realloc, ptr cannot be NULL!
 // Returns: pointer to memory
 _Use_decl_annotations_
-bool _xaResize(void **ptr, size_t size, unsigned int flags)
+bool _xaResize(void** ptr, size_t size, unsigned int flags)
 {
-    void *ret = NULL;
+    void* ret = NULL;
 
     if (!ptr)
         return false;
 
     lazyInit(&_xaInitState, _xaInit, NULL);
 
-    for (int oomphase = 0, oommaxphase = _xaMaxOOMPhase(flags); oomphase <= oommaxphase; oomphase++) {
+    for (int oomphase = 0, oommaxphase = _xaMaxOOMPhase(flags); oomphase <= oommaxphase;
+         oomphase++) {
         if (oomphase > 0)
-            _xaFreeUpMemory(oomphase, size);    // previous loop's allocation failed; try to free up some memory and try again
+            _xaFreeUpMemory(oomphase, size);   // previous loop's allocation failed; try to free up
+                                               // some memory and try again
 
         if (flags & XA_LG_ALIGN_MASK) {
             if (flags & XA_Zero) {
@@ -221,26 +228,27 @@ bool _xaResize(void **ptr, size_t size, unsigned int flags)
 
 // Frees the memory at ptr
 _Use_decl_annotations_
-void xaFree(void *ptr)
+void xaFree(void* ptr)
 {
     lazyInit(&_xaInitState, _xaInit, NULL);
     _xa_sys_free(ptr);
 }
 
 _Use_decl_annotations_
-bool _xaRelease(void **ptr)
+bool _xaRelease(void** ptr)
 {
-    if (!ptr) return false;
+    if (!ptr)
+        return false;
 
-    void *origptr = *ptr;
-    *ptr = NULL;
+    void* origptr = *ptr;
+    *ptr          = NULL;
 
-    xaFree(origptr);            // origptr may be NULL but will be ignored by xaFree
+    xaFree(origptr);   // origptr may be NULL but will be ignored by xaFree
     return origptr != NULL;
 }
 
 _Use_decl_annotations_
-size_t xaSize(void *ptr)
+size_t xaSize(void* ptr)
 {
     lazyInit(&_xaInitState, _xaInit, NULL);
     return _xa_sys_usable_size(ptr);
@@ -258,8 +266,8 @@ void xaFlush()
 }
 
 // instantiate these so they can be used as function pointers
-extern inline void *xa_malloc(size_t size);
-extern inline void *xa_calloc(size_t number, size_t size);
-extern inline void *xa_realloc(void *ptr, size_t size);
-extern inline void xa_free(void *ptr);
-extern inline char *xa_strdup(const char *src);
+extern inline void* xa_malloc(size_t size);
+extern inline void* xa_calloc(size_t number, size_t size);
+extern inline void* xa_realloc(void* ptr, size_t size);
+extern inline void xa_free(void* ptr);
+extern inline char* xa_strdup(const char* src);

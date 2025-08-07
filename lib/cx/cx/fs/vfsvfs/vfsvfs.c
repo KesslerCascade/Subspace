@@ -6,15 +6,15 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "vfsvfs.h"
+#include "fs/vfsvfs/vfsvfs.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "vfsvfsfile.h"
 #include "cx/fs/path.h"
+#include "cx/fs/vfsvfs/vfsvfsfile.h"
 
 _objfactory_guaranteed VFSVFS* VFSVFS_create(VFS* vfs, _In_opt_ strref rootpath)
 {
-    VFSVFS *ret;
+    VFSVFS* ret;
     ret = objInstCreate(VFSVFS);
 
     ret->vfs = objAcquire(vfs);
@@ -34,12 +34,12 @@ _Ret_opt_valid_ ObjInst* VFSVFS_open(_In_ VFSVFS* self, _In_opt_ strref path, fl
     string vfspath = 0;
     pathJoin(&vfspath, self->root, path);
 
-    VFSFile *file = vfsOpen(self->vfs, vfspath, flags);
+    VFSFile* file = vfsOpen(self->vfs, vfspath, flags);
     strDestroy(&vfspath);
     if (!file)
         return NULL;
 
-    VFSVFSFile *fileprov = vfsvfsfileCreate(file);
+    VFSVFSFile* fileprov = vfsvfsfileCreate(file);
     return objInstBase(fileprov);
 }
 
@@ -119,7 +119,8 @@ void VFSVFS_destroy(_In_ VFSVFS* self)
     // Autogen ends -------
 }
 
-bool VFSVFS_searchInit(_In_ VFSVFS* self, _Out_ FSSearchIter* iter, _In_opt_ strref path, _In_opt_ strref pattern, bool stat)
+bool VFSVFS_searchInit(_In_ VFSVFS* self, _Out_ FSSearchIter* iter, _In_opt_ strref path,
+                       _In_opt_ strref pattern, bool stat)
 {
     string vfspath = 0;
 
@@ -156,5 +157,5 @@ bool VFSVFS_getFSPath(_In_ VFSVFS* self, _Inout_ string* out, _In_opt_ strref pa
 }
 
 // Autogen begins -----
-#include "vfsvfs.auto.inc"
+#include "fs/vfsvfs/vfsvfs.auto.inc"
 // Autogen ends -------

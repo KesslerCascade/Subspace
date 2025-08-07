@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "trmutex.h"
+#include "taskqueue/resource/trmutex.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/taskqueue/taskqueue.h>
@@ -91,5 +91,5 @@ _objfactory_guaranteed TRMutex* TRMutex_create()
 }
 
 // Autogen begins -----
-#include "trmutex.auto.inc"
+#include "taskqueue/resource/trmutex.auto.inc"
 // Autogen ends -------

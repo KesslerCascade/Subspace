@@ -2,26 +2,18 @@ set(TQ_QUEUE_SRCS
     taskqueue/queue/tqcomplex.c
     taskqueue/queue/tqueue.c
     )
-set(TQ_QUEUE_INCLUDES
-    taskqueue/queue/tqcomplex.h
-    taskqueue/queue/tqueue.h
-    )
-set(TQ_QUEUE_SIDL
-    taskqueue/queue/tqcomplex.sidl
-    taskqueue/queue/tqueue.sidl
+set(TQ_QUEUE_AUTOGEN
+    taskqueue/queue/tqcomplex.cxh
+    taskqueue/queue/tqueue.cxh
     )
 
 set(TASKQUEUE_SRCS
     ${TASKQUEUE_SRCS}
     ${TQ_QUEUE_SRCS}
     PARENT_SCOPE)
-set(TASKQUEUE_INCLUDES
-    ${TASKQUEUE_INCLUDES}
-    ${TQ_QUEUE_INCLUDES}
-    PARENT_SCOPE)
-set(TASKQUEUE_SIDL
-    ${TASKQUEUE_SIDL}
-    ${TQ_QUEUE_SIDL}
+set(TASKQUEUE_AUTOGEN
+    ${TASKQUEUE_AUTOGEN}
+    ${TQ_QUEUE_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

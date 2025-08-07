@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "trfifo.h"
+#include "taskqueue/resource/trfifo.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/taskqueue/taskqueue.h>
@@ -121,5 +121,5 @@ _objfactory_guaranteed TRFifo* TRFifo_create()
 }
 
 // Autogen begins -----
-#include "trfifo.auto.inc"
+#include "taskqueue/resource/trfifo.auto.inc"
 // Autogen ends -------

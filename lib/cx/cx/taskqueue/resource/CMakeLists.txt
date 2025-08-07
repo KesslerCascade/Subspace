@@ -4,30 +4,20 @@ set(TQ_RESOURCE_SRCS
     taskqueue/resource/trlifo.c
     taskqueue/resource/trmutex.c
     )
-set(TQ_RESOURCE_INCLUDES
-    taskqueue/resource/taskresource.h
-    taskqueue/resource/trfifo.h
-    taskqueue/resource/trlifo.h
-    taskqueue/resource/trmutex.h
-    )
-set(TQ_RESOURCE_SIDL
-    taskqueue/resource/taskresource.sidl
-    taskqueue/resource/trfifo.sidl
-    taskqueue/resource/trlifo.sidl
-    taskqueue/resource/trmutex.sidl
+set(TQ_RESOURCE_AUTOGEN
+    taskqueue/resource/taskresource.cxh
+    taskqueue/resource/trfifo.cxh
+    taskqueue/resource/trlifo.cxh
+    taskqueue/resource/trmutex.cxh
     )
 
 set(TASKQUEUE_SRCS
     ${TASKQUEUE_SRCS}
     ${TQ_RESOURCE_SRCS}
     PARENT_SCOPE)
-set(TASKQUEUE_INCLUDES
-    ${TASKQUEUE_INCLUDES}
-    ${TQ_RESOURCE_INCLUDES}
-    PARENT_SCOPE)
-set(TASKQUEUE_SIDL
-    ${TASKQUEUE_SIDL}
-    ${TQ_RESOURCE_SIDL}
+set(TASKQUEUE_AUTOGEN
+    ${TASKQUEUE_AUTOGEN}
+    ${TQ_RESOURCE_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

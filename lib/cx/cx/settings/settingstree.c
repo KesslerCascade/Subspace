@@ -6,11 +6,11 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "settingstree.h"
+#include "settings/settingstree.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "settings_private.h"
-#include "settingshashnode.h"
+#include "cx/settings/settingshashnode.h"
 
 _objfactory_guaranteed SettingsTree* SettingsTree_create()
 {
@@ -39,5 +39,5 @@ void SettingsTree_destroy(_In_ SettingsTree* self)
 }
 
 // Autogen begins -----
-#include "settingstree.auto.inc"
+#include "settings/settingstree.auto.inc"
 // Autogen ends -------

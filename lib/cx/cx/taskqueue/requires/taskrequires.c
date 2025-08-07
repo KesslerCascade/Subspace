@@ -6,10 +6,10 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "taskrequires.h"
+#include "taskqueue/requires/taskrequires.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
 // Autogen begins -----
-#include "taskrequires.auto.inc"
+#include "taskqueue/requires/taskrequires.auto.inc"
 // Autogen ends -------

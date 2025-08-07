@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqmdedicated.h"
+#include "taskqueue/manager/tqmdedicated.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -97,5 +97,5 @@ void TQDedicatedManager_destroy(_In_ TQDedicatedManager* self)
 }
 
 // Autogen begins -----
-#include "tqmdedicated.auto.inc"
+#include "taskqueue/manager/tqmdedicated.auto.inc"
 // Autogen ends -------

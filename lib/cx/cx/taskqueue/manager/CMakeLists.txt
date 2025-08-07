@@ -5,32 +5,21 @@ set(TQ_MANAGER_SRCS
     taskqueue/manager/tqmmanual.c
     taskqueue/manager/tqmthreadpool.c
     )
-set(TQ_MANAGER_INCLUDES
-    taskqueue/manager/tqmanager.h
-    taskqueue/manager/tqmdedicated.h
-    taskqueue/manager/tqminworker.h
-    taskqueue/manager/tqmmanual.h
-    taskqueue/manager/tqmthreadpool.h
-    )
-set(TQ_MANAGER_SIDL
-    taskqueue/manager/tqmanager.sidl
-    taskqueue/manager/tqmdedicated.sidl
-    taskqueue/manager/tqminworker.sidl
-    taskqueue/manager/tqmmanual.sidl
-    taskqueue/manager/tqmthreadpool.sidl
+set(TQ_MANAGER_AUTOGEN
+    taskqueue/manager/tqmanager.cxh
+    taskqueue/manager/tqmdedicated.cxh
+    taskqueue/manager/tqminworker.cxh
+    taskqueue/manager/tqmmanual.cxh
+    taskqueue/manager/tqmthreadpool.cxh
     )
 
 set(TASKQUEUE_SRCS
     ${TASKQUEUE_SRCS}
     ${TQ_MANAGER_SRCS}
     PARENT_SCOPE)
-set(TASKQUEUE_INCLUDES
-    ${TASKQUEUE_INCLUDES}
-    ${TQ_MANAGER_INCLUDES}
-    PARENT_SCOPE)
-set(TASKQUEUE_SIDL
-    ${TASKQUEUE_SIDL}
-    ${TQ_MANAGER_SIDL}
+set(TASKQUEUE_AUTOGEN
+    ${TASKQUEUE_AUTOGEN}
+    ${TQ_MANAGER_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES
