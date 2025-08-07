@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "runinfo.h"
+#include "run/runinfo.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -15,11 +15,11 @@
 #include "db/database.h"
 #include "feature/featureregistry.h"
 #include "feature/runtracker/runtracker.h"
+#include "run/hulltracker.h"
+#include "run/logent.h"
+#include "run/logrelay.h"
+#include "run/scraptracker.h"
 #include "ui/subspaceui.h"
-#include "hulltracker.h"
-#include "logent.h"
-#include "logrelay.h"
-#include "scraptracker.h"
 
 _objfactory_guaranteed RunInfo* RunInfo_create(Subspace* ss)
 {
@@ -873,5 +873,5 @@ void LogReplay_destroy(_In_ LogReplay* self)
 
 // Autogen begins -----
 bool RunInfo_getRunDir(_In_ RunInfo* self, string* out);
-#include "runinfo.auto.inc"
+#include "run/runinfo.auto.inc"
 // Autogen ends -------

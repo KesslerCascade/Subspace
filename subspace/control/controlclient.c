@@ -6,12 +6,12 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "controlclient.h"
+#include "control/controlclient.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include "control/controlserver.h"
+#include "control/controltask.h"
 #include "gamemgr/gamemgr.h"
-#include "controlserver.h"
-#include "controltask.h"
 
 _objfactory_guaranteed ControlClient* ControlClient_create(ControlServer* svr, socket_t sock)
 {
@@ -116,5 +116,5 @@ void ControlClient_queue(_In_ ControlClient* self, ControlMsg* msg)
 }
 
 // Autogen begins -----
-#include "controlclient.auto.inc"
+#include "control/controlclient.auto.inc"
 // Autogen ends -------

@@ -1,0 +1,7 @@
+#include "feature/feature.cxh"
+
+class TimeWarp extends SubspaceFeature {
+    factory create(Subspace *ss);
+    override createSettingsPage;
+    override applyDefaultSettings;
+}

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "sectorinfo.h"
+#include "run/sectorinfo.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -33,5 +33,5 @@ intptr SectorInfo_cmp(_In_ SectorInfo* self, SectorInfo* other, uint32 flags)
 }
 
 // Autogen begins -----
-#include "sectorinfo.auto.inc"
+#include "run/sectorinfo.auto.inc"
 // Autogen ends -------

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "imageresample.h"
+#include "ui/image/imageresample.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -80,5 +80,5 @@ void ImageResample_destroy(_In_ ImageResample* self)
 }
 
 // Autogen begins -----
-#include "imageresample.auto.inc"
+#include "ui/image/imageresample.auto.inc"
 // Autogen ends -------

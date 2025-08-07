@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "controlserver.h"
+#include "control/controlserver.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "netsocket.h"
@@ -267,5 +267,5 @@ void ControlHandler_destroy(_In_ ControlHandler* self)
 }
 
 // Autogen begins -----
-#include "controlserver.auto.inc"
+#include "control/controlserver.auto.inc"
 // Autogen ends -------

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "logent.h"
+#include "run/logent.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/utils.h>
@@ -85,5 +85,5 @@ LogEnt_create(int64 sectorpoint, int64 savepoint, int64 time, float64 gametime, 
 }
 
 // Autogen begins -----
-#include "logent.auto.inc"
+#include "run/logent.auto.inc"
 // Autogen ends -------

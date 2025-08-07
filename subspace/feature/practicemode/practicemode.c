@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "practicemode.h"
+#include "feature/practicemode/practicemode.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -24,5 +24,5 @@ _objfactory_guaranteed PracticeMode* PracticeMode_create(Subspace* ss)
 }
 
 // Autogen begins -----
-#include "practicemode.auto.inc"
+#include "feature/practicemode/practicemode.auto.inc"
 // Autogen ends -------

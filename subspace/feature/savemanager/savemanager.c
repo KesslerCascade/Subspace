@@ -6,17 +6,17 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "savemanager.h"
+#include "feature/savemanager/savemanager.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
 #include <cx/utils.h>
 #include "db/database.h"
 #include "feature/featureregistry.h"
+#include "feature/savemanager/savemanagerpage.h"
 #include "run/runinfo.h"
 #include "util/pathfilter.h"
 #include "util/pathsubst.h"
-#include "savemanagerpage.h"
 
 static LazyInitState savefilevars_init_state;
 static hashtable savefilevars;
@@ -221,5 +221,5 @@ void SaveManagerCopy_destroy(_In_ SaveManagerCopy* self)
 }
 
 // Autogen begins -----
-#include "savemanager.auto.inc"
+#include "feature/savemanager/savemanager.auto.inc"
 // Autogen ends -------

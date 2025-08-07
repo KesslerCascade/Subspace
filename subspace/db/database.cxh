@@ -1,0 +1,19 @@
+#include "dbstmt.cxh"
+#include "subspace.h"
+
+struct sqlite3;
+[methodprefix db] class Database {
+    Subspace* ss;
+
+    sqlite3* db;
+
+    bool open();
+    bool check();       // upgrade schema if necessary
+    void close();
+
+    factory create(Subspace* ss);
+    destroy();
+
+    DbStmt* prepare(strref sql);
+    int64 lastId();     // get last auto-increment ID
+}

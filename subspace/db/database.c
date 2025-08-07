@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "database.h"
+#include "db/database.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <sqlite3.h>
@@ -115,5 +115,5 @@ int64 Database_lastId(_In_ Database* self)
 }
 
 // Autogen begins -----
-#include "database.auto.inc"
+#include "db/database.auto.inc"
 // Autogen ends -------

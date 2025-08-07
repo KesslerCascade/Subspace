@@ -1,0 +1,13 @@
+#include <cx/taskqueue.cxh>
+#include "ui/subspaceui.cxh"
+
+class UIUpdateDispatch extends Task {
+    object:SubspaceUI ui;
+    string panelname;
+    bool settings;
+    bool all;
+
+    factory mainWin(SubspaceUI *ui, strref panelname);
+    factory all(SubspaceUI *ui);
+    factory settings(SubspaceUI *ui, strref pagename);
+}

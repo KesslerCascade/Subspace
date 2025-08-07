@@ -6,10 +6,10 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "runtrackerpage.h"
+#include "feature/runtracker/runtrackerpage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "runtracker.h"
+#include "feature/runtracker/runtracker.h"
 
 _objfactory_guaranteed RunTrackerPage* RunTrackerPage_create(RunTracker* feature, SubspaceUI* ui)
 {
@@ -99,5 +99,5 @@ bool RunTrackerPage_update(_In_ RunTrackerPage* self)
 }
 
 // Autogen begins -----
-#include "runtrackerpage.auto.inc"
+#include "feature/runtracker/runtrackerpage.auto.inc"
 // Autogen ends -------

@@ -6,10 +6,10 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tweaks.h"
+#include "feature/tweaks/tweaks.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "tweakspage.h"
+#include "feature/tweaks/tweakspage.h"
 
 _objfactory_guaranteed Tweaks* Tweaks_create(Subspace* ss)
 {
@@ -52,5 +52,5 @@ SettingsPage* Tweaks_createSettingsPage(_In_ Tweaks* self, SubspaceUI* ui)
 }
 
 // Autogen begins -----
-#include "tweaks.auto.inc"
+#include "feature/tweaks/tweaks.auto.inc"
 // Autogen ends -------

@@ -1,0 +1,19 @@
+#include <cx/taskqueue.cxh>
+#include "ui/panel/panel.cxh"
+#include "run/logrelay.cxh"
+
+class HullGraphPanel extends Panel {
+    Ihandle *plot;
+    int ds[9];
+    int repairds;
+    [sorted] sarray:int64 sectoridx;
+
+    void clear();
+
+    void onHullUpdate(strref event, stvlist *params);
+    void onHullReset(strref event, stvlist *params);
+    void onHullRefresh(strref event, stvlist *params);
+
+    factory create(SubspaceUI *ui);
+    override make;
+}

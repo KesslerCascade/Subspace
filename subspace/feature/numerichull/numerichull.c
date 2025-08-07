@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "numerichull.h"
+#include "feature/numerichull/numerichull.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -23,5 +23,5 @@ _objfactory_guaranteed NumericHull* NumericHull_create(Subspace* ss)
 }
 
 // Autogen begins -----
-#include "numerichull.auto.inc"
+#include "feature/numerichull/numerichull.auto.inc"
 // Autogen ends -------

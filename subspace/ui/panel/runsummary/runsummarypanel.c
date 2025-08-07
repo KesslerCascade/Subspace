@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "runsummarypanel.h"
+#include "ui/panel/runsummary/runsummarypanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/subspaceui.h"
@@ -36,5 +36,5 @@ bool RunSummaryPanel_make(_In_ RunSummaryPanel* self)
 }
 
 // Autogen begins -----
-#include "runsummarypanel.auto.inc"
+#include "ui/panel/runsummary/runsummarypanel.auto.inc"
 // Autogen ends -------

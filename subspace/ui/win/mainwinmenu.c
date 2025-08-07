@@ -1,7 +1,7 @@
 #include <cx/container.h>
 #include "ui/util/iupsetobj.h"
-#include "about.h"
-#include "mainwin.h"
+#include "ui/win/about.h"
+#include "ui/win/mainwin.h"
 
 static int menu_exit(Ihandle* ih)
 {

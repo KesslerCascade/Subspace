@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "pkgfile.h"
+#include "pkgfile/pkgfile.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -176,5 +176,5 @@ void PkgDirEnt_destroy(_In_ PkgDirEnt* self)
 }
 
 // Autogen begins -----
-#include "pkgfile.auto.inc"
+#include "pkgfile/pkgfile.auto.inc"
 // Autogen ends -------

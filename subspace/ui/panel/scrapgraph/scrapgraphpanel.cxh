@@ -1,0 +1,18 @@
+#include <cx/taskqueue.cxh>
+#include "ui/panel/panel.cxh"
+
+class ScrapGraphPanel extends Panel {
+    Ihandle *plot;
+    int ds;
+    int ds2;
+    [sorted] sarray:int64 sectoridx;
+
+    void clear();
+
+    void onScrapUpdate(strref event, stvlist *params);
+    void onScrapReset(strref event, stvlist *params);
+    void onScrapRefresh(strref event, stvlist *params);
+
+    factory create(SubspaceUI *ui);
+    override make;
+}

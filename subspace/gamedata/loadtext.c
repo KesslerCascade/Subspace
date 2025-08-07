@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "loadtext.h"
+#include "gamedata/loadtext.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cxml/cxml.h>
@@ -101,5 +101,5 @@ void LoadText_destroy(_In_ LoadText* self)
 }
 
 // Autogen begins -----
-#include "loadtext.auto.inc"
+#include "gamedata/loadtext.auto.inc"
 // Autogen ends -------

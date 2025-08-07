@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "frameadv.h"
+#include "feature/frameadv/frameadv.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <iupkey.h>
@@ -27,5 +27,5 @@ _objfactory_guaranteed FrameAdv* FrameAdv_create(Subspace* ss)
 }
 
 // Autogen begins -----
-#include "frameadv.auto.inc"
+#include "feature/frameadv/frameadv.auto.inc"
 // Autogen ends -------

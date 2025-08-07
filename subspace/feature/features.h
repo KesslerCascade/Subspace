@@ -1,14 +1,14 @@
 #pragma once
 
-#include "featureregistry.h"
+#include "feature/featureregistry.h"
 
-#include "frameadv/frameadv.h"
-#include "infoblock/infoblock.h"
-#include "numerichull/numerichull.h"
-#include "practicemode/practicemode.h"
-#include "runtracker/runtracker.h"
-#include "savemanager/savemanager.h"
-#include "timewarp/timewarp.h"
-#include "tweaks/tweaks.h"
+#include "feature/frameadv/frameadv.h"
+#include "feature/infoblock/infoblock.h"
+#include "feature/numerichull/numerichull.h"
+#include "feature/practicemode/practicemode.h"
+#include "feature/runtracker/runtracker.h"
+#include "feature/savemanager/savemanager.h"
+#include "feature/timewarp/timewarp.h"
+#include "feature/tweaks/tweaks.h"
 
 void registerAllFeatures(FeatureRegistry *reg);

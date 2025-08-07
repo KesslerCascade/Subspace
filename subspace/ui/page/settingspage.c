@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "settingspage.h"
+#include "ui/page/settingspage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/util/iupsetobj.h"
@@ -41,5 +41,5 @@ _objinit_guaranteed bool SettingsPage_init(_In_ SettingsPage* self)
 }
 
 // Autogen begins -----
-#include "settingspage.auto.inc"
+#include "ui/page/settingspage.auto.inc"
 // Autogen ends -------

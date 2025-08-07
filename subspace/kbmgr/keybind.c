@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "keybind.h"
+#include "kbmgr/keybind.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -39,5 +39,5 @@ void KeyBind_destroy(_In_ KeyBind* self)
 }
 
 // Autogen begins -----
-#include "keybind.auto.inc"
+#include "kbmgr/keybind.auto.inc"
 // Autogen ends -------

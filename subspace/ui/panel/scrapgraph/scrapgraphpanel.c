@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "scrapgraphpanel.h"
+#include "ui/panel/scrapgraph/scrapgraphpanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -165,5 +165,5 @@ void ScrapGraphPanel_destroy(_In_ ScrapGraphPanel* self)
 }
 
 // Autogen begins -----
-#include "scrapgraphpanel.auto.inc"
+#include "ui/panel/scrapgraph/scrapgraphpanel.auto.inc"
 // Autogen ends -------

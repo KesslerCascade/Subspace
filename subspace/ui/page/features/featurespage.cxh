@@ -1,0 +1,11 @@
+#include "ui/page/settingspage.cxh"
+#include "gamemgr/gameinst.cxh"
+
+class FeaturesPage extends SettingsPage {
+    [noinit] sarray:Ihandle featpanels;
+
+    factory create(SubspaceUI *ui);
+    override make;
+    override update;
+    init();
+}

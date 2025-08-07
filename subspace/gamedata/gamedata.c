@@ -6,11 +6,11 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "gamedata.h"
+#include "gamedata/gamedata.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <pkgfs/pkgfs.h>
-#include "loadtext.h"
+#include "gamedata/loadtext.h"
 
 _objfactory_guaranteed GameData* GameData_create()
 {
@@ -177,5 +177,5 @@ void GameDataLoader_destroy(_In_ GameDataLoader* self)
 }
 
 // Autogen begins -----
-#include "gamedata.auto.inc"
+#include "gamedata/gamedata.auto.inc"
 // Autogen ends -------

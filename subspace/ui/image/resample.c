@@ -1,5 +1,5 @@
 #include <emmintrin.h>
-#include "image.h"
+#include "ui/image/image.h"
 
 #include <cx/utils.h>
 #include <math.h>

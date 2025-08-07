@@ -1,5 +1,0 @@
-#include "feature/feature.sidl"
-
-class FrameAdv extends SubspaceFeature {
-    factory create(Subspace *ss);
-}

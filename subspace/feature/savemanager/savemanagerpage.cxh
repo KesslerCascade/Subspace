@@ -1,0 +1,13 @@
+#include "ui/page/settingspage.cxh"
+#include "gamemgr/gameinst.cxh"
+
+class SaveManager;
+class SaveManagerPage extends SettingsPage {
+    SaveManager* feature;
+
+    Ihandle *savenametext;
+
+    factory create(SaveManager* feature, SubspaceUI* ui);
+    override make;
+    override update;
+}

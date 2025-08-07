@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "panel.h"
+#include "ui/panel/panel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/subspaceui.h"
@@ -54,5 +54,5 @@ _objinit_guaranteed bool Panel_init(_In_ Panel* self)
 }
 
 // Autogen begins -----
-#include "panel.auto.inc"
+#include "ui/panel/panel.auto.inc"
 // Autogen ends -------

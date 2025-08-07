@@ -1,0 +1,64 @@
+#include <iup.h>
+#include "subspace.h"
+#include "ui/panel/panel.cxh"
+
+#define MAINWIN_DEFAULT_WIDTH 700
+#define MAINWIN_DEFAULT_HEIGHT 400
+
+class SubspaceUI;
+class MainWin {
+    Subspace *ss;
+    SubspaceUI *ui;
+
+    Ihandle *win;
+    Ihandle *sidebar;
+    Ihandle *barsep;
+    Ihandle *menubtn;
+    Ihandle *playbtn;
+    Ihandle *runtrackerbtn;
+    Ihandle *zbox;
+    Ihandle *root;          // root of dynamic layout
+    Ihandle *timer;
+    uint32 activeInst;      // cookie of game instance that's being tracked through the UI
+
+    Ihandle *menu;          // hamburger menu
+
+    Ihandle *layoutmenu;    // right-click context menu for tabs / placeholders
+
+    hashtable:string:object panels;  // all panels (except welcome)
+    object:Panel welcomepanel;
+
+    bool make();
+    [extern] void makeMenu();
+    void show();
+    [extern] void showMenu(int mx, int my);
+    [extern] void showLayoutMenu(Ihandle *tabparent, Ihandle *ih, int mx, int my);
+    void update();
+    bool updatePanel(strref name);
+    void updateAll();
+    void recalcSize();
+    void finish();
+
+    [extern] unbound void loadLayout();
+    [extern] unbound void saveLayout();
+    [extern] unbound bool isPanelInLayout(strref name);
+    [extern] unbound Ihandle *createPlaceholder();
+    [extern] unbound Ihandle *createTabs();
+    [extern] unbound Ihandle *createSplit(bool vertical);
+    [extern] unbound void replaceSplitChild(Ihandle* split, Ihandle* oh, Ihandle* nh, bool destroy);
+    [extern] unbound void addTab(Ihandle *attachto, Ihandle *addbefore, strref name);
+    [extern] unbound void removeTab(Ihandle *tabparent, Ihandle *toremove);
+    [extern] unbound void addSplit(Ihandle *at, bool vertical);
+    [extern] unbound void removePlaceholder(Ihandle *ph);   // deletes the parent split
+
+    int width;
+    int height;
+    bool layoutDirty;
+
+    standalone int onClose(Ihandle *ih);
+    standalone int onResize(Ihandle *ih, int width, int height);
+    standalone int onTimer(Ihandle *ih);
+    void setLayoutDirty();
+    factory create(SubspaceUI *ui);
+    init();
+}

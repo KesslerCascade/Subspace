@@ -1,4 +1,4 @@
-#include "controlserver.h"
+#include "control/controlserver.h"
 
 #define CFIELD_IMPL(type)                                            \
     bool _cfieldVal_##type(hashtable fields, strref name, type* out) \

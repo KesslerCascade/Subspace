@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "iupattrdispatch.h"
+#include "ui/util/iupattrdispatch.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -59,5 +59,5 @@ void IupAttrDispatch_destroy(_In_ IupAttrDispatch* self)
 }
 
 // Autogen begins -----
-#include "iupattrdispatch.auto.inc"
+#include "ui/util/iupattrdispatch.auto.inc"
 // Autogen ends -------

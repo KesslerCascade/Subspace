@@ -6,13 +6,13 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "timewarppage.h"
+#include "feature/timewarp/timewarppage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
 #include <math.h>
 #include "feature/featureregistry.h"
-#include "timewarp.h"
+#include "feature/timewarp/timewarp.h"
 
 static int npow2(int val)
 {
@@ -222,5 +222,5 @@ void TimeWarpPage_destroy(_In_ TimeWarpPage* self)
 }
 
 // Autogen begins -----
-#include "timewarppage.auto.inc"
+#include "feature/timewarp/timewarppage.auto.inc"
 // Autogen ends -------

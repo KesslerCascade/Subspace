@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "keybindspage.h"
+#include "ui/page/keybinds/keybindspage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -348,5 +348,5 @@ void KeybindsPage_cancelBind(_In_ KeybindsPage* self)
 }
 
 // Autogen begins -----
-#include "keybindspage.auto.inc"
+#include "ui/page/keybinds/keybindspage.auto.inc"
 // Autogen ends -------

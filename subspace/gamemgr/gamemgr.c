@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "gamemgr.h"
+#include "gamemgr/gamemgr.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/subspaceui.h"
@@ -152,5 +152,5 @@ void GameMgr_checkStartupValidate(_In_ GameMgr* self)
 }
 
 // Autogen begins -----
-#include "gamemgr.auto.inc"
+#include "gamemgr/gamemgr.auto.inc"
 // Autogen ends -------

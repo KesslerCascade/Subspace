@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cx/string.h>
-#include "langdb.h"
+#include "lang/langdb.h"
 #include "subspace.h"
 
 bool langList(Subspace* ss, hashtable* out);

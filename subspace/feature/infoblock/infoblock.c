@@ -6,10 +6,10 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "infoblock.h"
+#include "feature/infoblock/infoblock.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "infoblockpage.h"
+#include "feature/infoblock/infoblockpage.h"
 
 _objfactory_guaranteed InfoBlock* InfoBlock_create(Subspace* ss)
 {
@@ -50,5 +50,5 @@ SettingsPage* InfoBlock_createSettingsPage(_In_ InfoBlock* self, SubspaceUI* ui)
 }
 
 // Autogen begins -----
-#include "infoblock.auto.inc"
+#include "feature/infoblock/infoblock.auto.inc"
 // Autogen ends -------

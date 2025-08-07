@@ -1,6 +1,6 @@
 #include <cx/container.h>
 #include "ui/util/iupsetobj.h"
-#include "mainwin.h"
+#include "ui/win/mainwin.h"
 
 static int split_valuechange(Ihandle* ih)
 {

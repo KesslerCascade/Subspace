@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "iupsetimagedispatch.h"
+#include "ui/util/iupsetimagedispatch.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -47,5 +47,5 @@ void IupSetImageDispatch_destroy(_In_ IupSetImageDispatch* self)
 }
 
 // Autogen begins -----
-#include "iupsetimagedispatch.auto.inc"
+#include "ui/util/iupsetimagedispatch.auto.inc"
 // Autogen ends -------

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "mainwin.h"
+#include "ui/win/mainwin.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -23,8 +23,8 @@
 #include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
+#include "ui/win/settingswin.h"
 #include "quitconfirm.h"
-#include "settingswin.h"
 
 #define REGISTERPANEL(mprefix)         \
     p = Panel(mprefix##Create(ui));    \
@@ -470,5 +470,5 @@ void MainWin_addTab(_In_ MainWin* self, Ihandle* attachto, Ihandle* addbefore, _
 void MainWin_removeTab(_In_ MainWin* self, Ihandle* tabparent, Ihandle* toremove);
 void MainWin_addSplit(_In_ MainWin* self, Ihandle* at, bool vertical);
 void MainWin_removePlaceholder(_In_ MainWin* self, Ihandle* ph);
-#include "mainwin.auto.inc"
+#include "ui/win/mainwin.auto.inc"
 // Autogen ends -------
