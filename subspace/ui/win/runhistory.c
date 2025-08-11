@@ -195,10 +195,24 @@ static int search_change(Ihandle* ih, int c, char* new_value)
     return IUP_DEFAULT;
 }
 
+static int search_key(Ihandle* ih, int c)
+{
+    RunHistoryWin* self = iupGetParentObj(RunHistoryWin, ih);
+    if (c == K_CR || c == K_NP_ENTER) {
+        IupSetAttribute(self->searchtimer, "RUN", "NO");
+        self->page = 1;
+        runhistorywinQuery(self);
+        return IUP_IGNORE;
+    }
+
+    return IUP_DEFAULT;
+}
+
 static int search_timer(Ihandle* ih)
 {
     RunHistoryWin* self = iupGetParentObj(RunHistoryWin, ih);
     IupSetAttribute(ih, "RUN", "NO");
+    self->page = 1;
     runhistorywinQuery(self);
 
     return IUP_DEFAULT;
@@ -234,6 +248,7 @@ bool RunHistoryWin_make(_In_ RunHistoryWin* self)
     IupSetAttribute(self->search, "EXPAND", "HORIZONTAL");
     iupSetObj(self->search, ObjNone, self, self->ui);
     IupSetCallback(self->search, "ACTION", (Icallback)search_change);
+    IupSetCallback(self->search, "K_ANY", (Icallback)search_key);
 
     Ihandle* catsep = IupSpace();
     IupSetAttribute(catsep, "SIZE", "20x1");
