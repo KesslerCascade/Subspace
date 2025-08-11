@@ -575,7 +575,7 @@ void RunHistoryWin_select(_In_ RunHistoryWin* self, int row)
     self->selectrow = row;
 
     IupSetAttribute(self->loadbtn, "ACTIVE", "YES");
-    IupSetAttribute(self->editbtn, "ACTIVE", "YES");
+    // IupSetAttribute(self->editbtn, "ACTIVE", "YES");
     bool canabandon = false;
 
     if (row <= saSize(self->rows)) {
