@@ -144,7 +144,40 @@ static int history_click(Ihandle* ih, int lin, int col, char* status)
         // on double click, act like they selected the line and then chose Load
         runhistorywinSelect(self, lin);
         loadbtn_action(ih);
+    } else if (iup_isbutton1(status) && lin == 0) {
+        RunHistoryColumn nsort = -1;
+        switch (col) {
+        case 1:
+            nsort = RHC_Start;
+            break;
+        case 2:
+            nsort = RHC_Result;
+            break;
+        case 3:
+            nsort = RHC_ShipType;
+            break;
+        case 4:
+            nsort = RHC_ShipName;
+            break;
+        case 5:
+            nsort = RHC_Sector;
+            break;
+        case 6:
+            nsort = RHC_Difficulty;
+            break;
+        }
+
+        if (nsort == self->sort) {
+            self->sortdesc = !self->sortdesc;
+        } else if (nsort != -1) {
+            self->sort     = nsort;
+            self->sortdesc = false;
+            self->page     = 1;
+        }
+
+        runhistorywinQuery(self);
     }
+
     return IUP_DEFAULT;
 }
 
@@ -354,8 +387,8 @@ void RunHistoryWin_finish(_In_ RunHistoryWin* self)
 
 static DbStmt* RunQuery(RunHistoryWin* self, int limit, int offset, bool countonly)
 {
-    Database* db = self->ss->db;
-    string sql   = 0;
+    Database* db      = self->ss->db;
+    string sql        = 0;
     string searchlike = 0;
 
     if (!strEmpty(self->searchtxt)) {
@@ -385,6 +418,9 @@ static DbStmt* RunQuery(RunHistoryWin* self, int limit, int offset, bool counton
         break;
     case RHC_ShipType:
         strAppend(&sql, _S" ORDER BY shiptype");
+        break;
+    case RHC_Result:
+        strAppend(&sql, _S" ORDER BY result");
         break;
     case RHC_Start:
     default:
@@ -423,6 +459,62 @@ out:
     return ret;
 }
 
+static void SetHeaderText(RunHistoryWin* self, RunHistoryColumn col)
+{
+    const char* colref = NULL;
+    strref colname     = 0;
+    string coltext     = 0;
+
+    switch (col) {
+    case RHC_Start:
+        colref  = "0:1";
+        colname = langGet(self->ss, _S"runhistory_col_start");
+        break;
+    case RHC_Result:
+        colref  = "0:2";
+        colname = langGet(self->ss, _S"runhistory_col_result");
+        break;
+    case RHC_ShipType:
+        colref  = "0:3";
+        colname = langGet(self->ss, _S"runhistory_col_shiptype");
+        break;
+    case RHC_ShipName:
+        colref  = "0:4";
+        colname = langGet(self->ss, _S"runhistory_col_shipname");
+        break;
+    case RHC_Sector:
+        colref  = "0:5";
+        colname = langGet(self->ss, _S"runhistory_col_sector");
+        break;
+    case RHC_Difficulty:
+        colref  = "0:6";
+        colname = langGet(self->ss, _S"runhistory_col_difficulty");
+        break;
+    case RHC_Category:
+        colref  = "0:7";
+        colname = langGet(self->ss, _S"runhistory_col_category");
+        break;
+    case RHC_Notes:
+        colref  = "0:8";
+        colname = langGet(self->ss, _S"runhistory_col_notes");
+        break;
+    }
+
+    if (col == self->sort) {
+        strFormat(&coltext,
+                  _S"${string} ${int(utfchar)}",
+                  stvar(strref, colname),
+                  stvar(int32, self->sortdesc ? 0x2191 : 0x2193));
+    } else {
+        strDup(&coltext, colname);
+    }
+
+    if (colref)
+        IupSetStrAttribute(self->rmtx, colref, strC(coltext));
+
+    strDestroy(&coltext);
+}
+
 void RunHistoryWin_query(_In_ RunHistoryWin* self)
 {
     string temp = 0, temp2 = 0;
@@ -446,6 +538,10 @@ void RunHistoryWin_query(_In_ RunHistoryWin* self)
     IupSetAttribute(self->rmtx, "NUMLIN", "0");
     IupSetInt(self->rmtx, "NUMLIN", PAGESIZE);
     int row = 1;
+
+    for (int i = (int)RHC_Start; i <= (int)RHC_Notes; i++) {
+        SetHeaderText(self, (RunHistoryColumn)i);
+    }
 
     while (dbstmtExec(stmt) && saSize(stmt->row) == 7) {
         int64 runid;
