@@ -140,7 +140,7 @@ static int history_select(Ihandle* ih, int lin, int col)
 static int history_click(Ihandle* ih, int lin, int col, char* status)
 {
     RunHistoryWin* self = iupGetParentObj(RunHistoryWin, ih);
-    if (iup_isbutton1(status) && iup_isdouble(status)) {
+    if (iup_isbutton1(status) && iup_isdouble(status) && lin > 0) {
         // on double click, act like they selected the line and then chose Load
         runhistorywinSelect(self, lin);
         loadbtn_action(ih);
@@ -568,6 +568,9 @@ void RunHistoryWin_query(_In_ RunHistoryWin* self)
 
 void RunHistoryWin_select(_In_ RunHistoryWin* self, int row)
 {
+    if (row < 1 || row > saSize(self->rows))
+        return;
+
     GameInst* inst = subspaceGame(self->ss);
     RunInfo* irun  = inst ? ginstRun(inst) : NULL;
     int64 activeid = irun ? irun->runid : -1;
@@ -600,12 +603,10 @@ void RunHistoryWin_select(_In_ RunHistoryWin* self, int row)
     // IupSetAttribute(self->editbtn, "ACTIVE", "YES");
     bool canabandon = false;
 
-    if (row <= saSize(self->rows)) {
-        sa_stvar* rowa = (sa_stvar*)&self->rows.a[row - 1];
-        int32 result   = -1;
-        stConvert(int32, &result, stvar, rowa->a[2]);
-        canabandon = (result == RUN_Active);
-    }
+    sa_stvar* rowa = (sa_stvar*)&self->rows.a[row - 1];
+    int32 result   = -1;
+    stConvert(int32, &result, stvar, rowa->a[2]);
+    canabandon = (result == RUN_Active);
 
     IupSetAttribute(self->abandonbtn, "ACTIVE", canabandon ? "YES" : "NO");
     IupSetAttribute(self->deletebtn, "ACTIVE", "YES");
