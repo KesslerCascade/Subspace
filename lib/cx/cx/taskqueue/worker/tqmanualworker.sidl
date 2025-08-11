@@ -1,5 +1,0 @@
-#include "tqworker.sidl"
-
-class TQManualWorker extends TQWorker {
-	factory create();
-}

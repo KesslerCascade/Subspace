@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "feature.h"
+#include "feature/feature.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "control/controlclient.h"
@@ -229,5 +229,5 @@ bool SubspaceFeature_isLocked(_In_ SubspaceFeature* self)
 }
 
 // Autogen begins -----
-#include "feature.auto.inc"
+#include "feature/feature.auto.inc"
 // Autogen ends -------

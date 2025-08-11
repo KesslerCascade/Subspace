@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqmanager.h"
+#include "taskqueue/manager/tqmanager.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -44,5 +44,5 @@ void TQManager_pretask(_In_ TQManager* self)
 }
 
 // Autogen begins -----
-#include "tqmanager.auto.inc"
+#include "taskqueue/manager/tqmanager.auto.inc"
 // Autogen ends -------

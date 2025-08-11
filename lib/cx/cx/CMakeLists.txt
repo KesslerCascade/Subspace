@@ -60,23 +60,23 @@ endif()
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES
     ${CX_BASE_INCLUDES}
     ${CX_SRCS}
-    ${CX_SIDL}
+    ${CX_AUTOGEN}
     ${CX_INCLUDES}
     ${CX_NATVIS_FILES}
     ${CX_CMAKE_FILES})
 
-add_sidl(${CX_SIDL})
+add_cxautogen(${CX_AUTOGEN})
 
 add_library(cx STATIC
     ${CX_SRCS}
-    ${CX_SIDL}
+    ${CX_AUTOGEN}
     ${CX_INCLUDES}
     ${CX_BASE_INCLUDES}
     ${CX_NATVIS_FILES}
     ${CX_CMAKE_FILES})
 
 target_link_libraries(cx ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} mimalloc mbedtls mbedx509 mbedcrypto)
-target_include_directories(cx SYSTEM PUBLIC ${CX_TOP_SOURCE_DIR} ${CX_TOP_SOURCE_DIR}/cx/include ${CX_TOP_BINARY_DIR})
+target_include_directories(cx SYSTEM PUBLIC ${CX_TOP_SOURCE_DIR} ${CX_TOP_SOURCE_DIR}/cx/include ${CX_TOP_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_compile_definitions(cx PRIVATE UNICODE _UNICODE)
 if (CX_COMPILER_IS_MSVC)
     target_link_options(cx PUBLIC /NATVIS:${CMAKE_CURRENT_SOURCE_DIR}/cx.natvis)

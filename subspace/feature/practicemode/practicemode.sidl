@@ -1,5 +1,0 @@
-#include "feature/feature.sidl"
-
-class PracticeMode extends SubspaceFeature {
-    factory create(Subspace *ss);
-}

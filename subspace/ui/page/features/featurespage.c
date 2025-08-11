@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "featurespage.h"
+#include "ui/page/features/featurespage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <iupdraw.h>
@@ -358,5 +358,5 @@ void FeaturesPage_destroy(_In_ FeaturesPage* self)
 }
 
 // Autogen begins -----
-#include "featurespage.auto.inc"
+#include "ui/page/features/featurespage.auto.inc"
 // Autogen ends -------

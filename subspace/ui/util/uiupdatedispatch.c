@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "uiupdatedispatch.h"
+#include "ui/util/uiupdatedispatch.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/win/mainwin.h"
@@ -89,5 +89,5 @@ void UIUpdateDispatch_destroy(_In_ UIUpdateDispatch* self)
 }
 
 // Autogen begins -----
-#include "uiupdatedispatch.auto.inc"
+#include "ui/util/uiupdatedispatch.auto.inc"
 // Autogen ends -------

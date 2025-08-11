@@ -22,67 +22,68 @@ if(WIN32)
     set(CMAKE_WIN32_EXECUTABLE true)
 endif()
 
-set(EXTRA_SIDL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
+set(EXTRA_CXAUTOGEN_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR})
 
-set(SUBSPACE_SIDL
-    control/controlclient.sidl
-    control/controltask.sidl
-    control/controlserver.sidl
-    db/database.sidl
-    db/dbstmt.sidl
-    feature/feature.sidl
-    feature/featureregistry.sidl
-    feature/frameadv/frameadv.sidl
-    feature/infoblock/infoblock.sidl
-    feature/infoblock/infoblockpage.sidl
-    feature/numerichull/numerichull.sidl
-    feature/practicemode/practicemode.sidl
-    feature/runtracker/runtracker.sidl
-    feature/runtracker/runtrackerpage.sidl
-    feature/savemanager/savemanager.sidl
-    feature/savemanager/savemanagerpage.sidl
-    feature/timewarp/timewarp.sidl
-    feature/timewarp/timewarppage.sidl
-    feature/tweaks/tweaks.sidl
-    feature/tweaks/tweakspage.sidl
-    gamedata/gamedata.sidl
-    gamedata/loadtext.sidl
-    gamemgr/gameinst.sidl
-    gamemgr/gamemgr.sidl
-    kbmgr/kbmgr.sidl
-    kbmgr/keybind.sidl
-    lang/langdb.sidl
-    run/hulltracker.sidl
-    run/logent.sidl
-    run/logrelay.sidl
-    run/runinfo.sidl
-    run/scraptracker.sidl
-    run/sectorinfo.sidl
-    ui/subspaceui.sidl
-    ui/image/image.sidl
-    ui/image/imageload.sidl
-    ui/image/imageresample.sidl
-    ui/page/settingspage.sidl
-    ui/page/features/featurespage.sidl
-    ui/page/keybinds/keybindspage.sidl
-    ui/page/setup/setuppage.sidl
-    ui/panel/panel.sidl
-    ui/panel/gameinfo/gameinfopanel.sidl
-    ui/panel/gameinfo/statlayoutinfo.sidl
-    ui/panel/hullgraph/hullgraphpanel.sidl
-    ui/panel/runsummary/runsummarypanel.sidl
-    ui/panel/scrapgraph/scrapgraphpanel.sidl
-    ui/panel/sectordetail/sectordetailpanel.sidl
-    ui/panel/welcome/welcomepanel.sidl
-    ui/util/iupattrdispatch.sidl
-    ui/util/iuprefreshdispatch.sidl
-    ui/util/iupsetimagedispatch.sidl
-    ui/util/uiupdatedispatch.sidl
-    ui/win/mainwin.sidl
-    ui/win/settingswin.sidl
+set(SUBSPACE_AUTOGEN
+    control/controlclient.cxh
+    control/controltask.cxh
+    control/controlserver.cxh
+    db/database.cxh
+    db/dbstmt.cxh
+    feature/feature.cxh
+    feature/featureregistry.cxh
+    feature/frameadv/frameadv.cxh
+    feature/infoblock/infoblock.cxh
+    feature/infoblock/infoblockpage.cxh
+    feature/numerichull/numerichull.cxh
+    feature/practicemode/practicemode.cxh
+    feature/runtracker/runtracker.cxh
+    feature/runtracker/runtrackerpage.cxh
+    feature/savemanager/savemanager.cxh
+    feature/savemanager/savemanagerpage.cxh
+    feature/timewarp/timewarp.cxh
+    feature/timewarp/timewarppage.cxh
+    feature/tweaks/tweaks.cxh
+    feature/tweaks/tweakspage.cxh
+    gamedata/gamedata.cxh
+    gamedata/loadtext.cxh
+    gamemgr/gameinst.cxh
+    gamemgr/gamemgr.cxh
+    kbmgr/kbmgr.cxh
+    kbmgr/keybind.cxh
+    lang/langdb.cxh
+    run/hulltracker.cxh
+    run/logent.cxh
+    run/logrelay.cxh
+    run/runinfo.cxh
+    run/scraptracker.cxh
+    run/sectorinfo.cxh
+    ui/subspaceui.cxh
+    ui/image/image.cxh
+    ui/image/imageload.cxh
+    ui/image/imageresample.cxh
+    ui/page/settingspage.cxh
+    ui/page/features/featurespage.cxh
+    ui/page/keybinds/keybindspage.cxh
+    ui/page/setup/setuppage.cxh
+    ui/panel/panel.cxh
+    ui/panel/gameinfo/gameinfopanel.cxh
+    ui/panel/gameinfo/statlayoutinfo.cxh
+    ui/panel/hullgraph/hullgraphpanel.cxh
+    ui/panel/runsummary/runsummarypanel.cxh
+    ui/panel/scrapgraph/scrapgraphpanel.cxh
+    ui/panel/sectordetail/sectordetailpanel.cxh
+    ui/panel/welcome/welcomepanel.cxh
+    ui/util/iupattrdispatch.cxh
+    ui/util/iuprefreshdispatch.cxh
+    ui/util/iupsetimagedispatch.cxh
+    ui/util/uiupdatedispatch.cxh
+    ui/win/mainwin.cxh
+    ui/win/runhistory.cxh
+    ui/win/settingswin.cxh
     )
 
-add_sidl(${SUBSPACE_SIDL})
+add_cxautogen(${SUBSPACE_AUTOGEN})
 
 add_executable(subspace
     control/cmds.c
@@ -136,6 +137,7 @@ add_executable(subspace
     run/hulltracker.c
     run/logent.c
     run/logrelay.c
+    run/rundb.c
     run/runinfo.c
     run/runinforundir.c
     run/scraptracker.c
@@ -170,6 +172,7 @@ add_executable(subspace
     ui/win/mainwinlayout.c
     ui/win/mainwinmenu.c
     ui/win/quitconfirm.c
+    ui/win/runhistory.c
     ui/win/settingswin.c
     util/pathfilter.c
     util/pathsubst.c
@@ -186,10 +189,10 @@ add_executable(subspace
     ${SHARED_SOURCE_DIR}/control.c
     ${SHARED_SOURCE_DIR}/logentspec.c
     ${SHARED_SOURCE_DIR}/net.c
-    ${SUBSPACE_SIDL})
+    ${SUBSPACE_AUTOGEN})
 target_compile_definitions(subspace PRIVATE $<$<CONFIG:Release>:SUBSPACE_RELEASE>)
 target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast libpkg cxml)
-target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 if(WIN32)
     target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/win32)

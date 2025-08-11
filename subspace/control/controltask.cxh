@@ -1,0 +1,14 @@
+#include <cx/taskqueue.cxh>
+#include "controlclient.cxh"
+#include "controlserver.cxh"
+#include <cx/ssdtree.h>
+#include <cx/fs.h>
+#include "subspace.h"
+
+class ControlTask extends ComplexTask {
+    object:ControlClient client;
+    object:ControlHandler handler;
+    ControlMsg *msg;        // message to process (control task becomes owner)
+
+    factory create(ControlClient *client, ControlHandler *handler, ControlMsg *msg);
+}

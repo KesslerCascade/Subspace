@@ -6,16 +6,16 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "gameinfopanel.h"
+#include "ui/panel/gameinfo/gameinfopanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
 #include <iupcontrols.h>
 #include "gamedata/gamedata.h"
 #include "gamemgr/gamemgr.h"
+#include "ui/panel/gameinfo/statlayoutinfo.h"
 #include "ui/subspaceui.h"
 #include "ui/util/iupsetobj.h"
-#include "statlayoutinfo.h"
 
 const char* statslabelbg = "56 56 56";
 
@@ -594,5 +594,5 @@ void GameInfoPanel_destroy(_In_ GameInfoPanel* self)
 }
 
 // Autogen begins -----
-#include "gameinfopanel.auto.inc"
+#include "ui/panel/gameinfo/gameinfopanel.auto.inc"
 // Autogen ends -------

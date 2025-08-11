@@ -1,19 +1,19 @@
-#include <cx/thread/thread_private.h>
 #include <cx/platform/win.h>
 #include <cx/string.h>
+#include <cx/thread/thread_private.h>
 #include <cx/time/time.h>
 #include <cx/utils/lazyinit.h>
 #include <process.h>
-#include "win_thread_threadobj.h"
+#include "cx/platform/win/win_thread_threadobj.h"
 
-typedef HRESULT (WINAPI *SetThreadDescription_t)(HANDLE hThread, PCWSTR lpThreadDescription);
+typedef HRESULT(WINAPI* SetThreadDescription_t)(HANDLE hThread, PCWSTR lpThreadDescription);
 static SetThreadDescription_t pSetThreadDescription;
 
-static WinThread *mainthread;
-static _Thread_local WinThread *curthread;
+static WinThread* mainthread;
+static _Thread_local WinThread* curthread;
 
 static LazyInitState platformThreadInitState;
-static void platformThreadInit(void *dummy)
+static void platformThreadInit(void* dummy)
 {
     // synthesize a Thread structure for the main thread, so thrCurrent can work
 
@@ -24,7 +24,7 @@ static void platformThreadInit(void *dummy)
     mainthread = _winthrobjCreate();
     if (mainthread) {
         mainthread->handle = GetCurrentThread();
-        mainthread->id = GetCurrentThreadId();
+        mainthread->id     = GetCurrentThreadId();
         strDup(&mainthread->name, _S"Main");
     } else {
         relFatalError("Failed to create main thread");
@@ -39,16 +39,17 @@ static void platformThreadInit(void *dummy)
     HANDLE hDll = LoadLibrary(TEXT("kernel32.dll"));
     relAssertMsg(hDll, "Failed to load kernel32.dll");
     if (hDll)
-        pSetThreadDescription = (SetThreadDescription_t)GetProcAddress(hDll, "SetThreadDescription");
+        pSetThreadDescription = (SetThreadDescription_t)GetProcAddress(hDll,
+                                                                       "SetThreadDescription");
 }
 
-static unsigned __stdcall _thrEntryPoint(void *data)
+static unsigned __stdcall _thrEntryPoint(void* data)
 {
-    WinThread *thr = (WinThread*)data;
+    WinThread* thr = (WinThread*)data;
     if (!thr)
         goto out;
 
-    thr->id = GetCurrentThreadId();
+    thr->id   = GetCurrentThreadId();
     curthread = thr;
 
     if (pSetThreadDescription)
@@ -67,16 +68,17 @@ out:
 }
 
 _Use_decl_annotations_
-Thread *_thrPlatformCreate() {
-    WinThread *wthr = _winthrobjCreate();
+Thread* _thrPlatformCreate()
+{
+    WinThread* wthr = _winthrobjCreate();
     return Thread(wthr);
 }
 
-bool _thrPlatformStart(Thread *thread)
+bool _thrPlatformStart(Thread* thread)
 {
     lazyInit(&platformThreadInitState, &platformThreadInit, NULL);
 
-    WinThread *thr = objDynCast(WinThread, thread);
+    WinThread* thr = objDynCast(WinThread, thread);
 
     if (!thr || thr->handle)
         return false;
@@ -85,19 +87,23 @@ bool _thrPlatformStart(Thread *thread)
     return !!thr->handle;
 }
 
-bool _thrPlatformWait(Thread *thread, int64 timeout)
+bool _thrPlatformWait(Thread* thread, int64 timeout)
 {
-    WinThread *thr = objDynCast(WinThread, thread);
-    if (!thr) return false;
+    WinThread* thr = objDynCast(WinThread, thread);
+    if (!thr)
+        return false;
 
-    return WaitForSingleObject(thr->handle, (timeout == timeForever) ? INFINITE : (DWORD)timeToMsec(timeout)) == WAIT_OBJECT_0;
+    return WaitForSingleObject(thr->handle,
+                               (timeout == timeForever) ? INFINITE : (DWORD)timeToMsec(timeout)) ==
+        WAIT_OBJECT_0;
 }
 
 _Use_decl_annotations_
-bool _thrPlatformSetPriority(Thread *thread, int prio)
+bool _thrPlatformSetPriority(Thread* thread, int prio)
 {
-    WinThread *thr = objDynCast(WinThread, thread);
-    if (!thr) return false;
+    WinThread* thr = objDynCast(WinThread, thread);
+    if (!thr)
+        return false;
 
     if (prio == THREAD_Batch) {
         // background mode only works on the current thread, so also adjust priority below
@@ -137,16 +143,17 @@ bool _thrPlatformSetPriority(Thread *thread, int prio)
 }
 
 _Use_decl_annotations_
-Thread *thrCurrent(void)
+Thread* thrCurrent(void)
 {
     return Thread(curthread);
 }
 
 _Use_decl_annotations_
-intptr thrOSThreadID(Thread *thread)
+intptr thrOSThreadID(Thread* thread)
 {
-    WinThread *thr = objDynCast(WinThread, thread);
-    if (!thr) return 0;
+    WinThread* thr = objDynCast(WinThread, thread);
+    if (!thr)
+        return 0;
 
     return thr->id;
 }

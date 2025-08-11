@@ -6,15 +6,15 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "runtracker.h"
+#include "feature/runtracker/runtracker.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "control/controlserver.h"
 #include "feature/featureregistry.h"
+#include "feature/runtracker/runtrackerpage.h"
 #include "feature/savemanager/savemanager.h"
 #include "gamemgr/gameinst.h"
 #include "ui/subspaceui.h"
-#include "runtrackerpage.h"
 
 _objfactory_guaranteed RunTracker* RunTracker_create(Subspace* ss)
 {
@@ -124,5 +124,5 @@ void RunTracker_updateLockState(_In_ RunTracker* self)
 }
 
 // Autogen begins -----
-#include "runtracker.auto.inc"
+#include "feature/runtracker/runtracker.auto.inc"
 // Autogen ends -------

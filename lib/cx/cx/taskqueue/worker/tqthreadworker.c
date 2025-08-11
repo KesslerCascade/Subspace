@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqthreadworker.h"
+#include "taskqueue/worker/tqthreadworker.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -147,5 +147,5 @@ void TQThreadWorker_destroy(_In_ TQThreadWorker* self)
 }
 
 // Autogen begins -----
-#include "tqthreadworker.auto.inc"
+#include "taskqueue/worker/tqthreadworker.auto.inc"
 // Autogen ends -------

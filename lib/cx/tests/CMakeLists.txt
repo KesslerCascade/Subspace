@@ -23,24 +23,20 @@ create_test_sourcelist(testsrc
     prqtest.c
     tqtest.c
     alltests.c)
-add_sidl(converttestobj.sidl
-    fmttestobj.sidl
-    objtestobj.sidl
-    tqtestobj.sidl)
+add_cxautogen(converttestobj.cxh
+    fmttestobj.cxh
+    objtestobj.cxh
+    tqtestobj.cxh)
 set(test_runner_files
     ${testsrc}
     fmttestobj.c
-    fmttestobj.h
-    fmttestobj.sidl
+    fmttestobj.cxh
     objtestobj.c
-    objtestobj.h
-    objtestobj.sidl
+    objtestobj.cxh
     converttestobj.c
-    converttestobj.h
-    converttestobj.sidl
+    converttestobj.cxh
     tqtestobj.c
-    tqtestobj.h
-    tqtestobj.sidl
+    tqtestobj.cxh
     common.h)
 
 source_group("" FILES ${test_runner_files})

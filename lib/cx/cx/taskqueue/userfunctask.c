@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "userfunctask.h"
+#include "taskqueue/userfunctask.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -29,5 +29,5 @@ uint32 UserFuncTask_run(_In_ UserFuncTask* self, _In_ TaskQueue* tq, _In_ TQWork
 }
 
 // Autogen begins -----
-#include "userfunctask.auto.inc"
+#include "taskqueue/userfunctask.auto.inc"
 // Autogen ends -------

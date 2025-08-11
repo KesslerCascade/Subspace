@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "image.h"
+#include "ui/image/image.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -143,5 +143,5 @@ void Image_destroy(_In_ Image* self)
 // Autogen begins -----
 bool Image_resample(_In_ Image* self, int nwidth, int nheight);
 bool Image_resampleToDPI(_In_ Image* self, int ndpi);
-#include "image.auto.inc"
+#include "ui/image/image.auto.inc"
 // Autogen ends -------

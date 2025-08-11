@@ -6,11 +6,11 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "scraptracker.h"
+#include "run/scraptracker.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "control/controlserver.h"
-#include "runinfo.h"
+#include "run/runinfo.h"
 
 _objfactory_guaranteed ScrapTracker* ScrapTracker_create(RunInfo* run)
 {
@@ -168,5 +168,5 @@ void ScrapTracker_destroy(_In_ ScrapTracker* self)
 }
 
 // Autogen begins -----
-#include "scraptracker.auto.inc"
+#include "run/scraptracker.auto.inc"
 // Autogen ends -------

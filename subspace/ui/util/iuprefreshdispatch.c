@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "iuprefreshdispatch.h"
+#include "ui/util/iuprefreshdispatch.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -31,5 +31,5 @@ uint32 IupRefreshDispatch_run(_In_ IupRefreshDispatch* self, _In_ TaskQueue* tq,
 }
 
 // Autogen begins -----
-#include "iuprefreshdispatch.auto.inc"
+#include "ui/util/iuprefreshdispatch.auto.inc"
 // Autogen ends -------

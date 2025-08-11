@@ -1,0 +1,24 @@
+#include <iup.h>
+#include "subspace.h"
+#include "feature/feature.cxh"
+#include "lang/lang.h"
+#include "ui/util/iupsetobj.h"
+#include "ui/util/settip.h"
+
+class SubspaceUI;
+class SettingsPage {
+    Subspace *ss;
+    SubspaceUI *ui;
+
+    weak:SubspaceFeature owner;
+
+    Ihandle *h;
+    Ihandle *parent;
+    strref name;
+    string imgname;
+    string title;
+
+    init();
+    bool make(Ihandle *list);
+    bool update();
+}

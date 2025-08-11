@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "hullgraphpanel.h"
+#include "ui/panel/hullgraph/hullgraphpanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -301,5 +301,5 @@ void HullGraphPanel_destroy(_In_ HullGraphPanel* self)
 }
 
 // Autogen begins -----
-#include "hullgraphpanel.auto.inc"
+#include "ui/panel/hullgraph/hullgraphpanel.auto.inc"
 // Autogen ends -------

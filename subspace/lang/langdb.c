@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "langdb.h"
+#include "lang/langdb.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/serialize/jsonparse.h>
@@ -82,5 +82,5 @@ void LanguageDB_destroy(_In_ LanguageDB* self)
 }
 
 // Autogen begins -----
-#include "langdb.auto.inc"
+#include "lang/langdb.auto.inc"
 // Autogen ends -------

@@ -6,13 +6,14 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "subspaceui.h"
+#include "ui/subspaceui.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
 #include "ui/util/uiupdatedispatch.h"
-#include "win/mainwin.h"
-#include "win/settingswin.h"
+#include "ui/win/mainwin.h"
+#include "ui/win/runhistory.h"
+#include "ui/win/settingswin.h"
 
 #include <cd.h>
 #include <iup.h>
@@ -229,6 +230,7 @@ void SubspaceUI_destroy(_In_ SubspaceUI* self)
     objRelease(&self->uiq);
     objRelease(&self->mainw);
     objRelease(&self->settingsw);
+    objRelease(&self->runhistw);
     rwlockDestroy(&self->listenerlock);
     htDestroy(&self->listeners);
     // Autogen ends -------
@@ -360,5 +362,5 @@ void UINotifyDispatch_destroy(_In_ UINotifyDispatch* self)
 }
 
 // Autogen begins -----
-#include "subspaceui.auto.inc"
+#include "ui/subspaceui.auto.inc"
 // Autogen ends -------

@@ -1,0 +1,5 @@
+#include "feature/feature.cxh"
+
+class FrameAdv extends SubspaceFeature {
+    factory create(Subspace *ss);
+}

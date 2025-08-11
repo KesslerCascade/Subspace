@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "threadobj.h"
+#include "thread/threadobj.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "thread_private.h"
@@ -50,5 +50,5 @@ void Thread_destroy(_In_ Thread* self)
 }
 
 // Autogen begins -----
-#include "threadobj.auto.inc"
+#include "thread/threadobj.auto.inc"
 // Autogen ends -------

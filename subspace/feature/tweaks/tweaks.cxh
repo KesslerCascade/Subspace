@@ -1,0 +1,7 @@
+#include "feature/feature.cxh"
+
+class Tweaks extends SubspaceFeature {
+    factory create(Subspace *ss);
+    override createSettingsPage;
+    override applyDefaultSettings;
+}

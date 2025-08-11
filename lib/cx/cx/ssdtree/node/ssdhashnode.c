@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "ssdhashnode.h"
+#include "ssdtree/node/ssdhashnode.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "../ssdtree.h"
@@ -252,5 +252,5 @@ bool SSDHashIter_isHashtable(_In_ SSDHashIter* self)
 }
 
 // Autogen begins -----
-#include "ssdhashnode.auto.inc"
+#include "ssdtree/node/ssdhashnode.auto.inc"
 // Autogen ends -------

@@ -4,9 +4,9 @@ set(FS_VFSVFS_SRCS
 set(FS_VFSVFS_INCLUDES
     fs/vfsvfs/vfsvfs.h
     fs/vfsvfs/vfsvfsfile.h)
-set(FS_VFSVFS_SIDL
-    fs/vfsvfs/vfsvfs.sidl
-    fs/vfsvfs/vfsvfsfile.sidl)
+set(FS_VFSVFS_AUTOGEN
+    fs/vfsvfs/vfsvfs.cxh
+    fs/vfsvfs/vfsvfsfile.cxh)
 
 set(CX_SRCS
     ${CX_SRCS}
@@ -16,9 +16,9 @@ set(CX_INCLUDES
     ${CX_INCLUDES}
     ${FS_VFSVFS_INCLUDES}
     PARENT_SCOPE)
-set(CX_SIDL
-    ${CX_SIDL}
-    ${FS_VFSVFS_SIDL}
+set(CX_AUTOGEN
+    ${CX_AUTOGEN}
+    ${FS_VFSVFS_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "ssdarraynode.h"
+#include "ssdtree/node/ssdarraynode.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "../ssdtree.h"
@@ -271,5 +271,5 @@ void SSDArrayIter_destroy(_In_ SSDArrayIter* self)
 }
 
 // Autogen begins -----
-#include "ssdarraynode.auto.inc"
+#include "ssdtree/node/ssdarraynode.auto.inc"
 // Autogen ends -------

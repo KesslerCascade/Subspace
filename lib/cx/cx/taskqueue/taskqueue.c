@@ -1,7 +1,7 @@
 #include "taskqueue_private.h"
 #include <cx/platform/os.h>
 #include <cx/time/clock.h>
-#include "userfunctask.h"
+#include "cx/taskqueue/userfunctask.h"
 
 _Use_decl_annotations_
 void tqPresetSingle(TaskQueueConfig* tqconfig)
@@ -63,7 +63,9 @@ void tqPresetHeavy(TaskQueueConfig* tqconfig)
         .tRampDown  = timeMS(1000),
         .loadFactor = 2,
     };
-    *tqconfig = (TaskQueueConfig) { .flags = TQ_ManagerThread, .pool = tpconfig, .mGC = timeMS(10) };
+    *tqconfig = (TaskQueueConfig) { .flags = TQ_ManagerThread,
+                                    .pool  = tpconfig,
+                                    .mGC   = timeMS(10) };
 }
 
 _Use_decl_annotations_

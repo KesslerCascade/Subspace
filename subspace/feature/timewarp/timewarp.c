@@ -6,12 +6,12 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "timewarp.h"
+#include "feature/timewarp/timewarp.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <iupkey.h>
+#include "feature/timewarp/timewarppage.h"
 #include "kbmgr/kbmgr.h"
-#include "timewarppage.h"
 
 _objfactory_guaranteed TimeWarp* TimeWarp_create(Subspace* ss)
 {
@@ -58,5 +58,5 @@ SettingsPage* TimeWarp_createSettingsPage(_In_ TimeWarp* self, SubspaceUI* ui)
 }
 
 // Autogen begins -----
-#include "timewarp.auto.inc"
+#include "feature/timewarp/timewarp.auto.inc"
 // Autogen ends -------

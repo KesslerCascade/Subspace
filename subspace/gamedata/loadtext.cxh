@@ -1,0 +1,8 @@
+#include "gamedata.cxh"
+
+class LoadText extends ComplexTask {
+    Subspace* ss;
+    object:GameData data;
+
+    factory Create(Subspace* ss, GameData* data);
+}

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "basictask.h"
+#include "taskqueue/task/basictask.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/taskqueue/taskqueue.h>
@@ -120,5 +120,5 @@ void BasicTask_runCancelled(_In_ BasicTask* self, _In_ TaskQueue* tq, _In_ TQWor
 }
 
 // Autogen begins -----
-#include "basictask.auto.inc"
+#include "taskqueue/task/basictask.auto.inc"
 // Autogen ends -------

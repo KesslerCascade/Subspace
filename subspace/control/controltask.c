@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "controltask.h"
+#include "control/controltask.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "gamemgr/gameinst.h"
@@ -143,5 +143,5 @@ uint32 ControlTask_run(_In_ ControlTask* self, _In_ TaskQueue* tq, _In_ TQWorker
 }
 
 // Autogen begins -----
-#include "controltask.auto.inc"
+#include "control/controltask.auto.inc"
 // Autogen ends -------

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "statlayoutinfo.h"
+#include "ui/panel/gameinfo/statlayoutinfo.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -53,5 +53,5 @@ void StatLayoutInfo_destroy(_In_ StatLayoutInfo* self)
 }
 
 // Autogen begins -----
-#include "statlayoutinfo.auto.inc"
+#include "ui/panel/gameinfo/statlayoutinfo.auto.inc"
 // Autogen ends -------

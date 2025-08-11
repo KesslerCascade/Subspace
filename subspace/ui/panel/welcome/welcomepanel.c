@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "welcomepanel.h"
+#include "ui/panel/welcome/welcomepanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/subspaceui.h"
@@ -158,5 +158,5 @@ bool WelcomePanel_make(_In_ WelcomePanel* self)
 }
 
 // Autogen begins -----
-#include "welcomepanel.auto.inc"
+#include "ui/panel/welcome/welcomepanel.auto.inc"
 // Autogen ends -------

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "win_thread_threadobj.h"
+#include "platform/win/win_thread_threadobj.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -26,5 +26,5 @@ void WinThread_destroy(_In_ WinThread* self)
 }
 
 // Autogen begins -----
-#include "win_thread_threadobj.auto.inc"
+#include "platform/win/win_thread_threadobj.auto.inc"
 // Autogen ends -------

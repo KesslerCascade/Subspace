@@ -3,28 +3,19 @@ set(TQ_RUNNER_SRCS
     taskqueue/runner/tqrthreadpool.c
     taskqueue/runner/tqrunner.c
     )
-set(TQ_RUNNER_INCLUDES
-    taskqueue/runner/tqrmanual.h
-    taskqueue/runner/tqrthreadpool.h
-    taskqueue/runner/tqrunner.h
-    )
-set(TQ_RUNNER_SIDL
-    taskqueue/runner/tqrmanual.sidl
-    taskqueue/runner/tqrthreadpool.sidl
-    taskqueue/runner/tqrunner.sidl
+set(TQ_RUNNER_AUTOGEN
+    taskqueue/runner/tqrmanual.cxh
+    taskqueue/runner/tqrthreadpool.cxh
+    taskqueue/runner/tqrunner.cxh
     )
 
 set(TASKQUEUE_SRCS
     ${TASKQUEUE_SRCS}
     ${TQ_RUNNER_SRCS}
     PARENT_SCOPE)
-set(TASKQUEUE_INCLUDES
-    ${TASKQUEUE_INCLUDES}
-    ${TQ_RUNNER_INCLUDES}
-    PARENT_SCOPE)
-set(TASKQUEUE_SIDL
-    ${TASKQUEUE_SIDL}
-    ${TQ_RUNNER_SIDL}
+set(TASKQUEUE_AUTOGEN
+    ${TASKQUEUE_AUTOGEN}
+    ${TQ_RUNNER_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

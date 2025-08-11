@@ -6,10 +6,10 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "vfsprovider.h"
+#include "fs/vfsprovider.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
 // Autogen begins -----
-#include "vfsprovider.auto.inc"
+#include "fs/vfsprovider.auto.inc"
 // Autogen ends -------

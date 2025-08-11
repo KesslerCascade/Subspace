@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "gameinst.h"
+#include "gamemgr/gameinst.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -14,9 +14,9 @@
 #include "control/controlserver.h"
 #include "feature/featureregistry.h"
 #include "feature/runtracker/runtracker.h"
+#include "gamemgr/gamemgr.h"
 #include "kbmgr/kbmgr.h"
 #include "ui/subspaceui.h"
-#include "gamemgr.h"
 #include "process.h"
 #include "version.h"
 
@@ -336,5 +336,5 @@ void GameInst_onValidate(_In_ GameInst* self, ControlClient* client)
 }
 
 // Autogen begins -----
-#include "gameinst.auto.inc"
+#include "gamemgr/gameinst.auto.inc"
 // Autogen ends -------

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "mainwin.h"
+#include "ui/win/mainwin.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -23,8 +23,8 @@
 #include "ui/subspaceui.h"
 #include "ui/util/iuploadimage.h"
 #include "ui/util/iupsetobj.h"
+#include "ui/win/settingswin.h"
 #include "quitconfirm.h"
-#include "settingswin.h"
 
 #define REGISTERPANEL(mprefix)         \
     p = Panel(mprefix##Create(ui));    \
@@ -287,14 +287,14 @@ void MainWin_update(_In_ MainWin* self)
     }
     strDestroy(&tmp);
 
+    GameInst* inst = NULL;
     // update play button state
     if (haveexe) {
-        GameInst* inst = subspaceGame(self->ss);
+        inst = subspaceGame(self->ss);
         if (inst) {
             GameInstState st = ginstGetState(inst);
             if (st == GI_Init || st == GI_Exited)
                 pbenabled = true;
-            objRelease(&inst);
         } else {
             pbenabled = true;
         }
@@ -305,7 +305,7 @@ void MainWin_update(_In_ MainWin* self)
     if (!rt || !featureIsEnabled(rt)) {
         IupSetAttribute(self->runtrackerbtn, "VISIBLE", "NO");
     } else {
-        RunInfo* run = subspaceRun(self->ss);
+        RunInfo* run = inst ? ginstRun(inst) : NULL;
         if (run && runinfoIsRecording(run)) {
             IupSetAttribute(self->runtrackerbtn, "IMAGE", "IMAGE_RUNTRACKER_RECORDING");
             IupSetAttribute(self->runtrackerbtn, "IMAGEHIGHLIGHT", "IMAGE_RUNTRACKER_RECORDING");
@@ -334,7 +334,7 @@ void MainWin_update(_In_ MainWin* self)
 
     IupSetAttribute(self->playbtn, "ACTIVE", pbenabled ? "YES" : "NO");
 
-    return;
+    objRelease(&inst);
 }
 
 void MainWin_updateAll(_In_ MainWin* self)
@@ -400,10 +400,12 @@ int MainWin_onClose(Ihandle* ih)
     checkLayout(self);
 
     // check if a recorded run is in progress
-    RunInfo* run = subspaceRun(self->ss);
+    GameInst* inst = subspaceGame(self->ss);
+    RunInfo* run   = inst ? ginstRun(inst) : NULL;
     if (run && runinfoIsRecording(run))
         quit = confirmQuit(self->ss);
     objRelease(&run);
+    objRelease(&inst);
 
     if (quit) {
         self->ss->exit = true;
@@ -470,5 +472,5 @@ void MainWin_addTab(_In_ MainWin* self, Ihandle* attachto, Ihandle* addbefore, _
 void MainWin_removeTab(_In_ MainWin* self, Ihandle* tabparent, Ihandle* toremove);
 void MainWin_addSplit(_In_ MainWin* self, Ihandle* at, bool vertical);
 void MainWin_removePlaceholder(_In_ MainWin* self, Ihandle* ph);
-#include "mainwin.auto.inc"
+#include "ui/win/mainwin.auto.inc"
 // Autogen ends -------

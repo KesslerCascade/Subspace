@@ -1,0 +1,15 @@
+#include "feature/feature.cxh"
+
+class RunTracker extends SubspaceFeature {
+    factory create(Subspace *ss);
+
+    bool paused;
+    bool isPaused();
+    void pause(bool paused);
+    void sendUpdate(bool recording);
+
+    void updateLockState();
+    override createSettingsPage;
+    override applyDefaultSettings;
+    override enable;
+}

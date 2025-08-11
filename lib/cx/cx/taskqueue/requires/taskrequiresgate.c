@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "taskrequiresgate.h"
+#include "taskqueue/requires/taskrequiresgate.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -166,5 +166,5 @@ void TaskRequiresGate_destroy(_In_ TaskRequiresGate* self)
 }
 
 // Autogen begins -----
-#include "taskrequiresgate.auto.inc"
+#include "taskqueue/requires/taskrequiresgate.auto.inc"
 // Autogen ends -------

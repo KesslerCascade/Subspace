@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqmthreadpool.h"
+#include "taskqueue/manager/tqmthreadpool.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -125,5 +125,5 @@ bool TQThreadPoolManager_stop(_In_ TQThreadPoolManager* self)
 }
 
 // Autogen begins -----
-#include "tqmthreadpool.auto.inc"
+#include "taskqueue/manager/tqmthreadpool.auto.inc"
 // Autogen ends -------

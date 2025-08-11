@@ -6,11 +6,11 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "imageload.h"
+#include "ui/image/imageload.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include "ui/image/imagedrivers.h"
 #include "ui/image/imageresample.h"
-#include "imagedrivers.h"
 
 static int findDriver(strref driver)
 {
@@ -143,5 +143,5 @@ void ImageLoad_destroy(_In_ ImageLoad* self)
 }
 
 // Autogen begins -----
-#include "imageload.auto.inc"
+#include "ui/image/imageload.auto.inc"
 // Autogen ends -------

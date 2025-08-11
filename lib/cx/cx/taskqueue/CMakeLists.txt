@@ -4,10 +4,9 @@ set(TASKQUEUE_SRCS
 set(TASKQUEUE_INCLUDES
     taskqueue/taskqueue.h
     taskqueue/taskqueue_private.h
-    taskqueue/taskqueue_shared.h
-    taskqueue/userfunctask.h)
-set(TASKQUEUE_SIDL
-    taskqueue/userfunctask.sidl)
+    taskqueue/taskqueue_shared.h)
+set(TASKQUEUE_AUTOGEN
+    taskqueue/userfunctask.cxh)
 
 add_subdirectory(manager)
 add_subdirectory(monitor)
@@ -27,9 +26,9 @@ set(CX_INCLUDES
     ${CX_INCLUDES}
     ${TASKQUEUE_INCLUDES}
     PARENT_SCOPE)
-set(CX_SIDL
-    ${CX_SIDL}
-    ${TASKQUEUE_SIDL}
+set(CX_AUTOGEN
+    ${CX_AUTOGEN}
+    ${TASKQUEUE_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

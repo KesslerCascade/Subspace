@@ -1,0 +1,59 @@
+#include <iup.h>
+#include "subspace.h"
+
+#define RUNHISTORYWIN_WIDTH 800
+#define RUNHISTORYWIN_HEIGHT 300
+
+typedef enum RunHistoryColumn {
+    RHC_Start,
+    RHC_Status,
+    RHC_ShipType,
+    RHC_ShipName,
+    RHC_Sector,
+    RHC_Difficulty,
+    RHC_Category,
+    RHC_Notes
+} RunHistoryColumn;
+
+class SubspaceUI;
+class RunHistoryWin {
+    Subspace *ss;
+    SubspaceUI *ui;
+
+    Ihandle *win;
+
+    Ihandle *search;
+    Ihandle *category;
+    Ihandle *rmtx;
+    Ihandle *status;
+    Ihandle *pages;
+    Ihandle *pgup;
+    Ihandle *pgdown;
+
+    Ihandle *loadbtn;
+    Ihandle *editbtn;
+    Ihandle *abandonbtn;
+    Ihandle *deletebtn;
+
+    Ihandle *searchtimer;
+
+    string searchtxt;
+    string catfilter;
+    int page;
+    int npages;
+    RunHistoryColumn sort;
+    bool sortdesc;
+
+    sarray:sarray rows;
+    int selectrow;
+
+    bool make();
+    void show();
+    standalone int onClose(Ihandle *ih);
+    void query();
+    void finish();
+    void select(int row);
+    int64 selectedRunId();
+
+    factory create(SubspaceUI *ui);
+}

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "vfsobj.h"
+#include "fs/vfsobj.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "vfs_private.h"
@@ -75,5 +75,5 @@ _objfactory_check VFS* VFS_createFromFS()
 }
 
 // Autogen begins -----
-#include "vfsobj.auto.inc"
+#include "fs/vfsobj.auto.inc"
 // Autogen ends -------

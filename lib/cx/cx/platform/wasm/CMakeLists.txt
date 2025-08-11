@@ -24,8 +24,7 @@ if(CX_PLATFORM_IS_WASM)
     set(PLATFORM_WASM_INCLUDES
         platform/wasm/wasm_hostid.h
         platform/wasm/wasm_os.h
-        platform/wasm/wasm_sys_entry.h
-        platform/wasm/wasm_thread_threadobj.h)
+        platform/wasm/wasm_sys_entry.h)
 
     set(PLATFORM_INCLUDES
         ${PLATFORM_INCLUDES}
@@ -33,8 +32,8 @@ if(CX_PLATFORM_IS_WASM)
         PARENT_SCOPE)
 endif()
 
-set(PLATFORM_WASM_SIDL
-    platform/wasm/wasm_thread_threadobj.sidl)
+set(PLATFORM_WASM_AUTOGEN
+    platform/wasm/wasm_thread_threadobj.cxh)
 
 set(CX_SRCS
     ${CX_SRCS}
@@ -44,9 +43,9 @@ set(CX_INCLUDES
     ${CX_INCLUDES}
     ${PLATFORM_WASM_INCLUDES}
     PARENT_SCOPE)
-set(CX_SIDL
-    ${CX_SIDL}
-    ${PLATFORM_WASM_SIDL}
+set(CX_AUTOGEN
+    ${CX_AUTOGEN}
+    ${PLATFORM_WASM_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

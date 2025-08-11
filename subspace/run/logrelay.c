@@ -6,12 +6,12 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "logrelay.h"
+#include "run/logrelay.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/utils/murmur.h>
+#include "run/runinfo.h"
 #include "ui/subspaceui.h"
-#include "runinfo.h"
 
 _objfactory_guaranteed LogRelay* LogRelay_create(Subspace* ss)
 {
@@ -275,5 +275,5 @@ uint32 SubscriberInfo_hash(_In_ SubscriberInfo* self, uint32 flags)
 }
 
 // Autogen begins -----
-#include "logrelay.auto.inc"
+#include "run/logrelay.auto.inc"
 // Autogen ends -------

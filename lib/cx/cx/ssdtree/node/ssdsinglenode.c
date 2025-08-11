@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "ssdsinglenode.h"
+#include "ssdtree/node/ssdsinglenode.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "../ssdtree.h"
@@ -159,5 +159,5 @@ bool SSDSingleIter_iterOut(_In_ SSDSingleIter* self, _When_(return == true, _Out
 }
 
 // Autogen begins -----
-#include "ssdsinglenode.auto.inc"
+#include "ssdtree/node/ssdsinglenode.auto.inc"
 // Autogen ends -------

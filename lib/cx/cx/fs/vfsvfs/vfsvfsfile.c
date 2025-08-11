@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "vfsvfsfile.h"
+#include "fs/vfsvfs/vfsvfsfile.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -74,5 +74,5 @@ void VFSVFSFile_destroy(_In_ VFSVFSFile* self)
 }
 
 // Autogen begins -----
-#include "vfsvfsfile.auto.inc"
+#include "fs/vfsvfs/vfsvfsfile.auto.inc"
 // Autogen ends -------

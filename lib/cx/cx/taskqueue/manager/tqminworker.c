@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqminworker.h"
+#include "taskqueue/manager/tqminworker.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -94,5 +94,5 @@ void TQInWorkerManager_destroy(_In_ TQInWorkerManager* self)
 }
 
 // Autogen begins -----
-#include "tqminworker.auto.inc"
+#include "taskqueue/manager/tqminworker.auto.inc"
 // Autogen ends -------

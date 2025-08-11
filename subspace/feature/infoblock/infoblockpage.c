@@ -6,10 +6,10 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "infoblockpage.h"
+#include "feature/infoblock/infoblockpage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "infoblock.h"
+#include "feature/infoblock/infoblock.h"
 
 static strref infoitems[]     = { _S"ssver", _S"ftlver", _S"fps", _S"sector" };
 static const int numinfoitems = 4;
@@ -321,5 +321,5 @@ void InfoBlockPage_save(_In_ InfoBlockPage* self)
 }
 
 // Autogen begins -----
-#include "infoblockpage.auto.inc"
+#include "feature/infoblock/infoblockpage.auto.inc"
 // Autogen ends -------

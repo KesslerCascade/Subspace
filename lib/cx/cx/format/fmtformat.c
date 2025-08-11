@@ -1,29 +1,29 @@
 #include "format_private.h"
+#include "cx/format/formattable.h"
 #include "cx/obj/objstdif.h"
 #include "cx/utils/compare.h"
-#include "formattable.h"
 
 _Use_decl_annotations_
-bool _fmtFindData(FMTContext *ctx)
+bool _fmtFindData(FMTContext* ctx)
 {
     bool ret = !strEmpty(ctx->v.def);
 
     if (ctx->v.vtype == -1)
         return ret;
 
-    bool isarray = ctx->v.arrayidx >= 0;
-    bool ishash = !strEmpty(ctx->v.hashkey);
+    bool isarray     = ctx->v.arrayidx >= 0;
+    bool ishash      = !strEmpty(ctx->v.hashkey);
     bool usestartarg = (ctx->v.idx == -1 && !isarray && !ishash);
-    int32 findinst = clamplow(ctx->v.idx, 1);
-    int32 idx = usestartarg ? ctx->startarg[ctx->v.vtype] : 0;
-    uint8 typeid = _fmtTypeIdMask[ctx->v.vtype][0];
-    uint8 typemask = _fmtTypeIdMask[ctx->v.vtype][1];
+    int32 findinst   = clamplow(ctx->v.idx, 1);
+    int32 idx        = usestartarg ? ctx->startarg[ctx->v.vtype] : 0;
+    uint8 typeid     = _fmtTypeIdMask[ctx->v.vtype][0];
+    uint8 typemask   = _fmtTypeIdMask[ctx->v.vtype][1];
 
     for (; findinst > 0; idx++) {
-        stvar *arg = &ctx->args[idx];
+        stvar* arg = &ctx->args[idx];
 
         if (idx >= ctx->nargs) {
-            ctx->v.vtype = -1;      // no data, don't try to format
+            ctx->v.vtype = -1;   // no data, don't try to format
             return ret;
         }
 
@@ -52,10 +52,10 @@ bool _fmtFindData(FMTContext *ctx)
         }
 
         ctx->v.type = saElemType(arr);
-        ctx->v.data = (void*)((uintptr)arr.a + (size_t)saElemSize(arr)*ctx->v.arrayidx);
+        ctx->v.data = (void*)((uintptr)arr.a + (size_t)saElemSize(arr) * ctx->v.arrayidx);
     } else if (ishash) {
         hashtable htbl = ctx->args[idx - 1].data.st_hashtable;
-        htelem elem = htFind(htbl, string, ctx->v.hashkey, none, 0);
+        htelem elem    = htFind(htbl, string, ctx->v.hashkey, none, 0);
         if (!elem) {
             ctx->v.vtype = -1;
             return ret;
@@ -69,17 +69,17 @@ bool _fmtFindData(FMTContext *ctx)
 
     if (typeid == stTypeId(object)) {
         // special handling for objects to ensure they have the right interface
-        Formattable *fmtif = objInstIf(*(ObjInst**)ctx->v.data, Formattable);
+        Formattable* fmtif = objInstIf(*(ObjInst**)ctx->v.data, Formattable);
         if (fmtif) {
             ctx->v.fmtdata[0] = (uintptr)fmtif;
         } else {
             // If an object doesn't implement Formattable, it might implement Convertible
-            Convertible *cvtif = objInstIf(*(ObjInst **)ctx->v.data, Convertible);
+            Convertible* cvtif = objInstIf(*(ObjInst**)ctx->v.data, Convertible);
             if (cvtif) {
                 ctx->v.fmtdata[1] = (uintptr)cvtif;
             } else {
                 ctx->v.vtype = -1;
-                ctx->v.data = NULL;
+                ctx->v.data  = NULL;
                 return ret;
             }
         }
@@ -87,15 +87,14 @@ bool _fmtFindData(FMTContext *ctx)
     return true;
 }
 
-static inline void fillPad(_Inout_ string *pad, int32 len)
+static inline void fillPad(_Inout_ string* pad, int32 len)
 {
     strClear(pad);
-    uint8 *buf = strBuffer(pad, len);
-    for (int32 i = 0; i < len; i++)
-        buf[i] = ' ';
+    uint8* buf = strBuffer(pad, len);
+    for (int32 i = 0; i < len; i++) buf[i] = ' ';
 }
 
-static void fmtApplyGenWidth(_Inout_ FMTVar *v, _Inout_ string *vstr, int32 width, uint32 flags)
+static void fmtApplyGenWidth(_Inout_ FMTVar* v, _Inout_ string* vstr, int32 width, uint32 flags)
 {
     if (width <= 0 || strLen(*vstr) == width)
         return;
@@ -122,7 +121,7 @@ static void fmtApplyGenWidth(_Inout_ FMTVar *v, _Inout_ string *vstr, int32 widt
     }
 }
 
-static void fmtApplyGenFlags(_Inout_ FMTContext *ctx, _Inout_ string *vstr)
+static void fmtApplyGenFlags(_Inout_ FMTContext* ctx, _Inout_ string* vstr)
 {
     if (!(ctx->v.flags & FMTVar_NoGenCase)) {
         if (ctx->v.flags & FMTVar_Upper)
@@ -136,7 +135,7 @@ static void fmtApplyGenFlags(_Inout_ FMTContext *ctx, _Inout_ string *vstr)
 }
 
 _Use_decl_annotations_
-void _fmtFormat(FMTContext *ctx)
+void _fmtFormat(FMTContext* ctx)
 {
     bool success = false;
 

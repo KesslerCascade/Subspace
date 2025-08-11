@@ -21,10 +21,9 @@ set(THREAD_INCLUDES
     thread/sema.h
     thread/thread.h
     thread/threadbase.h
-    thread/threadobj.h
     thread/thread_private.h)
-set(THREAD_SIDL
-    thread/threadobj.sidl)
+set(THREAD_AUTOGEN
+    thread/threadobj.cxh)
 
 set(CX_SRCS
     ${CX_SRCS}
@@ -34,9 +33,9 @@ set(CX_INCLUDES
     ${CX_INCLUDES}
     ${THREAD_INCLUDES}
     PARENT_SCOPE)
-set(CX_SIDL
-    ${CX_SIDL}
-    ${THREAD_SIDL}
+set(CX_AUTOGEN
+    ${CX_AUTOGEN}
+    ${THREAD_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

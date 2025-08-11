@@ -1,7 +1,8 @@
 #include <cx/container.h>
 #include "ui/util/iupsetobj.h"
-#include "about.h"
-#include "mainwin.h"
+#include "ui/win/about.h"
+#include "ui/win/mainwin.h"
+#include "ui/win/runhistory.h"
 
 static int menu_exit(Ihandle* ih)
 {
@@ -21,9 +22,26 @@ static int menu_about(Ihandle* ih)
     return IUP_DEFAULT;
 }
 
+static int menu_runhist(Ihandle* ih)
+{
+    MainWin* win = iupGetParentObj(MainWin, ih);
+    if (win) {
+        SubspaceUI* ui = win->ss->ui;
+        objRelease(&ui->runhistw);
+        ui->runhistw = runhistorywinCreate(win->ss->ui);
+        runhistorywinShow(ui->runhistw);
+    }
+    return IUP_DEFAULT;
+}
+
 void MainWin_makeMenu(_In_ MainWin* self)
 {
     SubspaceUI* ui = self->ui;
+
+    Ihandle* runhist = IupItem(langGetC(self->ss, "menu_runhistory"), NULL);
+    iupSetObj(runhist, ObjNone, self, ui);
+    IupSetCallback(runhist, "ACTION", menu_runhist);
+    Ihandle* sep1 = IupSeparator();
 
     Ihandle* about = IupItem(langGetC(self->ss, "menu_about"), NULL);
     iupSetObj(about, ObjNone, self, ui);
@@ -33,7 +51,7 @@ void MainWin_makeMenu(_In_ MainWin* self)
     iupSetObj(exit, ObjNone, self, ui);
     IupSetCallback(exit, "ACTION", menu_exit);
 
-    self->menu = IupMenu(about, exit, NULL);
+    self->menu = IupMenu(runhist, sep1, about, exit, NULL);
 }
 
 void MainWin_showMenu(_In_ MainWin* self, int mx, int my)

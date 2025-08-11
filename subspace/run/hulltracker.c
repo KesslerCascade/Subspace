@@ -6,11 +6,11 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "hulltracker.h"
+#include "run/hulltracker.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "control/controlserver.h"
-#include "runinfo.h"
+#include "run/runinfo.h"
 
 _objfactory_guaranteed HullTracker* HullTracker_create(RunInfo* run)
 {
@@ -182,5 +182,5 @@ void HullTracker_destroy(_In_ HullTracker* self)
 }
 
 // Autogen begins -----
-#include "hulltracker.auto.inc"
+#include "run/hulltracker.auto.inc"
 // Autogen ends -------

@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "tqmanualworker.h"
+#include "taskqueue/worker/tqmanualworker.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "cx/taskqueue/taskqueue_private.h"
@@ -72,5 +72,5 @@ int64 TQManualWorker_tick(_In_ TQManualWorker* self, _In_ TaskQueue* tq)
 }
 
 // Autogen begins -----
-#include "tqmanualworker.auto.inc"
+#include "taskqueue/worker/tqmanualworker.auto.inc"
 // Autogen ends -------

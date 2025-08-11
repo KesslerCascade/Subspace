@@ -1,7 +1,7 @@
 #pragma once
 
-#include "controlserver.h"
-#include "controlclient.h"
+#include "control/controlclient.h"
+#include "control/controlserver.h"
 #include "gamemgr/gameinst.h"
 
 void registerCmds(ControlServer* csvr);

@@ -6,11 +6,11 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "savemanagerpage.h"
+#include "feature/savemanager/savemanagerpage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
-#include "savemanager.h"
+#include "feature/savemanager/savemanager.h"
 
 _objfactory_guaranteed SaveManagerPage* SaveManagerPage_create(SaveManager* feature, SubspaceUI* ui)
 {
@@ -99,5 +99,5 @@ bool SaveManagerPage_update(_In_ SaveManagerPage* self)
     return true;}
 
 // Autogen begins -----
-#include "savemanagerpage.auto.inc"
+#include "feature/savemanager/savemanagerpage.auto.inc"
 // Autogen ends -------

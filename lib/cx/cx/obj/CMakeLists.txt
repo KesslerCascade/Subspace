@@ -10,8 +10,9 @@ set(OBJINCLUDES
     obj/objclass.h
     obj/objiface.h
     obj/objimpl.h
-    obj/objstdif.h
     obj/stype_obj.h)
+set(OBJSIDL
+    obj/objstdif.cxh)
 
 set(CX_SRCS
     ${CX_SRCS}
@@ -20,6 +21,10 @@ set(CX_SRCS
 set(CX_INCLUDES
     ${CX_INCLUDES}
     ${OBJINCLUDES}
+    PARENT_SCOPE)
+set(CX_AUTOGEN
+    ${CX_AUTOGEN}
+    ${OBJSIDL}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

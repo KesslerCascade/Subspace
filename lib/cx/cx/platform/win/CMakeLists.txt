@@ -21,7 +21,6 @@ if(CX_PLATFORM_IS_WINDOWS)
         platform/win/win_os.h
         platform/win/win_stacktrace.h
         platform/win/win_sys_entry.h
-        platform/win/win_thread_threadobj.h
         platform/win/win_time.h)
 
     set(PLATFORM_INCLUDES
@@ -30,8 +29,8 @@ if(CX_PLATFORM_IS_WINDOWS)
         PARENT_SCOPE)
 endif()
 
-set(PLATFORM_WIN_SIDL
-    platform/win/win_thread_threadobj.sidl)
+set(PLATFORM_WIN_AUTOGEN
+    platform/win/win_thread_threadobj.cxh)
 
 set(CX_SRCS
     ${CX_SRCS}
@@ -41,9 +40,9 @@ set(CX_INCLUDES
     ${CX_INCLUDES}
     ${PLATFORM_WIN_INCLUDES}
     PARENT_SCOPE)
-set(CX_SIDL
-    ${CX_SIDL}
-    ${PLATFORM_WIN_SIDL}
+set(CX_AUTOGEN
+    ${CX_AUTOGEN}
+    ${PLATFORM_WIN_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES

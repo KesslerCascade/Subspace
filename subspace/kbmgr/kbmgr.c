@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "kbmgr.h"
+#include "kbmgr/kbmgr.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "gamemgr/gamemgr.h"
@@ -151,5 +151,5 @@ void KBMgr_destroy(_In_ KBMgr* self)
 }
 
 // Autogen begins -----
-#include "kbmgr.auto.inc"
+#include "kbmgr/kbmgr.auto.inc"
 // Autogen ends -------

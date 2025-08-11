@@ -6,10 +6,10 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "pkgfs.h"
+#include "pkgfs/pkgfs.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
-#include "pkgfsfile.h"
+#include "pkgfs/pkgfsfile.h"
 
 _objfactory_guaranteed PkgFS* PkgFS_create(PkgFile* pkgf)
 {
@@ -184,5 +184,5 @@ void PkgFS_destroy(_In_ PkgFS* self)
 }
 
 // Autogen begins -----
-#include "pkgfs.auto.inc"
+#include "pkgfs/pkgfs.auto.inc"
 // Autogen ends -------

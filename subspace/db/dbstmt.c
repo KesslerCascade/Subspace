@@ -6,11 +6,11 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "dbstmt.h"
+#include "db/dbstmt.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <sqlite3.h>
-#include "database.h"
+#include "db/database.h"
 
 _objfactory_check DbStmt* DbStmt_create(Database* db, _In_opt_ strref sql)
 {
@@ -152,5 +152,5 @@ void DbStmt_destroy(_In_ DbStmt* self)
 }
 
 // Autogen begins -----
-#include "dbstmt.auto.inc"
+#include "db/dbstmt.auto.inc"
 // Autogen ends -------

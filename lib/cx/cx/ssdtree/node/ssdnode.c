@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "ssdnode.h"
+#include "ssdtree/node/ssdnode.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/time/clock.h>
@@ -67,5 +67,5 @@ void SSDIterator_destroy(_In_ SSDIterator* self)
 }
 
 // Autogen begins -----
-#include "ssdnode.auto.inc"
+#include "ssdtree/node/ssdnode.auto.inc"
 // Autogen ends -------

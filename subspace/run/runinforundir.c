@@ -4,7 +4,7 @@
 #include "feature/featureregistry.h"
 #include "feature/runtracker/runtracker.h"
 #include "lang/lang.h"
-#include "runinfo.h"
+#include "run/runinfo.h"
 
 static LazyInitState rundirvars_init_state;
 static hashtable rundirvars;

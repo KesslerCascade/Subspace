@@ -1,18 +1,18 @@
-#include <cx/thread.h>
 #include <cx/string.h>
+#include <cx/thread.h>
 #include <cx/utils/lazyinit.h>
 #include <unistd.h>
 #define _GNU_SOURCE
 #define __USE_GNU
 #include <pthread.h>
 #include <sched.h>
-#include "wasm_thread_threadobj.h"
+#include "cx/platform/wasm/wasm_thread_threadobj.h"
 
-static UnixThread *mainthread;
-static _Thread_local UnixThread *curthread;
+static UnixThread* mainthread;
+static _Thread_local UnixThread* curthread;
 
 static LazyInitState platformThreadInitState;
-static void platformThreadInit(void *dummy)
+static void platformThreadInit(void* dummy)
 {
     // synthesize a Thread structure for the main thread, so thrCurrent can work
 
@@ -29,16 +29,15 @@ static void platformThreadInit(void *dummy)
     curthread = mainthread;
 }
 
-
-static void _thrCancelCleanup(void *data)
+static void _thrCancelCleanup(void* data)
 {
-    UnixThread *thr = (UnixThread*)data;
+    UnixThread* thr = (UnixThread*)data;
     atomicStore(bool, &thr->running, false, Release);
 }
 
-static void* _thrEntryPoint(void *data)
+static void* _thrEntryPoint(void* data)
 {
-    UnixThread *thr = (UnixThread*)data;
+    UnixThread* thr = (UnixThread*)data;
     if (!thr)
         goto out;
 
@@ -56,16 +55,17 @@ out:
     return NULL;
 }
 
-Thread *_thrPlatformCreate() {
-    UnixThread *uthr = _unixthrobjCreate();
+Thread* _thrPlatformCreate()
+{
+    UnixThread* uthr = _unixthrobjCreate();
     return Thread(uthr);
 }
 
-bool _thrPlatformStart(Thread *thread)
+bool _thrPlatformStart(Thread* thread)
 {
     lazyInit(&platformThreadInitState, &platformThreadInit, NULL);
 
-    UnixThread *thr = objDynCast(UnixThread, thread);
+    UnixThread* thr = objDynCast(UnixThread, thread);
 
     if (!thr || thr->pthr)
         return 0;
@@ -78,10 +78,11 @@ bool _thrPlatformStart(Thread *thread)
     return ret;
 }
 
-bool _thrPlatformWait(Thread *thread, int64 timeout)
+bool _thrPlatformWait(Thread* thread, int64 timeout)
 {
-    UnixThread *thr = objDynCast(UnixThread, thread);
-    if (!thr) return false;
+    UnixThread* thr = objDynCast(UnixThread, thread);
+    if (!thr)
+        return false;
 
     // some pthreads implementations will crash if you try to join
     // a thread that's already been joined
@@ -92,7 +93,7 @@ bool _thrPlatformWait(Thread *thread, int64 timeout)
         thr->joined = !pthread_join(thr->pthr, NULL);
     else {
         struct timespec ts;
-	void *unused;
+        void* unused;
         timeToAbsTimespec(&ts, clockWall() + timeout);
         thr->joined = !pthread_timedjoin_np(thr->pthr, &unused, &ts);
     }
@@ -100,11 +101,12 @@ bool _thrPlatformWait(Thread *thread, int64 timeout)
 }
 
 // WebAssembly doesn't support thread priority at all
-bool _thrPlatformSetPriority(Thread *thread, int prio) {
+bool _thrPlatformSetPriority(Thread* thread, int prio)
+{
     return false;
 }
 
-Thread *thrCurrent(void)
+Thread* thrCurrent(void)
 {
     return Thread(curthread);
 }
@@ -112,7 +114,7 @@ Thread *thrCurrent(void)
 // WebAssembly doesn't have OS-visible thread IDs to speak of, so fake it
 // by just using the value of the thread pointer.
 
-intptr thrOSThreadID(Thread *thread)
+intptr thrOSThreadID(Thread* thread)
 {
     return (intptr)thread;
 }

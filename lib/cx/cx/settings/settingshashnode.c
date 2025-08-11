@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "settingshashnode.h"
+#include "settings/settingshashnode.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "settings_private.h"
@@ -238,5 +238,5 @@ void SettingsHashNode_destroy(_In_ SettingsHashNode* self)
 }
 
 // Autogen begins -----
-#include "settingshashnode.auto.inc"
+#include "settings/settingshashnode.auto.inc"
 // Autogen ends -------

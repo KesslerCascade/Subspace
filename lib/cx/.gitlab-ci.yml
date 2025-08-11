@@ -66,8 +66,8 @@ build_wasm:
   image: 'emscripten/emsdk:4.0.8'
   script:
     - 'cmake -S . -DCMAKE_BUILD_TYPE=Release -B _native'
-    - 'make -C _native -j4 cxobjgen'
-    - 'emcmake cmake -S . -DCMAKE_BUILD_TYPE=Release -B _build -Dcxobjgen_DIR=_native -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}'
+    - 'make -C _native -j4 cxautogen'
+    - 'emcmake cmake -S . -DCMAKE_BUILD_TYPE=Release -B _build -Dcxautogen_DIR=_native -DCMAKE_INSTALL_PREFIX=${CI_PROJECT_DIR}'
     - 'make -C _build -j4'
   artifacts:
     name: cx-build-wasm-$CI_COMMIT_REF_SLUG-$CI_PIPELINE_ID

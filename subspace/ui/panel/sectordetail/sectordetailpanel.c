@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "sectordetailpanel.h"
+#include "ui/panel/sectordetail/sectordetailpanel.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "ui/subspaceui.h"
@@ -36,5 +36,5 @@ bool SectorDetailPanel_make(_In_ SectorDetailPanel* self)
 }
 
 // Autogen begins -----
-#include "sectordetailpanel.auto.inc"
+#include "ui/panel/sectordetail/sectordetailpanel.auto.inc"
 // Autogen ends -------

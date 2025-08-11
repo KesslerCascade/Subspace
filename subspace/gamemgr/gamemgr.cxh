@@ -1,0 +1,24 @@
+#include "gameinst.cxh"
+#include "process.h"
+
+#include <cx/math.h>
+
+[methodprefix gmgr] class GameMgr {
+    Subspace *ss;
+
+    RWLock gmgrlock;
+    ProcWatchState *pws;
+    hashtable:uint32:object insts;      // hashed by cookie
+    PcgState pcg;
+
+    factory create(Subspace *subspace);
+    void reg(GameInst *inst);
+    void unreg(GameInst *inst);
+    GameInst *acquireByCookie(uint32 cookie);
+
+    bool play(GameInst **out);
+    bool validate(strref ftlexe, GameInst **out);
+    void checkStartupValidate();
+
+    uint32 genCookie();
+}

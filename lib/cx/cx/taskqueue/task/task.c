@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "task.h"
+#include "taskqueue/task/task.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/taskqueue/taskqueue_private.h>
@@ -61,5 +61,5 @@ bool Task_wait(_In_ Task* self, int64 timeout)
 }
 
 // Autogen begins -----
-#include "task.auto.inc"
+#include "taskqueue/task/task.auto.inc"
 // Autogen ends -------

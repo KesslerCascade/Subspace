@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "pkgfsfile.h"
+#include "pkgfs/pkgfsfile.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 
@@ -117,5 +117,5 @@ void PkgFSFile_destroy(_In_ PkgFSFile* self)
 }
 
 // Autogen begins -----
-#include "pkgfsfile.auto.inc"
+#include "pkgfs/pkgfsfile.auto.inc"
 // Autogen ends -------

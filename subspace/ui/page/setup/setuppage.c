@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "setuppage.h"
+#include "ui/page/setup/setuppage.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include <cx/format.h>
@@ -499,5 +499,5 @@ void SetupPage_destroy(_In_ SetupPage* self)
 }
 
 // Autogen begins -----
-#include "setuppage.auto.inc"
+#include "ui/page/setup/setuppage.auto.inc"
 // Autogen ends -------

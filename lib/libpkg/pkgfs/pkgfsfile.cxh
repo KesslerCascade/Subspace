@@ -1,0 +1,9 @@
+#include "pkgfs.cxh"
+
+class PkgFSFile implements VFSFileProvider {
+    object:PkgFS prov;
+    object:PkgDirEnt ent;
+    uint32 pos;
+    [canfail] factory create(PkgFS *prov, PkgDirEnt *ent);
+    destroy();
+}

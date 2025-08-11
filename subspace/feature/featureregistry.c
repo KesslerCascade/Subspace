@@ -6,7 +6,7 @@
 #include <cx/obj/objstdif.h>
 #include <cx/container.h>
 #include <cx/string.h>
-#include "featureregistry.h"
+#include "feature/featureregistry.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
 #include "features.h"
@@ -56,5 +56,5 @@ bool FeatureRegistry_isEnabled(_In_ FeatureRegistry* self, _In_opt_ strref name)
 }
 
 // Autogen begins -----
-#include "featureregistry.auto.inc"
+#include "feature/featureregistry.auto.inc"
 // Autogen ends -------

@@ -2,26 +2,18 @@ set(TQ_MONITOR_SRCS
     taskqueue/monitor/tqmonitor.c
     taskqueue/monitor/tqtpmonitor.c
     )
-set(TQ_MONITOR_INCLUDES
-    taskqueue/monitor/tqmonitor.h
-    taskqueue/monitor/tqtpmonitor.h
-    )
-set(TQ_MONITOR_SIDL
-    taskqueue/monitor/tqmonitor.sidl
-    taskqueue/monitor/tqtpmonitor.sidl
+set(TQ_MONITOR_AUTOGEN
+    taskqueue/monitor/tqmonitor.cxh
+    taskqueue/monitor/tqtpmonitor.cxh
     )
 
 set(TASKQUEUE_SRCS
     ${TASKQUEUE_SRCS}
     ${TQ_MONITOR_SRCS}
     PARENT_SCOPE)
-set(TASKQUEUE_INCLUDES
-    ${TASKQUEUE_INCLUDES}
-    ${TQ_MONITOR_INCLUDES}
-    PARENT_SCOPE)
-set(TASKQUEUE_SIDL
-    ${TASKQUEUE_SIDL}
-    ${TQ_MONITOR_SIDL}
+set(TASKQUEUE_AUTOGEN
+    ${TASKQUEUE_AUTOGEN}
+    ${TQ_MONITOR_AUTOGEN}
     PARENT_SCOPE)
 
 set(CX_CMAKE_FILES
