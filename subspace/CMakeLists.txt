@@ -79,6 +79,7 @@ set(SUBSPACE_AUTOGEN
     ui/util/iupsetimagedispatch.cxh
     ui/util/uiupdatedispatch.cxh
     ui/win/mainwin.cxh
+    ui/win/runhistory.cxh
     ui/win/settingswin.cxh
     )
 
@@ -136,6 +137,7 @@ add_executable(subspace
     run/hulltracker.c
     run/logent.c
     run/logrelay.c
+    run/rundb.c
     run/runinfo.c
     run/runinforundir.c
     run/scraptracker.c
@@ -170,6 +172,7 @@ add_executable(subspace
     ui/win/mainwinlayout.c
     ui/win/mainwinmenu.c
     ui/win/quitconfirm.c
+    ui/win/runhistory.c
     ui/win/settingswin.c
     util/pathfilter.c
     util/pathsubst.c

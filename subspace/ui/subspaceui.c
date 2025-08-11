@@ -12,6 +12,7 @@
 
 #include "ui/util/uiupdatedispatch.h"
 #include "ui/win/mainwin.h"
+#include "ui/win/runhistory.h"
 #include "ui/win/settingswin.h"
 
 #include <cd.h>
@@ -229,6 +230,7 @@ void SubspaceUI_destroy(_In_ SubspaceUI* self)
     objRelease(&self->uiq);
     objRelease(&self->mainw);
     objRelease(&self->settingsw);
+    objRelease(&self->runhistw);
     rwlockDestroy(&self->listenerlock);
     htDestroy(&self->listeners);
     // Autogen ends -------

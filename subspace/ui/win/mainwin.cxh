@@ -6,6 +6,7 @@
 #define MAINWIN_DEFAULT_HEIGHT 400
 
 class SubspaceUI;
+class RunHistoryWin;
 class MainWin {
     Subspace *ss;
     SubspaceUI *ui;

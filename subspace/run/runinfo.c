@@ -227,8 +227,6 @@ bool RunInfo_loadHistoric(_In_ RunInfo* self, int64 runid)
 
             saDestroy(&self->sectors);
             self->sectors = loadsectors;
-
-            runinfoSetRecording(self, true);
         }
 
         logFmt(Info,

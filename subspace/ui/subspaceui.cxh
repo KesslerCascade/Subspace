@@ -8,6 +8,7 @@ typedef void (*uiNotifyCallback)(void *self, strref event, stvlist *params);
 
 class MainWin;
 class SettingsWin;
+class RunHistoryWin;
 [methodprefix ssui] class SubspaceUI {
     Subspace *ss;
     object:TaskQueue uiq;
@@ -15,6 +16,7 @@ class SettingsWin;
 
     object:MainWin mainw;
     object:SettingsWin settingsw;
+    object:RunHistoryWin runhistw;
 
     RWLock listenerlock;
     hashtable:string:sarray listeners;
