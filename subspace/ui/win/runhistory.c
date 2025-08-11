@@ -310,10 +310,6 @@ void RunHistoryWin_show(_In_ RunHistoryWin* self)
     IupShowXY(self->win, IUP_CENTER, IUP_CENTER);
     IupSetAttribute(self->win, "SIMULATEMODAL", "YES");
 
-    // fix the matrix's rastersize so it doesn't keep growing on refresh
-    const char* rsz = IupGetAttribute(self->rmtx, "RASTERSIZE");
-    IupSetAttribute(self->rmtx, "RASTERSIZE", rsz);
-
     runhistorywinQuery(self);
 }
 
@@ -501,6 +497,9 @@ void RunHistoryWin_query(_In_ RunHistoryWin* self)
     }
 
     IupSetInt(self->rmtx, "NUMLIN", row - 1);
+    for (int i = 1; i < 8; i++) {
+        IupSetAttributeId(self->rmtx, "RASTERWIDTH", i, NULL);
+    }
     IupSetAttribute(self->rmtx, "FITTOTEXT", "C1");
     IupSetAttribute(self->rmtx, "FITTOTEXT", "C2");
     IupSetAttribute(self->rmtx, "FITTOTEXT", "C3");
