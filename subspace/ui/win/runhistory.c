@@ -124,7 +124,7 @@ static int deletebtn_action(Ihandle* ih)
         rundbDelete(self->ss, runhistorywinSelectedRunId(self));
         runhistorywinQuery(self);
     }
-    
+
     return IUP_DEFAULT;
 }
 
@@ -148,12 +148,41 @@ static int history_click(Ihandle* ih, int lin, int col, char* status)
     return IUP_DEFAULT;
 }
 
+static int search_change(Ihandle* ih, int c, char* new_value)
+{
+    RunHistoryWin* self = iupGetParentObj(RunHistoryWin, ih);
+    strClear(&self->searchtxt);
+    strCopy(&self->searchtxt, (strref)new_value);
+
+    // reset timer so it goes off 1 second after the last input
+    IupSetAttribute(self->searchtimer, "RUN", "NO");
+    IupSetAttribute(self->searchtimer, "TIME", "1000");
+    IupSetAttribute(self->searchtimer, "RUN", "YES");
+
+    return IUP_DEFAULT;
+}
+
+static int search_timer(Ihandle* ih)
+{
+    RunHistoryWin* self = iupGetParentObj(RunHistoryWin, ih);
+    IupSetAttribute(ih, "RUN", "NO");
+    runhistorywinQuery(self);
+
+    return IUP_DEFAULT;
+}
+
 bool RunHistoryWin_make(_In_ RunHistoryWin* self)
 {
+    self->searchtimer = IupTimer();
+    iupSetObj(self->searchtimer, ObjNone, self, self->ui);
+    IupSetCallback(self->searchtimer, "ACTION_CB", (Icallback)search_timer);
+
     Ihandle* searchlbl = IupLabel(langGetC(self->ss, "runhistory_search"));
     IupSetAttribute(searchlbl, "EXPAND", "VERTICALFREE");
     self->search = IupText("");
     IupSetAttribute(self->search, "EXPAND", "HORIZONTAL");
+    iupSetObj(self->search, ObjNone, self, self->ui);
+    IupSetCallback(self->search, "ACTION", (Icallback)search_change);
 
     Ihandle* catsep = IupSpace();
     IupSetAttribute(catsep, "SIZE", "20x1");
@@ -299,13 +328,21 @@ void RunHistoryWin_finish(_In_ RunHistoryWin* self)
 {
     if (self->win)
         IupDestroy(self->win);
-    self->win = NULL;
+    if (self->searchtimer)
+        IupDestroy(self->searchtimer);
+    self->win         = NULL;
+    self->searchtimer = NULL;
 }
 
 static DbStmt* RunQuery(RunHistoryWin* self, int limit, int offset, bool countonly)
 {
     Database* db = self->ss->db;
     string sql   = 0;
+    string searchlike = 0;
+
+    if (!strEmpty(self->searchtxt)) {
+        strNConcat(&searchlike, _S"%", self->searchtxt, _S"%");
+    }
 
     if (countonly)
         strDup(&sql, _S"SELECT COUNT(runid) FROM runs");
@@ -313,6 +350,10 @@ static DbStmt* RunQuery(RunHistoryWin* self, int limit, int offset, bool counton
         strDup(
             &sql,
             _S"SELECT runid, start, result, shiptype, shipname, sectorpoint, difficulty FROM runs");
+
+    if (!strEmpty(searchlike)) {
+        strAppend(&sql, _S" WHERE shiptype LIKE ? OR shipname LIKE ?");
+    }
 
     switch (self->sort) {
     case RHC_Difficulty:
@@ -347,6 +388,11 @@ static DbStmt* RunQuery(RunHistoryWin* self, int limit, int offset, bool counton
         goto out;
 
     int bc = 1;
+    if (!strEmpty(searchlike)) {
+        dbstmtBind(ret, bc++, stvar(strref, searchlike));
+        dbstmtBind(ret, bc++, stvar(strref, searchlike));
+    }
+
     if (limit > 0)
         dbstmtBind(ret, bc++, stvar(int32, limit));
 
@@ -355,6 +401,7 @@ static DbStmt* RunQuery(RunHistoryWin* self, int limit, int offset, bool counton
 
 out:
     strDestroy(&sql);
+    strDestroy(&searchlike);
     return ret;
 }
 

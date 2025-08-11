@@ -35,6 +35,8 @@ class RunHistoryWin {
     Ihandle *abandonbtn;
     Ihandle *deletebtn;
 
+    Ihandle *searchtimer;
+
     string searchtxt;
     string catfilter;
     int page;
