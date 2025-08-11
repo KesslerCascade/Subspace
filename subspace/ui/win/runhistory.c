@@ -171,6 +171,24 @@ static int search_timer(Ihandle* ih)
     return IUP_DEFAULT;
 }
 
+static int pgup_action(Ihandle* ih)
+{
+    RunHistoryWin* self = iupGetParentObj(RunHistoryWin, ih);
+    self->page          = clamplow(self->page - 1, 1);
+    runhistorywinQuery(self);
+
+    return IUP_DEFAULT;
+}
+
+static int pgdown_action(Ihandle* ih)
+{
+    RunHistoryWin* self = iupGetParentObj(RunHistoryWin, ih);
+    self->page          = clamphigh(self->page + 1, self->npages);
+    runhistorywinQuery(self);
+
+    return IUP_DEFAULT;
+}
+
 bool RunHistoryWin_make(_In_ RunHistoryWin* self)
 {
     self->searchtimer = IupTimer();
@@ -235,10 +253,14 @@ bool RunHistoryWin_make(_In_ RunHistoryWin* self)
 
     self->pgup = IupButton("<", "");
     IupSetAttribute(self->pgup, "ACTIVE", "NO");
+    iupSetObj(self->pgup, ObjNone, self, self->ui);
+    IupSetCallback(self->pgup, "ACTION", (Icallback)pgup_action);
     self->pages = IupLabel("0 / 0");
     IupSetAttribute(self->pages, "EXPAND", "VERTICALFREE");
     self->pgdown = IupButton(">", "");
     IupSetAttribute(self->pgdown, "ACTIVE", "NO");
+    iupSetObj(self->pgdown, ObjNone, self, self->ui);
+    IupSetCallback(self->pgdown, "ACTION", (Icallback)pgdown_action);
 
     Ihandle*
         bottomline = IupHbox(self->status, IupFill(), self->pgup, self->pages, self->pgdown, NULL);
