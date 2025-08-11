@@ -1,5 +1,6 @@
 #include "ftl/commandgui.h"
 
+#include "control/runlog.h"
 #include "hook/hook.h"
 #include "patch/patchlist.h"
 #include "subspacegame.h"
@@ -10,6 +11,11 @@ int subspace_CommandGui_GetCommand_post(int ret, CommandGui* self)
 {
     if (gs.saveAndQuit)
         return 8;
+
+    if (ret == 0)
+        runLogSend(&Log_Abandon, "Restart");
+    else if (ret == 6)
+        runLogSend(&Log_Abandon, "Hangar");
 
     return ret;
 }
