@@ -109,6 +109,17 @@ static int savecompat_action(Ihandle* ih, int state)
     return IUP_DEFAULT;
 }
 
+static int postgamesave_action(Ihandle* ih, int state)
+{
+    TweaksPage* self = iupGetParentObj(TweaksPage, ih);
+    if (!self)
+        return IUP_DEFAULT;
+
+    ssdSet(self->feature->settings, _S"postgamesave", true, stvar(bool, state ? true : false));
+    featureSendSettingCur(self->feature, _S"postgamesave");
+    return IUP_DEFAULT;
+}
+
 static int creditsmusic_action(Ihandle* ih, int state)
 {
     TweaksPage* self = iupGetParentObj(TweaksPage, ih);
@@ -190,7 +201,20 @@ bool TweaksPage_make(_In_ TweaksPage* self, Ihandle* list)
            langGet(self->ss, _S"tweaks_savecompat"),
            0);
 
-    Ihandle* savevbox = IupVbox(savesep, savelbl, self->preserveload, self->savecompat, NULL);
+    self->postgamesave = IupToggle(langGetC(self->ss, "tweaks_postgamesave"), NULL);
+    iupSetObj(self->postgamesave, ObjNone, self, self->ui);
+    IupSetCallback(self->postgamesave, "ACTION", (Icallback)postgamesave_action);
+    setTip(self->postgamesave,
+           langGet(self->ss, _S"tweaks_postgamesave_tip"),
+           langGet(self->ss, _S"tweaks_postgamesave"),
+           0);
+
+    Ihandle* savevbox = IupVbox(savesep,
+                                savelbl,
+                                self->preserveload,
+                                self->savecompat,
+                                self->postgamesave,
+                                NULL);
     IupSetAttribute(savevbox, "CMARGIN", "0x0");
 
     Ihandle* audspc = IupSpace();
@@ -261,6 +285,9 @@ bool TweaksPage_update(_In_ TweaksPage* self)
     IupSetAttribute(self->savecompat,
                     "VALUE",
                     ssdVal(bool, self->feature->settings, _S"savecompat", false) ? "ON" : "OFF");
+    IupSetAttribute(self->postgamesave,
+                    "VALUE",
+                    ssdVal(bool, self->feature->settings, _S"postgamesave", false) ? "ON" : "OFF");
 
     IupSetAttribute(self->creditsmusic,
                     "VALUE",

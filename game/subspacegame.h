@@ -103,6 +103,9 @@ typedef struct GameGlobalState {
     bool tweaksOverrideFPS;
     bool ignoreFileDeletion;
     char* saveFileOverride;   // temporary override for save file location
+    bool postGameSaveNow;     // save the game at the end of the frame
+    bool postGameSaveInProgress;   // we are doing the post game save right now
+    bool deleteSaveOnMenu;         // delete save file on return to main menu
 
     // Save & Quit flag
     bool saveAndQuit;

@@ -124,6 +124,8 @@
     "tweaks_preserveload_tip": "Prevents the game from deleting the continue.sav file upon load a saved game from the menu.",
     "tweaks_savecompat": "Save Game Compatibility Fix",
     "tweaks_savecompat_tip": "Alters the behaviour of saving games to write to a temporary file and then rename it into place when complete.\nThis increases compatibility with third-party tools that read the save file while the game is running.",
+    "tweaks_postgamesave": "Post-Game Save",
+    "tweaks_postgamesave_tip": "Creates one additional save file after victory/defeat, allowing data analysis tools such as FTL Hindsight to be able to record hull damage in the final Flagship phase.",
     "tweaks_audio": "Audio",
     "tweaks_creditsmusic": "Replace Credits Music (requires data mod)",
     "tweaks_creditsmusic_tip": "When the credits roll after a victory, instead of playing the title screen music, play a unique track called 'credits'.\nA separate data mod to provide this track is required.",

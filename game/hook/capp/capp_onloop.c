@@ -1,6 +1,7 @@
 #include "control/controlclient.h"
 #include "feature/feature.h"
 #include "feature/savemanager.h"
+#include "feature/tweaks.h"
 #include "ftl/capp.h"
 #include "ftl/scorekeeper.h"
 #include "ftl/worldmanager.h"
@@ -63,10 +64,13 @@ void subspace_CApp_OnLoop_post(CApp* self)
         gc.curDamageSource = NULL;
     }
 
-    if (SaveManager_feature.enabled && gs.autoSaveNow) {
-        gs.autoSaveNow = false;
+    if (SaveManager_feature.enabled && gs.autoSaveNow)
         saveManagerAutoSave(CApp_world(self));
-    }
+    gs.autoSaveNow = false;
+
+    if (Tweaks_feature.enabled && gs.postGameSaveNow)
+        tweaksPostGameSave();
+    gs.postGameSaveNow = false;
 
     controlClientProcessOutbound();
 }

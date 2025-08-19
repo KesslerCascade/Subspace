@@ -8,6 +8,7 @@ typedef struct TweaksSettings {
     int targetfps;
     bool preserveload;
     bool savecompat;
+    bool postgamesave;
     bool creditsmusic;
 } TweaksSettings;
 
@@ -16,4 +17,5 @@ void tweaksSetFrameTime();
 bool tweaksPreserveLoad();
 void tweaksPrepareSave();
 void tweaksFinalizeSave();
+void tweaksPostGameSave();
 bool tweaksOverrideGameOverMusic(SoundControl* sounds);

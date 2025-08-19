@@ -1,5 +1,6 @@
 #include "control/runlog.h"
 #include "feature/feature.h"
+#include "feature/tweaks.h"
 #include "ftl/capp.h"
 #include "ftl/completeship.h"
 #include "ftl/gameover.h"
@@ -37,6 +38,9 @@ int subspace_GameOver_SetVictory_pre(GameOver* self, bool victory, basic_string*
                 runLogSend(&Log_Defeat, reason);
             }
         }
+
+        if (Tweaks_feature.enabled)
+            gs.postGameSaveNow = true;
     }
 
     return 1;

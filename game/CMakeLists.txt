@@ -124,9 +124,11 @@ add_executable(subspacegame
     hook/cfps/cfps_targetframetime.c
     hook/combatcontrol/combatcontrol_rendertarget.c
     hook/commandgui/commandgui_getcommand.c
+    hook/commandgui/commandgui_isgameover.c
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
     hook/commandgui/commandgui_renderstatic.c
+    hook/filehelper/filehelper_deleteallsavefiles.c
     hook/filehelper/filehelper_deletefile.c
     hook/filehelper/filehelper_getsavefile.c
     hook/filehelper/filehelper_getuserfolder.c
