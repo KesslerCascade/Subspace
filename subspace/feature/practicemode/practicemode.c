@@ -9,6 +9,8 @@
 #include "feature/practicemode/practicemode.h"
 // clang-format on
 // ==================== Auto-generated section ends ======================
+#include <iupkey.h>
+#include "kbmgr/kbmgr.h"
 
 _objfactory_guaranteed PracticeMode* PracticeMode_create(Subspace* ss)
 {
@@ -17,7 +19,9 @@ _objfactory_guaranteed PracticeMode* PracticeMode_create(Subspace* ss)
 
     self->ss = ss;
     strDup(&self->name, _S"PracticeMode");
-    self->hidden = true;   // Hide while this is WIP
+
+    // kbmgrReg(ss->kbmgr, self, _S"practicemode_cheats", K_F9);
+    kbmgrReg(ss->kbmgr, self, _S"practicemode_revert", K_F10);
 
     objInstInit(self);
     return self;

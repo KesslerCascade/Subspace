@@ -10,6 +10,9 @@
 
 int subspace_WorldManager_SaveGame_pre(WorldManager* self)
 {
+    if (gs.practiceMode)
+        return 0;   // never save game when in practice mode
+
     if (Tweaks_feature.enabled && !gs.autoSaveInProgress)
         tweaksPrepareSave();
 

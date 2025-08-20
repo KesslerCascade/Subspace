@@ -8,6 +8,7 @@ class GameInfoPanel extends Panel {
     Ihandle *progressbar;
     Ihandle *atmenu;
     Ihandle *tutorial;
+    Ihandle *practice;
     Ihandle *info;
     Ihandle *zbox;
 

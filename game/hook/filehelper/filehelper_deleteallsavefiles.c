@@ -7,7 +7,7 @@
 
 int subspace_FileHelper_deleteAllSaveFiles_pre()
 {
-    if (gs.ignoreFileDeletion)
+    if (gs.ignoreFileDeletion || gs.practiceMode)
         return 0;
 
     return 1;

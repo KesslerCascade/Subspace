@@ -105,7 +105,7 @@ void tweaksFinalizeSave()
 void tweaksPostGameSave()
 {
     TweaksSettings* settings = Tweaks_feature.settings;
-    if (!settings->postgamesave)
+    if (!settings->postgamesave || gs.practiceMode)
         return;
 
     tweaksPrepareSave();

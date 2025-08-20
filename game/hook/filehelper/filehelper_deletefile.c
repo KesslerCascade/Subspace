@@ -7,7 +7,7 @@
 
 int subspace_FileHelper_deleteFile_pre(basic_string* filename)
 {
-    if (gs.ignoreFileDeletion)
+    if (gs.ignoreFileDeletion || gs.practiceMode)
         return 0;
 
     return 1;

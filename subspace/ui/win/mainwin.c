@@ -362,6 +362,10 @@ bool MainWin_updatePanel(_In_ MainWin* self, _In_opt_ strref name)
 
 void MainWin_finish(_In_ MainWin* self)
 {
+    if (self->m_practicesep)
+        IupDestroy(self->m_practicesep);
+    if (self->m_loadpractice)
+        IupDestroy(self->m_loadpractice);
     if (self->win)
         IupDestroy(self->win);
     if (self->timer)
@@ -374,12 +378,15 @@ void MainWin_finish(_In_ MainWin* self)
     self->timer      = NULL;
     self->menu       = NULL;
     self->layoutmenu = NULL;
+    self->m_practicesep  = NULL;
+    self->m_loadpractice = NULL;
 }
 
 void MainWin_destroy(_In_ MainWin* self)
 {
     MainWin_finish(self);
     // Autogen begins -----
+    strDestroy(&self->lastPracticeSaveDir);
     htDestroy(&self->panels);
     objRelease(&self->welcomepanel);
     // Autogen ends -------

@@ -7,6 +7,7 @@
 #include "ftl/gameover.h"
 #include "ftl/graphics/freetype.h"
 #include "ftl/misc.h"
+#include "ftl/scorekeeper.h"
 #include "ftl/shipmanager.h"
 #include "ftl/shipstatus.h"
 #include "ftl/starmap.h"
@@ -173,6 +174,25 @@ DisasmTrace CommandGui_RunCommand_DELETE_trace = {
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // is called twice
               { DT_OP(FINISH) } },
     .out  = { &SYM(CombatControl_GetCurrentTarget) }
+};
+
+DisasmTrace CommandGui_RunCommand_SHIP_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "SHIP ",
+    .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 20, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV, .argf = { 0, ARG_ADDR }, .argstr = { 0, "ALL" } },
+             { DT_OP(NOUNWIND) },
+             { DT_OP(SKIP), .imin = 1, .imax = 22, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ScoreKeeper_Keeper) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL },                              // CALL ScoreKeeper::GetShipId
+              { DT_OP(SKIP), .imin = 0, .imax = 12 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ScoreKeeper::UnlockShip
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ScoreKeeper_UnlockShip) }
 };
 
 INITWRAP(CommandGui_IsPaused);
@@ -601,4 +621,18 @@ DisasmTrace CommandGui_OnLoop_GameOverLoop_trace = {
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL GameOver::OnLoop
               { DT_OP(FINISH) } },
     .out  = { &SYM(GameOver_OnLoop) }
+};
+
+INITWRAP(CommandGui_OnCleanup);
+Symbol SYM(CommandGui_OnCleanup) = {
+    SYMNAME("CommandGui::OnCleanup"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace_s5 },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui9OnCleanupEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_OnCleanup) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
 };

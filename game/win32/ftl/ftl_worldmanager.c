@@ -48,7 +48,7 @@ FuncInfo FUNCINFO(WorldManager_StartGame) = {
 INITWRAP(WorldManager_LoadGame);
 Symbol SYM(WorldManager_LoadGame) = {
     SYMNAME("WorldManager::LoadGame"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu_trace },
              { .type = SYMBOL_FIND_EXPORT,
                 .name =
                     "_ZN12WorldManager8LoadGameENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },
@@ -569,8 +569,9 @@ DisasmTrace WorldManager_OnLoop_Mantis_trace = {
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX } },
                 .argsym = { 0, &SYM(AchievementTracker_Tracker) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 6 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL AchievementTracker::SetAchievement
-              { DT_OP(SKIP), .imin = 3, .imax = 10 },
+              { DT_OP(SKIP), .imin = 3, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX } },

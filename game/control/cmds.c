@@ -9,6 +9,7 @@ DECLCMD(FeatureSettings);
 DECLCMD(BindKey);
 DECLCMD(SaveAndQuit);
 DECLCMD(RunTrackerUpd);
+DECLCMD(LoadPractice);
 
 #define REGCMD(cmdname) controlClientRegister(#cmdname, cmd##cmdname)
 
@@ -20,4 +21,5 @@ void registerCmds()
     REGCMD(BindKey);
     REGCMD(SaveAndQuit);
     REGCMD(RunTrackerUpd);
+    REGCMD(LoadPractice);
 }

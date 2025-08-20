@@ -23,6 +23,11 @@ class MainWin {
     uint32 activeInst;      // cookie of game instance that's being tracked through the UI
 
     Ihandle *menu;          // hamburger menu
+    Ihandle *m_sep1;        // separator after run history
+    Ihandle *m_practicesep; // practice mode separator
+    Ihandle *m_loadpractice;// load practice save menu item
+    string lastPracticeSaveDir;
+    bool practiceInMenu;
 
     Ihandle *layoutmenu;    // right-click context menu for tabs / placeholders
 

@@ -166,6 +166,27 @@ static void makeTutorial(GameInfoPanel* self)
     IupSetAttribute(self->tutorial, "NCMARGIN", "8x8");
 }
 
+static void makePractice(GameInfoPanel* self)
+{
+    Ihandle* ttitle = IupFlatLabel(langGetC(self->ss, "gameinfo_practice_title"));
+    IupSetAttribute(ttitle, "FONT", "Helvetica, Bold 14");
+    IupSetAttribute(ttitle, "FGCOLOR", "255 255 255");
+    IupSetAttribute(ttitle, "EXPAND", "NO");
+    IupSetAttribute(ttitle, "ALIGNMENT", "ACENTER");
+
+    Ihandle* tlbl = IupFlatLabel(langGetC(self->ss, "gameinfo_practice_text"));
+    IupSetAttribute(tlbl, "FONT", "Helvetica, 12");
+    IupSetAttribute(tlbl, "FGCOLOR", "255 255 255");
+    IupSetAttribute(tlbl, "EXPAND", "YES");
+    IupSetAttribute(tlbl, "ALIGNMENT", "ATOP");
+    IupSetAttribute(tlbl, "TEXTWRAP", "YES");
+
+    self->practice = IupVbox(ttitle, tlbl, NULL);
+    IupSetAttribute(self->practice, "ALIGNMENT", "ACENTER");
+    IupSetAttribute(self->practice, "CGAP", "8");
+    IupSetAttribute(self->practice, "NCMARGIN", "8x8");
+}
+
 static void makeInfo(GameInfoPanel* self)
 {
     self->shipname = IupFlatLabel("");
@@ -286,12 +307,14 @@ bool GameInfoPanel_make(_In_ GameInfoPanel* self)
     makeLoading(self);
     makeAtmenu(self);
     makeTutorial(self);
+    makePractice(self);
     makeInfo(self);
 
     self->zbox = IupZbox(self->notrunning,
                          self->loading,
                          self->atmenu,
                          self->tutorial,
+                         self->practice,
                          self->info,
                          NULL);
     IupSetAttribute(self->zbox, "CHILDSIZEALL", "NO");
@@ -569,6 +592,11 @@ bool GameInfoPanel_update(_In_ GameInfoPanel* self)
 
     if (st == GI_Tutorial) {
         gotoSubPanel(self, self->tutorial);
+        goto out;
+    }
+
+    if (st == GI_Practice) {
+        gotoSubPanel(self, self->practice);
         goto out;
     }
 

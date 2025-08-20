@@ -247,5 +247,14 @@
     "runhistory_defeat": "Defeat",
     "runhistory_abandoned": "Abandoned",
     "runhistory_abandon_confirm": "Marking the run as abandoned should be done only if it is never going to be resumed. Are you sure?",
-    "runhistory_delete_confirm": "Caution! Deleting the run will permanently remove its information from the database! Are you sure you want to do this?"
+    "runhistory_delete_confirm": "Caution! Deleting the run will permanently remove its information from the database! Are you sure you want to do this?",
+    "practicemode_load": "Load &Practice Save...",
+    "practice_browse_title": "Load Practice Save",
+    "sav_files": "FTL Saved Games",
+    "practicemode_revert": "Revert To Save (Practice)",
+    "practicemode_revert_tip": "While in practice mode, revert to the last loaded save.",
+    "practicemode_cheats": "Cheat Menu (Practice)",
+    "practicemode_cheats_tip": "While in practice mode, open a menu of useful cheats.",
+    "gameinfo_practice_title": "Practice Mode",
+    "gameinfo_practice_text": "Run information is not collected while in practice mode."
 }

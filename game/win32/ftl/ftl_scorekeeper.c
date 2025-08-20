@@ -1,4 +1,5 @@
 #include "ftl/capp.h"
+#include "ftl/commandgui.h"
 #include "ftl/filehelper.h"
 #include "ftl/globals.h"
 #include "ftl/scorekeeper.h"
@@ -172,5 +173,23 @@ FuncInfo FUNCINFO(ScoreKeeper_AddScrapCollected) = {
     .nargs   = 2,
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_VOID
+};
+
+INITWRAP(ScoreKeeper_UnlockShip);
+Symbol SYM(ScoreKeeper_UnlockShip) = {
+    SYMNAME("ScoreKeeper::UnlockShip"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RunCommand_SHIP_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ScoreKeeper10UnlockShipEiibb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ScoreKeeper_UnlockShip) = {
+    .nargs   = 5,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true } },
     .rettype = RET_VOID
 };

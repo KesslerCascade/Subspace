@@ -15,6 +15,9 @@ int subspace_MenuMenu_Open_pre(MainMenu* self)
     controlMsgInt(msg, 0, "state", GAME_MENU);
     controlClientQueue(msg);
 
+    // if we were practicing, going to the main menu cancels it
+    gs.practiceMode = false;
+
     if (gs.deleteSaveOnMenu) {
         gs.ignoreFileDeletion = false;
         FileHelper_deleteAllSaveFiles();

@@ -75,7 +75,7 @@ typedef struct SubspaceGameSettings {
 
 typedef struct GameGlobalState {
     bool clearToStart;
-    bool sendAllStats;     // resend all stats next loop
+    bool sendAllStats;   // resend all stats next loop
     bool waitInProgress;
 
     // Numeric Hull
@@ -102,8 +102,8 @@ typedef struct GameGlobalState {
     // Tweaks
     bool tweaksOverrideFPS;
     bool ignoreFileDeletion;
-    char* saveFileOverride;   // temporary override for save file location
-    bool postGameSaveNow;     // save the game at the end of the frame
+    char* saveFileOverride;        // temporary override for save file location
+    bool postGameSaveNow;          // save the game at the end of the frame
     bool postGameSaveInProgress;   // we are doing the post game save right now
     bool deleteSaveOnMenu;         // delete save file on return to main menu
 
@@ -113,6 +113,11 @@ typedef struct GameGlobalState {
     // Save Manager
     bool autoSaveNow;          // Create a save to archive at the end of the frame
     bool autoSaveInProgress;   // we are doing an autosave right now
+
+    // Practice Mode
+    bool practiceMode;
+    bool practiceLoadSave;   // load the practice save at the end of the frame when it's safe
+    char* practiceSave;      // current practice save file
 } GameGlobalState;
 
 // Game state that reflets the current context of the FTL client

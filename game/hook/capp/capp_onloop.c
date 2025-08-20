@@ -1,5 +1,6 @@
 #include "control/controlclient.h"
 #include "feature/feature.h"
+#include "feature/practicemode.h"
 #include "feature/savemanager.h"
 #include "feature/tweaks.h"
 #include "ftl/capp.h"
@@ -71,6 +72,9 @@ void subspace_CApp_OnLoop_post(CApp* self)
     if (Tweaks_feature.enabled && gs.postGameSaveNow)
         tweaksPostGameSave();
     gs.postGameSaveNow = false;
+
+    if (gs.practiceLoadSave)
+        practiceLoad();
 
     controlClientProcessOutbound();
 }

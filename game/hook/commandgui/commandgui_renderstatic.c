@@ -4,7 +4,12 @@
 
 // ---- Hooks ----------------
 
-void subspace_CommandGui_RenderStatic_post(CommandGui* self) {}
+void subspace_CommandGui_RenderStatic_post(CommandGui* self)
+{
+    // don't check feature state here because it might have been disabled after starting a practice
+    // session
+    practiceRenderNotice();
+}
 
 // ---- Patch ----------------
 

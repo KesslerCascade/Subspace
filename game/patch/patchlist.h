@@ -1,6 +1,7 @@
 #pragma once
 #include "patch.h"
 
+extern Patch patch_AchievementTracker_SetAchievement;
 extern Patch patch_BlueprintManager_GetShipBlueprint;
 extern Patch patch_CApp_OnExecute;
 extern Patch patch_CApp_OnLoop;
@@ -24,6 +25,7 @@ extern Patch patch_GameOver_SetVictory;
 extern Patch patch_MainMenu_Open;
 extern Patch patch_MouseControl_OnRender;
 extern Patch patch_ResourceControl_RenderLoadingBar;
+extern Patch patch_ScoreKeeper_Various;
 extern Patch patch_Ship_DamageHull;
 extern Patch patch_Ship_ProjectileStrike;
 extern Patch patch_ShipManager_ModifyScrapCount;
