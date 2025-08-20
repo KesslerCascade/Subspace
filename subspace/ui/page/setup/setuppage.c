@@ -92,6 +92,9 @@ static int browseforftl(Ihandle* ih)
     IupSetAttribute(idlg, "FILTER", "*.exe");
     IupSetStrAttribute(idlg, "FILTERINFO", langGetC(gp->ss, "exe_files"));
     IupSetStrAttribute(idlg, "TITLE", langGetC(gp->ss, "ftl_browse_title"));
+    const char* curloc = IupGetAttribute(gp->ftlloctext, "VALUE");
+    if (curloc && curloc[0])
+        IupSetStrAttribute(idlg, "FILE", curloc);
 
     IupPopup(idlg, IUP_CENTER, IUP_CENTER);
 
@@ -105,6 +108,8 @@ static int browseforftl(Ihandle* ih)
         gmgrValidate(gp->ss->gmgr, ftlexe, NULL);
         strDestroy(&ftlexe);
     }
+
+    IupDestroy(idlg);
 
     return IUP_DEFAULT;
 }
@@ -199,6 +204,7 @@ static int browseforsaveovr(Ihandle* ih)
         strDestroy(&ovrdir);
     }
 
+    IupDestroy(idlg);
     strDestroy(&startdir);
 
     return IUP_DEFAULT;
