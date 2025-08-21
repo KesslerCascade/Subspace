@@ -10,6 +10,9 @@
 
 bool runLogSend(LogEntSpec* spec, ...)
 {
+    if (gs.practiceMode)
+        return false;
+
     // if disconnected, just drop combat events so that we don't queue up a ton of events
     if (spec->combat && !controlClientConnected())
         return false;

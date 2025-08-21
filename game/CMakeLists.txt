@@ -95,6 +95,7 @@ add_executable(subspacegame
     control/cmds/cmdcleartostart.c
     control/cmds/cmdenablefeature.c
     control/cmds/cmdfeaturesettings.c
+    control/cmds/cmdloadpractice.c
     control/cmds/cmdruntrackerupd.c
     control/cmds/cmdsaveandquit.c
     feature/base.c
@@ -115,6 +116,7 @@ add_executable(subspacegame
     hook/module.c
     hook/string.c
     hook/symbol.c
+    hook/achievementtracker/achievementtracker_setachievement.c
     hook/blueprintmanager/blueprintmanager_getshipblueprint.c
     hook/capp/capp_onexecute.c
     hook/capp/capp_onkeydown.c
@@ -124,9 +126,11 @@ add_executable(subspacegame
     hook/cfps/cfps_targetframetime.c
     hook/combatcontrol/combatcontrol_rendertarget.c
     hook/commandgui/commandgui_getcommand.c
+    hook/commandgui/commandgui_isgameover.c
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
     hook/commandgui/commandgui_renderstatic.c
+    hook/filehelper/filehelper_deleteallsavefiles.c
     hook/filehelper/filehelper_deletefile.c
     hook/filehelper/filehelper_getsavefile.c
     hook/filehelper/filehelper_getuserfolder.c
@@ -136,6 +140,7 @@ add_executable(subspacegame
     hook/mainmenu/mainmenu_open.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
+    hook/scorekeeper/scorekeeper_various.c
     hook/ship/ship_damagehull.c
     hook/ship/ship_projectilestrike.c
     hook/shipmanager/shipmanager_damagearea.c

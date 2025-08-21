@@ -30,7 +30,7 @@ extern DisasmTrace CApp_OnLoop_trace_s0;
 extern DisasmTrace CApp_OnLoop_trace_s1;
 extern DisasmTrace CApp_OnLoop_trace_s5;
 extern DisasmTrace CApp_OnLoop_trace_s8;
-extern DisasmTrace CApp_OnLoop_menu;
+extern DisasmTrace CApp_OnLoop_menu_trace;
 
 typedef int (*FUNCTYPE(CApp_OnInit))(CApp* self);
 DECLFUNC(CApp_OnInit);
@@ -49,9 +49,11 @@ DECLFUNC(CApp_GenInputEvents);
 
 DECLSYM(CApp_world_offset);
 DECLSYM(CApp_gui_offset);
+DECLSYM(CApp_menu_offset);
 
 DECLSYM(CApp_vtable);
 DECLSYM(CApp_vtable_OnKeyDown_offset);
 
 #define CApp_gui(capp) MEMBER(ftlbase, CApp, capp, CommandGui*, gui)
 #define CApp_world(capp) MEMBER(ftlbase, CApp, capp, WorldManager*, world)
+#define CApp_menu(capp)  (&MEMBER(ftlbase, CApp, capp, MainMenu, menu))

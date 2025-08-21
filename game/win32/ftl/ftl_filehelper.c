@@ -63,7 +63,7 @@ FuncInfo FUNCINFO(FileHelper_deleteAllSaveFiles) = { .nargs     = 0,
 INITWRAP(FileHelper_fileExists);
 Symbol SYM(FileHelper_fileExists) = {
     SYMNAME("FileHelper::fileExists"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu },
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu_trace },
              { .type = SYMBOL_FIND_EXPORT,
                 .name =
                     "_ZN10FileHelper10fileExistsERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },

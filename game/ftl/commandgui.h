@@ -18,6 +18,7 @@ extern DisasmTrace CommandGui_SpaceBar_trace;
 extern DisasmTrace CommandGui_RenderStatic_trace;
 extern DisasmTrace CommandGui_RunCommand_HULL_trace;
 extern DisasmTrace CommandGui_RunCommand_DELETE_trace;
+extern DisasmTrace CommandGui_RunCommand_SHIP_trace;
 extern DisasmTrace CommandGui_Restart_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace_2;
@@ -60,6 +61,7 @@ DECLFUNC(CommandGui_RenderStatic);
 
 typedef void (*FUNCTYPE(CommandGui_Restart))(CommandGui* self);
 DECLFUNC(CommandGui_Restart);
+#define CommandGui_Restart(self) FCALL(ftlbase, CommandGui_Restart, self)
 
 typedef void (*FUNCTYPE(CommandGui_OnLoop))(CommandGui* self);
 DECLFUNC(CommandGui_OnLoop);
@@ -72,6 +74,10 @@ DECLFUNC(CommandGui_LinkMap);
 
 typedef int (*FUNCTYPE(CommandGui_GetCommand))(CommandGui* self);
 DECLFUNC(CommandGui_GetCommand);
+
+typedef int (*FUNCTYPE(CommandGui_OnCleanup))(CommandGui* self);
+DECLFUNC(CommandGui_OnCleanup);
+#define CommandGui_OnCleanup(self) FCALL(ftlbase, CommandGui_OnCleanup, self)
 
 DECLSYM(CommandGui_SpaceBar);
 DECLSYM(CommandGui_shipComplete_offset);

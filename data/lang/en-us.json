@@ -124,6 +124,8 @@
     "tweaks_preserveload_tip": "Prevents the game from deleting the continue.sav file upon load a saved game from the menu.",
     "tweaks_savecompat": "Save Game Compatibility Fix",
     "tweaks_savecompat_tip": "Alters the behaviour of saving games to write to a temporary file and then rename it into place when complete.\nThis increases compatibility with third-party tools that read the save file while the game is running.",
+    "tweaks_postgamesave": "Post-Game Save",
+    "tweaks_postgamesave_tip": "Creates one additional save file after victory/defeat, allowing data analysis tools such as FTL Hindsight to be able to record hull damage in the final Flagship phase.",
     "tweaks_audio": "Audio",
     "tweaks_creditsmusic": "Replace Credits Music (requires data mod)",
     "tweaks_creditsmusic_tip": "When the credits roll after a victory, instead of playing the title screen music, play a unique track called 'credits'.\nA separate data mod to provide this track is required.",
@@ -245,5 +247,14 @@
     "runhistory_defeat": "Defeat",
     "runhistory_abandoned": "Abandoned",
     "runhistory_abandon_confirm": "Marking the run as abandoned should be done only if it is never going to be resumed. Are you sure?",
-    "runhistory_delete_confirm": "Caution! Deleting the run will permanently remove its information from the database! Are you sure you want to do this?"
+    "runhistory_delete_confirm": "Caution! Deleting the run will permanently remove its information from the database! Are you sure you want to do this?",
+    "practicemode_load": "Load &Practice Save...",
+    "practice_browse_title": "Load Practice Save",
+    "sav_files": "FTL Saved Games",
+    "practicemode_revert": "Revert To Save (Practice)",
+    "practicemode_revert_tip": "While in practice mode, revert to the last loaded save.",
+    "practicemode_cheats": "Cheat Menu (Practice)",
+    "practicemode_cheats_tip": "While in practice mode, open a menu of useful cheats.",
+    "gameinfo_practice_title": "Practice Mode",
+    "gameinfo_practice_text": "Run information is not collected while in practice mode."
 }

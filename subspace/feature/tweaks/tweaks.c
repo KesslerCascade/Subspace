@@ -37,6 +37,8 @@ void Tweaks_applyDefaultSettings(_In_ Tweaks* self)
             ssdSet(self->settings, _S"preserveload", false, stvar(bool, true));
         if (!ssdPtr(self->settings, _S"savecompat"))
             ssdSet(self->settings, _S"savecompat", false, stvar(bool, true));
+        if (!ssdPtr(self->settings, _S"postgamesave"))
+            ssdSet(self->settings, _S"postgamesave", false, stvar(bool, true));
         if (!ssdPtr(self->settings, _S"creditsmusic"))
             ssdSet(self->settings, _S"creditsmusic", false, stvar(bool, false));
     }

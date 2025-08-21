@@ -44,6 +44,7 @@ DECLFUNC(WorldManager_StartGame);
 
 typedef void (*FUNCTYPE(WorldManager_LoadGame))(WorldManager* self, basic_string* file);
 DECLFUNC(WorldManager_LoadGame);
+#define WorldManager_LoadGame(self, file) FCALL(ftlbase, WorldManager_LoadGame, self, file)
 
 typedef void (*FUNCTYPE(WorldManager_SaveGame))(WorldManager* self);
 DECLFUNC(WorldManager_SaveGame);

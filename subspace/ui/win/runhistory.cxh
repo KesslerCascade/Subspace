@@ -6,7 +6,7 @@
 
 typedef enum RunHistoryColumn {
     RHC_Start,
-    RHC_Status,
+    RHC_Result,
     RHC_ShipType,
     RHC_ShipName,
     RHC_Sector,

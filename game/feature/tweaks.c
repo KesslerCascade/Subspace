@@ -3,9 +3,11 @@
 #include <stddef.h>
 #include "feature/feature.h"
 #include "feature/timewarp.h"
+#include "ftl/capp.h"
 #include "ftl/filehelper.h"
 #include "ftl/globals.h"
 #include "ftl/soundcontrol.h"
+#include "ftl/worldmanager.h"
 #include "input/keybinds.h"
 #include "patch/patchlist.h"
 #include "tweaks.h"
@@ -100,6 +102,27 @@ void tweaksFinalizeSave()
     }
 }
 
+void tweaksPostGameSave()
+{
+    TweaksSettings* settings = Tweaks_feature.settings;
+    if (!settings->postgamesave || gs.practiceMode)
+        return;
+
+    tweaksPrepareSave();
+
+    gs.postGameSaveInProgress = true;
+    WorldManager* world       = CApp_world(theApp);
+    WorldManager_SaveGame(world);
+    gs.postGameSaveInProgress = false;
+
+    tweaksFinalizeSave();
+
+    gs.ignoreFileDeletion = true;   // the game keeps trying to delete the file every frame, don't
+                                    // let it yet
+    gs.deleteSaveOnMenu   = true;   // since we're not deleting it now, delete it when going bcak to
+                                    // the menu
+}
+
 bool tweaksOverrideGameOverMusic(SoundControl* sounds)
 {
     if (gc.inGameOverLoop) {
@@ -134,6 +157,8 @@ static bool tweaks_Enable(SubspaceFeature* feat, void* settings, bool enabled)
 Patch* Tweaks_patches[] = {
     &patch_CFPS_OnLoop,
     &patch_CFPS_TargetFrameTime,
+    &patch_CommandGui_IsGameOver,
+    &patch_FileHelper_deleteAllSaveFiles,
     &patch_FileHelper_deleteFile,
     &patch_FileHelper_getSaveFile,
     &patch_GameOver_OnLoop,
@@ -150,6 +175,9 @@ FeatureSettingsSpec Tweaks_spec = {
                 .type = CF_BOOL,
                 .off  = offsetof(TweaksSettings, preserveload) },
              { .name = "savecompat", .type = CF_BOOL, .off = offsetof(TweaksSettings, savecompat) },
+             { .name = "postgamesave",
+                .type = CF_BOOL,
+                .off  = offsetof(TweaksSettings, postgamesave) },
              { .name = "creditsmusic",
                 .type = CF_BOOL,
                 .off  = offsetof(TweaksSettings, creditsmusic) },
@@ -161,5 +189,9 @@ SubspaceFeature Tweaks_feature = {
     .enable          = tweaks_Enable,
     .settingsspec    = &Tweaks_spec,
     .requiredPatches = Tweaks_patches,
-    .requiredSymbols = { &SYM(FileHelper_fileExists), &SYM(FileHelper_renameFile), 0 }
+    .requiredSymbols = { &SYM(FileHelper_fileExists),
+                        &SYM(FileHelper_renameFile),
+                        &SYM(CApp_world_offset),
+                        &SYM(WorldManager_SaveGame),
+                        0 }
 };

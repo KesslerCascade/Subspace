@@ -625,13 +625,20 @@ DisasmTrace CApp_OnLoop_trace_s5 = {
              { I_CALL,
                 .argf   = { ARG_MATCH },
                 .argsym = { &SYM(CommandGui_IsGameOver) } },   // CALL CommandGui_IsGameOver
-              { DT_OP(SKIP), .imin = 10, .imax = 20 },
+              { DT_OP(SKIP), .imin = 8, .imax = 18 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CApp_gui_offset) } },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL CommandGui::OnCleanup
+              { DT_OP(SKIP), .imin = 0, .imax = 10 },
              { I_LEA },
-             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL MainMenu::Open
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MainMenu::Open
               { I_JMP },
 
              { DT_OP(FINISH) } },
-    .out  = { &SYM(MainMenu_Open) }
+    .out  = { &SYM(CommandGui_OnCleanup),   // DT_OUT_SYM1
+              &SYM(MainMenu_Open) }
 };
 
 /*
@@ -662,19 +669,20 @@ DisasmTrace CApp_OnLoop_trace_s8 = {
 };
 */
 
-DisasmTrace CApp_OnLoop_menu = {
+DisasmTrace CApp_OnLoop_menu_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(wp_CApp_OnLoop_MenuMenu_handler),
-    .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 4 },
-             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL MainMenu::OnLoop
+    .ops  = { { I_LEA, .argcap = { DT_CAPTURE1 }, .argout = { 0, DT_OUT_SYM1 } },   // this->menu
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MainMenu::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CALL,
-                .argout = { DT_OUT_SYM2 },
-                .argcap = { DT_CAPTURE1 } },   // CALL MainMenu::Choice
+                .argout = { DT_OUT_SYM3 },
+                .argcap = { DT_CAPTURE2 } },   // CALL MainMenu::Choice
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = -1 } } },
              { DT_OP(SKIP), .imin = 0, .imax = 4, .flow = DT_FLOW_JMP_BOTH },
-             { I_CALL, .argf = { ARG_MATCH }, .argcap = { DT_MATCH1 } },   // CALL MainMenu::Choice
+             { I_CALL, .argf = { ARG_MATCH }, .argcap = { DT_MATCH2 } },   // CALL MainMenu::Choice
               { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = 2 } } },
              { DT_OP(SKIP), .imin = 0, .imax = 4, .flow = DT_FLOW_JMP_BOTH },
@@ -682,16 +690,29 @@ DisasmTrace CApp_OnLoop_menu = {
              { DT_OP(SKIP), .imin = 4, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(FileHelper_getSaveFile) } },
              { DT_OP(SKIP), .imin = 0, .imax = 3 },
-             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL FileHelper::fileExists
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL FileHelper::fileExists
               { DT_OP(SKIP), .imin = 5, .imax = 14 },
              { I_TEST, .argf = { ARG_REG, ARG_REG }, .args = { { REG_AL }, { REG_AL } } },
              { DT_OP(SKIP), .imin = 1, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(FileHelper_getSaveFile) } },
              { DT_OP(SKIP), .imin = 1, .imax = 6 },
-             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL WorldManager::LoadGame
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL WorldManager::LoadGame
+              { DT_OP(SKIP), .imin = 1, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_MATCH },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH1 } },
+             { I_CALL, .argout = { DT_OUT_SYM6 } },   // CALL MainMenu::Close
               { DT_OP(FINISH) } },
-    .out  = { &SYM(MainMenu_OnLoop),                   // DT_OUT_SYM1
-              &SYM(MainMenu_Choice),                   // DT_OUT_SYM2
-              &SYM(FileHelper_fileExists),             // DT_OUT_SYM3
-              &SYM(WorldManager_LoadGame) }
+    .out  = { &SYM(CApp_menu_offset),                  // DT_OUT_SYM1
+              &SYM(MainMenu_OnLoop),                   // DT_OUT_SYM2
+              &SYM(MainMenu_Choice),                   // DT_OUT_SYM3
+              &SYM(FileHelper_fileExists),             // DT_OUT_SYM4
+              &SYM(WorldManager_LoadGame),             // DT_OUT_SYM5
+              &SYM(MainMenu_Close) }
+};
+
+Symbol SYM(CApp_menu_offset) = {
+    SYMNAME("CApp->menu"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu_trace }, { 0 } }
 };

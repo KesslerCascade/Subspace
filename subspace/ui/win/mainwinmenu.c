@@ -1,4 +1,7 @@
 #include <cx/container.h>
+#include "control/controlclient.h"
+#include "feature/featureregistry.h"
+#include "gamemgr/gameinst.h"
 #include "ui/util/iupsetobj.h"
 #include "ui/win/about.h"
 #include "ui/win/mainwin.h"
@@ -34,6 +37,56 @@ static int menu_runhist(Ihandle* ih)
     return IUP_DEFAULT;
 }
 
+static int menu_load_practice(Ihandle* ih)
+{
+    MainWin* win = iupGetParentObj(MainWin, ih);
+    if (win) {
+        Ihandle* idlg = IupFileDlg();
+        IupSetAttributeHandle(idlg, "PARENTDIALOG", win->win);
+        IupSetAttribute(idlg, "DIALOGTYPE", "OPEN");
+        IupSetAttribute(idlg, "FILTER", "*.sav");
+        IupSetStrAttribute(idlg, "FILTERINFO", langGetC(win->ss, "sav_files"));
+        IupSetStrAttribute(idlg, "TITLE", langGetC(win->ss, "practice_browse_title"));
+
+        if (strEmpty(win->lastPracticeSaveDir))
+            vfsGetFSPath(&win->lastPracticeSaveDir, win->ss->fs, RUNDIR_FILENAME);
+
+        if (!strEmpty(win->lastPracticeSaveDir)) {
+            string rundirreal = 0;
+            pathJoin(&rundirreal, win->lastPracticeSaveDir, _S"*.sav");
+            pathToPlatform(&rundirreal, rundirreal);
+            IupSetStrAttribute(idlg, "FILE", strC(rundirreal));
+            strDestroy(&rundirreal);
+        }
+
+        IupPopup(idlg, IUP_CENTER, IUP_CENTER);
+
+        if (IupGetInt(idlg, "STATUS") == 0) {
+            string savepath = 0;
+            const char* val = IupGetAttribute(idlg, "VALUE");
+            pathFromPlatform(&savepath, (strref)val);
+            pathNormalize(&savepath);
+            pathParent(&win->lastPracticeSaveDir, savepath);
+
+            GameInst* inst        = subspaceGame(win->ss);
+            ControlClient* client = inst ? objAcquireFromWeak(ControlClient, inst->client) : NULL;
+
+            if (client && vfsExist(win->ss->rootfs, savepath)) {
+                ControlMsg* msg = controlNewMsg("LoadPractice", 1);
+                controlMsgStr(msg, 0, "savepath", (strref)val);
+                cclientQueue(client, msg);
+            }
+
+            objRelease(&client);
+            objRelease(&inst);
+            strDestroy(&savepath);
+        }
+
+        IupDestroy(idlg);
+    }
+    return IUP_DEFAULT;
+}
+
 void MainWin_makeMenu(_In_ MainWin* self)
 {
     SubspaceUI* ui = self->ui;
@@ -41,8 +94,14 @@ void MainWin_makeMenu(_In_ MainWin* self)
     Ihandle* runhist = IupItem(langGetC(self->ss, "menu_runhistory"), NULL);
     iupSetObj(runhist, ObjNone, self, ui);
     IupSetCallback(runhist, "ACTION", menu_runhist);
-    Ihandle* sep1 = IupSeparator();
 
+    self->m_practicesep  = IupSeparator();
+    self->m_loadpractice = IupItem(langGetC(self->ss, "practicemode_load"), NULL);
+    iupSetObj(self->m_loadpractice, ObjNone, self, ui);
+    IupSetAttribute(self->m_loadpractice, "VISIBLE", "NO");
+    IupSetCallback(self->m_loadpractice, "ACTION", menu_load_practice);
+
+    self->m_sep1   = IupSeparator();
     Ihandle* about = IupItem(langGetC(self->ss, "menu_about"), NULL);
     iupSetObj(about, ObjNone, self, ui);
     IupSetCallback(about, "ACTION", menu_about);
@@ -51,7 +110,7 @@ void MainWin_makeMenu(_In_ MainWin* self)
     iupSetObj(exit, ObjNone, self, ui);
     IupSetCallback(exit, "ACTION", menu_exit);
 
-    self->menu = IupMenu(runhist, sep1, about, exit, NULL);
+    self->menu = IupMenu(runhist, self->m_sep1, about, exit, NULL);
 }
 
 void MainWin_showMenu(_In_ MainWin* self, int mx, int my)
@@ -63,6 +122,30 @@ void MainWin_showMenu(_In_ MainWin* self, int mx, int my)
     // If the provided coordinates are within the button, use those.
     // Otherwise pop up the menu in the center of the button,
     // i.e. if it was activated using the keyboard.
+
+    bool pmenabled = fregIsEnabled(self->ss->freg, _S"PracticeMode");
+    if (pmenabled & !self->practiceInMenu) {
+        IupUnmap(self->menu);
+        IupInsert(self->menu, self->m_sep1, self->m_loadpractice);
+        IupInsert(self->menu, self->m_loadpractice, self->m_practicesep);
+        self->practiceInMenu = true;
+    } else if (!pmenabled && self->practiceInMenu) {
+        IupUnmap(self->menu);
+        IupDetach(self->m_practicesep);
+        IupDetach(self->m_loadpractice);
+        self->practiceInMenu = false;
+    }
+
+    if (pmenabled) {
+        GameInst* inst      = subspaceGame(self->ss);
+        GameInstState state = GI_Init;
+        if (inst)
+            state = ginstGetState(inst);
+        objRelease(&inst);
+
+        bool canload = (state == GI_Menu) || (state == GI_Practice);
+        IupSetAttribute(self->m_loadpractice, "ACTIVE", canload ? "YES" : "NO");
+    }
 
     if (mx < x || mx > x + w || my < y || my > y + h) {
         mx = x + w / 2;

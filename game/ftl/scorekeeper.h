@@ -45,5 +45,9 @@ DECLFUNC(ScoreKeeper_AddExploredLocations);
 typedef void (*FUNCTYPE(ScoreKeeper_AddScrapCollected))(ScoreKeeper* self, int amount);
 DECLFUNC(ScoreKeeper_AddScrapCollected);
 
+typedef void (*FUNCTYPE(ScoreKeeper_UnlockShip))(ScoreKeeper* self, int shipId, int layout,
+                                                 bool save, bool hidePopup);
+DECLFUNC(ScoreKeeper_UnlockShip);
+
 // we know this is always at offset 0 in all versions
 #define ScoreKeeper_stats(keeper) ((StatTracker*)(keeper))

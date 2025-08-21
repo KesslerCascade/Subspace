@@ -21,6 +21,7 @@ DECLFUNC(FileHelper_closeBinaryFile);
 
 typedef void (*FUNCTYPE(FileHelper_deleteAllSaveFiles))();
 DECLFUNC(FileHelper_deleteAllSaveFiles);
+#define FileHelper_deleteAllSaveFiles() FCALL(ftlbase, FileHelper_deleteAllSaveFiles)
 
 typedef bool (*FUNCTYPE(FileHelper_fileExists))(basic_string* filename);
 DECLFUNC(FileHelper_fileExists);
