@@ -79,6 +79,7 @@ if(WIN32)
         win32/entry.c
         win32/int64.c
         win32/kernel32_overrides.c
+        win32/pcg.c
         win32/subspacegame.rc
         win32/osdep.c
         win32/thread.c
@@ -108,6 +109,7 @@ add_executable(subspacegame
     feature/practicemode.c
     feature/runtracker.c
     feature/savemanager.c
+    feature/seededruns.c
     feature/timewarp.c
     feature/tweaks.c
     ftl/graphics/colors.c
@@ -140,6 +142,7 @@ add_executable(subspacegame
     hook/gameover/gameover_onloop.c
     hook/gameover/gameover_setvictory.c
     hook/mainmenu/mainmenu_open.c
+    hook/misc/misc_random32.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
     hook/scorekeeper/scorekeeper_various.c

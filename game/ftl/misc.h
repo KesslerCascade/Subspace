@@ -11,6 +11,11 @@ DECLSYM(basicstring_from_int);
 
 typedef int32_t (*FUNCTYPE(random32))();
 DECLFUNC(random32);
+#define random32() FCALL(ftlbase, random32)
+
+typedef void (*FUNCTYPE(srandom32))(int32_t seed);
+DECLFUNC(srandom32);
+#define srandom32(seed) FCALL(ftlbase, srandom32, seed)
 
 // These aren't really addresses, but we use the symbol framework to extract them from the
 // disassembly.

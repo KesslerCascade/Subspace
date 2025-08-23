@@ -41,6 +41,7 @@ set(SUBSPACE_AUTOGEN
     feature/runtracker/runtrackerpage.cxh
     feature/savemanager/savemanager.cxh
     feature/savemanager/savemanagerpage.cxh
+    feature/seededruns/seededruns.cxh
     feature/timewarp/timewarp.cxh
     feature/timewarp/timewarppage.cxh
     feature/tweaks/tweaks.cxh
@@ -121,6 +122,7 @@ add_executable(subspace
     feature/runtracker/runtrackerpage.c
     feature/savemanager/savemanager.c
     feature/savemanager/savemanagerpage.c
+    feature/seededruns/seededruns.c
     feature/timewarp/timewarp.c
     feature/timewarp/timewarppage.c
     feature/tweaks/tweaks.c

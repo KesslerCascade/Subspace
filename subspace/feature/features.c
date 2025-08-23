@@ -27,6 +27,7 @@ void registerAllFeatures(FeatureRegistry *reg)
     registerFeature(reg, practicemodeCreate(ss));
     registerFeature(reg, runtrackerCreate(ss));
     registerFeature(reg, savemanagerCreate(ss));
+    registerFeature(reg, seededrunsCreate(ss));
     registerFeature(reg, timewarpCreate(ss));
     registerFeature(reg, tweaksCreate(ss));
 }

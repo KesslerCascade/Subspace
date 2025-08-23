@@ -188,8 +188,9 @@ DisasmTrace StarMap_NewGame_trace = {
               { DT_OP(CALL) },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_IMUL,
-                .argf = { 0, 0, ARG_ADDR },
-                .args = { { 0 }, { 0 }, { .addr = 0x5851f42d } } },   // magic LCG
+                .argf   = { 0, 0, ARG_ADDR },
+                .args   = { { 0 }, { 0 }, { .addr = 0x5851f42d } },   // magic LCG
+                .argcap = { DT_CAPTURE2 } },                          // _sil_random_state
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
              { I_IMUL,
                 .argf = { 0, 0, ARG_ADDR },
@@ -202,18 +203,26 @@ DisasmTrace StarMap_NewGame_trace = {
                 .argcap = { DT_MATCH1 },            // this [ +X ]
                 .args   = { { 0 }, { REG_EAX } },   // random32 output
                 .argout = { DT_OUT_SYM2 } },        // sectorMapSeed offset
-              { DT_OP(SKIP), .imin = 3, .imax = 8 },
+              { DT_OP(SKIP), .imin = 0, .imax = 5, .flow = DT_FLOW_JMP_BOTH },
+             { DT_OP(LABEL), .val = 2 },   // remember current position because we need to trace
+              { DT_OP(CALL) },
+             { DT_OP(SKIP), .imin = 0, .imax = 10 },
+             { I_MOV, .argf = { ARG_ADDR }, .argcap = { DT_MATCH2 } },   // _sil_random_state = seed
+              { DT_OP(GOTO), .val = 2 },                                  // go back into NewGame
+              { I_CALL, .argout = { DT_OUT_SYM3 } },                      // CALL random32()
+              { DT_OP(SKIP), .imin = 0, .imax = 4, .flow = DT_FLOW_JMP_UNCOND },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH1 } },
-             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL GenerateSectorMap
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL GenerateSectorMap
               { DT_OP(SKIP), .imin = 4, .imax = 10 },
-             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL GenerateMap
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL GenerateMap
               { DT_OP(FINISH) } },
     .out  = { &SYM(random32),                          // DT_OUT_SYM1
               &SYM(StarMap_sectorMapSeed_offset),      // DT_OUT_SYM2
-              &SYM(StarMap_GenerateSectorMap),         // DT_OUT_SYM3
+              &SYM(srandom32),                         // DT_OUT_SYM3
+              &SYM(StarMap_GenerateSectorMap),         // DT_OUT_SYM4
               &SYM(StarMap_GenerateMap) }
 };
 

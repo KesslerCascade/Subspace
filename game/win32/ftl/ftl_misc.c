@@ -58,3 +58,15 @@ Symbol SYM(random32) = {
              { 0 } }
 };
 FuncInfo FUNCINFO(random32) = { .nargs = 0, .purecdecl = true, .rettype = RET_INT };
+
+INITWRAP(srandom32);
+Symbol SYM(srandom32) = {
+    SYMNAME("srandom32"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StarMap_NewGame_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "srandom32" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(srandom32) = { .nargs     = 1,
+                                 .purecdecl = true,
+                                 .args      = { { 4, ARG_INT, 0, true } },
+                                 .rettype   = RET_VOID };

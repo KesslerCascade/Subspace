@@ -34,6 +34,7 @@ void registerAllFeatures()
     registerFeature(&PracticeMode_feature);
     registerFeature(&RunTracker_feature);
     registerFeature(&SaveManager_feature);
+    registerFeature(&SeededRuns_feature);
     registerFeature(&Tweaks_feature);
 }
 

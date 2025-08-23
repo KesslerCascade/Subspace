@@ -256,5 +256,7 @@
     "practicemode_cheats": "Cheat Menu (Practice)",
     "practicemode_cheats_tip": "While in practice mode, open a menu of useful cheats.",
     "gameinfo_practice_title": "Practice Mode",
-    "gameinfo_practice_text": "Run information is not collected while in practice mode."
+    "gameinfo_practice_text": "Run information is not collected while in practice mode.",
+    "feature_seededruns": "Seeded Runs",
+    "feature_seededruns_desc": "Adds a menu option to start a game with a specific seed, as well as the use of stabilized seeds."
 }

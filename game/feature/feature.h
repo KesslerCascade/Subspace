@@ -7,6 +7,7 @@ extern SubspaceFeature NumericHull_feature;
 extern SubspaceFeature PracticeMode_feature;
 extern SubspaceFeature RunTracker_feature;
 extern SubspaceFeature SaveManager_feature;
+extern SubspaceFeature SeededRuns_feature;
 extern SubspaceFeature TimeWarp_feature;
 extern SubspaceFeature Tweaks_feature;
 typedef struct ControlField ControlField;
