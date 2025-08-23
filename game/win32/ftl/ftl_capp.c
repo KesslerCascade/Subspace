@@ -606,14 +606,14 @@ DisasmTrace CApp_OnLoop_trace_s1 = {
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argsym = { 0, &SYM(TutorialManager_Tutorial) } },
-             { I_CALL },   // CALL TutorialManager::Start
+             { I_CALL },                              // CALL TutorialManager::Start
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
-             { I_CALL },   // CALL MainMenu::GetTutorialShip
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL MainMenu::GetTutorialShip
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ESP }, { REG_EAX } } },
              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL WorldManager::StartGame
               { DT_OP(FINISH) } },
-    .out  = { 0,                                       // DT_OUT_SYM1
+    .out  = { &SYM(MainMenu_GetTutorialShip),          // DT_OUT_SYM1
               &SYM(WorldManager_StartGame) }
 };
 

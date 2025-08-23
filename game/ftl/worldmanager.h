@@ -41,6 +41,7 @@ DECLFUNC(WorldManager_OnLoop);
 
 typedef void (*FUNCTYPE(WorldManager_StartGame))(WorldManager* self, ShipManager* newShip);
 DECLFUNC(WorldManager_StartGame);
+#define WorldManager_StartGame(self, newShip) FCALL(ftlbase, WorldManager_StartGame, self, newShip)
 
 typedef void (*FUNCTYPE(WorldManager_LoadGame))(WorldManager* self, basic_string* file);
 DECLFUNC(WorldManager_LoadGame);
@@ -61,6 +62,7 @@ DECLFUNC(WorldManager_CreateNewGame);
 
 typedef void (*FUNCTYPE(WorldManager_ClearLocation))(WorldManager* self);
 DECLFUNC(WorldManager_ClearLocation);
+#define WorldManager_ClearLocation(self) FCALL(ftlbase, WorldManager_ClearLocation, self)
 
 typedef void (*FUNCTYPE(WorldManager_CreateLocation))(WorldManager* self, Location* loc);
 DECLFUNC(WorldManager_CreateLocation);

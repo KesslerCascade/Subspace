@@ -6,7 +6,9 @@
 #include "ftl/globals.h"
 #include "ftl/location.h"
 #include "ftl/misc.h"
+#include "ftl/powermanager.h"
 #include "ftl/scorekeeper.h"
+#include "ftl/shipgraph.h"
 #include "ftl/shipmanager.h"
 #include "ftl/starmap.h"
 #include "ftl/tutorialmanager.h"
@@ -205,32 +207,38 @@ DisasmTrace WorldManager_Restart_trace = {
     .csym = &SYM(WorldManager_Restart),
     .ops  = { { DT_OP(SKIP), .imin = 7, .imax = 16 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ClearLocation(this)
-              { DT_OP(SKIP), .imin = 11, .imax = 18 },
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL ShipGraph::Restart
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL PowerManager::RestartAll
+              { DT_OP(SKIP), .imin = 8, .imax = 18 },
              { I_MOV,
                 .argf   = { ARG_REG },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_CAPTURE1 },
-                .argout = { 0, DT_OUT_SYM2 } },        // static ScoreKeeper instance
+                .argout = { 0, DT_OUT_SYM4 } },        // static ScoreKeeper instance
               { I_MOV, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ESP }, { .addr = 0 } } },
-             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL ScoreKeeper::SetVictory
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL ScoreKeeper::SetVictory
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH1 } },          // static ScoreKeeper instance
               { I_MOV, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ESP }, { .addr = 1 } } },
-             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL ScoreKeeper::SetSector
+             { I_CALL, .argout = { DT_OUT_SYM6 } },   // CALL ScoreKeeper::SetSector
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_CALL, .args = { ARG_ADDR }, .argsym = { &SYM(CommandGui_Restart) } },
              { DT_OP(SKIP), .imin = 0, .imax = 3 },
-             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL CreateNewGame(this)
+             { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL CreateNewGame(this)
               { DT_OP(FINISH) } },
     .out  = { &SYM(WorldManager_ClearLocation),        // DT_OYT_SYM1
-              &SYM(ScoreKeeper_Keeper),                // DT_OUT_SYM2
-              &SYM(ScoreKeeper_SetVictory),            // DT_OUT_SYM3
-              &SYM(ScoreKeeper_SetSector),             // DT_OUT_SYM4
+              &SYM(ShipGraph_Restart),                 // DT_OUT_SYM2
+              &SYM(PowerManager_RestartAll),           // DT_OUT_SYM3
+              &SYM(ScoreKeeper_Keeper),                // DT_OUT_SYM4
+              &SYM(ScoreKeeper_SetVictory),            // DT_OUT_SYM5
+              &SYM(ScoreKeeper_SetSector),             // DT_OUT_SYM6
               &SYM(WorldManager_CreateNewGame) }
 };
 

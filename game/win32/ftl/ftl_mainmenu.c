@@ -80,3 +80,17 @@ FuncInfo FUNCINFO(MainMenu_Close) = { .nargs   = 1,
                                       .stdcall = true,
                                       .args    = { { 4, ARG_PTR, REG_ECX, false } },
                                       .rettype = RET_VOID };
+
+INITWRAP(MainMenu_GetTutorialShip);
+Symbol SYM(MainMenu_GetTutorialShip) = {
+    SYMNAME("MainMenu::GetTutorialShip"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace_s1 },
+             { .type = SYMBOL_FIND_IMPORT, .name = "_ZN8MainMenu15GetTutorialShipEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(MainMenu_GetTutorialShip) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_PTR
+};

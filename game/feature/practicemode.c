@@ -7,6 +7,8 @@
 #include "ftl/graphics/csurface.h"
 #include "ftl/graphics/freetype.h"
 #include "ftl/mainmenu.h"
+#include "ftl/powermanager.h"
+#include "ftl/shipgraph.h"
 #include "ftl/worldmanager.h"
 #include "input/keybinds.h"
 #include "patch/patchlist.h"
@@ -37,27 +39,17 @@ void practiceLoad()
 
     if (world && gui && menu) {
         // reset state before loading save
-        CommandGui_OnCleanup(gui);
         // restart GUI if a ship exists, to make sure store window is closed while loading
-        if (WorldManager_playerShip(world))
-            CommandGui_Restart(gui);
-        // some of the cleanup happens in here too
-        MainMenu_Open(menu);
-
-        gs.practiceLoadPart2 = true;   // finish the load next frame
-    }
-}
-
-void practiceLoad2()
-{
-    gs.practiceLoadPart2 = false;
-
-    WorldManager* world = CApp_world(theApp);
-    CommandGui* gui     = CApp_gui(theApp);
-    MainMenu* menu      = CApp_menu(theApp);
-
-    if (world && gui && menu) {
         gs.practiceMode = true;
+
+        WorldManager_ClearLocation(world);
+        ShipGraph_Restart();
+        PowerManager_RestartAll();
+        if (WorldManager_playerShip(world)) {
+            CommandGui_Restart(gui);
+            CommandGui_OnCleanup(gui);
+        }
+
         basic_string fname;
         basic_string_set(&fname, gs.practiceSave);
         WorldManager_LoadGame(world, &fname);
@@ -136,12 +128,14 @@ SubspaceFeature PracticeMode_feature = {
     .requiredPatches = PracticeMode_patches,
     .keybinds        = PracticeMode_keybinds,
     .requiredSymbols = { &SYM(WorldManager_LoadGame),
+                        &SYM(WorldManager_StartGame),
                         &SYM(CApp_world_offset),
+                        &SYM(CommandGui_OnCleanup),
                         &SYM(CommandGui_Restart),
                         &SYM(CSurface_GL_SetColor),
                         &SYM(freetype_easy_print),
-                        &SYM(CommandGui_OnCleanup),
                         &SYM(MainMenu_Close),
-                        &SYM(MainMenu_Open),
+                        &SYM(ShipGraph_Restart),
+                        &SYM(PowerManager_RestartAll),
                         0 }
 };
