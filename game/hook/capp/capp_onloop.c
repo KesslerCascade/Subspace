@@ -73,6 +73,8 @@ void subspace_CApp_OnLoop_post(CApp* self)
         tweaksPostGameSave();
     gs.postGameSaveNow = false;
 
+    if (gs.practiceLoadPart2)
+        practiceLoad2();
     if (gs.practiceLoadSave)
         practiceLoad();
 

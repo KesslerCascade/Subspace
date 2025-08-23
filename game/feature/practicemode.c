@@ -44,6 +44,19 @@ void practiceLoad()
         // some of the cleanup happens in here too
         MainMenu_Open(menu);
 
+        gs.practiceLoadPart2 = true;   // finish the load next frame
+    }
+}
+
+void practiceLoad2()
+{
+    gs.practiceLoadPart2 = false;
+
+    WorldManager* world = CApp_world(theApp);
+    CommandGui* gui     = CApp_gui(theApp);
+    MainMenu* menu      = CApp_menu(theApp);
+
+    if (world && gui && menu) {
         gs.practiceMode = true;
         basic_string fname;
         basic_string_set(&fname, gs.practiceSave);

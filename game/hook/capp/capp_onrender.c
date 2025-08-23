@@ -12,6 +12,9 @@ int subspace_CApp_OnRender_pre(CApp* self)
 {
     gs.frameCount++;
 
+    if (gs.practiceLoadPart2)
+        return 0;   // don't flash the menu when loading a practice save
+
     if (TimeWarp_feature.enabled && gs.timeWarpActive && gs.warpFactor > 1) {
         framecounter++;
         if (framecounter >= (int)gs.warpFactor)
