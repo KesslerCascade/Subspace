@@ -93,7 +93,8 @@ static bool practiceMode_Enable(SubspaceFeature* feat, void* settings, bool enab
 
 static void practicemode_key_revert_cb(int key, int flags)
 {
-    gs.practiceLoadSave = true;
+    if (PracticeMode_feature.enabled && gs.practiceMode)
+        gs.practiceLoadSave = true;
 }
 
 static void practicemode_key_cheats_cb(int key, int flags)
