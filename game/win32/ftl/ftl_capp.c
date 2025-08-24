@@ -407,7 +407,7 @@ DisasmTrace CApp_OnRender_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(CApp_OnRender),
     // TODO: Make this better and more comprehensive
-    .ops  = { { DT_OP(SKIP), .imin = 15, .imax = 25 },
+    .ops  = { { DT_OP(SKIP), .imin = 13, .imax = 25 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },
              { I_CMP,
                 .argf   = { ARG_PTRSIZE, ARG_ADDR },

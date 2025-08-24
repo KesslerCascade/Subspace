@@ -641,7 +641,12 @@ DisasmTrace CommandGui_RenderPause_trace = {
     .c    = DTRACE_STRREFS,
     .cstr = "paused_text",
     .mod  = DTRACE_MOD_FUNCSTART,
-    .ops  = { { I_CMP, .outip = DT_OUT_SYM1 }, { DT_OP(FINISH) } },
+    .ops  = { { DT_OP(NOOP), .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 0, .imax = 12 },
+             { I_CMP, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ECX }, { .addr = 0 } } },
+             { DT_OP(SKIP), .imin = 1, .imax = 3 },
+             { I_CMP, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ECX }, { .addr = 0 } } },
+             { DT_OP(FINISH) } },
     .out  = { &SYM(CommandGui_RenderPause) }
 };
 

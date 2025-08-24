@@ -270,14 +270,14 @@ DECLSYM(d3d_sys_texture_lock);
 DisasmTrace sys_texture_lock_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(sys_texture_lock),
-    .ops  = { { DT_OP(SKIP), .imin = 6, .imax = 25 },
+    .ops  = { { DT_OP(SKIP), .imin = 4, .imax = 25 },
              { DT_OP(LABEL), .val = 1 },
              { I_JNZ },
-             { DT_OP(SKIP), .imin = 0, .imax = 12 },
+             { DT_OP(SKIP), .imin = 0, .imax = 16 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL opengl_sys_texture_lock
               { DT_OP(GOTO), .val = 1 },
              { DT_OP(JMP) },
-             { DT_OP(SKIP), .imin = 0, .imax = 12 },
+             { DT_OP(SKIP), .imin = 0, .imax = 13 },
              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL d3d_sys_texture_lock
               { DT_OP(FINISH) } },
     .out  = { &SYM(opengl_sys_texture_lock),           // DT_OUT_SYM1
