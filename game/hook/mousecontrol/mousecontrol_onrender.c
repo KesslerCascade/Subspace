@@ -10,6 +10,9 @@
 // one of the last things that's drawn
 int subspace_MouseControl_OnRender_pre(MouseControl* self)
 {
+    if (gs.renderingScreenshot)
+        return 0;
+
     return 1;
 }
 

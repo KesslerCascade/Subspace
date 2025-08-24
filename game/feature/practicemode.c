@@ -28,8 +28,6 @@ void practiceSetSave(const char* fn)
 
 void practiceLoad()
 {
-    gs.practiceLoadSave = false;
-
     if (!PracticeMode_feature.enabled || !gs.practiceSave)
         return;
 

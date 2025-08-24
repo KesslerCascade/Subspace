@@ -40,6 +40,9 @@ typedef void (*FUNCTYPE(CApp_OnLoop))(CApp* self);
 DECLFUNC(CApp_OnLoop);
 typedef void (*FUNCTYPE(CApp_OnRender))(CApp* self);
 DECLFUNC(CApp_OnRender);
+#define CApp_OnRender(self) FCALL(ftlbase, CApp_OnRender, self)
+typedef void (*FUNCTYPE(CApp_UpdateWindowSettings))(CApp* self);
+DECLFUNC(CApp_UpdateWindowSettings);
 
 typedef void (*FUNCTYPE(CApp_OnKeyDown))(CApp* self, int key);
 DECLFUNC(CApp_OnKeyDown);
@@ -50,6 +53,8 @@ DECLFUNC(CApp_GenInputEvents);
 DECLSYM(CApp_world_offset);
 DECLSYM(CApp_gui_offset);
 DECLSYM(CApp_menu_offset);
+DECLSYM(CApp_framebuffer_offset);
+DECLSYM(CApp_useFrameBuffer_offset);
 
 DECLSYM(CApp_vtable);
 DECLSYM(CApp_vtable_OnKeyDown_offset);
@@ -57,3 +62,5 @@ DECLSYM(CApp_vtable_OnKeyDown_offset);
 #define CApp_gui(capp) MEMBER(ftlbase, CApp, capp, CommandGui*, gui)
 #define CApp_world(capp) MEMBER(ftlbase, CApp, capp, WorldManager*, world)
 #define CApp_menu(capp)  (&MEMBER(ftlbase, CApp, capp, MainMenu, menu))
+#define CApp_framebuffer(capp)    MEMBER(ftlbase, CApp, capp, int*, framebuffer)
+#define CApp_useFrameBuffer(capp) MEMBER(ftlbase, CApp, capp, bool, useFrameBuffer)

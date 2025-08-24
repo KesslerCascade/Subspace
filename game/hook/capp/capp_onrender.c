@@ -33,11 +33,21 @@ int subspace_CApp_OnRender_pre(CApp* self)
     return 1;   // we do want to execute the original CApp::OnRender
 }
 
+void subspace_CApp_OnRender_post(CApp* self)
+{
+    if (Screenshot_feature.enabled && gs.screenshotNow)
+        renderScreenshot(self);
+    gs.screenshotNow = false;
+}
+
 // ---- Patch ----------------
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {
-    return hookFunction(base, CApp_OnRender, subspace_CApp_OnRender_pre, NULL);
+    return hookFunction(base,
+                        CApp_OnRender,
+                        subspace_CApp_OnRender_pre,
+                        subspace_CApp_OnRender_post);
 }
 
 Patch patch_CApp_OnRender = {

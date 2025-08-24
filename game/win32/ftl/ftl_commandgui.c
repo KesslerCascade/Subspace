@@ -636,3 +636,24 @@ FuncInfo FUNCINFO(CommandGui_OnCleanup) = {
     .args    = { { 4, ARG_PTR, REG_ECX, false } },
     .rettype = RET_VOID
 };
+
+DisasmTrace CommandGui_RenderPause_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "paused_text",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_CMP, .outip = DT_OUT_SYM1 }, { DT_OP(FINISH) } },
+    .out  = { &SYM(CommandGui_RenderPause) }
+};
+
+Symbol SYM(CommandGui_RenderPause) = {
+    SYMNAME("CommandGui::RenderPause"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RenderPause_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN10CommandGui11RenderPauseEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CommandGui_RenderPause) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};

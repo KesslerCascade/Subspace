@@ -60,6 +60,7 @@ if(WIN32)
         win32/ftl/ftl_shipmanager.c
         win32/ftl/ftl_shipstatus.c
         win32/ftl/ftl_shipsystem.c
+        win32/ftl/ftl_sil.c
         win32/ftl/ftl_soundcontrol.c
         win32/ftl/ftl_starmap.c
         win32/ftl/ftl_startup.c
@@ -108,6 +109,7 @@ add_executable(subspacegame
     feature/practicemode.c
     feature/runtracker.c
     feature/savemanager.c
+    feature/screenshot.c
     feature/timewarp.c
     feature/tweaks.c
     ftl/graphics/colors.c
@@ -126,11 +128,14 @@ add_executable(subspacegame
     hook/capp/capp_onrender.c
     hook/cfps/cfps_onloop.c
     hook/cfps/cfps_targetframetime.c
+    hook/csurface/csurface_finishframe.c
+    hook/csurface/csurface_gl_blitframebuffer.c
     hook/combatcontrol/combatcontrol_rendertarget.c
     hook/commandgui/commandgui_getcommand.c
     hook/commandgui/commandgui_isgameover.c
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
+    hook/commandgui/commandgui_renderpause.c
     hook/commandgui/commandgui_renderstatic.c
     hook/filehelper/filehelper_deleteallsavefiles.c
     hook/filehelper/filehelper_deletefile.c
@@ -169,6 +174,7 @@ add_executable(subspacegame
     input/keybinds.c
     input/keyboard.c
     log/log.c
+    util/lcg.c
     patch/patch.c
     subspacegame.c
     version.c

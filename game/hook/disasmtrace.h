@@ -118,6 +118,7 @@ typedef enum DisasmCandidateTraceType {
     DTRACE_REFS,       // Check all instructions that reference a particular pointer
     DTRACE_STRREFS,    // Check all instructions that reference a particular string
     DTRACE_CALLS,      // Check all function calls to a particular address
+    DTRACE_FUNCS,      // Check every function (slow!)
 } DisasmCandidateTraceType;
 
 typedef enum DisasmCandidateTraceModifier {

@@ -75,6 +75,7 @@ void subspace_CApp_OnLoop_post(CApp* self)
 
     if (gs.practiceLoadSave)
         practiceLoad();
+    gs.practiceLoadSave = false;
 
     controlClientProcessOutbound();
 }

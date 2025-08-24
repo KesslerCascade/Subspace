@@ -22,6 +22,7 @@ void osSetCurrentDir(const char* dir)
     MultiByteToWideChar(CP_UTF8, 0, dir, -1, dirw, dlen);
 
     SetCurrentDirectoryW(dirw);
+    sfree(dirw);
 }
 
 void osSleep(int msec)
@@ -79,5 +80,33 @@ bool osAbsolutePathUTF8(const char* fname, char* buf, size_t bufsz)
 out:
     sfree(cbuf);
     sfree(cbuf2);
+    return ret;
+}
+
+bool osWriteFile(const char* fn, uint8_t* buf, size_t sz)
+{
+    bool ret     = false;
+    int fnlen    = MultiByteToWideChar(CP_UTF8, 0, fn, -1, NULL, 0);
+    wchar_t* fnw = smalloc(fnlen * sizeof(wchar_t));
+    MultiByteToWideChar(CP_UTF8, 0, fn, -1, fnw, fnlen);
+
+    HANDLE f = CreateFileW(fnw,
+                           GENERIC_WRITE,
+                           FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE,
+                           NULL,
+                           CREATE_ALWAYS,
+                           FILE_ATTRIBUTE_NORMAL,
+                           NULL);
+    if (!f)
+        goto out;
+
+    DWORD didwrite;
+    WriteFile(f, buf, sz, &didwrite, NULL);
+    ret = (didwrite == sz);
+
+out:
+    if (f != INVALID_HANDLE_VALUE)
+        CloseHandle(f);
+    sfree(fnw);
     return ret;
 }

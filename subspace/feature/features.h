@@ -8,6 +8,7 @@
 #include "feature/practicemode/practicemode.h"
 #include "feature/runtracker/runtracker.h"
 #include "feature/savemanager/savemanager.h"
+#include "feature/screenshot/screenshot.h"
 #include "feature/timewarp/timewarp.h"
 #include "feature/tweaks/tweaks.h"
 

@@ -256,5 +256,9 @@
     "practicemode_cheats": "Cheat Menu (Practice)",
     "practicemode_cheats_tip": "While in practice mode, open a menu of useful cheats.",
     "gameinfo_practice_title": "Practice Mode",
-    "gameinfo_practice_text": "Run information is not collected while in practice mode."
+    "gameinfo_practice_text": "Run information is not collected while in practice mode.",
+    "feature_screenshot": "Screenshot",
+    "feature_screenshot_desc": "Take screenshots with a hotkey, or automatically on certain events.",
+    "screenshot_take": "Take Screenshot",
+    "screenshot_take_tip": "Saves the current game screen to a file."
 }

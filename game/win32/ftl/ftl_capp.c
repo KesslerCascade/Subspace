@@ -5,6 +5,7 @@
 #include "ftl/commandgui.h"
 #include "ftl/filehelper.h"
 #include "ftl/globals.h"
+#include "ftl/graphics/csurface.h"
 #include "ftl/mainmenu.h"
 #include "ftl/misc.h"
 #include "ftl/mousecontrol.h"
@@ -309,6 +310,7 @@ FuncInfo FUNCINFO(CApp_GenInputEvents) = { .nargs   = 1,
                                            .stdcall = true,
                                            .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
+INITWRAP(CApp_OnRender);
 Symbol SYM(CApp_OnRender) = {
     SYMNAME("CApp::OnRender"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
@@ -318,7 +320,21 @@ Symbol SYM(CApp_OnRender) = {
 };
 FuncInfo FUNCINFO(CApp_OnRender) = { .nargs   = 1,
                                      .stdcall = true,
-                                     .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+                                     .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                     .rettype = RET_VOID };
+
+Symbol SYM(CApp_UpdateWindowSettings) = {
+    SYMNAME("CApp::UpdateWindowSettings"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp20UpdateWindowSettingsEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CApp_UpdateWindowSettings) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
 
 DisasmTrace CApp_OnKeyDown_trace = {
     .c    = DTRACE_ADDR,
@@ -391,7 +407,13 @@ DisasmTrace CApp_OnRender_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(CApp_OnRender),
     // TODO: Make this better and more comprehensive
-    .ops  = { { DT_OP(SKIP), .imin = 45, .imax = 60 },
+    .ops  = { { DT_OP(SKIP), .imin = 15, .imax = 25 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },
+             { I_CMP,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 1 }, { .addr = 0 } },
+                .argout = { DT_OUT_SYM2 } },
+             { DT_OP(SKIP), .imin = 25, .imax = 40 },
              { I_CMP },
              { I_JZ },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
@@ -399,21 +421,46 @@ DisasmTrace CApp_OnRender_trace = {
              { DT_OP(LABEL), .val = 1 },   // save location to come back here later
               { DT_OP(JMP) },               // follow JE
               { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
-             { I_CALL, .argout = { DT_OUT_SYM1 } },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },
              { DT_OP(GOTO), .val = 1 },   // Go back to the JE
               { I_JZ },
              { I_LEA },
-             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MainMenu::OnRender
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL MainMenu::OnRender
               { DT_OP(SKIP), .imin = 4, .imax = 17 },
              { I_CALL },
              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
-             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL MouseControl::OnRender
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL MouseControl::OnRender
               { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
-             { I_CALL },
-             { I_CMP },
-             { I_JNZ },
-             { DT_OP(FINISH) } },
-    .out  = { &SYM(CommandGui_RenderStatic), &SYM(MainMenu_OnRender), &SYM(MouseControl_OnRender) }
+             { I_CALL },                              // CALL CFPS::OnRender
+              { I_CMP },
+             { I_JNZ, DT_OP(JMP) },
+             { DT_OP(SKIP), .imin = 30, .imax = 40 },
+             { I_JZ },
+             { I_MOV,
+                .argcap = { DT_CAPTURE1 },
+                .argout = { 0, DT_OUT_SYM6 } },   // this->framebuffer
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x44340000 } } },   // 720.0f
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x44a00000 } } },   // 1280.0f
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argout = { DT_OUT_SYM7 } },                 // CALL GL_BlitFrameBuffer
+              { I_CALL },                                            // CALL GL_EnableBlend
+              { DT_OP(SKIP), .imin = 0, .imax = 1, .flow = DT_FLOW_JMP_UNCOND },
+             { I_CALL, .argout = { DT_OUT_SYM8 } },                 // CALL CSurface::FinishFrame
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_UpdateWindowSettings),                       // DT_OUT_SYM1
+              &SYM(CApp_useFrameBuffer_offset),                      // DT_OUT_SYM2
+              &SYM(CommandGui_RenderStatic),                         // DT_OUT_SYM3
+              &SYM(MainMenu_OnRender),                               // DT_OUT_SYM4
+              &SYM(MouseControl_OnRender),                           // DT_OUT_SYM5
+              &SYM(CApp_framebuffer_offset),                         // DT_OUT_SYM6
+              &SYM(CSurface_GL_BlitFrameBuffer),                     // DT_OUT_SYM7
+              &SYM(CSurface_FinishFrame) }
 };
 
 // Trace for version of the code with 2-argument TextLibrary::GetText
@@ -715,4 +762,14 @@ DisasmTrace CApp_OnLoop_menu_trace = {
 Symbol SYM(CApp_menu_offset) = {
     SYMNAME("CApp->menu"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu_trace }, { 0 } }
+};
+
+Symbol SYM(CApp_framebuffer_offset) = {
+    SYMNAME("CApp->framebuffer"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace }, { 0 } }
+};
+
+Symbol SYM(CApp_useFrameBuffer_offset) = {
+    SYMNAME("CApp->useFrameBuffer"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace }, { 0 } }
 };

@@ -1,4 +1,5 @@
 #include "ftl/osdep.h"
+#include "ftl/sil.h"
 #include "ftl/startup.h"
 
 #include "hook/disasmtrace.h"
@@ -24,9 +25,9 @@ DisasmTrace WinMain_trace = {
     .c    = DTRACE_STRREFS,
     .cstr = "SIL",
     .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 5 },
-             { DT_OP(CALL) },   // follow sil__main call
+             { DT_OP(CALL) },                         // follow sil__main call
               { DT_OP(SKIP), .imin = 3, .imax = 10 },
-             { I_CALL },        // thread_init
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // thread_init
               { I_TEST },
              { I_JZ },
              { I_CALL },   // time_init
@@ -44,9 +45,10 @@ DisasmTrace WinMain_trace = {
              { I_CALL },   // userdata_init
               { DT_OP(SKIP), .imin = 3, .imax = 12 },
              { I_MOV, .argf = { ARG_MATCH }, .args = { { REG_ESP, .idx = REG_UNDEF, .addr = 0 } } },
-             { I_CALL, .argout = { DT_OUT_SYM1 } },   // sil_main
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // sil_main
               { DT_OP(FINISH) } },
-    .out  = { &SYM(sil_main) }
+    .out  = { &SYM(thread_init),                       // DT_OUT_SYM1
+              &SYM(sil_main) }
 };
 
 // Alternate trace for builds that have extra debugging code in sil__main
@@ -54,15 +56,19 @@ DisasmTrace WinMain_fallback_trace = {
     .c    = DTRACE_STRREFS,
     .cstr = "SIL",
     .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 5 },
-             { DT_OP(CALL) },   // follow sil__main call
-              { DT_OP(SKIP), .imin = 30, .imax = 50 },
+             { DT_OP(CALL) },                         // follow sil__main call
+              { DT_OP(SKIP), .imin = 3, .imax = 10 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // thread_init
+              { I_TEST },
+             { DT_OP(SKIP), .imin = 20, .imax = 40 },
              { I_MOV, .argf = { ARG_MATCH }, .args = { { REG_ESP, .idx = REG_UNDEF, .addr = 0 } } },
              { DT_OP(CALL) },   // follow sil_main call
-              { DT_OP(SKIP), .imin = 40, .imax = 90, .outip = DT_OUT_SYM1 },
+              { DT_OP(SKIP), .imin = 40, .imax = 90, .outip = DT_OUT_SYM2 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ESP } },
                 .argstr = { 0, "FasterThanLight" } },
              { DT_OP(FINISH) } },
-    .out  = { &SYM(sil_main) }
+    .out  = { &SYM(thread_init),   // DT_OUT_SYM1
+              &SYM(sil_main) }
 };

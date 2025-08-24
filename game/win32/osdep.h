@@ -12,6 +12,8 @@ extern void osWriteDbg(const char* str);
 void osShowError(const char* str);
 void osSetCurrentDir(const char* dir);
 
+bool osWriteFile(const char* fn, uint8_t* buf, size_t sz);
+
 typedef int (*threadfunc_t)(void* data);
 bool osStartThread(threadfunc_t func, void* data);
 

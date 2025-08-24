@@ -118,6 +118,10 @@ typedef struct GameGlobalState {
     bool practiceMode;
     bool practiceLoadSave;   // load the practice save at the end of the frame when it's safe
     char* practiceSave;      // current practice save file
+
+    // Screenshot
+    bool screenshotNow;         // take a screenshot at the end of the frame
+    bool renderingScreenshot;   // currently rendering a special frame for screenshot
 } GameGlobalState;
 
 // Game state that reflets the current context of the FTL client

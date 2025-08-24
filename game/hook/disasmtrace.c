@@ -374,7 +374,7 @@ bool disasmTrace(addr_t base, DisasmTrace* trace)
     if (!saddr && trace->cstr) {
         saddr = findString(base, trace->cstr);
     }
-    if (!saddr)   // nowhere to search :(
+    if (!saddr && trace->c != DTRACE_FUNCS)   // nowhere to search :(
         return false;
 
     switch (trace->c) {
@@ -388,6 +388,9 @@ bool disasmTrace(addr_t base, DisasmTrace* trace)
         break;
     case DTRACE_CALLS:
         al = hashtbl_get(&mi->funccallhash, saddr);
+        break;
+    case DTRACE_FUNCS:
+        al = mi->funclist;
         break;
     }
 
