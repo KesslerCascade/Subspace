@@ -7,7 +7,7 @@
 
 int subspace_CommandGui_RenderPause_pre(CommandGui* self)
 {
-    if (gs.renderingScreenshot)
+    if (Screenshot_feature.enabled && screenshotHidePause())
         return 0;
 
     return 1;

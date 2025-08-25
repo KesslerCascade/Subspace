@@ -9,8 +9,10 @@
 int subspace_CSurface_GL_BlitFrameBuffer_pre(int* fb, float size_x, float size_y, bool aa)
 {
     if (Screenshot_feature.enabled && gs.renderingScreenshot) {
-        saveScreenshot(fb);
-        return 0;       // don't actually blit it
+        if (screenshotUseFramebuf()) {
+            saveScreenshotFramebuf(fb);   // save pre-scaled buffer (1280x720)
+            return 0;                     // don't actually blit it
+        }
     }
 
     return 1;

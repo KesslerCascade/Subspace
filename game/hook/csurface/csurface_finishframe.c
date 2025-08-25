@@ -8,8 +8,12 @@
 
 int subspace_CSurface_FinishFrame_pre(int* fb, float size_x, float size_y, bool aa)
 {
-    if (Screenshot_feature.enabled && gs.renderingScreenshot)
-        return 0;       // don't swap buffers
+    if (Screenshot_feature.enabled && gs.renderingScreenshot) {
+        if (!screenshotUseFramebuf())
+            saveScreenshotFallback();   // capture back buffer contents now
+
+        return 0;                       // don't swap buffers
+    }
 
     return 1;
 }

@@ -1,3 +1,4 @@
+#include "feature/screenshot.h"
 #include "ftl/cfps.h"
 #include "ftl/mousecontrol.h"
 #include "hook/hook.h"
@@ -10,7 +11,7 @@
 // one of the last things that's drawn
 int subspace_MouseControl_OnRender_pre(MouseControl* self)
 {
-    if (gs.renderingScreenshot)
+    if (Screenshot_feature.enabled && screenshotHideMouse())
         return 0;
 
     return 1;

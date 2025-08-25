@@ -1,12 +1,11 @@
 #pragma once
 
 #include "ftl/ftl.h"
+#include "ftl/sil_osdep.h"
 #include "hook/function.h"
 
 typedef struct IDArray IDArray;
 typedef struct UserDataParams UserDataParams;
-
-bool patch_sil_texture_lock(addr_t base);  // OSDEP
 
 // global SIL functions
 typedef void* (*FUNCTYPE(texture_lock_readonly))(int texture_id);
@@ -45,3 +44,9 @@ DECLFUNC(mem_alloc);
 typedef void* (*FUNCTYPE(sys_texture_lock))(void* texture, int lock_mode, int x, int y, int w,
                                             int h);
 DECLFUNC(sys_texture_lock);
+
+typedef int (*FUNCTYPE(sys_graphics_read_pixels))(int x, int y, int w, int h, int stride,
+                                                  void* buffer);
+DECLFUNC(sys_graphics_read_pixels);
+#define sys_graphics_read_pixels(x, y, w, h, stride, buffer) \
+    FCALL(ftlbase, sys_graphics_read_pixels, x, y, w, h, stride, buffer);

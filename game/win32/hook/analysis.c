@@ -179,6 +179,7 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers, hasht
 
     p = code.start;
     while (p < code.end) {
+        bool added = false;
         ulong ilen = Disasm((char*)p, MIN(MAXCMDSIZE, code.end - p), addr(p), &disasm, DISASM_FILE);
 
         // if this is a relative call, record it
@@ -189,29 +190,39 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtbl* importtrackers, hasht
             addr_t dest     = (p + 5) + reldest;
 
             // Only process addresses within the code segment.
-            // We don't care about library calls anyway, and this helps filter out false positives.
+            // We don't care about library calls anyway, and this helps filter out false
+            // positives.
             if (dest >= code.start && dest <= code.end) {
                 addPtr(&mi->relcallhash, dest, p + 1);
                 if (disasm.inst == I_CALL) {   // for CALL only, record it as a function call
                     addPtr(&mi->funccallhash, dest, p);
                     hashtbl_setint(functrackers, dest, 2);
                 }
+                added = true;
             }
-        } else if (disasm.inst == I_CALL) {
+        }
+
+        if (!added && disasm.inst == I_CALL) {
             // get absolute calls to addresses
             t_arg* arg = &disasm.arg[0];
             if (arg->base == REG_UNDEF && arg->idx == REG_UNDEF && arg->addr >= code.start &&
                 arg->addr <= code.end) {
                 addPtr(&mi->funccallhash, disasm.arg[0].addr, p);
                 hashtbl_setint(functrackers, disasm.arg[0].addr, 2);
+                added = true;
             }
-        } else if (disasm.inst == I_JMP &&
-                   hashtbl_find(importtrackers, disasm.arg[0].addr) != HT_NOT_FOUND) {
+        }
+
+        if (!added && disasm.inst == I_JMP &&
+            hashtbl_find(importtrackers, disasm.arg[0].addr) != HT_NOT_FOUND) {
             ImportTrackerEnt* trk = hashtbl_get(importtrackers, disasm.arg[0].addr);
-            // this is a jump into the thunk table; record its location so imported symbols can be
-            // used as waypoints in the code
+            // this is a jump into the thunk table; record its location so imported symbols can
+            // be used as waypoints in the code
             addImport(&mi->importhash, trk->lib, trk->funcname, p);
-        } else {
+            added = true;
+        }
+
+        if (!added) {
             // check args for pointers
             for (int i = 0; i < 3; i++) {
                 t_arg* arg = &disasm.arg[i];

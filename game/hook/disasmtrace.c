@@ -197,6 +197,18 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                             // check address (same as disp) only
                             if (disasm.arg[i].addr != comp.addr)
                                 match = false;
+                        } else if (dts.op->argf[i] == ARG_DEREF) {
+                            // check address (same as disp) only
+                            bool inrdata = (disasm.arg[i].addr >= rdata.start) &&
+                                (disasm.arg[i].addr + disasm.arg[i].ptrsize < rdata.end);
+                            if (disasm.arg[i].ptrsize > 0 && inrdata) {
+                                if (memcmp((uint8_t*)disasm.arg[i].addr,
+                                           &comp.addr,
+                                           disasm.arg[i].ptrsize) != 0)
+                                    match = false;
+                            } else {
+                                match = false;
+                            }
                         } else if (dts.op->argf[i] == ARG_PTRSIZE) {
                             // check pointer size only
                             if (disasm.arg[i].ptrsize != comp.ptrsize)

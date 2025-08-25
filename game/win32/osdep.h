@@ -25,3 +25,5 @@ int64_t osFrameTime();
 void osNextFrame();
 
 bool osAbsolutePathUTF8(const char* fname, char* buf, size_t bufsz);
+
+bool osIsUsingDirect3D();

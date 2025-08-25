@@ -773,3 +773,217 @@ Symbol SYM(CApp_useFrameBuffer_offset) = {
     SYMNAME("CApp->useFrameBuffer"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace }, { 0 } }
 };
+
+DisasmTrace sil_main_directx_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "-directx",
+    .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 1 }, { .addr = 1 } },
+                .argout = { DT_OUT_SYM1 } },   // app.useDirect3D = true
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_useDirect3D_offset) }
+};
+
+Symbol SYM(CApp_useDirect3D_offset) = {
+    SYMNAME("Capp->useDirect3D"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &sil_main_directx_trace }, { 0 } }
+};
+
+DisasmTrace CApp_UpdateWindowSettings_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CApp_UpdateWindowSettings),
+    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 15 },
+             { DT_OP(LABEL), .val = 1 },
+             { I_CMP },
+             { DT_OP(SKIP), .imin = 5, .imax = 25, .flow = DT_FLOW_JMP_BOTH },
+             { I_PXOR },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM2 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { DT_OP(LABEL), .val = 2 },
+             { I_MOV,
+                .argf   = { ARG_ADDR, ARG_ADDR },
+                .argsym = { &SYM(CApp_useFrameBuffer_offset) },
+                .args   = { { 0 }, { .addr = 1 } } },   // this->useFrameBuffer = true
+              { DT_OP(SKIP), .imin = 4, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOVSS,
+                .argf = { 0, ARG_DEREF },
+                .args = { { 0 }, { .addr = 0x3f100000 } } },   // 0.5625
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = 4 } },
+                .argout = { DT_OUT_SYM3 } },   // y_bar
+              { DT_OP(GOTO), .val = 2 },       // go back to before branch point
+              { DT_OP(SKIP), .imin = 5, .imax = 11, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOVSS,
+                .argf = { 0, ARG_DEREF },
+                .args = { { 0 }, { .addr = 0x3fe38e39 } } },   // 1.7777778
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = 4 } },
+                .argout = { DT_OUT_SYM4 } },   // x_bar
+              { DT_OP(GOTO), .val = 1 },       // go back to start of function
+              { DT_OP(SKIP), .imin = 6, .imax = 26, .flow = DT_FLOW_JMP_BOTH },
+             { DT_OP(LABEL), .val = 3 },
+             { I_MOV,
+                .argf   = { ARG_ADDR, ARG_ADDR },
+                .argsym = { &SYM(CApp_useFrameBuffer_offset) },
+                .args   = { { 0 }, { .addr = 0 } } },   // this->useFrameBuffer = false
+              { DT_OP(SKIP), .imin = 0, .imax = 16 },
+             {
+                 I_LEA,
+                  .argf = { 0, ARG_ADDR },
+                  .args = { { 0 }, { .disp = -1280 } },
+             }, { DT_OP(SKIP), .imin = 2, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { DT_OUT_SYM5 } },   // modifier_x = (screen_x - 1280) /2
+              { DT_OP(GOTO), .val = 3 },
+             { DT_OP(SKIP), .imin = 1, .imax = 17 },
+             { I_LEA, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = -720 } } },
+             { DT_OP(SKIP), .imin = 2, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { DT_OUT_SYM6 } },   // modifier_y = (screen_y - 1280) /2
+
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_screen_x_offset),     // DT_OUT_SYM1
+              &SYM(CApp_screen_y_offset),     // DT_OUT_SYM2
+              &SYM(CApp_y_bar_offset),        // DT_OUT_SYM3
+              &SYM(CApp_x_bar_offset),        // DT_OUT_SYM4
+              &SYM(CApp_modifier_x_offset),   // DT_OUT_SYM5
+              &SYM(CApp_modifier_y_offset) }
+};
+
+// alternate version for some different compiler settings
+DisasmTrace CApp_UpdateWindowSettings_trace_2 = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CApp_UpdateWindowSettings),
+    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 15 },
+             { DT_OP(LABEL), .val = 1 },
+             { I_CMP },
+             { DT_OP(SKIP), .imin = 5, .imax = 25, .flow = DT_FLOW_JMP_BOTH },
+             { I_PXOR },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM2 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { DT_OP(LABEL), .val = 2 },
+             { I_MOV,
+                .argf   = { ARG_ADDR, ARG_ADDR },
+                .argsym = { &SYM(CApp_useFrameBuffer_offset) },
+                .args   = { { 0 }, { .addr = 1 } } },   // this->useFrameBuffer = true
+              { DT_OP(SKIP), .imin = 4, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
+             { I_MULSS,
+                .argf = { 0, ARG_DEREF },
+                .args = { { 0 }, { .addr = 0x3f100000 } } },   // 0.5625
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = 4 } },
+                .argout = { DT_OUT_SYM3 } },   // y_bar
+              { DT_OP(GOTO), .val = 2 },       // go back to before branch point
+              { DT_OP(SKIP), .imin = 5, .imax = 11, .flow = DT_FLOW_JMP_BOTH },
+             { I_MULSS,
+                .argf = { 0, ARG_DEREF },
+                .args = { { 0 }, { .addr = 0x3fe38e39 } } },   // 1.7777778
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = 4 } },
+                .argout = { DT_OUT_SYM4 } },   // x_bar
+              { DT_OP(GOTO), .val = 1 },       // go back to start of function
+              { DT_OP(SKIP), .imin = 6, .imax = 26, .flow = DT_FLOW_JMP_BOTH },
+             { DT_OP(LABEL), .val = 3 },
+             { I_MOV,
+                .argf   = { ARG_ADDR, ARG_ADDR },
+                .argsym = { &SYM(CApp_useFrameBuffer_offset) },
+                .args   = { { 0 }, { .addr = 0 } } },   // this->useFrameBuffer = false
+              { DT_OP(SKIP), .imin = 0, .imax = 12 },
+             {
+                 I_SUB,
+                  .argf = { 0, ARG_ADDR },
+                  .args = { { 0 }, { .disp = 1280 } },
+             }, { DT_OP(SKIP), .imin = 2, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { DT_OUT_SYM5 } },   // modifier_x = (screen_x - 1280) /2
+              { DT_OP(GOTO), .val = 3 },
+             { DT_OP(SKIP), .imin = 1, .imax = 13 },
+             { I_SUB, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = 720 } } },
+             { DT_OP(SKIP), .imin = 2, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { DT_OUT_SYM6 } },   // modifier_y = (screen_y - 1280) /2
+
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_screen_x_offset),     // DT_OUT_SYM1
+              &SYM(CApp_screen_y_offset),     // DT_OUT_SYM2
+              &SYM(CApp_y_bar_offset),        // DT_OUT_SYM3
+              &SYM(CApp_x_bar_offset),        // DT_OUT_SYM4
+              &SYM(CApp_modifier_x_offset),   // DT_OUT_SYM5
+              &SYM(CApp_modifier_y_offset) }
+};
+
+Symbol SYM(CApp_screen_x_offset) = {
+    SYMNAME("Capp->screen_x"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_screen_y_offset) = {
+    SYMNAME("Capp->screen_y"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_x_bar_offset) = {
+    SYMNAME("Capp->x_bar"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_y_bar_offset) = {
+    SYMNAME("Capp->y_bar"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_modifier_x_offset) = {
+    SYMNAME("Capp->modifier_x"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_modifier_y_offset) = {
+    SYMNAME("Capp->modifier_y"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};

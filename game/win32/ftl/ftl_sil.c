@@ -265,8 +265,6 @@ FuncInfo FUNCINFO(sys_texture_lock) = {
 };
 
 // Windows-specific
-DECLSYM(opengl_sys_texture_lock);
-DECLSYM(d3d_sys_texture_lock);
 DisasmTrace sys_texture_lock_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(sys_texture_lock),
@@ -299,7 +297,6 @@ Symbol SYM(d3d_sys_texture_lock) = {
 
 // the SIL code in FTL has this check backwards. It's fixed in the current source but apparently not
 // the verison they compiled against. Mark the instruction IP so it can be easily patched.
-DECLSYM(opengl_sys_texture_lock_wrong_cmp);
 DisasmTrace opengl_sys_texture_lock_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(opengl_sys_texture_lock),
@@ -313,7 +310,6 @@ DisasmTrace opengl_sys_texture_lock_trace = {
 };
 
 // D3D verison makes the same mistake, but is also correct in current source...
-DECLSYM(d3d_sys_texture_lock_wrong_cmp);
 DisasmTrace d3d_sys_texture_lock_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(d3d_sys_texture_lock),
@@ -335,23 +331,110 @@ Symbol SYM(d3d_sys_texture_lock_wrong_cmp) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &d3d_sys_texture_lock_trace }, { 0 } }
 };
 
-bool patch_sil_texture_lock(addr_t base)
-{
-    addr_t gladdr = symAddr(base, opengl_sys_texture_lock_wrong_cmp);
-    // addr_t d3daddr = symAddr(base, d3d_sys_texture_lock_wrong_cmp);
+DisasmTrace handle_touch_event_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "GetPointerType",
+    .ops  = { { DT_OP(SKIP), .imin = 35, .imax = 50 },
+             { I_SAR, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x10 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL windows_window
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(windows_window) }
+};
 
-    if (gladdr == 0)   // || d3daddr == 0)
-        return false;
+INITWRAP(windows_window);
+Symbol SYM(windows_window) = {
+    SYMNAME("windows_window"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &handle_touch_event_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "windows_window" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(windows_window) = { .nargs = 0, .purecdecl = true, .rettype = RET_PTR };
 
-    if (*((uint8_t*)gladdr) != 0x0f || *((uint8_t*)(gladdr + 1)) != 0x85)   // JNE
-        return false;
-    *((uint8_t*)(gladdr + 1)) = 0x84;                                       // JE
+DisasmTrace pglReadPixels_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "glReadPixels",
+    .ops  = { { I_MOV },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL },   // CALL lookup_function
+              { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_MOV,
+                .argf   = { 0, ARG_MATCH },
+                .args   = { { 0 }, { .base = REG_EAX, .idx = REG_UNDEF, .addr = 0 } },
+                .argout = { DT_OUT_SYM1 } },   // pglReadPizels = EAX
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(pglReadPixels) }
+};
 
-    /* D3D texture reading seems to be broken and crashes in 1.6.14,
-    while simply failing in older versions
-    if (*((uint8_t*)d3daddr) != 0x75)   // JNZ
-        return false;
-    *((uint8_t*)d3daddr) = 0x74;        // JZ
-    */
-    return true;
-}
+Symbol SYM(pglReadPixels) = {
+    SYMNAME("pglReadPixels"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &pglReadPixels_trace }, { 0 } }
+};
+
+DisasmTrace glReadPixels_trace = {
+    .c    = DTRACE_REFS,
+    .csym = &SYM(pglReadPixels),
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { DT_OP(NOOP), .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 0, .imax = 37 },
+             { I_CALL, .argf = ARG_ADDR, .argsym = { &SYM(pglReadPixels) } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(glReadPixels) },
+};
+
+Symbol SYM(glReadPixels) = {
+    SYMNAME("glReadPixels"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &glReadPixels_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "glReadPixels@28" },
+             { 0 } }
+};
+
+DisasmTrace opengl_sys_graphics_read_pixels_trace = {
+    .c    = DTRACE_CALLS,
+    .csym = &SYM(glReadPixels),
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { DT_OP(NOOP), .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 35, .imax = 50 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x0d02 } } },   // glPixelStorei parameter
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(opengl_sys_graphics_read_pixels) },
+};
+
+Symbol SYM(opengl_sys_graphics_read_pixels) = {
+    SYMNAME("opengl_sys_graphics_read_pixels"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &opengl_sys_graphics_read_pixels_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "opengl_sys_graphics_read_pixels" },
+             { 0 } }
+};
+
+DisasmTrace sys_graphics_read_pixels_trace = {
+    .c    = DTRACE_CALLS,
+    .csym = &SYM(opengl_sys_graphics_read_pixels),
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { DT_OP(NOOP), .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 10, .imax = 30 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(opengl_sys_graphics_read_pixels) } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(sys_graphics_read_pixels) }  // whew, finally!
+};
+
+INITWRAP(sys_graphics_read_pixels);
+Symbol SYM(sys_graphics_read_pixels) = {
+    SYMNAME("sys_graphics_read_pixels"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &sys_graphics_read_pixels_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "sys_graphics_read_pixels" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(sys_graphics_read_pixels) = {
+    .nargs     = 6,
+    .purecdecl = true,
+    .args      = { { 4, ARG_INT, 0, true },
+                  { 4, ARG_INT, 0, true },
+                  { 4, ARG_INT, 0, true },
+                  { 4, ARG_INT, 0, true },
+                  { 4, ARG_INT, 0, true },
+                  { 4, ARG_PTR, 0, true } },
+    .rettype   = RET_INT
+};
