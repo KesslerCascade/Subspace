@@ -121,7 +121,9 @@ typedef struct GameGlobalState {
 
     // Screenshot
     bool screenshotNow;         // take a screenshot at the end of the frame
+    bool screenshotNowAuto;     // take a screenshot at the end of the frame (automatic)
     bool renderingScreenshot;   // currently rendering a special frame for screenshot
+    bool renderingScreenshotAuto;
 } GameGlobalState;
 
 // Game state that reflets the current context of the FTL client

@@ -33,7 +33,7 @@ void runTrackerHandleUpdate(bool r)
 bool runTrackerRenderWarning(void)
 {
     // if we're recording, check if we're still connected
-    if (!recording || controlClientConnected())
+    if (!recording || controlClientConnected() || gs.renderingScreenshot)
         return false;
 
     GL_Color color = { 1, 0.2, 0.2, 1 };

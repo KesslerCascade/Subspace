@@ -21,6 +21,7 @@
 #define RUNDIRFMT_DEFAULT \
     _S "${year}-${month}-${day} ${hour}${minute}${second} - ${shiptype} - ${shipname}"
 #define SAVENAME_DEFAULT     _S "${sector}-${beacon} ${event}"
+#define SCREENSHOTNAME_DEFAULT _S "${year}-${month}-${day} ${hour}${minute}${second} - ${shipname}"
 
 #define LUA_MAIN_FILENAME _S "subspace.lua"
 

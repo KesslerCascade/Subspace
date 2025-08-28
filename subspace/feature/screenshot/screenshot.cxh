@@ -2,4 +2,6 @@
 
 class Screenshot extends SubspaceFeature {
     factory create(Subspace *ss);
+    override createSettingsPage;
+    override applyDefaultSettings;
 }

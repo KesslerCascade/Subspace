@@ -42,6 +42,7 @@ set(SUBSPACE_AUTOGEN
     feature/savemanager/savemanager.cxh
     feature/savemanager/savemanagerpage.cxh
     feature/screenshot/screenshot.cxh
+    feature/screenshot/screenshotpage.cxh
     feature/timewarp/timewarp.cxh
     feature/timewarp/timewarppage.cxh
     feature/tweaks/tweaks.cxh
@@ -123,6 +124,7 @@ add_executable(subspace
     feature/savemanager/savemanager.c
     feature/savemanager/savemanagerpage.c
     feature/screenshot/screenshot.c
+    feature/screenshot/screenshotpage.c
     feature/timewarp/timewarp.c
     feature/timewarp/timewarppage.c
     feature/tweaks/tweaks.c
@@ -193,7 +195,7 @@ add_executable(subspace
     ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_AUTOGEN})
 target_compile_definitions(subspace PRIVATE $<$<CONFIG:Release>:SUBSPACE_RELEASE>)
-target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast libpkg cxml)
+target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast png_static libjpeg libpkg cxml)
 target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 if(WIN32)

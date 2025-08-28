@@ -35,9 +35,14 @@ int subspace_CApp_OnRender_pre(CApp* self)
 
 void subspace_CApp_OnRender_post(CApp* self)
 {
-    if (Screenshot_feature.enabled && gs.screenshotNow)
-        renderScreenshot(self);
+    if (Screenshot_feature.enabled) {
+        if (gs.screenshotNow)
+            renderScreenshot(self, false);
+        else if (gs.screenshotNowAuto)
+            renderScreenshot(self, true);
+    }
     gs.screenshotNow = false;
+    gs.screenshotNowAuto = false;
 }
 
 // ---- Patch ----------------
