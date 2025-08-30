@@ -22,6 +22,7 @@ else()
     add_library(png ALIAS png_static)
 
     add_subdirectory(libjpeg)
+    add_subdirectory(libexif)
 
     set(BUILD_SHARED_LIBS   OFF CACHE INTERNAL "Build shared libraries" FORCE)
     set(FT_DISABLE_BZIP2    ON  CACHE INTERNAL "Disable support of bzip2 compressed fonts." FORCE)

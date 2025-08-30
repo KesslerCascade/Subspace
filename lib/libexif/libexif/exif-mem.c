@@ -24,6 +24,8 @@
 
 #include <stdlib.h>
 
+#include <cx/xalloc.h>
+
 struct _ExifMem {
 	unsigned int ref_count;
 	ExifMemAllocFunc alloc_func;
@@ -35,21 +37,21 @@ struct _ExifMem {
 static void *
 exif_mem_alloc_func (ExifLong ds)
 {
-	return calloc ((size_t) ds, 1);
+	return xa_calloc ((size_t) ds, 1);
 }
 
 /*! Default memory reallocation function. */
 static void *
 exif_mem_realloc_func (void *d, ExifLong ds)
 {
-	return realloc (d, (size_t) ds);
+	return xa_realloc (d, (size_t) ds);
 }
 
 /*! Default memory free function. */
 static void
 exif_mem_free_func (void *d)
 {
-	free (d);
+	xa_free (d);
 }
 
 ExifMem *
