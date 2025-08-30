@@ -105,6 +105,7 @@ add_executable(subspace
     control/cmds/cmdlog.c
     control/cmds/cmdnewgame.c
     control/cmds/cmdrunlog.c
+    control/cmds/cmdscreenshot.c
     control/cmds/cmdsector.c
     control/cmds/cmdstats.c
     control/cmds/cmdvalidate.c
@@ -124,7 +125,11 @@ add_executable(subspace
     feature/savemanager/savemanager.c
     feature/savemanager/savemanagerpage.c
     feature/screenshot/screenshot.c
+    feature/screenshot/screenshotexif.c
+    feature/screenshot/screenshotjpeg.c
     feature/screenshot/screenshotpage.c
+    feature/screenshot/screenshotpng.c
+    feature/screenshot/screenshotxmp.c
     feature/timewarp/timewarp.c
     feature/timewarp/timewarppage.c
     feature/tweaks/tweaks.c
@@ -195,7 +200,7 @@ add_executable(subspace
     ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_AUTOGEN})
 target_compile_definitions(subspace PRIVATE $<$<CONFIG:Release>:SUBSPACE_RELEASE>)
-target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast png_static libjpeg libpkg cxml)
+target_link_libraries(subspace cx iupcontrols iupplot sqlite nanosvg nanosvgrast png_static libjpeg libexif libpkg cxml)
 target_include_directories(subspace PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 
 if(WIN32)

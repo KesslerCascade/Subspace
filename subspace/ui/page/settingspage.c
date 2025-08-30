@@ -24,6 +24,11 @@ bool SettingsPage_update(_In_ SettingsPage* self)
     return true;
 }
 
+bool SettingsPage_show(_In_ SettingsPage* self)
+{
+    return true;
+}
+
 void SettingsPage_destroy(_In_ SettingsPage* self)
 {
     // Autogen begins -----

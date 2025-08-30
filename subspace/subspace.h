@@ -22,6 +22,7 @@
     _S "${year}-${month}-${day} ${hour}${minute}${second} - ${shiptype} - ${shipname}"
 #define SAVENAME_DEFAULT     _S "${sector}-${beacon} ${event}"
 #define SCREENSHOTNAME_DEFAULT _S "${year}-${month}-${day} ${hour}${minute}${second} - ${shipname}"
+#define SCREENSHOTDIR_FILENAME _S "/screenshots"
 
 #define LUA_MAIN_FILENAME _S "subspace.lua"
 

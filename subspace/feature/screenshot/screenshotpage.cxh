@@ -1,13 +1,6 @@
 #include "ui/page/settingspage.cxh"
 #include "feature/screenshot/screenshot.cxh"
 
-typedef enum ScreenshotLoc {
-    SSLOC_Invalid = 0,
-    SSLOC_Global,
-    SSLOC_Rundir,
-    SSLOC_Custom
-} ScreenshotLoc;
-
 class Screenshot;
 class ScreenshotPage extends SettingsPage {
     Screenshot* feature;
@@ -20,18 +13,32 @@ class ScreenshotPage extends SettingsPage {
     Ihandle *namefmttext;
     Ihandle *nameextlabel;
 
+    Ihandle *manlbl;
     object:SSLocControls mloc;
     object:SSLocControls aloc;
 
+    Ihandle *sound;
     Ihandle *hidemouse;
-    Ihandle *hidepaused;
+    Ihandle *hidepause;
     Ihandle *hideinfoblock;
+    Ihandle *metadata;
 
-    void updateLoc(SSLocControls *c);
+    Ihandle *autoach;
+    Ihandle *autorfs1;
+    Ihandle *autorfs2;
+    Ihandle *autorfs3;
+    Ihandle *autowinfight;
+    Ihandle *autodestroyed;
+    Ihandle *autogameover;
+    Ihandle *autovictory;
+    Ihandle *autocredits;
 
     factory create(Screenshot* feature, SubspaceUI* ui);
     override make;
     override update;
+    override show;
+
+    void updateFormatActive(strref fmt);
 }
 
 class SSLocControls
@@ -50,5 +57,6 @@ class SSLocControls
 
     factory create(ScreenshotPage *page, bool isauto);
     bool make();
+    void updateButtons(int32 loc);
     bool update();
 }

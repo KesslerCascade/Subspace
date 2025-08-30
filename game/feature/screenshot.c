@@ -7,6 +7,8 @@
 #include "ftl/filehelper.h"
 #include "ftl/globals.h"
 #include "ftl/graphics/csurface.h"
+#include "ftl/misc.h"
+#include "ftl/scorekeeper.h"
 #include "ftl/shipmanager.h"
 #include "ftl/sil.h"
 #include "ftl/starmap.h"
@@ -27,8 +29,10 @@ typedef struct SSInfo {
     // metadata to send
     char* shiptype;
     char* shipname;
+    char* sectortype;
     int difficulty;
     int sector;
+    int beacon;
     int seed;
     bool automatic;
 } SSInfo;
@@ -37,36 +41,43 @@ static int ss_write_thread(void* data)
 {
     SSInfo* ss = (SSInfo*)data;
 
-    // flip the image, and set alpha channel to 255
+    // flip the image, remote alpha channel
 
-    size_t bsz         = ss->w * ss->h * 4;
+    size_t bsz         = ss->w * ss->h * 3;
     uint8_t* processed = malloc(bsz);
 
     for (int y = 0; y < ss->h; y++) {
         uint8_t* srcrow  = &ss->buf[y * ss->w * 4];
-        uint8_t* destrow = &processed[(ss->h - y - 1) * ss->w * 4];
+        uint8_t* destrow = &processed[(ss->h - y - 1) * ss->w * 3];
         for (int x = 0; x < ss->w; x++) {
-            destrow[x * 4]     = srcrow[x * 4];
-            destrow[x * 4 + 1] = srcrow[x * 4 + 1];
-            destrow[x * 4 + 2] = srcrow[x * 4 + 2];
-            destrow[x * 4 + 3] = 0xff;
+            destrow[x * 3]     = srcrow[x * 4];
+            destrow[x * 3 + 1] = srcrow[x * 4 + 1];
+            destrow[x * 3 + 2] = srcrow[x * 4 + 2];
         }
     }
     osWriteFile(ss->fn, processed, bsz);
     free(processed);
 
-    ControlMsg* msg = controlNewMsg("Screenshot", 7);
+    ControlMsg* msg = controlNewMsg("Screenshot", 14);
     controlMsgBool(msg, 0, "auto", ss->automatic);
     controlMsgStr(msg, 1, "filename", ss->fn);
-    controlMsgStr(msg, 2, "ship", ss->shiptype);
-    controlMsgStr(msg, 3, "name", ss->shipname);
-    controlMsgInt(msg, 4, "sector", ss->sector);
-    controlMsgInt(msg, 5, "seed", ss->seed);
-    controlMsgInt(msg, 6, "difficulty", ss->difficulty);
+    controlMsgInt(msg, 2, "w", ss->w);
+    controlMsgInt(msg, 3, "h", ss->h);
+    controlMsgStr(msg, 4, "ship", ss->shiptype);
+    controlMsgStr(msg, 5, "name", ss->shipname);
+    controlMsgInt(msg, 6, "sector", ss->sector);
+    controlMsgStr(msg, 7, "sectortype", ss->sectortype);
+    controlMsgInt(msg, 8, "beacon", ss->beacon);
+    controlMsgUInt(msg, 9, "seed", ss->seed);
+    controlMsgInt(msg, 10, "difficulty", ss->difficulty);
+    controlMsgInt(msg, 11, "major", g_version_major);
+    controlMsgInt(msg, 12, "minor", g_version_minor);
+    controlMsgInt(msg, 13, "rev", g_version_rev);
     controlClientQueue(msg);
 
     free(ss->shiptype);
     free(ss->shipname);
+    free(ss->sectortype);
     free(ss->fn);
     free(ss->buf);
     free(ss);
@@ -109,21 +120,28 @@ static void screenshotMetadata(SSInfo* ss)
     ShipBlueprint* sbp       = smgr ? ShipManager_myBlueprint(smgr) : NULL;
     basic_string* shipType   = sbp ? ShipBlueprint_blueprintName(sbp) : NULL;
     TextString* shipName     = sbp ? ShipBlueprint_name(sbp) : NULL;
+    Sector* sector           = map ? StarMap_currentSector(map) : NULL;
+    StatTracker* stats       = ScoreKeeper_stats(SKeeper);
 
-    if (shipType && shipName && map) {
+    if (shipType && shipName && sector && stats) {
         ss->shiptype   = strdup(shipType->buf);
         ss->shipname   = strdup(shipName->data.buf);
+        ss->sectortype = strdup(Sector_description_type(sector)->buf);
         ss->difficulty = g_Settings_difficulty;
         ss->sector     = StarMap_worldLevel(map);
+        ss->beacon     = stats[1].current;
         ss->seed       = StarMap_sectorMapSeed(map);
     } else {
-        ss->shiptype    = malloc(1);
-        ss->shiptype[0] = 0;
-        ss->shipname    = malloc(1);
-        ss->shipname[0] = 0;
-        ss->difficulty  = 0;
-        ss->sector      = 0;
-        ss->seed        = 0;
+        ss->shiptype      = malloc(1);
+        ss->shiptype[0]   = 0;
+        ss->shipname      = malloc(1);
+        ss->shipname[0]   = 0;
+        ss->sectortype    = malloc(1);
+        ss->sectortype[0] = 0;
+        ss->difficulty    = 0;
+        ss->sector        = 0;
+        ss->beacon        = 0;
+        ss->seed          = 0;
     }
 }
 

@@ -20,5 +20,6 @@ class SettingsPage {
 
     init();
     bool make(Ihandle *list);
+    bool show();
     bool update();
 }

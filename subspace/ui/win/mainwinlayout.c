@@ -356,10 +356,10 @@ static void saveLayoutNode(MainWin* self, SSDNode* node, Ihandle* in,
             if (size > 0)
                 ssdSet(node, _S"size", false, stvar(int32, size));
 
-            SSDNode* chld = ssdSubtree(node, _S"first", true);
+            SSDNode* chld = ssdSubtree(node, _S"first", SSD_Create_Hashtable);
             saveLayoutNode(self, chld, IupGetChild(in, 1), _ssdCurrentLockState);
             objRelease(&chld);
-            chld = ssdSubtree(node, _S"second", true);
+            chld = ssdSubtree(node, _S"second", SSD_Create_Hashtable);
             saveLayoutNode(self, chld, IupGetChild(in, 2), _ssdCurrentLockState);
             objRelease(&chld);
         } else if (cls && !strcmp(cls, "flattabs")) {
@@ -391,10 +391,11 @@ void MainWin_saveLayout(_In_ MainWin* self)
     }
 
     ssdRemove(sets, _S"ui/layout");
-    SSDNode* layout = ssdSubtree(sets, _S"ui/layout", true);
+    SSDNode* layout = ssdSubtree(sets, _S"ui/layout", SSD_Create_Hashtable);
     if (!layout)
         return;
     saveLayoutNode(self, layout, self->root, NULL);
+    objRelease(&layout);
 }
 
 static bool findPanelNode(MainWin* self, Ihandle* in, strref name)
