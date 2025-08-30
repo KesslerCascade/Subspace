@@ -303,8 +303,6 @@ bool ScreenshotPage_make(_In_ ScreenshotPage* self, Ihandle* list)
     IupSetAttribute(toggleblock, "CMARGIN", "0x0");
     IupSetAttribute(toggleblock, "CGAP", "1");
 
-    Ihandle* manspc = IupSpace();
-    IupSetAttribute(manspc, "SIZE", "1x3");
     Ihandle* mansep = IupLabel("");
     IupSetAttribute(mansep, "SEPARATOR", "HORIZONTAL");
     IupSetAttribute(mansep, "EXPAND", "HORIZONTAL");
@@ -317,8 +315,6 @@ bool ScreenshotPage_make(_In_ ScreenshotPage* self, Ihandle* list)
     IupSetAttribute(self->manlbl, "FONT", "Helvetica, Bold 10");
     IupSetAttribute(self->manlbl, "EXPAND", "HORIZONTAL");
 
-    Ihandle* autospc = IupSpace();
-    IupSetAttribute(autospc, "SIZE", "1x3");
     Ihandle* autosep = IupLabel("");
     IupSetAttribute(autosep, "SEPARATOR", "HORIZONTAL");
     IupSetAttribute(autosep, "EXPAND", "HORIZONTAL");
@@ -378,11 +374,9 @@ bool ScreenshotPage_make(_In_ ScreenshotPage* self, Ihandle* list)
                                fnamevbox,
                                fnamevarlistlabel,
                                toggleblock,
-                               manspc,
                                mansep,
                                self->manlbl,
                                self->mloc->h,
-                               autospc,
                                autosep,
                                autolbl,
                                autobox,
