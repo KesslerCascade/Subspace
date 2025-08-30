@@ -15,6 +15,7 @@
 #include "feature/featureregistry.h"
 #include "kbmgr/kbmgr.h"
 #include "kbmgr/keymap.h"
+#include "ui/win/settingswin.h"
 
 _objfactory_guaranteed ScreenshotPage* ScreenshotPage_create(Screenshot* feature, SubspaceUI* ui)
 {
@@ -522,6 +523,94 @@ static int screenshot_loc_radio_action(Ihandle* ih, int state)
     return IUP_DEFAULT;
 }
 
+static int screenshot_global_open_action(Ihandle* ih)
+{
+    Subspace* ss = iupGetSubspace(ih);
+    if (!ss)
+        return IUP_IGNORE;
+
+    string fpath = 0;
+    if (vfsGetFSPath(&fpath, ss->fs, SCREENSHOTDIR_FILENAME)) {
+        pathToPlatform(&fpath, fpath);
+        openFolder(fpath);
+    }
+
+    strDestroy(&fpath);
+    return IUP_DEFAULT;
+}
+
+static int screenshot_custom_text_change(Ihandle* ih, int c, char* new_value)
+{
+    SSLocControls* self = iupGetParentObj(SSLocControls, ih);
+    if (!self)
+        return IUP_IGNORE;
+
+    SSDNode* sets;
+
+    if (self->isauto)
+        sets = ssdSubtree(self->page->feature->settings, _S"auto", SSD_Create_Hashtable);
+    else
+        sets = ssdSubtree(self->page->feature->settings, _S"manual", SSD_Create_Hashtable);
+    if (!sets)
+        return IUP_IGNORE;
+
+    string customdir = 0;
+    pathFromPlatform(&customdir, (strref)new_value);
+    pathNormalize(&customdir);
+    ssdSet(sets, _S"custom", true, stvar(string, customdir));
+    strDestroy(&customdir);
+
+    objRelease(&sets);
+    return IUP_DEFAULT;
+}
+
+static int screenshot_custom_browse_action(Ihandle* ih)
+{
+    SSLocControls* self = iupGetParentObj(SSLocControls, ih);
+    if (!self)
+        return IUP_IGNORE;
+
+    SSDNode* sets;
+
+    if (self->isauto)
+        sets = ssdSubtree(self->page->feature->settings, _S"auto", SSD_Create_Hashtable);
+    else
+        sets = ssdSubtree(self->page->feature->settings, _S"manual", SSD_Create_Hashtable);
+    if (!sets)
+        return IUP_IGNORE;
+
+    Ihandle* idlg   = IupFileDlg();
+    string startdir = 0;
+    if (ssdStringOut(sets, _S"custom", &startdir)) {
+        pathParent(&startdir, startdir);
+        pathToPlatform(&startdir, startdir);
+    }
+    IupSetAttributeHandle(idlg, "PARENTDIALOG", self->ss->ui->settingsw->win);
+    IupSetAttribute(idlg, "DIALOGTYPE", "DIR");
+    IupSetStrAttribute(idlg, "TITLE", langGetC(self->ss, "screenshot_custom_browse_title"));
+    if (!strEmpty(startdir))
+        IupSetStrAttribute(idlg, "DIRECTORY", strC(startdir));
+
+    IupPopup(idlg, IUP_CENTER, IUP_CENTER);
+
+    if (IupGetInt(idlg, "STATUS") == 0) {
+        const char* val = IupGetAttribute(idlg, "VALUE");
+        IupSetStrAttribute(self->ctext, "VALUE", val);
+
+        string customdir = 0;
+        pathFromPlatform(&customdir, (strref)val);
+        pathNormalize(&customdir);
+        ssdSet(sets, _S"custom", true, stvar(string, customdir));
+        strDestroy(&customdir);
+    }
+
+    IupDestroy(idlg);
+    strDestroy(&startdir);
+    objRelease(&sets);
+
+    return IUP_DEFAULT;
+}
+
 bool SSLocControls_make(_In_ SSLocControls* self)
 {
     self->global = IupToggle(langGetC(self->ss, "screenshot_global"), NULL);
@@ -534,6 +623,8 @@ bool SSLocControls_make(_In_ SSLocControls* self)
 
     self->globalopen = IupButton(langGetC(self->ss, "screenshot_global_open"), NULL);
     IupSetAttribute(self->globalopen, "CPADDING", "6x1");
+    iupSetObj(self->globalopen, ObjNone, self, self->ss->ui);
+    IupSetCallback(self->globalopen, "ACTION", (Icallback)screenshot_global_open_action);
 
     self->rundir = IupToggle(langGetC(self->ss, "screenshot_rundir"), NULL);
     setTip(self->rundir,
@@ -549,8 +640,14 @@ bool SSLocControls_make(_In_ SSLocControls* self)
 
     self->ctext = IupText(NULL);
     IupSetAttribute(self->ctext, "EXPAND", "HORIZONTAL");
+    iupSetObj(self->ctext, ObjNone, self, self->ss->ui);
+    IupSetCallback(self->ctext, "ACTION", (Icallback)screenshot_custom_text_change);
+
     self->cbrowse = IupButton(langGetC(self->ss, "settings_ftl_browse"), NULL);
     IupSetAttribute(self->cbrowse, "CPADDING", "6x1");
+    iupSetObj(self->cbrowse, ObjNone, self, self->ss->ui);
+    IupSetCallback(self->cbrowse, "ACTION", (Icallback)screenshot_custom_browse_action);
+
     Ihandle* mgbl = IupHbox(self->global, self->globalopen, NULL);
     IupSetAttribute(mgbl, "CMARGIN", "0x0");
     IupSetAttribute(mgbl, "CGAP", "6");
@@ -597,6 +694,12 @@ bool SSLocControls_update(_In_ SSLocControls* self)
         loc = SSLOC_Global;   // for below tests in case this is hit by default
         break;
     }
+
+    string customdir = 0;
+    ssdStringOut(sets, _S"custom", &customdir);
+    pathToPlatform(&customdir, customdir);
+    IupSetStrAttribute(self->ctext, "VALUE", strC(customdir));
+    strDestroy(&customdir);
 
     ssloccontrolsUpdateButtons(self, loc);
     IupSetAttribute(self->rundir, "ACTIVE", runtracker ? "YES" : "NO");

@@ -168,7 +168,7 @@ void Screenshot_process(_In_ Screenshot* self, _In_opt_ strref fn, RunInfo* run,
     switch (loc) {
     case SSLOC_Custom:
         outvfs = self->ss->rootfs;
-        ssdStringOut(self->settings, _S"path", &outdir);
+        ssdStringOut(self->settings, automatic ? _S"auto/custom" : _S"manual/custom", &outdir);
         break;
     case SSLOC_Rundir:
         if (!run)

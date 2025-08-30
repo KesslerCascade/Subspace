@@ -293,5 +293,6 @@
     "screenshot_gameover": "Game over screen",
     "screenshot_victory": "Victory screen (score)",
     "screenshot_credits": "Victory page (credits)",
-    "screenshot_none": "None"
+    "screenshot_none": "None",
+    "screenshot_custom_browse_title": "Choose custom screenshot location"
 }

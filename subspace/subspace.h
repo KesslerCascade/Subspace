@@ -98,3 +98,4 @@ bool logOpen(VFS* vfs, string filename, LogDest** defer);
 bool logClose(void);
 void fatalError(strref msg, bool osdeperr);
 int64 toLocalTime(int64 time);
+bool openFolder(strref fpath);
