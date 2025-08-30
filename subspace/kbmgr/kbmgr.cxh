@@ -9,6 +9,7 @@ class KBMgr {
 
     factory create(Subspace *subspace);
     bool bind(strref name, int key);
+    int get(strref name);
     void reg(SubspaceFeature *owner, strref name, int default_key);
     void sendAll(ControlClient *client);
 }
