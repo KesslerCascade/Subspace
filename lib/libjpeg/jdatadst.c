@@ -19,6 +19,7 @@
 #include "jinclude.h"
 #include "jpeglib.h"
 #include "jerror.h"
+#include <cx/xalloc.h>
 
 #ifndef HAVE_STDLIB_H		/* <stdlib.h> should declare malloc(),free() */
 extern void * malloc JPP((size_t size));
@@ -123,7 +124,7 @@ empty_mem_output_buffer (j_compress_ptr cinfo)
 
   /* Try to allocate new buffer with double size */
   nextsize = dest->bufsize * 2;
-  nextbuffer = (JOCTET *) malloc(nextsize);
+  nextbuffer = (JOCTET *) xa_malloc(nextsize);
 
   if (nextbuffer == NULL)
     ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 11);
@@ -131,7 +132,7 @@ empty_mem_output_buffer (j_compress_ptr cinfo)
   MEMCOPY(nextbuffer, dest->buffer, dest->bufsize);
 
   if (dest->newbuffer != NULL)
-    free(dest->newbuffer);
+    xa_free(dest->newbuffer);
 
   dest->newbuffer = nextbuffer;
 
@@ -252,7 +253,7 @@ jpeg_mem_dest (j_compress_ptr cinfo,
 
   if (*outbuffer == NULL || *outsize == 0) {
     /* Allocate initial buffer */
-    dest->newbuffer = *outbuffer = (unsigned char *) malloc(OUTPUT_BUF_SIZE);
+    dest->newbuffer = *outbuffer = (unsigned char *) xa_malloc(OUTPUT_BUF_SIZE);
     if (dest->newbuffer == NULL)
       ERREXIT1(cinfo, JERR_OUT_OF_MEMORY, 10);
     *outsize = OUTPUT_BUF_SIZE;
