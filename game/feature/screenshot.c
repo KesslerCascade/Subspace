@@ -270,6 +270,12 @@ bool screenshotUseFramebuf(void)
     return CApp_useFrameBuffer(theApp) && !osIsUsingDirect3D();
 }
 
+bool screenshotAuto(int event)
+{
+    ScreenshotSettings* settings = Screenshot_feature.settings;
+    return !!(settings->events & event);
+}
+
 // ---- Keybinds ----------------
 
 static void screenshot_take_cb(int key, int flags)
@@ -294,6 +300,7 @@ FeatureSettingsSpec Screenshot_spec = {
              { .name = "hideinfoblock",
                 .type = CF_BOOL,
                 .off  = offsetof(ScreenshotSettings, hideinfoblock) },
+             { .name = "events", .type = CF_INT, .off = offsetof(ScreenshotSettings, events) },
              { 0 } }
 };
 
@@ -305,6 +312,7 @@ Patch* Screenshot_patches[] = {
     &patch_CApp_OnRender,
     &patch_MouseControl_OnRender,
     &patch_CommandGui_RenderPause,
+    &patch_AchievementTracker_OnLoop,
 #ifdef WIN32
     &patch_SILTextureLock,
 #endif

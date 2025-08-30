@@ -30,6 +30,7 @@ INITWRAP(SoundControl_PlaySoundMix);
 Symbol SYM(SoundControl_PlaySoundMix) = {
     SYMNAME("SoundControl::PlaySoundMix"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &AchievementTracker_OnLoop_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &AchievementTracker_OnLoop_trace_2 },
              { .type = SYMBOL_FIND_EXPORT,
                 .name =
                     "FTLGame._ZN12SoundControl12PlaySoundMixERKNSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEEfb" },

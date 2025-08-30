@@ -33,6 +33,7 @@ if(WIN32)
         win32/ftl/graphics/ftl_csurface.c
         win32/ftl/graphics/ftl_freetype.c
         win32/ftl/ftl_achievementtracker.c
+        win32/ftl/ftl_animationtracker.c
         win32/ftl/ftl_blueprintmanager.c
         win32/ftl/ftl_capp.c
         win32/ftl/ftl_cevent.c
@@ -122,6 +123,7 @@ add_executable(subspacegame
     hook/module.c
     hook/string.c
     hook/symbol.c
+    hook/achievementtracker/achievementtracker_onloop.c
     hook/achievementtracker/achievementtracker_setachievement.c
     hook/blueprintmanager/blueprintmanager_getshipblueprint.c
     hook/capp/capp_onexecute.c

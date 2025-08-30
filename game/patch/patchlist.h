@@ -1,6 +1,7 @@
 #pragma once
 #include "patch.h"
 
+extern Patch patch_AchievementTracker_OnLoop;
 extern Patch patch_AchievementTracker_SetAchievement;
 extern Patch patch_BlueprintManager_GetShipBlueprint;
 extern Patch patch_CApp_OnExecute;

@@ -95,7 +95,7 @@ void Screenshot_applyDefaultSettings(_In_ Screenshot* self)
             ssdSet(self->settings, _S"auto/loc", true, stvar(int32, SSLOC_Global));
 
         if (!ssdPtr(self->settings, _S"events"))
-            ssdSet(self->settings, _S"events", true, stvar(int32, 0));
+            ssdSet(self->settings, _S"events", true, stvar(uint32, 0));
     }
 }
 

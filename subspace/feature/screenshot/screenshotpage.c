@@ -118,12 +118,12 @@ static int screenshot_event_action(Ihandle* ih, int state)
     SSDNode* sets = self->feature->settings;
     ssdLockedTransaction(sets)
     {
-        int32 ev = ssdVal(int32, sets, _S"events", 0);
+        uint32 ev = ssdVal(uint32, sets, _S"events", 0);
         if (state)
             ev |= bit;
         else
             ev &= ~bit;
-        ssdSet(sets, _S"events", true, stvar(int32, ev));
+        ssdSet(sets, _S"events", true, stvar(uint32, ev));
     }
 
     featureSendSettingCur(self->feature, _S"events");
@@ -437,7 +437,7 @@ bool ScreenshotPage_update(_In_ ScreenshotPage* self)
     IupSetfAttribute(self->jpgqvalnum, "VALUE", "%d", quality);
     IupSetInt(self->jpgqval, "VALUE", quality);
 
-    int events = ssdVal(int32, sets, _S"events", 0);
+    uint32 events = ssdVal(uint32, sets, _S"events", 0);
     IupSetAttribute(self->autoach, "VALUE", (events & SSEvent_Ach) ? "ON" : "OFF");
     IupSetAttribute(self->autorfs1, "VALUE", (events & SSEvent_RFS1) ? "ON" : "OFF");
     IupSetAttribute(self->autorfs2, "VALUE", (events & SSEvent_RFS2) ? "ON" : "OFF");
