@@ -2,6 +2,7 @@
 
 #include "ftl/achievementtracker.h"
 #include "ftl/capp.h"
+#include "ftl/soundcontrol.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -59,4 +60,18 @@ FuncInfo FUNCINFO(AchievementTracker_SetAchievement) = {
                 { 4, ARG_INT, 0, true },
                 { 4, ARG_INT, 0, true } },
     .rettype = RET_VOID
+};
+
+DisasmTrace AchievementTracker_OnLoop_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(AchievementTracker_OnLoop),
+    .ops  = { { DT_OP(SKIP), .imin = 40, .imax = 60, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(SoundControl_Sounds) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL SoundControl::PlaySoundMix
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(SoundControl_PlaySoundMix) }
 };

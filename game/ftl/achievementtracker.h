@@ -6,6 +6,8 @@
 
 typedef struct AchievementTracker AchievementTracker;
 
+extern DisasmTrace AchievementTracker_OnLoop_trace;
+
 // FTL functions & wrappers below
 
 DECLSYM(AchievementTracker_Tracker);

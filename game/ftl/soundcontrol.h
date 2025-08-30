@@ -16,3 +16,9 @@ typedef void (*FUNCTYPE(SoundControl_StartPlaylist))(SoundControl* self, vector*
 DECLFUNC(SoundControl_StartPlaylist);
 #define SoundControl_StartPlaylist(self, newPlayList) \
     FCALL(ftlbase, SoundControl_StartPlaylist, self, newPlayList)
+
+typedef unsigned int (*FUNCTYPE(SoundControl_PlaySoundMix))(SoundControl* this, basic_string* name,
+                                                            float volume, bool loop);
+DECLFUNC(SoundControl_PlaySoundMix);
+#define SoundControl_PlaySoundMix(self, name, volume, loop) \
+    FCALL(ftlbase, SoundControl_PlaySoundMix, self, name, volume, loop)

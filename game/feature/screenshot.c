@@ -11,6 +11,7 @@
 #include "ftl/scorekeeper.h"
 #include "ftl/shipmanager.h"
 #include "ftl/sil.h"
+#include "ftl/soundcontrol.h"
 #include "ftl/starmap.h"
 #include "ftl/worldmanager.h"
 #include "input/keybinds.h"
@@ -19,6 +20,11 @@
 #include "osdep.h"
 #include "ospatchlist.h"
 #include "screenshot.h"
+
+static bool currentScreenshotAuto;
+static lock_t soundlock;
+static bool soundlock_init;
+static bool screenshotSound;
 
 typedef struct SSInfo {
     char* fn;
@@ -74,6 +80,10 @@ static int ss_write_thread(void* data)
     controlMsgInt(msg, 12, "minor", g_version_minor);
     controlMsgInt(msg, 13, "rev", g_version_rev);
     controlClientQueue(msg);
+
+    lock_acq(&soundlock);
+    screenshotSound = true;
+    lock_rel(&soundlock);
 
     free(ss->shiptype);
     free(ss->shipname);
@@ -169,7 +179,7 @@ void saveScreenshotFramebuf(int* fb)
     memcpy(ss->buf, data, dsize);
     texture_unlock(tex);
 
-    ss->automatic = gs.renderingScreenshotAuto;
+    ss->automatic = currentScreenshotAuto;
     screenshotMetadata(ss);
     osStartThread(ss_write_thread, ss);
 }
@@ -194,18 +204,46 @@ void saveScreenshotFallback(void)
     ss->buf      = malloc(dsize);
     sys_graphics_read_pixels(modx + barx, mody + bary, ss->w, ss->h, ss->w, ss->buf);
 
-    ss->automatic = gs.renderingScreenshotAuto;
+    ss->automatic = currentScreenshotAuto;
     screenshotMetadata(ss);
     osStartThread(ss_write_thread, ss);
 }
 
 void renderScreenshot(CApp* app, bool automatic)
 {
-    gs.renderingScreenshot     = true;
-    gs.renderingScreenshotAuto = automatic;
+    gs.renderingScreenshot = true;
+    currentScreenshotAuto  = automatic;
     CApp_OnRender(app);
-    gs.renderingScreenshotAuto = false;
-    gs.renderingScreenshot     = false;
+    currentScreenshotAuto  = false;
+    gs.renderingScreenshot = false;
+}
+
+void screenshotCheckSound(void)
+{
+    ScreenshotSettings* settings = Screenshot_feature.settings;
+
+    if (!soundlock_init) {
+        lock_init(&soundlock);
+        soundlock_init = true;
+    }
+
+    lock_acq(&soundlock);
+    bool playsound  = screenshotSound;
+    screenshotSound = false;
+    lock_rel(&soundlock);
+
+    if (playsound && settings->sound) {
+        // use a unique mix of 2 select sounds
+
+        basic_string temp;
+        basic_string_set(&temp, "hoverBeep");
+        SoundControl_PlaySoundMix(SCSounds, &temp, -1, false);
+        basic_string_destroy(&temp);
+
+        basic_string_set(&temp, "powerUpFail");
+        SoundControl_PlaySoundMix(SCSounds, &temp, -1, false);
+        basic_string_destroy(&temp);
+    }
 }
 
 bool screenshotHideMouse(void)
@@ -246,7 +284,8 @@ static KeyBind Screenshot_keybinds[] = {
 
 FeatureSettingsSpec Screenshot_spec = {
     .size = sizeof(ScreenshotSettings),
-    .ent  = { { .name = "hidemouse",
+    .ent  = { { .name = "sound", .type = CF_BOOL, .off = offsetof(ScreenshotSettings, sound) },
+             { .name = "hidemouse",
                 .type = CF_BOOL,
                 .off  = offsetof(ScreenshotSettings, hidemouse) },
              { .name = "hidepause",
@@ -296,6 +335,8 @@ SubspaceFeature Screenshot_feature = {
                         &SYM(CompleteShip_shipManager_offset),
                         &SYM(ShipManager_myBlueprint_offset),
                         &SYM(Settings_difficulty),
+                        &SYM(SoundControl_Sounds),
+                        &SYM(SoundControl_PlaySoundMix),
 #ifdef WIN32
                         &SYM(CApp_useDirect3D_offset),
 #endif
