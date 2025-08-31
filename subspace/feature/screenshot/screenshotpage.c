@@ -249,7 +249,7 @@ bool ScreenshotPage_make(_In_ ScreenshotPage* self, Ihandle* list)
     IupSetAttribute(fnamehbox, "CMARGIN", "0x0");
     IupSetAttribute(fnamehbox, "CGAP", "3");
 
-    Ihandle* fnamevbox = IupVbox(fnamelabel, fnamehbox);
+    Ihandle* fnamevbox = IupVbox(fnamelabel, fnamehbox, NULL);
     IupSetAttribute(fnamevbox, "CMARGIN", "0x0");
     IupSetAttribute(fnamevbox, "CGAP", "1");
 
