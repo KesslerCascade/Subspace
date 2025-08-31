@@ -82,17 +82,56 @@ DisasmTrace GameOver_SetVictory_trace = {
     .ops  = { { DT_OP(SKIP), .imin = 10, .imax = 20 },
              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { DT_OUT_SYM1 } },
              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { DT_OUT_SYM2 } },
-             { DT_OP(FINISH) } },
-    .out  = { &SYM(GameOver_bVictory_offset),   // DT_OUT_SYM1
-              &SYM(GameOver_bShowingCredits_offset) }
+             { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_LEA,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM3 } },   // this->credits
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(GameOver_bVictory_offset),     // DT_OUT_SYM1
+              &SYM(GameOver_bShowingCredits_offset),
+             &SYM(GameOver_credits_offset) }
+};
+
+// 1.6.9 version
+DisasmTrace GameOver_SetVictory_trace_2 = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(GameOver_SetVictory),
+    .ops  = { { DT_OP(SKIP), .imin = 10, .imax = 20 },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { DT_OUT_SYM1 } },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { DT_OUT_SYM2 } },
+             { DT_OP(SKIP), .imin = 35, .imax = 45, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV, .argf = { ARG_REG, ARG_REG }, .args = { { REG_ECX }, { REG_EBP } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 8 },
+             { I_ADD,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM3 } },   // this->credits
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL },                         // CreditScreen::Start
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(GameOver_bVictory_offset),     // DT_OUT_SYM1
+              &SYM(GameOver_bShowingCredits_offset),
+             &SYM(GameOver_credits_offset) }
 };
 
 Symbol SYM(GameOver_bVictory_offset) = {
     SYMNAME("GameOver->bVictory"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace }, { 0 } }
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace_2 },
+             { 0 } }
 };
 
 Symbol SYM(GameOver_bShowingCredits_offset) = {
     SYMNAME("GameOver->bShowingCredits"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace }, { 0 } }
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(GameOver_credits_offset) = {
+    SYMNAME("GameOver->credits"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace_2 },
+             { 0 } }
 };

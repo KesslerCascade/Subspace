@@ -532,14 +532,14 @@ DisasmTrace CApp_OnLoop_trace = {
              { I_MOV,
                 .argf   = { ARG_REG },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, DT_CAPTURE2 } },   // MOV ECX, MouseControl::Mouse
+                .argcap = { 0, DT_CAPTURE2 } },        // MOV ECX, MouseControl::Mouse
               { DT_OP(SKIP), .imin = 0, .imax = 2 },
-             { I_CALL },                         // CALL MouseControl::Reset
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MouseControl::Reset
               { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH2 } },          // MOV ECX, MouseControl::Mouse
-              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MouseControl::OnLoop
+              { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL MouseControl::OnLoop
               { DT_OP(SKIP), .imin = 2, .imax = 10 },
              { I_CMP },
              { DT_OP(JMP) },   // follow the JNE
@@ -549,19 +549,19 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argcap = { 0, DT_CAPTURE3 } },   // store CommandGui offset
               { I_CALL,
                 .argcap = { DT_CAPTURE1 },
-                .argout = { DT_OUT_SYM3 } },   // CALL CommandGui::IsPaused
+                .argout = { DT_OUT_SYM4 } },   // CALL CommandGui::IsPaused
               { DT_OP(SKIP), .imin = 3, .imax = 6 },
              { I_CALL },                      // CALL SoundControl::OnLoop
-              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { 0, DT_OUT_SYM4 } },
+              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { 0, DT_OUT_SYM5 } },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
-             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL AchievementTracker::OnLoop
+             { I_CALL, .argout = { DT_OUT_SYM6 } },   // CALL AchievementTracker::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
              { DT_OP(LABEL), .val = 1 },              // we want to trace both outcomes
               { I_CMP,                                 // (this->menu).bOpen
                 .argf = { ARG_PTRSIZE, ARG_ADDR },
                 .args = { { .ptrsize = 1 }, { .addr = 0 } } },
              { DT_OP(SKIP), .imin = 0, .imax = 2, .flow = DT_FLOW_JMP_BOTH },   // branch reordering
-              { I_LEA, .outip = DT_OUT_SYM6 },   // menu handler waypoint
+              { I_LEA, .outip = DT_OUT_SYM7 },   // menu handler waypoint
               { DT_OP(GOTO), .val = 1 },         // back to branch point
               { DT_OP(SKIP),
                 .imin = 2,
@@ -571,33 +571,34 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argf   = { ARG_MATCH },
                 .argcap = { DT_MATCH1 } },             // CALL CommandGui::IsPaused
               { DT_OP(SKIP), .imin = 1, .imax = 5 },
-             { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL WorldManager::OnLoop
+             { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL WorldManager::OnLoop
               { DT_OP(SKIP), .imin = 1, .imax = 8 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
-              { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL CommandGui::OnLoop
+              { I_CALL, .argout = { DT_OUT_SYM9 } },   // CALL CommandGui::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
-              { I_CALL, .argout = { DT_OUT_SYM9 } },   // CALL CommandGui::GetCommand
+                .argcap = { 0, DT_MATCH3 } },           // verify CommandGui object
+              { I_CALL, .argout = { DT_OUT_SYM10 } },   // CALL CommandGui::GetCommand
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CMP },
              { I_JA },
-             { I_JMP, .outip = { DT_OUT_SYM10 } },    // switch() waypoint
+             { I_JMP, .outip = { DT_OUT_SYM11 } },    // switch() waypoint
               { DT_OP(FINISH) } },
     .out  = { &SYM(CFPS_OnLoop),                       // DT_OUT_SYM1
-              &SYM(MouseControl_OnLoop),               // DT_OUT_SYM2
-              &SYM(CommandGui_IsPaused),               // DT_OUT_SYM3
-              &SYM(AchievementTracker_Tracker),        // DT_OUT_SYM4
-              &SYM(AchievementTracker_OnLoop),         // DT_OUT_SYM5
-              &SYM(wp_CApp_OnLoop_MenuMenu_handler),   // DT_OUT_SYM6
-              &SYM(WorldManager_OnLoop),               // DT_OUT_SYM7
-              &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM8
-              &SYM(CommandGui_GetCommand),             // DT_OUT_SYM9
+              &SYM(MouseControl_Reset),                // DT_OUT_SYM2
+              &SYM(MouseControl_OnLoop),               // DT_OUT_SYM3
+              &SYM(CommandGui_IsPaused),               // DT_OUT_SYM4
+              &SYM(AchievementTracker_Tracker),        // DT_OUT_SYM5
+              &SYM(AchievementTracker_OnLoop),         // DT_OUT_SYM6
+              &SYM(wp_CApp_OnLoop_MenuMenu_handler),   // DT_OUT_SYM7
+              &SYM(WorldManager_OnLoop),               // DT_OUT_SYM8
+              &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM9
+              &SYM(CommandGui_GetCommand),             // DT_OUT_SYM10
               &SYM(wp_CApp_OnLoop_GetCommand_switch) }
 };
 

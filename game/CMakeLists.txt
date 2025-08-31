@@ -39,6 +39,7 @@ if(WIN32)
         win32/ftl/ftl_capp.c
         win32/ftl/ftl_cevent.c
         win32/ftl/ftl_cfps.c
+        win32/ftl/ftl_creditscreen.c
         win32/ftl/ftl_combatcontrol.c
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
