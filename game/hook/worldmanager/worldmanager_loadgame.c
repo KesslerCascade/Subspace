@@ -75,6 +75,7 @@ Patch patch_WorldManager_LoadGame = {
                         &SYM(WorldManager_starMap_offset),
                         &SYM(StarMap_sectorMapSeed_offset),
                         &SYM(CompleteShip_shipManager_offset),
+                        &SYM(ShipManager_myBlueprint_offset),
                         &SYM(ShipBlueprint_blueprintName_offset),
                         &SYM(ShipBlueprint_name_offset),
                         &SYM(Settings_difficulty),

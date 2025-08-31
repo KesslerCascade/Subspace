@@ -7,6 +7,8 @@
 #include <cx/platform/win/win_time.h>
 #include <cx/utils.h>
 
+#include <shellapi.h>
+
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "comctl32.lib")
 #pragma comment(lib, "shell32.lib")
@@ -64,4 +66,16 @@ int64 toLocalTime(int64 time)
     SystemTimeToTzSpecificLocalTime(&tzi, &st, &lst);
     SystemTimeToFileTime(&lst, &ft);
     return timeFromFileTime(&ft);
+}
+
+bool openFolder(strref fpath)
+{
+    bool ret = false;
+    pathToPlatform(&fpath, fpath);
+
+    uint16* npath  = strToUTF16S(fpath);
+    HINSTANCE inst = npath ? ShellExecuteW(NULL, L"explore", npath, NULL, NULL, SW_SHOW) : NULL;
+    ret            = ((intptr)inst > 32);
+
+    return ret;
 }

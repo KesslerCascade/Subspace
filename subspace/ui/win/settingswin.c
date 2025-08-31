@@ -185,6 +185,8 @@ void SettingsWin_showPage(_In_ SettingsWin* self, int num)
     if (num < 0 || num >= saSize(self->pages))
         return;
 
+    settingspageShow(self->pages.a[num]);
+
     for (int i = 0; i < saSize(self->zboxmap); i++) {
         if (num == self->zboxmap.a[i]) {
             IupSetInt(self->pagelist, "VALUE", i + 1);
@@ -199,8 +201,10 @@ void SettingsWin_showPageByList(_In_ SettingsWin* self, int listid)
     if (listid < 1 || listid > saSize(self->zboxmap))
         return;
 
+    SettingsPage* page = self->pages.a[self->zboxmap.a[listid - 1]];
+    settingspageShow(page);
     IupSetInt(self->pagelist, "VALUE", listid);
-    IupSetAttributeHandle(self->pagezbox, "VALUE", self->pages.a[self->zboxmap.a[listid - 1]]->h);
+    IupSetAttributeHandle(self->pagezbox, "VALUE", page->h);
 }
 
 void SettingsWin_updateList(_In_ SettingsWin* self)

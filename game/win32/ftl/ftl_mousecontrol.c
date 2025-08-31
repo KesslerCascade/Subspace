@@ -39,3 +39,15 @@ DisasmTrace MouseControl_OnLoop_trace = {
               { DT_OP(FINISH) } },
     .out  = { &SYM(CFPS_GetSpeedFactor) }
 };
+
+INITWRAP(MouseControl_Reset);
+Symbol SYM(MouseControl_Reset) = {
+    SYMNAME("MouseControl::Reset"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12MouseControl5ResetEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(MouseControl_Reset) = { .nargs   = 1,
+                                          .stdcall = true,
+                                          .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                          .rettype = RET_VOID };

@@ -21,6 +21,13 @@ Symbol SYM(crt_realloc) = {
 };
 FuncInfo FUNCINFO(crt_realloc) = { .nargs = 2, .purecdecl = true };
 
+INITWRAP(crt_strdup);
+Symbol SYM(crt_strdup) = {
+    SYMNAME("strdup"),
+    .find = { { .type = SYMBOL_FIND_IMPORT, .str = "msvcrt.dll", .name = "_strdup" }, { 0 } }
+};
+FuncInfo FUNCINFO(crt_strdup) = { .nargs = 1, .purecdecl = true };
+
 INITWRAP(crt_snprintf);
 Symbol SYM(crt_snprintf) = {
     SYMNAME("snprintf"),

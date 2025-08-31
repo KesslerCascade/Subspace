@@ -5,6 +5,10 @@
 #include "hook/function.h"
 
 typedef struct AchievementTracker AchievementTracker;
+typedef struct AnimationTracker AnimationTracker;
+
+extern DisasmTrace AchievementTracker_OnLoop_trace;
+extern DisasmTrace AchievementTracker_OnLoop_trace_2;
 
 // FTL functions & wrappers below
 
@@ -21,3 +25,7 @@ typedef void (*FUNCTYPE(AchievementTracker_SetAchievement))(AchievementTracker* 
                                                             basic_string* achievement, bool noPopup,
                                                             bool sendToServer);
 DECLFUNC(AchievementTracker_SetAchievement);
+
+DECLSYM(AchievementTracker_achievementPopup_offset);
+#define AchievementTracker_achievementPopup(atracker) \
+    (&MEMBER(ftlbase, AchievementTracker, atracker, AnimationTracker, achievementPopup))

@@ -16,4 +16,7 @@ DECLFUNC(MouseControl_OnRender);
 typedef void (*FUNCTYPE(MouseControl_OnLoop))(MouseControl* self);
 DECLFUNC(MouseControl_OnLoop);
 
+typedef void (*FUNCTYPE(MouseControl_Reset))(MouseControl* self);
+DECLFUNC(MouseControl_Reset);
+
 extern DisasmTrace MouseControl_OnLoop_trace;

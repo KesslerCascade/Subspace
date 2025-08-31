@@ -1,20 +1,24 @@
 #pragma once
 #include "patch.h"
 
+extern Patch patch_AchievementTracker_OnLoop;
 extern Patch patch_AchievementTracker_SetAchievement;
 extern Patch patch_BlueprintManager_GetShipBlueprint;
 extern Patch patch_CApp_OnExecute;
 extern Patch patch_CApp_OnLoop;
 extern Patch patch_CApp_OnKeyDown;
-extern Patch patch_CFPS_OnLoop;
 extern Patch patch_CApp_OnRender;
+extern Patch patch_CFPS_OnLoop;
 extern Patch patch_CFPS_TargetFrameTime;
 extern Patch patch_CombatControl_RenderTarget;
 extern Patch patch_CommandGui_GetCommand;
 extern Patch patch_CommandGui_KeyDown;
 extern Patch patch_CommandGui_IsGameOver;
 extern Patch patch_CommandGui_OnLoop;
+extern Patch patch_CommandGui_RenderPause;
 extern Patch patch_CommandGui_RenderStatic;
+extern Patch patch_CSurface_FinishFrame;
+extern Patch patch_CSurface_GL_BlitFrameBuffer;
 extern Patch patch_FileHelper_deleteAllSaveFiles;
 extern Patch patch_FileHelper_deleteFile;
 extern Patch patch_FileHelper_getSaveFile;
