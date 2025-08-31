@@ -26,7 +26,8 @@ Symbol SYM(CApp_OnExecute) = {
 };
 FuncInfo FUNCINFO(CApp_OnExecute) = { .nargs   = 1,
                                       .stdcall = true,
-                                      .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+                                      .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                      .rettype = RET_INT };
 
 DisasmTrace CApp_OnExecute_trace = {
     .c    = DTRACE_ADDR,
