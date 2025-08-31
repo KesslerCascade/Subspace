@@ -2,6 +2,7 @@
 
 #include "feature/feature.h"
 #include "ftl/blueprintmanager.h"
+#include "ftl/bossship.h"
 #include "ftl/capp.h"
 #include "ftl/completeship.h"
 #include "ftl/filehelper.h"
@@ -25,6 +26,9 @@ static bool currentScreenshotAuto;
 static lock_t soundlock;
 static bool soundlock_init;
 static bool screenshotSound;
+
+static bool playerDestroyed;
+static bool enemyDestroyed;
 
 typedef struct SSInfo {
     char* fn;
@@ -246,6 +250,43 @@ void screenshotCheckSound(void)
     }
 }
 
+void screenshotCheckDestroyed(void)
+{
+    WorldManager* world  = CApp_world(theApp);
+    CompleteShip* pcship = world ? WorldManager_playerShip(world) : NULL;
+    ShipManager* pship   = pcship ? CompleteShip_shipManager(pcship) : NULL;
+    if (pship && ShipManager_bDestroyed(pship)) {
+        if (!playerDestroyed && screenshotAuto(SSEvent_Destroyed)) {
+            playerDestroyed      = true;
+            gs.screenshotNowAuto = true;
+        }
+    } else {
+        playerDestroyed = false;
+    }
+
+    CompleteShip* ecship = pcship ? CompleteShip_enemyShip(pcship) : NULL;
+    ShipManager* eship   = ecship ? CompleteShip_shipManager(ecship) : NULL;
+    if (eship && ShipManager_bDestroyed(eship)) {
+        if (!enemyDestroyed && screenshotAuto(SSEvent_WinFight)) {
+            enemyDestroyed       = true;
+            gs.screenshotNowAuto = true;
+        } else {
+            // otherwise maybe this is a boss stage, check the specific events for those
+            BossShip* bship = WorldManager_bossShip(world);
+            if (!enemyDestroyed && bship) {
+                if ((BossShip_currentStage(bship) == 1 && screenshotAuto(SSEvent_RFS1)) ||
+                    (BossShip_currentStage(bship) == 2 && screenshotAuto(SSEvent_RFS2)) ||
+                    (BossShip_currentStage(bship) == 3 && screenshotAuto(SSEvent_RFS3))) {
+                    enemyDestroyed       = true;
+                    gs.screenshotNowAuto = true;
+                }
+            }
+        }
+    } else {
+        enemyDestroyed = false;
+    }
+}
+
 bool screenshotHideMouse(void)
 {
     ScreenshotSettings* settings = Screenshot_feature.settings;
@@ -272,6 +313,9 @@ bool screenshotUseFramebuf(void)
 
 bool screenshotAuto(int event)
 {
+    if (!Screenshot_feature.enabled)
+        return false;
+
     ScreenshotSettings* settings = Screenshot_feature.settings;
     return !!(settings->events & event);
 }
@@ -313,6 +357,7 @@ Patch* Screenshot_patches[] = {
     &patch_MouseControl_OnRender,
     &patch_CommandGui_RenderPause,
     &patch_AchievementTracker_OnLoop,
+    &patch_GameOver_OnLoop,
 #ifdef WIN32
     &patch_SILTextureLock,
 #endif
@@ -340,7 +385,10 @@ SubspaceFeature Screenshot_feature = {
                         &SYM(sys_graphics_read_pixels),
                         &SYM(WorldManager_playerShip_offset),
                         &SYM(WorldManager_starMap_offset),
+                        &SYM(WorldManager_bossShip_offset),
+                        &SYM(BossShip_currentStage_offset),
                         &SYM(CompleteShip_shipManager_offset),
+                        &SYM(CompleteShip_enemyShip_offset),
                         &SYM(ShipManager_myBlueprint_offset),
                         &SYM(Settings_difficulty),
                         &SYM(SoundControl_Sounds),

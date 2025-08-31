@@ -22,3 +22,4 @@ bool screenshotHidePause(void);     // should pause text be hidden in screenshot
 bool screenshotHideInfoBlock(void);   // should pause text be hidden in screenshot
 bool screenshotUseFramebuf(void);   // if screenshot feature is using the framebuffer
 bool screenshotAuto(int event);     // if we should take a screenshot when event happens
+void screenshotCheckDestroyed(void);

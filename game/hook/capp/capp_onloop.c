@@ -78,8 +78,10 @@ void subspace_CApp_OnLoop_post(CApp* self)
         practiceLoad();
     gs.practiceLoadSave = false;
 
-    if (Screenshot_feature.enabled)
+    if (Screenshot_feature.enabled) {
+        screenshotCheckDestroyed();
         screenshotCheckSound();
+    }
 
     controlClientProcessOutbound();
 }

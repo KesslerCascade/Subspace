@@ -27,6 +27,7 @@ extern DisasmTrace WorldManager_CheckForNewLocation_trace_2;
 extern DisasmTrace WorldManager_PrepareAutoSave_trace;
 extern DisasmTrace WorldManager_PauseLoop_trace;
 extern DisasmTrace WorldManager_ModifyResources_trace;
+extern DisasmTrace WorldManager_OnLoop_trace;
 extern DisasmTrace WorldManager_OnLoop_Mantis_trace;
 extern DisasmTrace WorldManager_CreateLocation_trace;
 
@@ -79,6 +80,8 @@ DECLSYM(WorldManager_playerShip_offset);
     *(&MEMBER(ftlbase, WorldManager, worldmgr, CompleteShip*, playerShip))
 
 DECLSYM(WorldManager_bossShip_offset);
+#define WorldManager_bossShip(worldmgr) \
+    *(&MEMBER(ftlbase, WorldManager, worldmgr, BossShip*, bossShip))
 
 DECLSYM(WorldManager_starMap_offset);
 #define WorldManager_starMap(worldmgr) (&MEMBER(ftlbase, WorldManager, worldmgr, StarMap, starMap))

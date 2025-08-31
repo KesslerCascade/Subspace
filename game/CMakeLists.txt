@@ -35,6 +35,7 @@ if(WIN32)
         win32/ftl/ftl_achievementtracker.c
         win32/ftl/ftl_animationtracker.c
         win32/ftl/ftl_blueprintmanager.c
+        win32/ftl/ftl_bossship.c
         win32/ftl/ftl_capp.c
         win32/ftl/ftl_cevent.c
         win32/ftl/ftl_cfps.c

@@ -75,3 +75,24 @@ DisasmTrace GameOver_OnLoop_trace = {
     .out  = { &SYM(SoundControl_Sounds),               // DT_OUT_SYM1
               &SYM(SoundControl_StartPlaylist) }
 };
+
+DisasmTrace GameOver_SetVictory_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(GameOver_SetVictory),
+    .ops  = { { DT_OP(SKIP), .imin = 10, .imax = 20 },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { DT_OUT_SYM1 } },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { DT_OUT_SYM2 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(GameOver_bVictory_offset),   // DT_OUT_SYM1
+              &SYM(GameOver_bShowingCredits_offset) }
+};
+
+Symbol SYM(GameOver_bVictory_offset) = {
+    SYMNAME("GameOver->bVictory"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace }, { 0 } }
+};
+
+Symbol SYM(GameOver_bShowingCredits_offset) = {
+    SYMNAME("GameOver->bShowingCredits"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &GameOver_SetVictory_trace }, { 0 } }
+};
