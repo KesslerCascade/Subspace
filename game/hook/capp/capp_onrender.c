@@ -35,7 +35,7 @@ int subspace_CApp_OnRender_pre(CApp* self)
 
 void subspace_CApp_OnRender_post(CApp* self)
 {
-    if (Screenshot_feature.enabled) {
+    if (Screenshot_feature.enabled && !gs.practiceMode) {
         if (gs.screenshotNow)
             renderScreenshot(self, false);
         else if (gs.screenshotNowAuto)
