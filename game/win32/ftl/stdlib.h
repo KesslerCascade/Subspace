@@ -18,6 +18,10 @@ typedef void* (*FUNCTYPE(crt_realloc))(void* ptr, size_t size);
 DECLFUNC(crt_realloc);
 #define realloc(ptr, sz) FCALL(ftlbase, crt_realloc, ptr, sz)
 
+typedef char* (*FUNCTYPE(crt_strdup))(const char* src);
+DECLFUNC(crt_strdup);
+#define strdup(src) FCALL(ftlbase, crt_strdup, src)
+
 typedef int (*FUNCTYPE(crt_snprintf))(char* s, size_t n, const char* format, ...);
 DECLFUNC(crt_snprintf);
 #define snprintf(s, n, format, ...) FCALL(ftlbase, crt_snprintf, s, n, format, __VA_ARGS__)

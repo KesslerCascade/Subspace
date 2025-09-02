@@ -33,10 +33,13 @@ if(WIN32)
         win32/ftl/graphics/ftl_csurface.c
         win32/ftl/graphics/ftl_freetype.c
         win32/ftl/ftl_achievementtracker.c
+        win32/ftl/ftl_animationtracker.c
         win32/ftl/ftl_blueprintmanager.c
+        win32/ftl/ftl_bossship.c
         win32/ftl/ftl_capp.c
         win32/ftl/ftl_cevent.c
         win32/ftl/ftl_cfps.c
+        win32/ftl/ftl_creditscreen.c
         win32/ftl/ftl_combatcontrol.c
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
@@ -60,6 +63,7 @@ if(WIN32)
         win32/ftl/ftl_shipmanager.c
         win32/ftl/ftl_shipstatus.c
         win32/ftl/ftl_shipsystem.c
+        win32/ftl/ftl_sil.c
         win32/ftl/ftl_soundcontrol.c
         win32/ftl/ftl_starmap.c
         win32/ftl/ftl_startup.c
@@ -76,6 +80,8 @@ if(WIN32)
         win32/loader/rtld.c
         win32/loader/rtldoverrides.c
         win32/patch/patch_osdep.c
+        win32/patch/patch_sil.c
+        win32/d3d.c
         win32/entry.c
         win32/int64.c
         win32/kernel32_overrides.c
@@ -108,6 +114,7 @@ add_executable(subspacegame
     feature/practicemode.c
     feature/runtracker.c
     feature/savemanager.c
+    feature/screenshot.c
     feature/timewarp.c
     feature/tweaks.c
     ftl/graphics/colors.c
@@ -118,6 +125,7 @@ add_executable(subspacegame
     hook/module.c
     hook/string.c
     hook/symbol.c
+    hook/achievementtracker/achievementtracker_onloop.c
     hook/achievementtracker/achievementtracker_setachievement.c
     hook/blueprintmanager/blueprintmanager_getshipblueprint.c
     hook/capp/capp_onexecute.c
@@ -126,11 +134,14 @@ add_executable(subspacegame
     hook/capp/capp_onrender.c
     hook/cfps/cfps_onloop.c
     hook/cfps/cfps_targetframetime.c
+    hook/csurface/csurface_finishframe.c
+    hook/csurface/csurface_gl_blitframebuffer.c
     hook/combatcontrol/combatcontrol_rendertarget.c
     hook/commandgui/commandgui_getcommand.c
     hook/commandgui/commandgui_isgameover.c
     hook/commandgui/commandgui_keydown.c
     hook/commandgui/commandgui_onloop.c
+    hook/commandgui/commandgui_renderpause.c
     hook/commandgui/commandgui_renderstatic.c
     hook/filehelper/filehelper_deleteallsavefiles.c
     hook/filehelper/filehelper_deletefile.c
@@ -169,6 +180,7 @@ add_executable(subspacegame
     input/keybinds.c
     input/keyboard.c
     log/log.c
+    util/lcg.c
     patch/patch.c
     subspacegame.c
     version.c

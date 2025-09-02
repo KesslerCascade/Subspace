@@ -2,6 +2,7 @@
 #include "feature/feature.h"
 #include "feature/practicemode.h"
 #include "feature/savemanager.h"
+#include "feature/screenshot.h"
 #include "feature/tweaks.h"
 #include "ftl/capp.h"
 #include "ftl/scorekeeper.h"
@@ -75,6 +76,12 @@ void subspace_CApp_OnLoop_post(CApp* self)
 
     if (gs.practiceLoadSave)
         practiceLoad();
+    gs.practiceLoadSave = false;
+
+    if (Screenshot_feature.enabled) {
+        screenshotCheckDestroyed();
+        screenshotCheckSound();
+    }
 
     controlClientProcessOutbound();
 }

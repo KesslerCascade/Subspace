@@ -24,6 +24,7 @@ typedef enum DisasmArgOp {
     ARG_MATCH,     // must exactly match what's in the args
     ARG_REG,       // match register only, ignoring disp
     ARG_ADDR,      // match addr / disp value only
+    ARG_DEREF,     // dereference fixed address in data segment and compare value
     ARG_PTRSIZE,   // match pointer size only
 } DisasmArgOp;
 
@@ -118,6 +119,7 @@ typedef enum DisasmCandidateTraceType {
     DTRACE_REFS,       // Check all instructions that reference a particular pointer
     DTRACE_STRREFS,    // Check all instructions that reference a particular string
     DTRACE_CALLS,      // Check all function calls to a particular address
+    DTRACE_FUNCS,      // Check every function (slow!)
 } DisasmCandidateTraceType;
 
 typedef enum DisasmCandidateTraceModifier {

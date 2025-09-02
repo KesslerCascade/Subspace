@@ -1,4 +1,5 @@
 #include "ftl/achievementtracker.h"
+#include "ftl/bossship.h"
 #include "ftl/capp.h"
 #include "ftl/commandgui.h"
 #include "ftl/completeship.h"
@@ -90,8 +91,8 @@ DisasmTrace WorldManager_CreateShip_trace = {
                 .argf   = { ARG_REG, ARG_REG },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH2 } },
-             { I_CALL },                  // CALL BossShip::StartStage
-              { DT_OP(GOTO), .val = 1 },   // go back to main branch
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL BossShip::StartStage
+              { DT_OP(GOTO), .val = 1 },               // go back to main branch
               { DT_OP(SKIP), .imin = 20, .imax = 36 },
              { I_TEST },
              { DT_OP(SKIP),
@@ -112,8 +113,8 @@ DisasmTrace WorldManager_CreateShip_trace = {
               { DT_OP(FINISH) } },
     .out  = { &SYM(WorldManager_CreateShip),                  // DT_OUT_SYM1
               &SYM(WorldManager_bossShip_offset),             // DT_OUT_SYM2
-              0,                                              // for BossShip::StartStage
-              &SYM(WorldManager_starMap_worldLevel_offset),   // DT_OUT_SYM5
+              &SYM(BossShip_StartStage),                      // DT_OUT_SYM3
+              &SYM(WorldManager_starMap_worldLevel_offset),   // DT_OUT_SYM4
               &SYM(CompleteShip_OnInit) }
 };
 
@@ -514,8 +515,16 @@ DisasmTrace WorldManager_OnLoop_trace = {
     .csym = &SYM(WorldManager_OnLoop),
     .ops  = { { DT_OP(SKIP), .imin = 9, .imax = 17 },
              { I_CALL, .argout = { DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 250, .imax = 400 },
+             { I_CMP,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 4 }, { .addr = 3 } },
+                .argout = { DT_OUT_SYM2 } },   // if (this->bossShip->currentStage != 3)
+              { DT_OP(SKIP), .imin = 0, .imax = 4, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(StarMap_CheckGameOver) } },
              { DT_OP(FINISH) } },
-    .out  = &SYM(WorldManager_CheckForNewLocation)
+    .out  = { &SYM(WorldManager_CheckForNewLocation),   // DT_OUT_SYM1
+              &SYM(BossShip_currentStage_offset) }
 };
 
 Symbol SYM(WorldManager_CheckForNewLocation) = {

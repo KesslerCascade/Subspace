@@ -611,6 +611,10 @@ const t_cmddata cmddata[] = {
     { 0x00FFFF, 0x00290F, 2,00,  MX0,RXM,NNN, C_SSE + 0,          I_MOVAPS },
     { 0xFFFFFF, 0x280F66, 2,00,  RXM,MX0,NNN, C_SSE + 0,          I_MOVAPD },
     { 0xFFFFFF, 0x290F66, 2,00,  MX0,RXM,NNN, C_SSE + 0,          I_MOVAPD },
+    { 0x00FFFF, 0x00100F, 2,00,  RXM,MX0,NNN, C_SSE + 0,          I_MOVUPS },
+    { 0x00FFFF, 0x00110F, 2,00,  MX0,RXM,NNN, C_SSE + 0,          I_MOVUPS },
+    { 0xFFFFFF, 0x100F66, 2,00,  RXM,MX0,NNN, C_SSE + 0,          I_MOVUPD },
+    { 0xFFFFFF, 0x110F66, 2,00,  MX0,RXM,NNN, C_SSE + 0,          I_MOVUPD },
     // End of command table.
     { 0x000000, 0x000000, 0,00,  NNN,NNN,NNN, C_CMD + 0,          I_NONE }
 };

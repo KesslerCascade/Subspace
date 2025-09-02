@@ -3,6 +3,7 @@
 #include "ftl/stdlib.h"
 
 #include "feature/feature.h"
+#include "feature/screenshot.h"
 #include "feature/timewarp.h"
 #include "ftl/capp.h"
 #include "ftl/globals.h"
@@ -22,6 +23,9 @@
 void infoBlockRender(void)
 {
     InfoBlockSettings* settings = (InfoBlockSettings*)InfoBlock_feature.settings;
+
+    if (screenshotHideInfoBlock())
+        return;
 
     char buf[128];
     basic_string tmp;

@@ -350,10 +350,15 @@ static bool timeWarp_Enable(SubspaceFeature* feat, void* settings, bool enabled)
     return enabled;
 }
 
-Patch* TimeWarp_patches[] = { &patch_CFPS_OnLoop,           &patch_CFPS_TargetFrameTime,
-                              &patch_MouseControl_OnRender, &patch_CommandGui_KeyDown,
-                              &patch_CommandGui_OnLoop,     &patch_ShipStatus_OnRender,
-                              &patch_CApp_OnRender,         0 };
+Patch* TimeWarp_patches[] = {
+    &patch_CFPS_OnLoop,
+    &patch_CFPS_TargetFrameTime,
+    &patch_CommandGui_KeyDown,
+    &patch_CommandGui_OnLoop,
+    &patch_ShipStatus_OnRender,
+    &patch_CApp_OnRender,
+    0
+};
 
 FeatureSettingsSpec TimeWarp_spec = {
     .size = sizeof(TimeWarpSettings),

@@ -644,7 +644,9 @@ typedef enum e_inst
     I_UCOMISS,
     I_UCOMISD,
     I_MOVAPS,
-    I_MOVAPD
+    I_MOVAPD,
+    I_MOVUPS,
+    I_MOVUPD
 } e_inst;
 
 #define C_TYPEMASK     0x1F0            // Mask for command type

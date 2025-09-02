@@ -132,6 +132,20 @@ bool KBMgr_bind(_In_ KBMgr* self, _In_opt_ strref name, int key)
     return ret;
 }
 
+int KBMgr_get(_In_ KBMgr* self, _In_opt_ strref name)
+{
+    int ret = 0;
+
+    withReadLock (&self->kbmgrlock) {
+        KeyBind* bind;
+        if (htFind(self->binds, strref, name, object, &bind, HT_Borrow)) {
+            ret = bind->iupkey;
+        }
+    }
+
+    return ret;
+}
+
 void KBMgr_sendAll(_In_ KBMgr* self, ControlClient* client)
 {
     withReadLock (&self->kbmgrlock) {

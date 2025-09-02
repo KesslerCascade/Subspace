@@ -5,6 +5,7 @@
 #include "ftl/commandgui.h"
 #include "ftl/filehelper.h"
 #include "ftl/globals.h"
+#include "ftl/graphics/csurface.h"
 #include "ftl/mainmenu.h"
 #include "ftl/misc.h"
 #include "ftl/mousecontrol.h"
@@ -26,7 +27,8 @@ Symbol SYM(CApp_OnExecute) = {
 };
 FuncInfo FUNCINFO(CApp_OnExecute) = { .nargs   = 1,
                                       .stdcall = true,
-                                      .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+                                      .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                      .rettype = RET_INT };
 
 DisasmTrace CApp_OnExecute_trace = {
     .c    = DTRACE_ADDR,
@@ -309,6 +311,7 @@ FuncInfo FUNCINFO(CApp_GenInputEvents) = { .nargs   = 1,
                                            .stdcall = true,
                                            .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
+INITWRAP(CApp_OnRender);
 Symbol SYM(CApp_OnRender) = {
     SYMNAME("CApp::OnRender"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnExecute_rungame_trace_1 },
@@ -318,7 +321,21 @@ Symbol SYM(CApp_OnRender) = {
 };
 FuncInfo FUNCINFO(CApp_OnRender) = { .nargs   = 1,
                                      .stdcall = true,
-                                     .args    = { { 4, ARG_PTR, REG_ECX, false } } };
+                                     .args    = { { 4, ARG_PTR, REG_ECX, false } },
+                                     .rettype = RET_VOID };
+
+Symbol SYM(CApp_UpdateWindowSettings) = {
+    SYMNAME("CApp::UpdateWindowSettings"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN4CApp20UpdateWindowSettingsEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(CApp_UpdateWindowSettings) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
 
 DisasmTrace CApp_OnKeyDown_trace = {
     .c    = DTRACE_ADDR,
@@ -391,7 +408,13 @@ DisasmTrace CApp_OnRender_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(CApp_OnRender),
     // TODO: Make this better and more comprehensive
-    .ops  = { { DT_OP(SKIP), .imin = 45, .imax = 60 },
+    .ops  = { { DT_OP(SKIP), .imin = 13, .imax = 25 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },
+             { I_CMP,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 1 }, { .addr = 0 } },
+                .argout = { DT_OUT_SYM2 } },
+             { DT_OP(SKIP), .imin = 25, .imax = 40 },
              { I_CMP },
              { I_JZ },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
@@ -399,21 +422,46 @@ DisasmTrace CApp_OnRender_trace = {
              { DT_OP(LABEL), .val = 1 },   // save location to come back here later
               { DT_OP(JMP) },               // follow JE
               { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
-             { I_CALL, .argout = { DT_OUT_SYM1 } },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },
              { DT_OP(GOTO), .val = 1 },   // Go back to the JE
               { I_JZ },
              { I_LEA },
-             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MainMenu::OnRender
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL MainMenu::OnRender
               { DT_OP(SKIP), .imin = 4, .imax = 17 },
              { I_CALL },
              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
-             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL MouseControl::OnRender
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL MouseControl::OnRender
               { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
-             { I_CALL },
-             { I_CMP },
-             { I_JNZ },
-             { DT_OP(FINISH) } },
-    .out  = { &SYM(CommandGui_RenderStatic), &SYM(MainMenu_OnRender), &SYM(MouseControl_OnRender) }
+             { I_CALL },                              // CALL CFPS::OnRender
+              { I_CMP },
+             { I_JNZ, DT_OP(JMP) },
+             { DT_OP(SKIP), .imin = 30, .imax = 40 },
+             { I_JZ },
+             { I_MOV,
+                .argcap = { DT_CAPTURE1 },
+                .argout = { 0, DT_OUT_SYM6 } },   // this->framebuffer
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x44340000 } } },   // 720.0f
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0x44a00000 } } },   // 1280.0f
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argout = { DT_OUT_SYM7 } },                 // CALL GL_BlitFrameBuffer
+              { I_CALL },                                            // CALL GL_EnableBlend
+              { DT_OP(SKIP), .imin = 0, .imax = 1, .flow = DT_FLOW_JMP_UNCOND },
+             { I_CALL, .argout = { DT_OUT_SYM8 } },                 // CALL CSurface::FinishFrame
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_UpdateWindowSettings),                       // DT_OUT_SYM1
+              &SYM(CApp_useFrameBuffer_offset),                      // DT_OUT_SYM2
+              &SYM(CommandGui_RenderStatic),                         // DT_OUT_SYM3
+              &SYM(MainMenu_OnRender),                               // DT_OUT_SYM4
+              &SYM(MouseControl_OnRender),                           // DT_OUT_SYM5
+              &SYM(CApp_framebuffer_offset),                         // DT_OUT_SYM6
+              &SYM(CSurface_GL_BlitFrameBuffer),                     // DT_OUT_SYM7
+              &SYM(CSurface_FinishFrame) }
 };
 
 // Trace for version of the code with 2-argument TextLibrary::GetText
@@ -485,14 +533,14 @@ DisasmTrace CApp_OnLoop_trace = {
              { I_MOV,
                 .argf   = { ARG_REG },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, DT_CAPTURE2 } },   // MOV ECX, MouseControl::Mouse
+                .argcap = { 0, DT_CAPTURE2 } },        // MOV ECX, MouseControl::Mouse
               { DT_OP(SKIP), .imin = 0, .imax = 2 },
-             { I_CALL },                         // CALL MouseControl::Reset
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MouseControl::Reset
               { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH2 } },          // MOV ECX, MouseControl::Mouse
-              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL MouseControl::OnLoop
+              { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL MouseControl::OnLoop
               { DT_OP(SKIP), .imin = 2, .imax = 10 },
              { I_CMP },
              { DT_OP(JMP) },   // follow the JNE
@@ -502,19 +550,19 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argcap = { 0, DT_CAPTURE3 } },   // store CommandGui offset
               { I_CALL,
                 .argcap = { DT_CAPTURE1 },
-                .argout = { DT_OUT_SYM3 } },   // CALL CommandGui::IsPaused
+                .argout = { DT_OUT_SYM4 } },   // CALL CommandGui::IsPaused
               { DT_OP(SKIP), .imin = 3, .imax = 6 },
              { I_CALL },                      // CALL SoundControl::OnLoop
-              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { 0, DT_OUT_SYM4 } },
+              { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } }, .argout = { 0, DT_OUT_SYM5 } },
              { DT_OP(SKIP), .imin = 0, .imax = 2 },
-             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL AchievementTracker::OnLoop
+             { I_CALL, .argout = { DT_OUT_SYM6 } },   // CALL AchievementTracker::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
              { DT_OP(LABEL), .val = 1 },              // we want to trace both outcomes
               { I_CMP,                                 // (this->menu).bOpen
                 .argf = { ARG_PTRSIZE, ARG_ADDR },
                 .args = { { .ptrsize = 1 }, { .addr = 0 } } },
              { DT_OP(SKIP), .imin = 0, .imax = 2, .flow = DT_FLOW_JMP_BOTH },   // branch reordering
-              { I_LEA, .outip = DT_OUT_SYM6 },   // menu handler waypoint
+              { I_LEA, .outip = DT_OUT_SYM7 },   // menu handler waypoint
               { DT_OP(GOTO), .val = 1 },         // back to branch point
               { DT_OP(SKIP),
                 .imin = 2,
@@ -524,33 +572,34 @@ DisasmTrace CApp_OnLoop_trace = {
                 .argf   = { ARG_MATCH },
                 .argcap = { DT_MATCH1 } },             // CALL CommandGui::IsPaused
               { DT_OP(SKIP), .imin = 1, .imax = 5 },
-             { I_CALL, .argout = { DT_OUT_SYM7 } },   // CALL WorldManager::OnLoop
+             { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL WorldManager::OnLoop
               { DT_OP(SKIP), .imin = 1, .imax = 8 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
                 .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
-              { I_CALL, .argout = { DT_OUT_SYM8 } },   // CALL CommandGui::OnLoop
+              { I_CALL, .argout = { DT_OUT_SYM9 } },   // CALL CommandGui::OnLoop
               { DT_OP(SKIP), .imin = 0, .imax = 2 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_MATCH },
                 .args   = { { REG_ECX } },
-                .argcap = { 0, DT_MATCH3 } },          // verify CommandGui object
-              { I_CALL, .argout = { DT_OUT_SYM9 } },   // CALL CommandGui::GetCommand
+                .argcap = { 0, DT_MATCH3 } },           // verify CommandGui object
+              { I_CALL, .argout = { DT_OUT_SYM10 } },   // CALL CommandGui::GetCommand
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CMP },
              { I_JA },
-             { I_JMP, .outip = { DT_OUT_SYM10 } },    // switch() waypoint
+             { I_JMP, .outip = { DT_OUT_SYM11 } },    // switch() waypoint
               { DT_OP(FINISH) } },
     .out  = { &SYM(CFPS_OnLoop),                       // DT_OUT_SYM1
-              &SYM(MouseControl_OnLoop),               // DT_OUT_SYM2
-              &SYM(CommandGui_IsPaused),               // DT_OUT_SYM3
-              &SYM(AchievementTracker_Tracker),        // DT_OUT_SYM4
-              &SYM(AchievementTracker_OnLoop),         // DT_OUT_SYM5
-              &SYM(wp_CApp_OnLoop_MenuMenu_handler),   // DT_OUT_SYM6
-              &SYM(WorldManager_OnLoop),               // DT_OUT_SYM7
-              &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM8
-              &SYM(CommandGui_GetCommand),             // DT_OUT_SYM9
+              &SYM(MouseControl_Reset),                // DT_OUT_SYM2
+              &SYM(MouseControl_OnLoop),               // DT_OUT_SYM3
+              &SYM(CommandGui_IsPaused),               // DT_OUT_SYM4
+              &SYM(AchievementTracker_Tracker),        // DT_OUT_SYM5
+              &SYM(AchievementTracker_OnLoop),         // DT_OUT_SYM6
+              &SYM(wp_CApp_OnLoop_MenuMenu_handler),   // DT_OUT_SYM7
+              &SYM(WorldManager_OnLoop),               // DT_OUT_SYM8
+              &SYM(CommandGui_OnLoop),                 // DT_OUT_SYM9
+              &SYM(CommandGui_GetCommand),             // DT_OUT_SYM10
               &SYM(wp_CApp_OnLoop_GetCommand_switch) }
 };
 
@@ -715,4 +764,228 @@ DisasmTrace CApp_OnLoop_menu_trace = {
 Symbol SYM(CApp_menu_offset) = {
     SYMNAME("CApp->menu"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnLoop_menu_trace }, { 0 } }
+};
+
+Symbol SYM(CApp_framebuffer_offset) = {
+    SYMNAME("CApp->framebuffer"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace }, { 0 } }
+};
+
+Symbol SYM(CApp_useFrameBuffer_offset) = {
+    SYMNAME("CApp->useFrameBuffer"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_OnRender_trace }, { 0 } }
+};
+
+DisasmTrace sil_main_directx_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "-directx",
+    .ops  = { { DT_OP(SKIP), .imin = 1, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE, ARG_ADDR },
+                .args   = { { .ptrsize = 1 }, { .addr = 1 } },
+                .argout = { DT_OUT_SYM1 } },   // app.useDirect3D = true
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_useDirect3D_offset) }
+};
+
+Symbol SYM(CApp_useDirect3D_offset) = {
+    SYMNAME("Capp->useDirect3D"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &sil_main_directx_trace }, { 0 } }
+};
+
+DisasmTrace CApp_UpdateWindowSettings_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CApp_UpdateWindowSettings),
+    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 15 },
+             { DT_OP(LABEL), .val = 1 },
+             { I_CMP },
+             { DT_OP(SKIP), .imin = 5, .imax = 25, .flow = DT_FLOW_JMP_BOTH },
+             { I_PXOR },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM2 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { DT_OP(LABEL), .val = 2 },
+             { I_MOV,
+                .argf   = { ARG_ADDR, ARG_ADDR },
+                .argsym = { &SYM(CApp_useFrameBuffer_offset) },
+                .args   = { { 0 }, { .addr = 1 } } },   // this->useFrameBuffer = true
+              { DT_OP(SKIP), .imin = 4, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOVSS,
+                .argf = { 0, ARG_DEREF },
+                .args = { { 0 }, { .addr = 0x3f100000 } } },   // 0.5625
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = 4 } },
+                .argout = { DT_OUT_SYM3 } },   // y_bar
+              { DT_OP(GOTO), .val = 2 },       // go back to before branch point
+              { DT_OP(SKIP), .imin = 5, .imax = 11, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOVSS,
+                .argf = { 0, ARG_DEREF },
+                .args = { { 0 }, { .addr = 0x3fe38e39 } } },   // 1.7777778
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = 4 } },
+                .argout = { DT_OUT_SYM4 } },   // x_bar
+              { DT_OP(GOTO), .val = 1 },       // go back to start of function
+              { DT_OP(SKIP), .imin = 6, .imax = 26, .flow = DT_FLOW_JMP_BOTH },
+             { DT_OP(LABEL), .val = 3 },
+             { I_MOV,
+                .argf   = { ARG_ADDR, ARG_ADDR },
+                .argsym = { &SYM(CApp_useFrameBuffer_offset) },
+                .args   = { { 0 }, { .addr = 0 } } },   // this->useFrameBuffer = false
+              { DT_OP(SKIP), .imin = 0, .imax = 16 },
+             {
+                 I_LEA,
+                  .argf = { 0, ARG_ADDR },
+                  .args = { { 0 }, { .disp = -1280 } },
+             }, { DT_OP(SKIP), .imin = 2, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { DT_OUT_SYM5 } },   // modifier_x = (screen_x - 1280) /2
+              { DT_OP(GOTO), .val = 3 },
+             { DT_OP(SKIP), .imin = 1, .imax = 17 },
+             { I_LEA, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = -720 } } },
+             { DT_OP(SKIP), .imin = 2, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { DT_OUT_SYM6 } },   // modifier_y = (screen_y - 1280) /2
+
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_screen_x_offset),     // DT_OUT_SYM1
+              &SYM(CApp_screen_y_offset),     // DT_OUT_SYM2
+              &SYM(CApp_y_bar_offset),        // DT_OUT_SYM3
+              &SYM(CApp_x_bar_offset),        // DT_OUT_SYM4
+              &SYM(CApp_modifier_x_offset),   // DT_OUT_SYM5
+              &SYM(CApp_modifier_y_offset) }
+};
+
+// alternate version for some different compiler settings
+DisasmTrace CApp_UpdateWindowSettings_trace_2 = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CApp_UpdateWindowSettings),
+    .ops  = { { DT_OP(SKIP), .imin = 0, .imax = 15 },
+             { DT_OP(LABEL), .val = 1 },
+             { I_CMP },
+             { DT_OP(SKIP), .imin = 5, .imax = 25, .flow = DT_FLOW_JMP_BOTH },
+             { I_PXOR },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM1 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM2 } },
+             { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { DT_OP(LABEL), .val = 2 },
+             { I_MOV,
+                .argf   = { ARG_ADDR, ARG_ADDR },
+                .argsym = { &SYM(CApp_useFrameBuffer_offset) },
+                .args   = { { 0 }, { .addr = 1 } } },   // this->useFrameBuffer = true
+              { DT_OP(SKIP), .imin = 4, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
+             { I_MULSS,
+                .argf = { 0, ARG_DEREF },
+                .args = { { 0 }, { .addr = 0x3f100000 } } },   // 0.5625
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = 4 } },
+                .argout = { DT_OUT_SYM3 } },   // y_bar
+              { DT_OP(GOTO), .val = 2 },       // go back to before branch point
+              { DT_OP(SKIP), .imin = 5, .imax = 11, .flow = DT_FLOW_JMP_BOTH },
+             { I_MULSS,
+                .argf = { 0, ARG_DEREF },
+                .args = { { 0 }, { .addr = 0x3fe38e39 } } },   // 1.7777778
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_MOV,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = 4 } },
+                .argout = { DT_OUT_SYM4 } },   // x_bar
+              { DT_OP(GOTO), .val = 1 },       // go back to start of function
+              { DT_OP(SKIP), .imin = 6, .imax = 26, .flow = DT_FLOW_JMP_BOTH },
+             { DT_OP(LABEL), .val = 3 },
+             { I_MOV,
+                .argf   = { ARG_ADDR, ARG_ADDR },
+                .argsym = { &SYM(CApp_useFrameBuffer_offset) },
+                .args   = { { 0 }, { .addr = 0 } } },   // this->useFrameBuffer = false
+              { DT_OP(SKIP), .imin = 0, .imax = 12 },
+             {
+                 I_SUB,
+                  .argf = { 0, ARG_ADDR },
+                  .args = { { 0 }, { .disp = 1280 } },
+             }, { DT_OP(SKIP), .imin = 2, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { DT_OUT_SYM5 } },   // modifier_x = (screen_x - 1280) /2
+              { DT_OP(GOTO), .val = 3 },
+             { DT_OP(SKIP), .imin = 1, .imax = 13 },
+             { I_SUB, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .disp = 720 } } },
+             { DT_OP(SKIP), .imin = 2, .imax = 6 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { DT_OUT_SYM6 } },   // modifier_y = (screen_y - 1280) /2
+
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(CApp_screen_x_offset),     // DT_OUT_SYM1
+              &SYM(CApp_screen_y_offset),     // DT_OUT_SYM2
+              &SYM(CApp_y_bar_offset),        // DT_OUT_SYM3
+              &SYM(CApp_x_bar_offset),        // DT_OUT_SYM4
+              &SYM(CApp_modifier_x_offset),   // DT_OUT_SYM5
+              &SYM(CApp_modifier_y_offset) }
+};
+
+Symbol SYM(CApp_screen_x_offset) = {
+    SYMNAME("Capp->screen_x"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_screen_y_offset) = {
+    SYMNAME("Capp->screen_y"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_x_bar_offset) = {
+    SYMNAME("Capp->x_bar"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_y_bar_offset) = {
+    SYMNAME("Capp->y_bar"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_modifier_x_offset) = {
+    SYMNAME("Capp->modifier_x"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
+};
+
+Symbol SYM(CApp_modifier_y_offset) = {
+    SYMNAME("Capp->modifier_y"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &CApp_UpdateWindowSettings_trace_2 },
+             { 0 } }
 };

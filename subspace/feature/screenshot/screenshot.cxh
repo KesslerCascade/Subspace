@@ -1,0 +1,25 @@
+#include "feature/feature.cxh"
+#include "proto.h"
+
+typedef enum ScreenshotLoc {
+    SSLOC_Invalid = 0,
+    SSLOC_Global,
+    SSLOC_Rundir,
+    SSLOC_Custom
+} ScreenshotLoc;
+
+class RunInfo;
+class Screenshot extends SubspaceFeature {
+    factory create(Subspace *ss);
+    override createSettingsPage;
+    override applyDefaultSettings;
+
+    Mutex fileCreateLock;
+    int lastAlt;
+
+    void process(strref fn, RunInfo *run, int64 timestamp, bool automatic, hashtable fields);
+    [extern] bool populateEXIF(uint8 **buf, uint32 *bufsz, RunInfo *run, int64 timestamp, bool automatic, hashtable fields);
+    [extern] bool populateXMP(string *out, RunInfo *run, int64 timestamp, bool automatic, hashtable fields);
+    [extern] bool writeJpeg(VFSFile *out, uint8 *data, int w, int h, uint8 *exifdata, uint32 exifdsz, string xmpdata);
+    [extern] bool writePng(VFSFile *out, uint8 *data, int w, int h, uint8 *exifdata, uint32 exifdsz, string xmpdata, int64 timestamp);
+}
