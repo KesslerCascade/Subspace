@@ -267,18 +267,20 @@ void screenshotCheckDestroyed(void)
     CompleteShip* ecship = pcship ? CompleteShip_enemyShip(pcship) : NULL;
     ShipManager* eship   = ecship ? CompleteShip_shipManager(ecship) : NULL;
     if (eship && ShipManager_bDestroyed(eship)) {
-        if (!enemyDestroyed && screenshotAuto(SSEvent_WinFight)) {
-            enemyDestroyed       = true;
-            gs.screenshotNowAuto = true;
-        } else {
-            // otherwise maybe this is a boss stage, check the specific events for those
-            BossShip* bship = WorldManager_bossShip(world);
-            if (!enemyDestroyed && bship) {
-                if ((BossShip_currentStage(bship) == 1 && screenshotAuto(SSEvent_RFS1)) ||
-                    (BossShip_currentStage(bship) == 2 && screenshotAuto(SSEvent_RFS2)) ||
-                    (BossShip_currentStage(bship) == 3 && screenshotAuto(SSEvent_RFS3))) {
-                    enemyDestroyed       = true;
-                    gs.screenshotNowAuto = true;
+        if (!enemyDestroyed) {
+            if (screenshotAuto(SSEvent_WinFight)) {
+                enemyDestroyed       = true;
+                gs.screenshotNowAuto = true;
+            } else {
+                // otherwise maybe this is a boss stage, check the specific events for those
+                BossShip* bship = WorldManager_bossShip(world);
+                if ((CompleteShip*)bship == ecship) {
+                    if ((BossShip_currentStage(bship) == 1 && screenshotAuto(SSEvent_RFS1)) ||
+                        (BossShip_currentStage(bship) == 2 && screenshotAuto(SSEvent_RFS2)) ||
+                        (BossShip_currentStage(bship) == 3 && screenshotAuto(SSEvent_RFS3))) {
+                        enemyDestroyed       = true;
+                        gs.screenshotNowAuto = true;
+                    }
                 }
             }
         }
