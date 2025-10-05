@@ -40,8 +40,6 @@ void InfoBlock_applyDefaultSettings(_In_ InfoBlock* self)
     }
 }
 
-extern SettingsPage*
-SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
 extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
 #define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
 SettingsPage* InfoBlock_createSettingsPage(_In_ InfoBlock* self, SubspaceUI* ui)
