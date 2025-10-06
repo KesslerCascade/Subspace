@@ -72,5 +72,7 @@ int64 TQManualWorker_tick(_In_ TQManualWorker* self, _In_ TaskQueue* tq)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/worker/tqmanualworker.auto.inc"
+// clang-format on
 // Autogen ends -------

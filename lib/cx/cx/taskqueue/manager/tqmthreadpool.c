@@ -125,5 +125,7 @@ bool TQThreadPoolManager_stop(_In_ TQThreadPoolManager* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/manager/tqmthreadpool.auto.inc"
+// clang-format on
 // Autogen ends -------

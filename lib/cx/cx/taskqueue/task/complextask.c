@@ -275,5 +275,7 @@ bool ComplexTask_cancel(_In_ ComplexTask* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/task/complextask.auto.inc"
+// clang-format on
 // Autogen ends -------

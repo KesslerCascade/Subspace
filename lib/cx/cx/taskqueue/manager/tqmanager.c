@@ -44,5 +44,7 @@ void TQManager_pretask(_In_ TQManager* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/manager/tqmanager.auto.inc"
+// clang-format on
 // Autogen ends -------

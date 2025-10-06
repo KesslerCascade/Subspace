@@ -120,5 +120,7 @@ void BasicTask_runCancelled(_In_ BasicTask* self, _In_ TaskQueue* tq, _In_ TQWor
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/task/basictask.auto.inc"
+// clang-format on
 // Autogen ends -------

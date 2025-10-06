@@ -271,5 +271,7 @@ void SSDArrayIter_destroy(_In_ SSDArrayIter* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ssdtree/node/ssdarraynode.auto.inc"
+// clang-format on
 // Autogen ends -------

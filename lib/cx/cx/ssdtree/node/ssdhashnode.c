@@ -252,5 +252,7 @@ bool SSDHashIter_isHashtable(_In_ SSDHashIter* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ssdtree/node/ssdhashnode.auto.inc"
+// clang-format on
 // Autogen ends -------

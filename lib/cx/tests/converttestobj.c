@@ -47,5 +47,7 @@ void ConvertTestClass_destroy(_In_ ConvertTestClass* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "converttestobj.auto.inc"
+// clang-format on
 // Autogen ends -------

@@ -21,5 +21,7 @@ _objfactory_guaranteed UnixThread *UnixThread_create()
 }
 
 // Autogen begins -----
+// clang-format off
 #include "platform/wasm/wasm_thread_threadobj.auto.inc"
+// clang-format on
 // Autogen ends -------

@@ -75,5 +75,7 @@ _objfactory_check VFS* VFS_createFromFS()
 }
 
 // Autogen begins -----
+// clang-format off
 #include "fs/vfsobj.auto.inc"
+// clang-format on
 // Autogen ends -------

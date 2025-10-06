@@ -26,5 +26,7 @@ void WinThread_destroy(_In_ WinThread* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "platform/win/win_thread_threadobj.auto.inc"
+// clang-format on
 // Autogen ends -------

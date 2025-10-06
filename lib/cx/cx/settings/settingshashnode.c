@@ -238,5 +238,7 @@ void SettingsHashNode_destroy(_In_ SettingsHashNode* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "settings/settingshashnode.auto.inc"
+// clang-format on
 // Autogen ends -------

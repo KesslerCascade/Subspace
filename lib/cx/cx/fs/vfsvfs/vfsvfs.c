@@ -157,5 +157,7 @@ bool VFSVFS_getFSPath(_In_ VFSVFS* self, _Inout_ string* out, _In_opt_ strref pa
 }
 
 // Autogen begins -----
+// clang-format off
 #include "fs/vfsvfs/vfsvfs.auto.inc"
+// clang-format on
 // Autogen ends -------

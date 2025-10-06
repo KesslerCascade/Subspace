@@ -74,5 +74,7 @@ void VFSVFSFile_destroy(_In_ VFSVFSFile* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "fs/vfsvfs/vfsvfsfile.auto.inc"
+// clang-format on
 // Autogen ends -------

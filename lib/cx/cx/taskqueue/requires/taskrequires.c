@@ -11,5 +11,7 @@
 // ==================== Auto-generated section ends ======================
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/requires/taskrequires.auto.inc"
+// clang-format on
 // Autogen ends -------

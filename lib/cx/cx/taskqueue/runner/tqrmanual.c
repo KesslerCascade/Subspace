@@ -54,5 +54,7 @@ bool TQManualRunner_stop(_In_ TQManualRunner* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/runner/tqrmanual.auto.inc"
+// clang-format on
 // Autogen ends -------

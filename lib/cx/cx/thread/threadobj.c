@@ -50,5 +50,7 @@ void Thread_destroy(_In_ Thread* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "thread/threadobj.auto.inc"
+// clang-format on
 // Autogen ends -------

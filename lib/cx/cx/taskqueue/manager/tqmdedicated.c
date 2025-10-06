@@ -97,5 +97,7 @@ void TQDedicatedManager_destroy(_In_ TQDedicatedManager* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/manager/tqmdedicated.auto.inc"
+// clang-format on
 // Autogen ends -------

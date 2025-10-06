@@ -103,5 +103,7 @@ _objfactory_guaranteed TRLifo* TRLifo_create()
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/resource/trlifo.auto.inc"
+// clang-format on
 // Autogen ends -------

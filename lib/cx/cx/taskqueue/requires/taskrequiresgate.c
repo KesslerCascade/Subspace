@@ -166,5 +166,7 @@ void TaskRequiresGate_destroy(_In_ TaskRequiresGate* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/requires/taskrequiresgate.auto.inc"
+// clang-format on
 // Autogen ends -------

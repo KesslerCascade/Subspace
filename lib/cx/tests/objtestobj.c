@@ -97,5 +97,7 @@ _objfactory_guaranteed TestCls4b* TestCls4b_create()
 }
 
 // Autogen begins -----
+// clang-format off
 #include "objtestobj.auto.inc"
+// clang-format on
 // Autogen ends -------

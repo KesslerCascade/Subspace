@@ -70,5 +70,7 @@ void SSDTree_destroy(_In_ SSDTree* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ssdtree/ssdtreeobj.auto.inc"
+// clang-format on
 // Autogen ends -------
