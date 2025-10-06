@@ -80,5 +80,7 @@ void ImageResample_destroy(_In_ ImageResample* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/image/imageresample.auto.inc"
+// clang-format on
 // Autogen ends -------

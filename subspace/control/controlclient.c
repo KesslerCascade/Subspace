@@ -116,5 +116,7 @@ void ControlClient_queue(_In_ ControlClient* self, ControlMsg* msg)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "control/controlclient.auto.inc"
+// clang-format on
 // Autogen ends -------

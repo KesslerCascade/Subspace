@@ -182,5 +182,7 @@ void HullTracker_destroy(_In_ HullTracker* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "run/hulltracker.auto.inc"
+// clang-format on
 // Autogen ends -------

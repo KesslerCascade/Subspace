@@ -275,5 +275,7 @@ uint32 SubscriberInfo_hash(_In_ SubscriberInfo* self, uint32 flags)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "run/logrelay.auto.inc"
+// clang-format on
 // Autogen ends -------

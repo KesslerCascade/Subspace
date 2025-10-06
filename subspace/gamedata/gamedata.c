@@ -177,5 +177,7 @@ void GameDataLoader_destroy(_In_ GameDataLoader* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "gamedata/gamedata.auto.inc"
+// clang-format on
 // Autogen ends -------

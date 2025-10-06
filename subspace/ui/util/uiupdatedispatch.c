@@ -89,5 +89,7 @@ void UIUpdateDispatch_destroy(_In_ UIUpdateDispatch* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/util/uiupdatedispatch.auto.inc"
+// clang-format on
 // Autogen ends -------

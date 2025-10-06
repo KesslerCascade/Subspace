@@ -168,5 +168,7 @@ void ScrapTracker_destroy(_In_ ScrapTracker* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "run/scraptracker.auto.inc"
+// clang-format on
 // Autogen ends -------

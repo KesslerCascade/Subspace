@@ -85,5 +85,7 @@ LogEnt_create(int64 sectorpoint, int64 savepoint, int64 time, float64 gametime, 
 }
 
 // Autogen begins -----
+// clang-format off
 #include "run/logent.auto.inc"
+// clang-format on
 // Autogen ends -------

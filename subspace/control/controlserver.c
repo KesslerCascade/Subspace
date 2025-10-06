@@ -267,5 +267,7 @@ void ControlHandler_destroy(_In_ ControlHandler* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "control/controlserver.auto.inc"
+// clang-format on
 // Autogen ends -------

@@ -28,5 +28,7 @@ _objfactory_guaranteed PracticeMode* PracticeMode_create(Subspace* ss)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/practicemode/practicemode.auto.inc"
+// clang-format on
 // Autogen ends -------

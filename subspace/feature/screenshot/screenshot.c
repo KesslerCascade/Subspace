@@ -354,13 +354,11 @@ void Screenshot_destroy(_In_ Screenshot* self)
 }
 
 // Autogen begins -----
-bool Screenshot_populateEXIF(_In_ Screenshot* self, uint8** buf, uint32* bufsz, RunInfo* run,
-                             int64 timestamp, bool automatic, hashtable fields);
-bool Screenshot_populateXMP(_In_ Screenshot* self, string* out, RunInfo* run, int64 timestamp,
-                            bool automatic, hashtable fields);
-bool Screenshot_writeJpeg(_In_ Screenshot* self, VFSFile* out, uint8* data, int w, int h,
-                          uint8* exifdata, uint32 exifdsz, string xmpdata);
-bool Screenshot_writePng(_In_ Screenshot* self, VFSFile* out, uint8* data, int w, int h,
-                         uint8* exifdata, uint32 exifdsz, string xmpdata, int64 timestamp);
+// clang-format off
+bool Screenshot_populateEXIF(_In_ Screenshot* self, uint8** buf, uint32* bufsz, RunInfo* run, int64 timestamp, bool automatic, hashtable fields);
+bool Screenshot_populateXMP(_In_ Screenshot* self, string* out, RunInfo* run, int64 timestamp, bool automatic, hashtable fields);
+bool Screenshot_writeJpeg(_In_ Screenshot* self, VFSFile* out, uint8* data, int w, int h, uint8* exifdata, uint32 exifdsz, string xmpdata);
+bool Screenshot_writePng(_In_ Screenshot* self, VFSFile* out, uint8* data, int w, int h, uint8* exifdata, uint32 exifdsz, string xmpdata, int64 timestamp);
 #include "feature/screenshot/screenshot.auto.inc"
+// clang-format on
 // Autogen ends -------

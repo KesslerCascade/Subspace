@@ -505,5 +505,7 @@ void SetupPage_destroy(_In_ SetupPage* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/page/setup/setuppage.auto.inc"
+// clang-format on
 // Autogen ends -------

@@ -46,5 +46,7 @@ _objinit_guaranteed bool SettingsPage_init(_In_ SettingsPage* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/page/settingspage.auto.inc"
+// clang-format on
 // Autogen ends -------

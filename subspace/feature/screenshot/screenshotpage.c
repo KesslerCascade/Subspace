@@ -717,5 +717,7 @@ void SSLocControls_updateButtons(_In_ SSLocControls* self, int32 loc)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/screenshot/screenshotpage.auto.inc"
+// clang-format on
 // Autogen ends -------

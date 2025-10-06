@@ -219,5 +219,7 @@ void SaveManagerCopy_destroy(_In_ SaveManagerCopy* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/savemanager/savemanager.auto.inc"
+// clang-format on
 // Autogen ends -------

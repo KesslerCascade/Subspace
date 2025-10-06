@@ -222,5 +222,7 @@ void TimeWarpPage_destroy(_In_ TimeWarpPage* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/timewarp/timewarppage.auto.inc"
+// clang-format on
 // Autogen ends -------

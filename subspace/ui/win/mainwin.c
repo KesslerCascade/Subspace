@@ -465,6 +465,7 @@ void MainWin_setLayoutDirty(_In_ MainWin* self)
 }
 
 // Autogen begins -----
+// clang-format off
 void MainWin_makeMenu(_In_ MainWin* self);
 void MainWin_showMenu(_In_ MainWin* self, int mx, int my);
 void MainWin_showLayoutMenu(_In_ MainWin* self, Ihandle* tabparent, Ihandle* ih, int mx, int my);
@@ -480,4 +481,5 @@ void MainWin_removeTab(_In_ MainWin* self, Ihandle* tabparent, Ihandle* toremove
 void MainWin_addSplit(_In_ MainWin* self, Ihandle* at, bool vertical);
 void MainWin_removePlaceholder(_In_ MainWin* self, Ihandle* ph);
 #include "ui/win/mainwin.auto.inc"
+// clang-format on
 // Autogen ends -------

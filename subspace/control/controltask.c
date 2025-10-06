@@ -143,5 +143,7 @@ uint32 ControlTask_run(_In_ ControlTask* self, _In_ TaskQueue* tq, _In_ TQWorker
 }
 
 // Autogen begins -----
+// clang-format off
 #include "control/controltask.auto.inc"
+// clang-format on
 // Autogen ends -------

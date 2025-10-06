@@ -23,5 +23,7 @@ _objfactory_guaranteed NumericHull* NumericHull_create(Subspace* ss)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/numerichull/numerichull.auto.inc"
+// clang-format on
 // Autogen ends -------

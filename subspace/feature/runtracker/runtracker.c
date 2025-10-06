@@ -124,5 +124,7 @@ void RunTracker_updateLockState(_In_ RunTracker* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/runtracker/runtracker.auto.inc"
+// clang-format on
 // Autogen ends -------

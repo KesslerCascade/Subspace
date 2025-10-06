@@ -152,5 +152,7 @@ void DbStmt_destroy(_In_ DbStmt* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "db/dbstmt.auto.inc"
+// clang-format on
 // Autogen ends -------

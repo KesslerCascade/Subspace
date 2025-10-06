@@ -54,5 +54,7 @@ SettingsPage* TimeWarp_createSettingsPage(_In_ TimeWarp* self, SubspaceUI* ui)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/timewarp/timewarp.auto.inc"
+// clang-format on
 // Autogen ends -------

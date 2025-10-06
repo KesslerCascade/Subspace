@@ -165,5 +165,7 @@ void ScrapGraphPanel_destroy(_In_ ScrapGraphPanel* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/panel/scrapgraph/scrapgraphpanel.auto.inc"
+// clang-format on
 // Autogen ends -------

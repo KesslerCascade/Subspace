@@ -141,7 +141,9 @@ void Image_destroy(_In_ Image* self)
 }
 
 // Autogen begins -----
+// clang-format off
 bool Image_resample(_In_ Image* self, int nwidth, int nheight);
 bool Image_resampleToDPI(_In_ Image* self, int ndpi);
 #include "ui/image/image.auto.inc"
+// clang-format on
 // Autogen ends -------

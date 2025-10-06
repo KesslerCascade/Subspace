@@ -622,5 +622,7 @@ void GameInfoPanel_destroy(_In_ GameInfoPanel* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/panel/gameinfo/gameinfopanel.auto.inc"
+// clang-format on
 // Autogen ends -------

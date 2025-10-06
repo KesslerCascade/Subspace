@@ -52,5 +52,7 @@ SettingsPage* Tweaks_createSettingsPage(_In_ Tweaks* self, SubspaceUI* ui)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/tweaks/tweaks.auto.inc"
+// clang-format on
 // Autogen ends -------

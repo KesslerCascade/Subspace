@@ -229,5 +229,7 @@ bool SubspaceFeature_isLocked(_In_ SubspaceFeature* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/feature.auto.inc"
+// clang-format on
 // Autogen ends -------

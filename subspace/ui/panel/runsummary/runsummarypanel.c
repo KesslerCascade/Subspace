@@ -36,5 +36,7 @@ bool RunSummaryPanel_make(_In_ RunSummaryPanel* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/panel/runsummary/runsummarypanel.auto.inc"
+// clang-format on
 // Autogen ends -------

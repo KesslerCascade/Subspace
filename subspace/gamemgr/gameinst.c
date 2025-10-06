@@ -336,5 +336,7 @@ void GameInst_onValidate(_In_ GameInst* self, ControlClient* client)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "gamemgr/gameinst.auto.inc"
+// clang-format on
 // Autogen ends -------

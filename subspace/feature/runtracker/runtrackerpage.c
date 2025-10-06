@@ -99,5 +99,7 @@ bool RunTrackerPage_update(_In_ RunTrackerPage* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/runtracker/runtrackerpage.auto.inc"
+// clang-format on
 // Autogen ends -------

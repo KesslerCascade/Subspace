@@ -99,5 +99,7 @@ bool SaveManagerPage_update(_In_ SaveManagerPage* self)
     return true;}
 
 // Autogen begins -----
+// clang-format off
 #include "feature/savemanager/savemanagerpage.auto.inc"
+// clang-format on
 // Autogen ends -------

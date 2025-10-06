@@ -358,5 +358,7 @@ void FeaturesPage_destroy(_In_ FeaturesPage* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/page/features/featurespage.auto.inc"
+// clang-format on
 // Autogen ends -------

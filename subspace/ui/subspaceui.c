@@ -362,5 +362,7 @@ void UINotifyDispatch_destroy(_In_ UINotifyDispatch* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/subspaceui.auto.inc"
+// clang-format on
 // Autogen ends -------

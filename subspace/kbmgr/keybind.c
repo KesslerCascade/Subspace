@@ -39,5 +39,7 @@ void KeyBind_destroy(_In_ KeyBind* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "kbmgr/keybind.auto.inc"
+// clang-format on
 // Autogen ends -------

@@ -31,5 +31,7 @@ uint32 IupRefreshDispatch_run(_In_ IupRefreshDispatch* self, _In_ TaskQueue* tq,
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/util/iuprefreshdispatch.auto.inc"
+// clang-format on
 // Autogen ends -------

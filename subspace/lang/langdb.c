@@ -82,5 +82,7 @@ void LanguageDB_destroy(_In_ LanguageDB* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "lang/langdb.auto.inc"
+// clang-format on
 // Autogen ends -------

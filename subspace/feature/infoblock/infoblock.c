@@ -48,5 +48,7 @@ SettingsPage* InfoBlock_createSettingsPage(_In_ InfoBlock* self, SubspaceUI* ui)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/infoblock/infoblock.auto.inc"
+// clang-format on
 // Autogen ends -------

@@ -304,5 +304,7 @@ void TweaksPage_destroy(_In_ TweaksPage* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/tweaks/tweakspage.auto.inc"
+// clang-format on
 // Autogen ends -------
