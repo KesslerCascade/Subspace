@@ -76,7 +76,7 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: game-win32-exe
-          path: build/game-win32/RelWithDebInfo/*
+          path: build/game-win32/MinSizeRel/*
 
   mkdat:
     runs-on: windows-latest
