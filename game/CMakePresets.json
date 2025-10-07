@@ -20,7 +20,6 @@
                 "rhs": "x86"
             },
             "cacheVariables": {
-                "CMAKE_CONFIGURATION_TYPES": "Debug;Release;MinSizeRel",
                 "BUILD_GAME": true,
                 "CMAKE_C_COMPILER": "cl.exe",
                 "CMAKE_CXX_COMPILER": "cl.exe"
@@ -38,7 +37,7 @@
             "name": "game-dev-release",
             "displayName": "Game (Dev Release)",
             "configurePreset": "game-win32",
-            "configuration": "MinSizeRel"
+            "configuration": "RelWithDebInfo"
         },
         {
             "name": "game-release",
