@@ -3,10 +3,6 @@
 #include "ftl/ftl.h"
 #include "hook/function.h"
 
-typedef struct CompleteShip CompleteShip;
-typedef struct ShipManager ShipManager;
-typedef struct ShipBlueprint ShipBlueprint;
-
 // FTL functions and wrappers below
 
 extern DisasmTrace CompleteShip_OnInit_trace;

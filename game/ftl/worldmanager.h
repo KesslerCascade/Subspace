@@ -4,15 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct WorldManager WorldManager;
-typedef struct ShipManager ShipManager;
-typedef struct CompleteShip CompleteShip;
-typedef struct ShipEvent ShipEvent;
-typedef struct StarMap StarMap;
-typedef struct Location Location;
-typedef struct LocationEvent LocationEvent;
-typedef struct CommandGui CommandGui;
-
 int subspace_WorldManager_ctor_pre(WorldManager* self);
 
 // FTL functions & hooks below

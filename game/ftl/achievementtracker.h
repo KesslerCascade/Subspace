@@ -4,9 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct AchievementTracker AchievementTracker;
-typedef struct AnimationTracker AnimationTracker;
-
 extern DisasmTrace AchievementTracker_OnLoop_trace;
 extern DisasmTrace AchievementTracker_OnLoop_trace_2;
 

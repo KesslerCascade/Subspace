@@ -4,10 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct StarMap StarMap;
-typedef struct Sector Sector;
-typedef struct Location Location;
-
 extern DisasmTrace StarMap_OnRender_sector_title_trace;
 extern DisasmTrace StarMap_NewGame_trace;
 extern DisasmTrace StarMap_GenerateMap_Rock_Crystal_Beacon_trace;

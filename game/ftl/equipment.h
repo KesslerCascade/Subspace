@@ -4,11 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct Equipment Equipment;
-typedef struct EquipmentBox EquipmentBox;
-typedef struct AugmentEquipBox AugmentEquipBox;
-typedef struct WeaponBlueprint WeaponBlueprint;
-
 extern DisasmTrace Equipment_AddWeapon_trace;
 
 typedef void (*FUNCTYPE(Equipment_Jump))(Equipment* self);

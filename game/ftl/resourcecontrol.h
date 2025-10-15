@@ -4,8 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct ResourceControl ResourceControl;
-
 int subspace_ResourceControl_RenderLoadingBar_pre(ResourceControl* self, float initialProgress,
                                                   float finalProgress);
 

@@ -4,10 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct CommandGui CommandGui;
-typedef struct StarMap StarMap;
-typedef struct Equipment Equipment;
-
 int subspace_CommandGui_KeyDown_pre(CommandGui* self, int key, bool shiftHeld);
 int subspace_CommandGui_OnLoop_pre(CommandGui* self);
 void subspace_CommandGui_OnLoop_post(CommandGui* self);

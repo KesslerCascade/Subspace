@@ -5,11 +5,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct ShipManager ShipManager;
-typedef struct ShipBlueprint ShipBlueprint;
-typedef struct WeaponBlueprint WeaponBlueprint;
-typedef struct ProjectileFactory ProjectileFactory;
-
 // FTL functions & wrappers below
 
 extern DisasmTrace ShipManager_OnLoop_trace;

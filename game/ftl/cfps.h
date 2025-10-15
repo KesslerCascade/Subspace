@@ -4,8 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct CFPS CFPS;
-
 void subspace_CFPS_OnLoop_post(CFPS* self);
 
 // FTL functions & wrappers below

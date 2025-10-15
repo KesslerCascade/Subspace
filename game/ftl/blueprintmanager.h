@@ -3,8 +3,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct BlueprintManager BlueprintManager;
-
 // FTL functions & wrappers below
 
 DECLSYM(ShipBlueprint_blueprintName_offset);

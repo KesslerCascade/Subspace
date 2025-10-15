@@ -4,8 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct ScoreKeeper ScoreKeeper;
-
 typedef struct StatTracker {
     int maximum;
     int total;

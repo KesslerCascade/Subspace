@@ -3,8 +3,6 @@
 #include "ftl/ftl.h"
 #include "hook/function.h"
 
-typedef struct Ship Ship;
-
 // FTL functions & wrappers below
 
 typedef int (*FUNCTYPE(Ship_DamageHull))(Ship *ship, int dmg);

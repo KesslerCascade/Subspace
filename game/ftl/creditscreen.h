@@ -3,8 +3,6 @@
 #include "ftl/ftl.h"
 #include "hook/function.h"
 
-typedef struct CreditScreen CreditScreen;
-
 // FTL functions and wrappers below
 
 DECLSYM(CreditScreen_pausing_offset);
