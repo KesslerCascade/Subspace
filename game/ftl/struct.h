@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include "ftl/types.h"
 
 // Helper macro for getting members of structures where the offsets are found at runtime through
 // disassembly. This uses the symbol resolution system to automatically calculate and cache the
@@ -8,6 +9,9 @@
 
 #define MEMBER(base, ParentType, parent, MemberType, member) \
     (*(MemberType*)((((uintptr_t)(parent)) + (symAddr(base, ParentType##_##member##_offset)))))
+
+#define MEMBER_FIXED(base, ParentType, parent, MemberType, offset) \
+    (*(MemberType*)((((uintptr_t)(parent)) + (offset))))
 
 typedef struct GL_Color {
     float r;
@@ -58,3 +62,10 @@ typedef struct Damage {
     bool bFriendlyFire;
     int iStun;
 } Damage;
+
+typedef struct EquipmentBoxItem {
+    ProjectileFactory* pWeapon;
+    Drone* pDrone;
+    CrewMember* pCrew;
+    AugmentBlueprint* augment;
+} EquipmentBoxItem;

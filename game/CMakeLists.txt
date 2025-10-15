@@ -43,6 +43,7 @@ if(WIN32)
         win32/ftl/ftl_combatcontrol.c
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
+        win32/ftl/ftl_equipment.c
         win32/ftl/ftl_eventsystem.c
         win32/ftl/ftl_filehelper.c
         win32/ftl/ftl_ftlbutton.c
@@ -156,6 +157,7 @@ add_executable(subspacegame
     hook/scorekeeper/scorekeeper_various.c
     hook/ship/ship_damagehull.c
     hook/ship/ship_projectilestrike.c
+    hook/shipmanager/shipmanager_addweapon.c
     hook/shipmanager/shipmanager_damagearea.c
     hook/shipmanager/shipmanager_damagebeam.c
     hook/shipmanager/shipmanager_damagehull.c

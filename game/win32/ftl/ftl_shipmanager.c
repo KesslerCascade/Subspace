@@ -1,4 +1,5 @@
 #include "ftl/commandgui.h"
+#include "ftl/equipment.h"
 #include "ftl/ship.h"
 #include "ftl/shipmanager.h"
 #include "ftl/shipstatus.h"
@@ -264,6 +265,19 @@ FuncInfo FUNCINFO(ShipManager_JumpLeave) = {
     .rettype = RET_VOID
 };
 
+Symbol SYM(ShipManager_JumpArrive) = {
+    SYMNAME("ShipManager::JumpArrive"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_ForceJumpComplete_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager10JumpArriveEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_JumpArrive) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
 Symbol SYM(ShipManager_fuel_count_offset) = {
     SYMNAME("ShipManager->fuel_count"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_JumpLeave_trace }, { 0 } }
@@ -373,3 +387,43 @@ FuncInfo FUNCINFO(ShipManager_OnLoop) = { .nargs   = 1,
                                           .stdcall = true,
                                           .args    = { { 4, ARG_PTR, REG_ECX, false } },
                                           .rettype = RET_VOID };
+
+Symbol SYM(ShipManager_HasSystem) = {
+    SYMNAME("ShipManager::HasSystem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager9HasSystemEi" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_HasSystem) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+Symbol SYM(ShipManager_GetWeaponTotal) = {
+    SYMNAME("ShipManager::GetWeaponTotal"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager14GetWeaponTotalEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_GetWeaponTotal) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_INT
+};
+
+Symbol SYM(ShipManager_AddWeapon) = {
+    SYMNAME("ShipManager::AddWeapon"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN11ShipManager9AddWeaponEPK15WeaponBlueprinti" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_AddWeapon) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};

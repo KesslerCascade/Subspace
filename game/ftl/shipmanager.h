@@ -7,6 +7,7 @@
 
 typedef struct ShipManager ShipManager;
 typedef struct ShipBlueprint ShipBlueprint;
+typedef struct WeaponBlueprint WeaponBlueprint;
 
 // FTL functions & wrappers below
 
@@ -35,6 +36,9 @@ DECLFUNC(ShipManager_Wait);
 
 typedef void (*FUNCTYPE(ShipManager_JumpLeave))(ShipManager* ship);
 DECLFUNC(ShipManager_JumpLeave);
+
+typedef void (*FUNCTYPE(ShipManager_JumpArrive))(ShipManager* ship);
+DECLFUNC(ShipManager_JumpArrive);
 
 typedef int (*FUNCTYPE(ShipManager_GetDroneCount))(ShipManager* ship);
 DECLFUNC(ShipManager_GetDroneCount);
@@ -65,6 +69,10 @@ typedef float (*FUNCTYPE(ShipManager_GetAugmentationValue))(ShipManager* ship, b
 DECLFUNC(ShipManager_GetAugmentationValue);
 #define ShipManager_GetAugmentationValue(self, augId) \
     FCALL(ftlbase, ShipManager_GetAugmentationValue, self, augId)
+
+typedef bool (*FUNCTYPE(ShipManager_HasSystem))(ShipManager* ship, int systemId);
+DECLFUNC(ShipManager_HasSystem);
+#define ShipManager_HasSystem(self, systemId) FCALL(ftlbase, ShipManager_HasSystem, self, systemId)
 
 DECLSYM(ShipManager_ship_offset);
 DECLSYM(ShipManager_current_target_offset);
@@ -106,3 +114,13 @@ typedef bool (*FUNCTYPE(ShipManager_DamageBeam))(ShipManager* self, Pointf curre
 DECLFUNC(ShipManager_DamageBeam);
 
 DECLSYM(ShipManager_DamageSystem);
+
+typedef int (*FUNCTYPE(ShipManager_GetWeaponTotal))(ShipManager* self);
+DECLFUNC(ShipManager_GetWeaponTotal);
+#define ShipManager_GetWeaponTotal(self) FCALL(ftlbase, ShipManager_GetWeaponTotal, self)
+
+typedef int (*FUNCTYPE(ShipManager_AddWeapon))(ShipManager* self, WeaponBlueprint* weapon,
+                                               int slot);
+DECLFUNC(ShipManager_AddWeapon);
+#define ShipManager_AddWeapon(self, weapon, slot) \
+    FCALL(ftlbase, ShipManager_AddWeapon, self, weapon, slot)

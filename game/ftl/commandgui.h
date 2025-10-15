@@ -6,6 +6,7 @@
 
 typedef struct CommandGui CommandGui;
 typedef struct StarMap StarMap;
+typedef struct Equipment Equipment;
 
 int subspace_CommandGui_KeyDown_pre(CommandGui* self, int key, bool shiftHeld);
 int subspace_CommandGui_OnLoop_pre(CommandGui* self);
@@ -19,11 +20,13 @@ extern DisasmTrace CommandGui_RenderStatic_trace;
 extern DisasmTrace CommandGui_RunCommand_HULL_trace;
 extern DisasmTrace CommandGui_RunCommand_DELETE_trace;
 extern DisasmTrace CommandGui_RunCommand_SHIP_trace;
+extern DisasmTrace CommandGui_RunCommand_WEAPON_trace;
 extern DisasmTrace CommandGui_Restart_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace_2;
 extern DisasmTrace CommandGui_OnLoop_trace;
 extern DisasmTrace CommandGui_OnLoop_GameOverLoop_trace;
+extern DisasmTrace CommandGui_ForceJumpComplete_trace;
 
 typedef void (*FUNCTYPE(CommandGui_KeyDown))(CommandGui* self, int key, bool shiftHeld);
 DECLFUNC(CommandGui_KeyDown);
@@ -87,6 +90,7 @@ DECLSYM(CommandGui_shipComplete_offset);
 DECLSYM(CommandGui_gameOverScreen_offset);
 DECLSYM(CommandGui_starMap_offset);
 DECLSYM(CommandGui_newLocation_offset);
+DECLSYM(CommandGui_equipScreen_offset);
 
 #define CommandGui_shipComplete(cgui) MEMBER(ftlbase, CommandGui, cgui, CompleteShip*, shipComplete)
 // convenience macro since we almost always want the ShipManager
@@ -98,3 +102,5 @@ DECLSYM(CommandGui_newLocation_offset);
                 ShipManager*,                                                   \
                 shipManager) :                                                  \
          0)
+
+#define CommandGui_equipScreen(cgui) MEMBER(ftlbase, CommandGui, cgui, Equipment*, equipScreen)

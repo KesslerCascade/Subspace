@@ -32,6 +32,7 @@ extern Patch patch_ResourceControl_RenderLoadingBar;
 extern Patch patch_ScoreKeeper_Various;
 extern Patch patch_Ship_DamageHull;
 extern Patch patch_Ship_ProjectileStrike;
+extern Patch patch_ShipManager_AddWeapon;
 extern Patch patch_ShipManager_ModifyScrapCount;
 extern Patch patch_ShipManager_SunDamage;
 extern Patch patch_ShipManager_JumpLeave;
