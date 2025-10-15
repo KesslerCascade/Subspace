@@ -427,3 +427,41 @@ FuncInfo FUNCINFO(ShipManager_AddWeapon) = {
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
     .rettype = RET_INT
 };
+
+DisasmTrace ShipManager_PowerWeapon_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Shouldn't be powering weapons, no weapon system\n",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 18, .imax = 30 },
+             { I_RETN, .argf = { ARG_ADDR }, .args = { { .addr = 0x0c } } },   // 3 stack params
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_PowerWeapon) }
+};
+
+Symbol SYM(ShipManager_PowerWeapon) = {
+    SYMNAME("ShipManager::PowerWeapon"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_PowerWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN11ShipManager11PowerWeaponEP17ProjectileFactorybb" },
+             { 0 } }
+};
+
+DisasmTrace ShipManager_DePowerWeapon_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Shouldn't be powering weapons, no weapon system\n",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 18, .imax = 30 },
+             { I_RETN, .argf = { ARG_ADDR }, .args = { { .addr = 0x8 } } },   // 2 stack params
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_PowerWeapon) }
+};
+
+Symbol SYM(ShipManager_DePowerWeapon) = {
+    SYMNAME("ShipManager::DePowerWeapon"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DePowerWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN11ShipManager13DePowerWeaponEP17ProjectileFactoryb" },
+             { 0 } }
+};

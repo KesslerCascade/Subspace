@@ -8,6 +8,7 @@
 typedef struct ShipManager ShipManager;
 typedef struct ShipBlueprint ShipBlueprint;
 typedef struct WeaponBlueprint WeaponBlueprint;
+typedef struct ProjectileFactory ProjectileFactory;
 
 // FTL functions & wrappers below
 
@@ -124,3 +125,11 @@ typedef int (*FUNCTYPE(ShipManager_AddWeapon))(ShipManager* self, WeaponBlueprin
 DECLFUNC(ShipManager_AddWeapon);
 #define ShipManager_AddWeapon(self, weapon, slot) \
     FCALL(ftlbase, ShipManager_AddWeapon, self, weapon, slot)
+
+typedef bool (*FUNCTYPE(ShipManager_DePowerWeapon))(ShipManager* self, ProjectileFactory* weapon,
+                                                    bool userDriven);
+DECLFUNC(ShipManager_DePowerWeapon);
+
+typedef bool (*FUNCTYPE(ShipManager_PowerWeapon))(ShipManager* self, ProjectileFactory* weapon,
+                                                  bool userDriven, bool force);
+DECLFUNC(ShipManager_PowerWeapon);
