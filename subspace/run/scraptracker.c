@@ -26,14 +26,14 @@ _objfactory_guaranteed ScrapTracker* ScrapTracker_create(RunInfo* run)
     htInit(&self->beacons, int64, opaque(ScrapTotals), 200);
     htInit(&self->sectors, int64, opaque(ScrapTotals), 16);
 
+    logrelaySubscribe(self->ss->runlog, self, _S"Scrap");
+    logrelaySubscribe(self->ss->runlog, self, _S"Sector");
+
     return self;
 }
 
 _objinit_guaranteed bool ScrapTracker_init(_In_ ScrapTracker* self)
 {
-    logrelaySubscribe(self->ss->runlog, self, _S"Scrap");
-    logrelaySubscribe(self->ss->runlog, self, _S"Sector");
-
     // Autogen begins -----
     rwlockInit(&self->lock);
     return true;
@@ -123,20 +123,24 @@ void ScrapTracker_logNotify(_In_ ScrapTracker* self, LogEnt* ent, bool replay)
             }
         }
 
-        ScrapTotalAddToHash(&self->beacons, ent->savepoint, &delta);
-        ScrapTotalAddToHash(&self->sectors, ent->sectorpoint, &delta);
-        ScrapTotalAggregate(&self->total, &delta);
+        withWriteLock (&self->lock) {
+            ScrapTotalAddToHash(&self->beacons, ent->savepoint, &delta);
+            ScrapTotalAddToHash(&self->sectors, ent->sectorpoint, &delta);
+            ScrapTotalAggregate(&self->total, &delta);
+        }
 
         ssuiNotify(self->ss->ui,
                    _S"Scrap_Update",
                    stvar(int64, ent->savepoint),
                    stvar(int64, ent->sectorpoint),
                    stvar(bool, replay));
-    } else if (ent->spec = &Log_Sector) {
+    } else if (ent->spec == &Log_Sector) {
         // when entering a new sector, pre-create the aggregate entries in the hashes so they
         // already exist
         ScrapTotals delta = { 0 };
-        ScrapTotalAddToHash(&self->sectors, ent->sectorpoint, &delta);
+        withWriteLock (&self->lock) {
+            ScrapTotalAddToHash(&self->sectors, ent->sectorpoint, &delta);
+        }
 
         // this helps keep the UI updated
         ssuiNotify(self->ss->ui,

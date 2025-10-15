@@ -26,14 +26,14 @@ _objfactory_guaranteed HullTracker* HullTracker_create(RunInfo* run)
     htInit(&self->beacons, int64, opaque(HullTotals), 200);
     htInit(&self->sectors, int64, opaque(HullTotals), 16);
 
+    logrelaySubscribe(self->ss->runlog, self, _S"HullDamage");
+    logrelaySubscribe(self->ss->runlog, self, _S"Sector");
+
     return self;
 }
 
 _objinit_guaranteed bool HullTracker_init(_In_ HullTracker* self)
 {
-    logrelaySubscribe(self->ss->runlog, self, _S"HullDamage");
-    logrelaySubscribe(self->ss->runlog, self, _S"Sector");
-
     // Autogen begins -----
     rwlockInit(&self->lock);
     return true;
@@ -137,20 +137,24 @@ void HullTracker_logNotify(_In_ HullTracker* self, LogEnt* ent, bool replay)
             delta.repair = -amount;
         }
 
-        HullTotalAddToHash(&self->beacons, ent->savepoint, &delta);
-        HullTotalAddToHash(&self->sectors, ent->sectorpoint, &delta);
-        HullTotalAggregate(&self->total, &delta);
+        withWriteLock (&self->lock) {
+            HullTotalAddToHash(&self->beacons, ent->savepoint, &delta);
+            HullTotalAddToHash(&self->sectors, ent->sectorpoint, &delta);
+            HullTotalAggregate(&self->total, &delta);
+        }
 
         ssuiNotify(self->ss->ui,
                    _S"Hull_Update",
                    stvar(int64, ent->savepoint),
                    stvar(int64, ent->sectorpoint),
                    stvar(bool, replay));
-    } else if (ent->spec = &Log_Sector) {
+    } else if (ent->spec == &Log_Sector) {
         // when entering a new sector, pre-create the aggregate entries in the hashes so they
         // already exist
         HullTotals delta = { 0 };
-        HullTotalAddToHash(&self->sectors, ent->sectorpoint, &delta);
+        withWriteLock (&self->lock) {
+            HullTotalAddToHash(&self->sectors, ent->sectorpoint, &delta);
+        }
 
         // this helps keep the UI updated
         ssuiNotify(self->ss->ui,
