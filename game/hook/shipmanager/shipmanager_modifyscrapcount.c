@@ -3,7 +3,7 @@
 #include "hook/hook.h"
 #include "patch/patchlist.h"
 
-static DamageSource repairsrc;
+static EventSource repairsrc;
 static int pre_currentScrap;
 
 // ---- Hooks ----------------
@@ -21,7 +21,7 @@ int ShipManager_ModifyScrapCount_pre(ShipManager* self, int amount, bool income)
         }
 
         // for hull repair
-        damageSourceSet(&repairsrc, "RepairArm");
+        eventSourceSet(Damage, &repairsrc, "RepairArm");
     }
 
     return 1;
@@ -44,7 +44,7 @@ void ShipManager_ModifyScrapCount_post(ShipManager* self, int amount, bool incom
         }
     }
 
-    damageSourceFinish(&repairsrc);
+    eventSourceFinish(Damage, &repairsrc);
 }
 
 // ---- Patch ----------------

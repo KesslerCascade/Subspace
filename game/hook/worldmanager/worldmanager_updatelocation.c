@@ -8,14 +8,14 @@
 #include "patch/patchlist.h"
 #include "subspacegame.h"
 
-static DamageSource eventsrc;
+static EventSource eventsrc;
 
 int WorldManager_UpdateLocation_pre(WorldManager* self, LocationEvent* event)
 {
     gs.waitInProgress = false;
 
     if (RunTracker_feature.enabled) {
-        damageSourceSet(&eventsrc, "Event");
+        eventSourceSet(Damage, &eventsrc, "Event");
 
         basic_string* eventname = event ? LocationEvent_eventName(event) : NULL;
         if (eventname) {
@@ -28,7 +28,7 @@ int WorldManager_UpdateLocation_pre(WorldManager* self, LocationEvent* event)
 
 void WorldManager_UpdateLocation_post(WorldManager* self, LocationEvent* event)
 {
-    damageSourceFinish(&eventsrc);
+    eventSourceFinish(Damage, &eventsrc);
 }
 
 // ---- Patch ----------------

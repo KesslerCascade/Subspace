@@ -5,7 +5,7 @@
 
 // ---- Hooks ----------------
 
-static DamageSource areasrc;
+static EventSource areasrc;
 
 bool ShipManager_DamageArea_pre(ShipManager* self, Pointf location, Damage damage, bool forceHit)
 {
@@ -21,14 +21,14 @@ bool ShipManager_DamageArea_pre(ShipManager* self, Pointf location, Damage damag
             // Projectile::CollisionCheck something better can be done there.
             if (damage.selfId == -1 && damage.iDamage == 3 && damage.iShieldPiercing == 5 &&
                 damage.breachChance == 10 && damage.fireChance == 0)
-                damageSourceSet(&areasrc, "ASB");
+                eventSourceSet(Damage, &areasrc, "ASB");
             else if (damage.iDamage == 1 && damage.iShieldPiercing == 0 && damage.fireChance == 2 &&
                      damage.breachChance == 1)
-                damageSourceSet(&areasrc, "Asteroid");
+                eventSourceSet(Damage, &areasrc, "Asteroid");
             else if (damage.iShieldPiercing >= 5)
-                damageSourceSet(&areasrc, "Missile");
+                eventSourceSet(Damage, &areasrc, "Missile");
             else
-                damageSourceSet(&areasrc, "Projectile");   // something else
+                eventSourceSet(Damage, &areasrc, "Projectile");   // something else
         }
     }
 
@@ -38,7 +38,7 @@ bool ShipManager_DamageArea_pre(ShipManager* self, Pointf location, Damage damag
 bool ShipManager_DamageArea_post(bool ret, ShipManager* self, Pointf location, Damage damage,
                                  bool forceHit)
 {
-    damageSourceFinish(&areasrc);
+    eventSourceFinish(Damage, &areasrc);
     return ret;
 }
 

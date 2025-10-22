@@ -7,21 +7,20 @@
 
 static bool recording = false;
 
-void damageSourceSet(DamageSource* ds, const char* src)
+void _eventSourceSet(EventSource* es, const char** cur, const char* src)
 {
-    if (!ds->set) {
-        ds->prev           = gc.curDamageSource;
-        ds->set            = true;
-        gc.curDamageSource = src;
+    if (!es->set) {
+        es->prev = *cur;
+        es->set  = true;
+        *cur     = src;
     }
 }
-
-void damageSourceFinish(DamageSource* ds)
+void _eventSourceFinish(EventSource* es, const char** cur)
 {
-    if (ds->set) {
-        gc.curDamageSource = ds->prev;
-        ds->prev           = NULL;
-        ds->set            = false;
+    if (es->set) {
+        *cur     = es->prev;
+        es->prev = NULL;
+        es->set  = false;
     }
 }
 
