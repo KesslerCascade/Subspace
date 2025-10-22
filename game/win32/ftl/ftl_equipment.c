@@ -117,14 +117,22 @@ DisasmTrace Equipment_AddWeapon_trace = {
              { I_CALL,
                 .argf   = { ARG_ADDR },
                 .argcap = { DT_MATCH2 } },   // verify this is CALL ShipManager::GetWeaponTotal
-              { DT_OP(SKIP), .imin = 36, .imax = 50, .flow = DT_FLOW_JMP_BOTH },
+              { DT_OP(SKIP), .imin = 26, .imax = 40, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { 0, ARG_PTRSIZE },
+                .args   = { { 0 }, { .ptrsize = 4 } },
+                .argout = { 0, DT_OUT_SYM4 } },   // this->vEquipmentBoxes
+              { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_SAR },
+             { DT_OP(SKIP), .imin = 2, .imax = 7, .flow = DT_FLOW_JMP_BOTH },
              { I_MOV, .argf = { ARG_REG, ARG_PTRSIZE }, .args = { { REG_ECX }, { .ptrsize = 4 } } },
-             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL EquipmentBox::IsEmpty
+             { I_CALL, .argout = { DT_OUT_SYM5 } },   // CALL EquipmentBox::IsEmpty
               { I_TEST },
              { DT_OP(FINISH) } },
-    .out  = { &SYM(ShipManager_HasSystem),        // DT_OUT_SYM1
-              &SYM(ShipManager_GetWeaponTotal),   // DT_OUT_SYM2
-              &SYM(ShipManager_AddWeapon),        // DT_OUT_SYM3
+    .out  = { &SYM(ShipManager_HasSystem),              // DT_OUT_SYM1
+              &SYM(ShipManager_GetWeaponTotal),         // DT_OUT_SYM2
+              &SYM(ShipManager_AddWeapon),              // DT_OUT_SYM3
+              &SYM(Equipment_vEquipmentBoxes_offset),   // DT_OUT_SYM4
               &SYM(EquipmentBox_IsEmpty) }
 };
 
@@ -150,4 +158,9 @@ DisasmTrace EquipmentBox_IsEmpty_trace = {
 Symbol SYM(EquipmentBox_item_offset) = {
     SYMNAME("EquipmentBox->item"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &EquipmentBox_IsEmpty_trace }, { 0 } }
+};
+
+Symbol SYM(Equipment_vEquipmentBoxes_offset) = {
+    SYMNAME("Equipment->vEquipmentBoxes"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace }, { 0 } }
 };

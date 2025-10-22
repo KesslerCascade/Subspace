@@ -24,6 +24,9 @@ DECLSYM(Equipment_bOverAugCapacity_offset);
 #define Equipment_bOverCapacity(equip)    MEMBER(ftlbase, Equipment, equip, bool, bOverCapacity)
 #define Equipment_bOverAugCapacity(equip) MEMBER(ftlbase, Equipment, equip, bool, bOverAugCapacity)
 
+DECLSYM(Equipment_vEquipmentBoxes_offset);
+#define Equipment_vEquipmentBoxes(equip) MEMBER(ftlbase, Equipment, equip, vector*, vEquipmentBoxes)
+
 DECLSYM(EquipmentBox_item_offset);
 #define EquipmentBox_item(box) MEMBER(ftlbase, EquipmentBox, box, EquipmentBoxItem*, item)
 

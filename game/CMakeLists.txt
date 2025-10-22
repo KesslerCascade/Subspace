@@ -55,6 +55,7 @@ if(WIN32)
         win32/ftl/ftl_mousecontrol.c
         win32/ftl/ftl_osdep.c
         win32/ftl/ftl_powermanager.c
+        win32/ftl/ftl_projectilefactory.c
         win32/ftl/ftl_resourcecontrol.c
         win32/ftl/ftl_scorekeeper.c
         win32/ftl/ftl_settings.c
@@ -72,6 +73,7 @@ if(WIN32)
         win32/ftl/ftl_textlibrary.c
         win32/ftl/ftl_tutorialmanager.c
         win32/ftl/ftl_waypoints.c
+        win32/ftl/ftl_weaponsystem.c
         win32/ftl/ftl_worldmanager.c
         win32/hook/analysis.c
         win32/hook/export.c

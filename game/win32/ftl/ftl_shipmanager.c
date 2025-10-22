@@ -4,6 +4,7 @@
 #include "ftl/shipmanager.h"
 #include "ftl/shipstatus.h"
 #include "ftl/shipsystem.h"
+#include "ftl/weaponsystem.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -433,10 +434,19 @@ DisasmTrace ShipManager_PowerWeapon_trace = {
     .cstr = "Shouldn't be powering weapons, no weapon system\n",
     .mod  = DTRACE_MOD_FUNCSTART,
     .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
-             { DT_OP(SKIP), .imin = 18, .imax = 30 },
+             { DT_OP(SKIP), .imin = 10, .imax = 20, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_REG },
+                .args   = { { REG_ECX }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM2 } },        // this->weaponSystem
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL WeaponSystem::PowerWeapon
+              { DT_OP(SKIP), .imin = 5, .imax = 13 },
              { I_RETN, .argf = { ARG_ADDR }, .args = { { .addr = 0x0c } } },   // 3 stack params
               { DT_OP(FINISH) } },
-    .out  = { &SYM(ShipManager_PowerWeapon) }
+    .out  = { &SYM(ShipManager_PowerWeapon),                                    // DT_OUT_SYM1
+              &SYM(ShipManager_weaponSystem_offset),                            // DT_OUT_SYM2
+              &SYM(WeaponSystem_PowerWeapon) }
 };
 
 Symbol SYM(ShipManager_PowerWeapon) = {
@@ -445,6 +455,15 @@ Symbol SYM(ShipManager_PowerWeapon) = {
              { .type = SYMBOL_FIND_EXPORT,
                 .name = "_ZN11ShipManager11PowerWeaponEP17ProjectileFactorybb" },
              { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_PowerWeapon) = {
+    .nargs   = 4,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false },
+                { 4, ARG_PTR, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
 };
 
 DisasmTrace ShipManager_DePowerWeapon_trace = {
@@ -464,4 +483,29 @@ Symbol SYM(ShipManager_DePowerWeapon) = {
              { .type = SYMBOL_FIND_EXPORT,
                 .name = "_ZN11ShipManager13DePowerWeaponEP17ProjectileFactoryb" },
              { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_DePowerWeapon) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+Symbol SYM(ShipManager_weaponSystem_offset) = {
+    SYMNAME("ShipManager->weaponSystem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_PowerWeapon_trace }, { 0 } }
+};
+
+DisasmTrace ShipManager_GetWeaponTotal_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipManager_GetWeaponTotal),
+    .ops  = { { DT_OP(SKIP), .imin = 4, .imax = 12 },
+             { I_SUB,
+                .argf   = { 0, ARG_PTRSIZE },
+                .args   = { { 0 }, { .ptrsize = 4 } },
+                .argout = { 0, DT_OUT_SYM1 },
+                .argcap = { DT_CAPTURE1 } },   // weaponSystem->weapons
+              { I_SAR, .argf = { ARG_MATCH }, .argcap = { DT_MATCH1 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(WeaponSystem_weapons_offset) }
 };

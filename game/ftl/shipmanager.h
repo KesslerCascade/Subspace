@@ -10,6 +10,8 @@
 extern DisasmTrace ShipManager_OnLoop_trace;
 extern DisasmTrace ShipManager_DamageHull_trace;
 extern DisasmTrace ShipManager_SunDamage_trace;
+extern DisasmTrace ShipManager_PowerWeapon_trace;
+extern DisasmTrace ShipManager_GetWeaponTotal_trace;
 
 typedef bool (*FUNCTYPE(ShipManager_OnInit))(ShipManager* ship, ShipBlueprint* bluePrint,
                                              int level);
@@ -128,3 +130,7 @@ DECLFUNC(ShipManager_DePowerWeapon);
 typedef bool (*FUNCTYPE(ShipManager_PowerWeapon))(ShipManager* self, ProjectileFactory* weapon,
                                                   bool userDriven, bool force);
 DECLFUNC(ShipManager_PowerWeapon);
+
+DECLSYM(ShipManager_weaponSystem_offset);
+#define ShipManager_weaponSystem(self) \
+    (MEMBER(ftlbase, ShipManager, self, WeaponSystem*, weaponSystem))

@@ -6,6 +6,6 @@
 
 // FTL functions & wrappers below
 
-typedef int (*FUNCTYPE(PowerManager_RestartAll))();
-DECLFUNC(PowerManager_RestartAll);
-#define PowerManager_RestartAll() FCALL(ftlbase, PowerManager_RestartAll)
+DECLSYM(ProjectileFactory_blueprint_offset);
+#define ProjectileFactory_blueprint(pf) \
+    (MEMBER(ftlbase, ProjectileFactory, pf, ProjectileBlueprint*, blueprint))
