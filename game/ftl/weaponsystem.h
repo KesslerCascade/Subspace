@@ -11,4 +11,5 @@ typedef bool (*FUNCTYPE(WeaponSystem_PowerWeapon))(WeaponSystem* self, Projectil
 DECLFUNC(WeaponSystem_PowerWeapon);
 
 DECLSYM(WeaponSystem_weapons_offset);
+// vector<ProjectileFactory*>
 #define WeaponSystem_weapons(ws) (&MEMBER(ftlbase, WeaponSystem, ws, vector, weapons))

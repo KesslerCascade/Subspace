@@ -136,6 +136,54 @@ DisasmTrace Equipment_AddWeapon_trace = {
               &SYM(EquipmentBox_IsEmpty) }
 };
 
+Symbol SYM(Equipment_AddDrone) = {
+    SYMNAME("Equipment::AddDrone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RunCommand_DRONE_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN9Equipment8AddDroneEPK14DroneBlueprintbb" },
+             { 0 } }
+};
+
+DisasmTrace Equipment_AddDrone_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(Equipment_AddDrone),
+    .ops  = { { DT_OP(SKIP), .imin = 5, .imax = 15 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // this pointer
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { DT_OP(LABEL), .val = 1 },      // before forceCargo check
+              { I_CMP,
+                .argf = { ARG_PTRSIZE, ARG_ADDR },
+                .args = { { .ptrsize = 1 }, { .addr = 0 } } },   // if (!forceCargo)
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { DT_OP(JMP) },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL },   // CALL ShipManager::CreateDrone
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .argcap = { 0, DT_MATCH1 },
+                .argout = { 0, DT_OUT_SYM1 } },   // this->cargoId
+              { DT_OP(GOTO), .val = 1 },          // back to forceCargo check
+              { DT_OP(SKIP), .imin = 2, .imax = 8 },
+             { I_MOV, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ESP }, { .addr = 4 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL },                              // CALL ShipManager::HasSystem
+              { DT_OP(SKIP), .imin = 2, .imax = 7, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL ShipManager::GetDroneTotal
+              { DT_OP(SKIP), .imin = 1, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf = { ARG_REG, ARG_ADDR },
+                .args = { { REG_ESP }, { .addr = 0xffffffff } } },   // -1 param
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },                 // CALL ShipManager::AddDrone
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(Equipment_cargoId_offset),                        // DT_OUT_SYM1
+              &SYM(ShipManager_GetDroneTotal),                       // DT_OUT_SYM2
+              &SYM(ShipManager_AddDrone) }
+};
+
 Symbol SYM(EquipmentBox_IsEmpty) = {
     SYMNAME("EquipmentBox::IsEmpty"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace },
@@ -163,4 +211,9 @@ Symbol SYM(EquipmentBox_item_offset) = {
 Symbol SYM(Equipment_vEquipmentBoxes_offset) = {
     SYMNAME("Equipment->vEquipmentBoxes"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace }, { 0 } }
+};
+
+Symbol SYM(Equipment_cargoId_offset) = {
+    SYMNAME("Equipment->cargoId"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddDrone_trace }, { 0 } }
 };

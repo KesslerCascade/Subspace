@@ -43,6 +43,8 @@ if(WIN32)
         win32/ftl/ftl_combatcontrol.c
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
+        win32/ftl/ftl_drone.c
+        win32/ftl/ftl_dronesystem.c
         win32/ftl/ftl_equipment.c
         win32/ftl/ftl_eventsystem.c
         win32/ftl/ftl_filehelper.c
@@ -183,6 +185,8 @@ add_executable(subspacegame
     hook/worldmanager/worldmanager_updatelocation.c
     input/keybinds.c
     input/keyboard.c
+    inventory/inventory.c
+    inventory/invscan.c
     log/log.c
     util/lcg.c
     patch/patch.c

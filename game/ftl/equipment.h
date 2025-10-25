@@ -5,6 +5,7 @@
 #include "hook/function.h"
 
 extern DisasmTrace Equipment_AddWeapon_trace;
+extern DisasmTrace Equipment_AddDrone_trace;
 
 typedef void (*FUNCTYPE(Equipment_Jump))(Equipment* self);
 DECLFUNC(Equipment_Jump);
@@ -12,6 +13,10 @@ DECLFUNC(Equipment_Jump);
 typedef void (*FUNCTYPE(Equipment_AddWeapon))(Equipment* self, WeaponBlueprint* weaponBlueprint,
                                               bool free, bool forceCargo);
 DECLFUNC(Equipment_AddWeapon);
+
+typedef void (*FUNCTYPE(Equipment_AddDrone))(Equipment* self, DroneBlueprint* droneBlueprint,
+                                             bool free, bool forceCargo);
+DECLFUNC(Equipment_AddDrone);
 
 DECLSYM(Equipment_overcapacityBox_offset);
 DECLSYM(Equipment_overAugBox_offset);
@@ -24,11 +29,16 @@ DECLSYM(Equipment_bOverAugCapacity_offset);
 #define Equipment_bOverCapacity(equip)    MEMBER(ftlbase, Equipment, equip, bool, bOverCapacity)
 #define Equipment_bOverAugCapacity(equip) MEMBER(ftlbase, Equipment, equip, bool, bOverAugCapacity)
 
+// vector<EquipmentBox*>
 DECLSYM(Equipment_vEquipmentBoxes_offset);
-#define Equipment_vEquipmentBoxes(equip) MEMBER(ftlbase, Equipment, equip, vector*, vEquipmentBoxes)
+#define Equipment_vEquipmentBoxes(equip) \
+    (&MEMBER(ftlbase, Equipment, equip, vector, vEquipmentBoxes))
 
 DECLSYM(EquipmentBox_item_offset);
-#define EquipmentBox_item(box) MEMBER(ftlbase, EquipmentBox, box, EquipmentBoxItem*, item)
+#define EquipmentBox_item(box) (&MEMBER(ftlbase, EquipmentBox, box, EquipmentBoxItem, item))
 
 typedef bool (*FUNCTYPE(EquipmentBox_IsEmpty))(EquipmentBox* self);
 DECLFUNC(EquipmentBox_IsEmpty);
+
+DECLSYM(Equipment_cargoId_offset);
+#define Equipment_cargoId(equip) MEMBER(ftlbase, Equipment, equip, int, cargoId)

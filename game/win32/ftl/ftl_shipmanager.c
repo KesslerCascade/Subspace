@@ -1,4 +1,5 @@
 #include "ftl/commandgui.h"
+#include "ftl/dronesystem.h"
 #include "ftl/equipment.h"
 #include "ftl/ship.h"
 #include "ftl/shipmanager.h"
@@ -25,7 +26,7 @@ INITWRAP(ShipManager_GetIsJumping);
 Symbol SYM(ShipManager_GetIsJumping) = {
     SYMNAME("ShipManager::GetIsJumping"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SpaceBar_trace },
-             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager12GetIsJumpingEv" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager12GetIsJumpingEv" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_GetIsJumping) = { .nargs   = 1,
@@ -120,7 +121,7 @@ Symbol SYM(ShipManager_GetDroneCount) = {
     SYMNAME("ShipManager::GetDroneCount"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v2 },
-             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager13GetDroneCountEv" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager13GetDroneCountEv" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_GetDroneCount) = { .nargs   = 1,
@@ -132,7 +133,7 @@ Symbol SYM(ShipManager_GetMissileCount) = {
     SYMNAME("ShipManager::GetMissileCount"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v2 },
-             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager15GetMissileCountEv" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager15GetMissileCountEv" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_GetMissileCount) = { .nargs   = 1,
@@ -145,7 +146,7 @@ Symbol SYM(ShipManager_HasEquipment) = {
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CheckForNewLocation_trace_2 },
              { .type = SYMBOL_FIND_EXPORT,
                 .name =
-                    "EAX,_ZN10ShipObject12HasEquipmentENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },
+                    "_ZN10ShipObject12HasEquipmentENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_HasEquipment) = {
@@ -158,7 +159,7 @@ INITWRAP(ShipManager_ModifyScrapCount);
 Symbol SYM(ShipManager_ModifyScrapCount) = {
     SYMNAME("ShipManager::ModifyScrapCount"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_ModifyResources_trace },
-             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager16ModifyScrapCountEib" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager16ModifyScrapCountEib" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_ModifyScrapCount) = {
@@ -405,7 +406,7 @@ FuncInfo FUNCINFO(ShipManager_HasSystem) = {
 Symbol SYM(ShipManager_GetWeaponTotal) = {
     SYMNAME("ShipManager::GetWeaponTotal"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace },
-             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager14GetWeaponTotalEv" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager14GetWeaponTotalEv" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_GetWeaponTotal) = {
@@ -508,4 +509,69 @@ DisasmTrace ShipManager_GetWeaponTotal_trace = {
               { I_SAR, .argf = { ARG_MATCH }, .argcap = { DT_MATCH1 } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(WeaponSystem_weapons_offset) }
+};
+
+Symbol SYM(ShipManager_AddDrone) = {
+    SYMNAME("ShipManager::AddDrone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN11ShipManager8AddDroneEPK14DroneBlueprinti" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_AddDrone) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_PTR
+};
+
+DisasmTrace ShipManager_AddDrone_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipManager_AddDrone),
+    .ops  = { { DT_OP(SKIP), .imin = 13, .imax = 21, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // capture this pointer
+              { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL },                      // CALL ShipManager::CreateCrewDrone
+              { DT_OP(SKIP), .imin = 3, .imax = 9, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL },                      // CALL ShipManager::CreateSpaceDrone
+              { DT_OP(SKIP), .imin = 2, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_REG },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH1 },
+                .argout = { 0, DT_OUT_SYM1 } },        // this->droneSystem
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL DroneSystem::AddDrone
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_droneSystem_offset),    // DT_OUT_SYM1
+              &SYM(DroneSystem_AddDrone) }
+};
+
+Symbol SYM(ShipManager_droneSystem_offset) = {
+    SYMNAME("ShipManager->droneSystem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_AddDrone_trace }, { 0 } }
+};
+
+Symbol SYM(ShipManager_GetDroneTotal) = {
+    SYMNAME("ShipManager::GetDroneTotal"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager13GetDroneTotalEv" },
+             { 0 } }
+};
+
+DisasmTrace ShipManager_GetDroneTotal_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipManager_GetDroneTotal),
+    .ops  = { { DT_OP(SKIP), .imin = 4, .imax = 12 },
+             { I_SUB,
+                .argf   = { 0, ARG_PTRSIZE },
+                .args   = { { 0 }, { .ptrsize = 4 } },
+                .argout = { 0, DT_OUT_SYM1 },
+                .argcap = { DT_CAPTURE1 } },   // droneSystem->drones
+              { I_SAR, .argf = { ARG_MATCH }, .argcap = { DT_MATCH1 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(DroneSystem_drones_offset) }
 };

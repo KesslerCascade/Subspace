@@ -378,7 +378,8 @@ DisasmTrace WorldManager_CheckForNewLocation_trace_2 = {
                 .args   = { { REG_ECX } },
                 .argsym = { 0, &SYM(WorldManager_commandGui_offset) } },   // this->commandGui
               { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL CommandGui::ForceJumpComplete
-              { DT_OP(SKIP), .imin = 6, .imax = 13, .flow = DT_FLOW_JMP_BOTH },
+              { I_MOV },
+             { DT_OP(SKIP), .imin = 5, .imax = 12, .flow = DT_FLOW_JMP_BOTH },
              { I_CALL, .argf = { ARG_ADDR }, .argsym = &SYM(StarMap_GenerateMap) },
              { DT_OP(SKIP), .imin = 8, .imax = 18 },
              { I_MOV, .argf = { 0, ARG_ADDR }, .argstr = { 0, "FLEET_DISTRACTION" } },

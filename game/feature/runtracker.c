@@ -1,8 +1,15 @@
 #include "runtracker.h"
 #include "control/controlclient.h"
 #include "feature/feature.h"
+#include "ftl/commandgui.h"
+#include "ftl/drone.h"
+#include "ftl/dronesystem.h"
+#include "ftl/equipment.h"
 #include "ftl/graphics/csurface.h"
 #include "ftl/graphics/freetype.h"
+#include "ftl/projectilefactory.h"
+#include "ftl/shipmanager.h"
+#include "ftl/weaponsystem.h"
 #include "patch/patchlist.h"
 
 static bool recording = false;
@@ -90,5 +97,14 @@ SubspaceFeature RunTracker_feature = {
     .requiredSymbols = { &SYM(freetype_easy_printRightAlign),
                         &SYM(freetype_easy_measurePrintLines),
                         &SYM(CSurface_GL_SetColor),
+                        &SYM(ShipManager_weaponSystem_offset),
+                        &SYM(WeaponSystem_weapons_offset),
+                        &SYM(DroneSystem_drones_offset),
+                        &SYM(ProjectileFactory_blueprint_offset),
+                        &SYM(CommandGui_equipScreen_offset),
+                        &SYM(Equipment_vEquipmentBoxes_offset),
+                        &SYM(EquipmentBox_item_offset),
+                        &SYM(Equipment_cargoId_offset),
+                        &SYM(Drone_blueprint_offset),
                         0 }
 };

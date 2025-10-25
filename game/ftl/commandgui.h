@@ -17,6 +17,7 @@ extern DisasmTrace CommandGui_RunCommand_HULL_trace;
 extern DisasmTrace CommandGui_RunCommand_DELETE_trace;
 extern DisasmTrace CommandGui_RunCommand_SHIP_trace;
 extern DisasmTrace CommandGui_RunCommand_WEAPON_trace;
+extern DisasmTrace CommandGui_RunCommand_DRONE_trace;
 extern DisasmTrace CommandGui_Restart_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace_2;
@@ -99,4 +100,4 @@ DECLSYM(CommandGui_equipScreen_offset);
                 shipManager) :                                                  \
          0)
 
-#define CommandGui_equipScreen(cgui) MEMBER(ftlbase, CommandGui, cgui, Equipment*, equipScreen)
+#define CommandGui_equipScreen(cgui) (&MEMBER(ftlbase, CommandGui, cgui, Equipment, equipScreen))

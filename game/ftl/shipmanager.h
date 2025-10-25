@@ -12,6 +12,8 @@ extern DisasmTrace ShipManager_DamageHull_trace;
 extern DisasmTrace ShipManager_SunDamage_trace;
 extern DisasmTrace ShipManager_PowerWeapon_trace;
 extern DisasmTrace ShipManager_GetWeaponTotal_trace;
+extern DisasmTrace ShipManager_AddDrone_trace;
+extern DisasmTrace ShipManager_GetDroneTotal_trace;
 
 typedef bool (*FUNCTYPE(ShipManager_OnInit))(ShipManager* ship, ShipBlueprint* bluePrint,
                                              int level);
@@ -134,3 +136,17 @@ DECLFUNC(ShipManager_PowerWeapon);
 DECLSYM(ShipManager_weaponSystem_offset);
 #define ShipManager_weaponSystem(self) \
     (MEMBER(ftlbase, ShipManager, self, WeaponSystem*, weaponSystem))
+
+typedef int (*FUNCTYPE(ShipManager_GetDroneTotal))(ShipManager* self);
+DECLFUNC(ShipManager_GetDroneTotal);
+#define ShipManager_GetDroneTotal(self) FCALL(ftlbase, ShipManager_GetDroneTotal, self)
+
+typedef Drone* (*FUNCTYPE(ShipManager_AddDrone))(ShipManager* self, DroneBlueprint* drone,
+                                                 int slot);
+DECLFUNC(ShipManager_AddDrone);
+#define ShipManager_AddDrone(self, drone, slot) \
+    FCALL(ftlbase, ShipManager_AddDrone, self, drone, slot)
+
+DECLSYM(ShipManager_droneSystem_offset);
+#define ShipManager_droneSystem(self) \
+    (MEMBER(ftlbase, ShipManager, self, DroneSystem*, droneSystem))

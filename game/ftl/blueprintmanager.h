@@ -21,4 +21,4 @@ typedef ShipBlueprint* (*FUNCTYPE(BlueprintManager_GetShipBlueprint))(BlueprintM
 DECLFUNC(BlueprintManager_GetShipBlueprint);
 
 // fixed offset that is the same across all versions
-#define Blueprint_name(bprint) (&MEMBER_FIXED(ftlbase, Blueprint, bprint, basic_string, 4)
+#define Blueprint_name(bprint) (&MEMBER_FIXED(ftlbase, Blueprint, bprint, basic_string, 4))

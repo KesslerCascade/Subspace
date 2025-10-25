@@ -33,6 +33,9 @@ static void specinit(void* dummy)
     addspec(&Log_Sector);
     addspec(&Log_Ship);
     addspec(&Log_Start);
+    addspec(&Log_InvAdd);
+    addspec(&Log_InvMove);
+    addspec(&Log_InvRemove);
 }
 
 void LogEnt_destroy(_In_ LogEnt* self)

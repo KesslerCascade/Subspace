@@ -132,6 +132,7 @@ typedef struct GameGlobalContext {
     bool inGameOverLoop;
     const char* curScrapSource;
     const char* curDamageSource;
+    const char* curInvSource;
 } GameGlobalContext;
 
 extern SubspaceGameSettings settings;

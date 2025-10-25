@@ -210,6 +210,20 @@ DisasmTrace CommandGui_RunCommand_WEAPON_trace = {
     .out  = { &SYM(Equipment_AddWeapon) }
 };
 
+DisasmTrace CommandGui_RunCommand_DRONE_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "DRONE ",
+    .ops  = { { DT_OP(SKIP), .imin = 20, .imax = 40, .flow = DT_FLOW_JMP_BOTH },
+             { I_ADD,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CommandGui_equipScreen_offset) } },   // this = this->equipScreen
+              { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL Equipment::AddDrone
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(Equipment_AddDrone) }
+};
+
 INITWRAP(CommandGui_IsPaused);
 Symbol SYM(CommandGui_IsPaused) = {
     SYMNAME("CommandGui::IsPaused"),
@@ -681,7 +695,7 @@ FuncInfo FUNCINFO(CommandGui_RenderPause) = {
 DisasmTrace CommandGui_ForceJumpComplete_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(CommandGui_ForceJumpComplete),
-    .ops  = { { DT_OP(SKIP), .imin = 4, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
+    .ops  = { { DT_OP(SKIP), .imin = 3, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
              { I_MOV,
                 .argf   = { 0, ARG_ADDR },
                 .argsym = { 0, &SYM(CommandGui_shipComplete_offset) } },   // this->shipComplete

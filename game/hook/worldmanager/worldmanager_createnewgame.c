@@ -1,5 +1,6 @@
 #include "control/controlclient.h"
 #include "control/runlog.h"
+#include "feature/runtracker.h"
 #include "ftl/blueprintmanager.h"
 #include "ftl/capp.h"
 #include "ftl/completeship.h"
@@ -8,6 +9,7 @@
 #include "ftl/starmap.h"
 #include "ftl/tutorialmanager.h"
 #include "ftl/worldmanager.h"
+#include "inventory/invscan.h"
 #include "proto.h"
 #include "subspacegame.h"
 
@@ -45,6 +47,14 @@ void subspace_WorldManager_CreateNewGame_post(WorldManager* self)
         ControlMsg* msg = controlNewMsg("GameState", 1);
         controlMsgInt(msg, 0, "state", GAME_TUTORIAL);
         controlClientQueue(msg);
+    }
+
+    // save initial ship inventory
+    if (RunTracker_feature.enabled) {
+        EventSource origsrc = { 0 };
+        eventSourceSet(Inv, &origsrc, "Starting");
+        invScan();
+        eventSourceFinish(Inv, &origsrc);
     }
 
     gs.sendAllStats = true;
