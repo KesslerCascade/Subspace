@@ -2,6 +2,7 @@
 #include "ftl/completeship.h"
 #include "ftl/misc.h"
 #include "ftl/shipmanager.h"
+#include "ftl/shipobject.h"
 #include "ftl/soundcontrol.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
@@ -52,7 +53,7 @@ FuncInfo FUNCINFO(CompleteShip_DeadCrew) = {
 
 DisasmTrace CompleteShip_InitiateTeleport_trace = {
     .c    = DTRACE_CALLS,
-    .csym = &SYM(ShipManager_HasEquipment),
+    .csym = &SYM(ShipObject_HasEquipment),
     .mod  = DTRACE_MOD_FUNCSTART,
     .ops  = { { DT_OP(NOOP), .outip = DT_OUT_SYM1 },
              { DT_OP(SKIP), .imin = 15, .imax = 25, .flow = DT_FLOW_JMP_BOTH },
@@ -85,7 +86,7 @@ DisasmTrace CompleteShip_InitiateTeleport_trace = {
                 .argf = { 0, ARG_ADDR },
                 .args = { { 0 }, { .addr = 0x4145485f } } },   // _HEA
               { DT_OP(SKIP), .imin = 0, .imax = 10 },
-             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(ShipManager_HasEquipment) } },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(ShipObject_HasEquipment) } },
              { DT_OP(FINISH) } },
     .out  = { &SYM(CompleteShip_InitiateTeleport),   // DT_OUT_SYM1
               &SYM(CompleteShip_enemyShip_offset) }

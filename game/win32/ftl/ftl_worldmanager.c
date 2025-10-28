@@ -11,6 +11,7 @@
 #include "ftl/scorekeeper.h"
 #include "ftl/shipgraph.h"
 #include "ftl/shipmanager.h"
+#include "ftl/shipobject.h"
 #include "ftl/starmap.h"
 #include "ftl/tutorialmanager.h"
 #include "ftl/worldmanager.h"
@@ -389,7 +390,7 @@ DisasmTrace WorldManager_CheckForNewLocation_trace_2 = {
              { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL ShipObject::HasEquipment
               { DT_OP(FINISH) } },
     .out  = { &SYM(CommandGui_ForceJumpComplete),      // DT_OUT_SYM1
-              &SYM(ShipManager_HasEquipment) }
+              &SYM(ShipObject_HasEquipment) }
 };
 
 DisasmTrace WorldManager_PauseLoop_trace = {

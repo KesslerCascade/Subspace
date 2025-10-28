@@ -49,6 +49,7 @@ typedef struct ResourceControl ResourceControl;
 typedef struct ScoreKeeper ScoreKeeper;
 typedef struct ShipEvent ShipEvent;
 typedef struct ShipManager ShipManager;
+typedef struct ShipObject ShipObject;
 typedef struct ShipStatus ShipStatus;
 typedef struct SoundControl SoundControl;
 typedef struct Sector Sector;

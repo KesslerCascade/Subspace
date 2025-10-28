@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "ftl/types.h"
 
 // Helper macro for getting members of structures where the offsets are found at runtime through
@@ -39,6 +40,24 @@ typedef struct vector {
     void* finish;           // just past last element
     void* end_of_storage;   // just past end of allocated space
 } vector;
+
+typedef struct rb_tree_node rb_tree_node;
+typedef struct rb_tree_node {
+    int color;
+    rb_tree_node* parent;
+    rb_tree_node* left;
+    rb_tree_node* right;
+} rb_tree_node;
+
+typedef struct rb_tree_header {
+    rb_tree_node h;
+    size_t node_count;
+} rb_tree_header;
+
+typedef struct rb_tree {
+    int pad;   // void* ?
+    rb_tree_header h;
+} rb_tree;
 
 typedef struct TextString {
     basic_string data;

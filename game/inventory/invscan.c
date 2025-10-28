@@ -8,6 +8,7 @@
 #include "ftl/equipment.h"
 #include "ftl/projectilefactory.h"
 #include "ftl/shipmanager.h"
+#include "ftl/shipobject.h"
 #include "ftl/weaponsystem.h"
 #include "ftl/worldmanager.h"
 #include "invscan.h"
@@ -69,6 +70,31 @@ static void invScanPopulateDrones(ShipManager* sm) {
         if (dname)
             invScanAdd(INVT_Drone, dname->buf, INVL_Drones);
     }
+}
+
+static void invScanPopulateAugmentRecurse(AugListItem* item)
+{
+    if (item->node.left)
+        invScanPopulateAugmentRecurse((AugListItem*)item->node.left);
+
+    if (item->key.len > 0) {
+        // break out multiple of the same augmentation into seprate items
+        for (int i = 0; i < item->value; i++) {
+            invScanAdd(INVT_Augment, item->key.buf, INVL_Augments);
+        }
+    }
+
+    if (item->node.right)
+        invScanPopulateAugmentRecurse((AugListItem*)item->node.right);
+}
+
+static void invScanPopulateAugments()
+{
+    ShipInfo* info   = (ShipInfo*)ShipObject_shipInfoList->start;
+    rb_tree* augList = info ? &info[1].augList : NULL;
+
+    if (augList && augList->h.h.parent)
+        invScanPopulateAugmentRecurse((AugListItem*)augList->h.h.parent);
 }
 
 static void invScanPopulateEquipBox(EquipmentBox* eb, InventoryLocation loc)
@@ -151,7 +177,9 @@ void invScan(void)
     if (sm) {
         invScanPopulateWeapons(sm);
         invScanPopulateDrones(sm);
+        invScanPopulateAugments();
         invScanPopulateCargo(gui);
+        invScanPopulateOverflow(gui);
     }
 
     // Phase 2: process each item found

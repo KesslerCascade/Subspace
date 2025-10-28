@@ -9,6 +9,7 @@
 #include "ftl/graphics/freetype.h"
 #include "ftl/projectilefactory.h"
 #include "ftl/shipmanager.h"
+#include "ftl/shipobject.h"
 #include "ftl/weaponsystem.h"
 #include "patch/patchlist.h"
 
@@ -104,7 +105,10 @@ SubspaceFeature RunTracker_feature = {
                         &SYM(CommandGui_equipScreen_offset),
                         &SYM(Equipment_vEquipmentBoxes_offset),
                         &SYM(EquipmentBox_item_offset),
+                        &SYM(Equipment_overcapacityBox_offset),
+                        &SYM(Equipment_overAugBox_offset),
                         &SYM(Equipment_cargoId_offset),
                         &SYM(Drone_blueprint_offset),
+                        &SYM(ShipObject_shipInfoList),
                         0 }
 };

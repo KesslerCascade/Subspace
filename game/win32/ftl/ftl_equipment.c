@@ -26,9 +26,9 @@ DisasmTrace Equipment_Jump_trace = {
              { I_MOV,
                 .argf   = { ARG_REG, ARG_REG },
                 .args   = { { REG_ECX }, { REG_ECX } },
-                .argout = { DT_OUT_SYM1 } },   // this = this->overcapacityBox
+                .argout = { 0, DT_OUT_SYM1 } },   // this = this->overcapacityBox
               { DT_OP(SKIP), .imin = 0, .imax = 4 },
-             { I_CALL },                      // virtual call
+             { I_CALL },                         // virtual call
               { DT_OP(SKIP), .imin = 0, .imax = 5 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_REG },
@@ -41,13 +41,13 @@ DisasmTrace Equipment_Jump_trace = {
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { 0 }, { .addr = 0 } },
-                .argcap = { DT_CAPTURE1 },
+                .argcap = { DT_MATCH1 },
                 .argout = { DT_OUT_SYM3 } },   // this->bOverCapacity = 0
               { DT_OP(SKIP), .imin = 0, .imax = 1 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { 0 }, { .addr = 0 } },
-                .argcap = { DT_CAPTURE1 },
+                .argcap = { DT_MATCH1 },
                 .argout = { DT_OUT_SYM4 } },            // this->bOverAugCapacity = 0
               { DT_OP(FINISH) } },
     .out  = { &SYM(Equipment_overcapacityBox_offset),   // DT_OUT_SYM1

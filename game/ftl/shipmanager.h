@@ -53,23 +53,6 @@ DECLFUNC(ShipManager_ModifyScrapCount);
 #define ShipManager_ModifyScrapCount(self, amount, income) \
     FCALL(ftlbase, ShipManager_GetMissileCount, self, amount, income)
 
-// technically this is a ShipObject method, but it's ShipManager's base class and is always at
-// offset 0
-typedef int (*FUNCTYPE(ShipManager_HasEquipment))(ShipManager* ship, basic_string* blueName);
-DECLFUNC(ShipManager_HasEquipment);
-#define ShipManager_HasEquipment(self, blueName) \
-    FCALL(ftlbase, ShipManager_HasEquipment, self, blueName)
-
-typedef int (*FUNCTYPE(ShipManager_HasAugmentation))(ShipManager* ship, basic_string* augId);
-DECLFUNC(ShipManager_HasAugmentation);
-#define ShipManager_HasAugmentation(self, augId) \
-    FCALL(ftlbase, ShipManager_HasAugmentation, self, augId)
-
-typedef float (*FUNCTYPE(ShipManager_GetAugmentationValue))(ShipManager* ship, basic_string* augId);
-DECLFUNC(ShipManager_GetAugmentationValue);
-#define ShipManager_GetAugmentationValue(self, augId) \
-    FCALL(ftlbase, ShipManager_GetAugmentationValue, self, augId)
-
 typedef bool (*FUNCTYPE(ShipManager_HasSystem))(ShipManager* ship, int systemId);
 DECLFUNC(ShipManager_HasSystem);
 #define ShipManager_HasSystem(self, systemId) FCALL(ftlbase, ShipManager_HasSystem, self, systemId)

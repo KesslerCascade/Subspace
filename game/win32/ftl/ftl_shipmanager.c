@@ -140,21 +140,6 @@ FuncInfo FUNCINFO(ShipManager_GetMissileCount) = { .nargs   = 1,
                                                    .stdcall = true,
                                                    .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
-INITWRAP(ShipManager_HasEquipment);
-Symbol SYM(ShipManager_HasEquipment) = {
-    SYMNAME("ShipManager::HasEquipment"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CheckForNewLocation_trace_2 },
-             { .type = SYMBOL_FIND_EXPORT,
-                .name =
-                    "_ZN10ShipObject12HasEquipmentENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },
-             { 0 } }
-};
-FuncInfo FUNCINFO(ShipManager_HasEquipment) = {
-    .nargs   = 2,
-    .stdcall = true,
-    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } }
-};
-
 INITWRAP(ShipManager_ModifyScrapCount);
 Symbol SYM(ShipManager_ModifyScrapCount) = {
     SYMNAME("ShipManager::ModifyScrapCount"),

@@ -84,7 +84,7 @@ LogEntSpec Log_InvMove = {
 
 LogEntSpec Log_InvRemove = {
     .id         = "InvRemove",
-    .numParams  = 3,
+    .numParams  = 4,
     .priority   = 14,
     .paramTypes = { LP_STRING, LP_STRING, LP_STRING, LP_STRING  },
     .paramNames = { "disp",    "type",    "name",    "location" }
