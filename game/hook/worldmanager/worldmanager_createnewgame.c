@@ -53,6 +53,7 @@ void subspace_WorldManager_CreateNewGame_post(WorldManager* self)
     if (RunTracker_feature.enabled) {
         EventSource origsrc = { 0 };
         eventSourceSet(Inv, &origsrc, "Starting");
+        invReset();
         invScan();
         eventSourceFinish(Inv, &origsrc);
     }

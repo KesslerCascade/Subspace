@@ -54,8 +54,10 @@ void subspace_WorldManager_LoadGame_post(WorldManager* self, basic_string* file)
         controlClientQueue(msg);
     }
 
-    if (RunTracker_feature.enabled)
+    if (RunTracker_feature.enabled) {
+        invReset();
         invScan();
+    }
 
     gs.sendAllStats = true;
     gc.loadingGame  = false;
