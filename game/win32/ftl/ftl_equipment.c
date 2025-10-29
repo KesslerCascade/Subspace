@@ -110,8 +110,9 @@ DisasmTrace Equipment_AddWeapon_trace = {
                 .args = { { REG_ESP }, { .addr = 0xffffffff } } },   // -1 param
               { DT_OP(SKIP), .imin = 0, .imax = 3 },
              { I_CALL, .argout = { DT_OUT_SYM3 } },                 // CALL ShipManager::AddWeapon
+              { DT_OP(NOUNWIND) },
 
-              { DT_OP(GOTO), .val = 1 },   // back to forceCargo branch point
+             { DT_OP(GOTO), .val = 1 },   // back to forceCargo branch point
               { I_TEST },                  // if (!forceCargo)
               { DT_OP(SKIP), .imin = 2, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
              { I_CALL,
@@ -156,17 +157,27 @@ DisasmTrace Equipment_AddDrone_trace = {
               { I_CMP,
                 .argf = { ARG_PTRSIZE, ARG_ADDR },
                 .args = { { .ptrsize = 1 }, { .addr = 0 } } },   // if (!forceCargo)
-              { DT_OP(SKIP), .imin = 0, .imax = 5 },
-             { DT_OP(JMP) },
-             { DT_OP(SKIP), .imin = 0, .imax = 3 },
-             { I_CALL },   // CALL ShipManager::CreateDrone
+              { DT_OP(SKIP), .imin = 3, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL },                                        // CALL ShipManager::CreateDrone
               { DT_OP(SKIP), .imin = 0, .imax = 3 },
              { I_MOV,
                 .argf   = { 0, ARG_REG },
                 .argcap = { 0, DT_MATCH1 },
                 .argout = { 0, DT_OUT_SYM1 } },   // this->cargoId
-              { DT_OP(GOTO), .val = 1 },          // back to forceCargo check
-              { DT_OP(SKIP), .imin = 2, .imax = 8 },
+              { DT_OP(SKIP), .imin = 0, .imax = 5 },
+             { I_MOV,
+                .argf = { ARG_PTRSIZE, ARG_ADDR },
+                .args = { { .ptrsize = 4 }, { .addr = 0 } } },
+             { I_MOV,
+                .argf = { ARG_PTRSIZE, ARG_ADDR },
+                .args = { { .ptrsize = 4 }, { .addr = 0 } } },
+             { I_MOV,
+                .argf = { ARG_PTRSIZE, ARG_ADDR },
+                .args = { { .ptrsize = 4 }, { .addr = 0 } } },
+             { DT_OP(NOUNWIND) },
+             { DT_OP(GOTO), .val = 1 },   // back to forceCargo check
+
+              { DT_OP(SKIP), .imin = 3, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
              { I_MOV, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ESP }, { .addr = 4 } } },
              { DT_OP(SKIP), .imin = 0, .imax = 4 },
              { I_CALL },                              // CALL ShipManager::HasSystem

@@ -50,7 +50,7 @@ FuncInfo FUNCINFO(ShipObject_HasAugmentation) = {
 DisasmTrace ShipObject_HasAugmentation_trace = {
     .c    = DTRACE_ADDR,
     .csym = &SYM(ShipObject_HasAugmentation),
-    .ops  = { { DT_OP(SKIP), .imin = 14, .imax = 22 },
+    .ops  = { { DT_OP(SKIP), .imin = 14, .imax = 50 },
              { I_IMUL,
                 .argf   = { 0, 0, ARG_ADDR },
                 .args   = { { 0 }, { 0 }, { .addr = 0x34 } },

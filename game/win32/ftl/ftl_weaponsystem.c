@@ -24,9 +24,9 @@ DisasmTrace WeaponSystem_PowerWeapon_trace = {
     .csym = &SYM(WeaponSystem_PowerWeapon),
     .ops  = { { DT_OP(SKIP), .imin = 14, .imax = 22 },
              { I_CALL },   // CALL ShipSystem::GetLocked
-              { DT_OP(SKIP), .imin = 2, .imax = 9 },
+              { DT_OP(SKIP), .imin = 1, .imax = 9 },
              { I_CMP },
-             { DT_OP(SKIP), .imin = 1, .imax = 6 },
+             { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
              { I_MOV,
                 .argf   = { 0, ARG_PTRSIZE },
                 .args   = { { 0 }, { .ptrsize = 4 } },
