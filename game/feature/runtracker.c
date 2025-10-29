@@ -88,6 +88,7 @@ Patch* RunTracker_patches[] = {
     &patch_BlueprintManager_GetShipBlueprint,
     &patch_CommandGui_GetCommand,
     &patch_FTLButton_OnRender,
+    &patch_WorldManager_ModifyResources,
     0
 };
 

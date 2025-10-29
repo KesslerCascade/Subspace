@@ -61,10 +61,10 @@ if(WIN32)
         win32/ftl/ftl_resourcecontrol.c
         win32/ftl/ftl_scorekeeper.c
         win32/ftl/ftl_settings.c
-        win32/ftl/ftl_shipmanager.c
         win32/ftl/ftl_ship.c
         win32/ftl/ftl_shipgraph.c
         win32/ftl/ftl_shipmanager.c
+        win32/ftl/ftl_shipobject.c
         win32/ftl/ftl_shipstatus.c
         win32/ftl/ftl_shipsystem.c
         win32/ftl/ftl_sil.c
@@ -179,6 +179,7 @@ add_executable(subspacegame
     hook/worldmanager/worldmanager_createnewgame.c
     hook/worldmanager/worldmanager_createship.c
     hook/worldmanager/worldmanager_loadgame.c
+    hook/worldmanager/worldmanager_modifyresources.c
     hook/worldmanager/worldmanager_onloop.c
     hook/worldmanager/worldmanager_prepareautosave.c
     hook/worldmanager/worldmanager_savegame.c
