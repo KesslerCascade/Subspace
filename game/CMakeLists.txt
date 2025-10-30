@@ -11,20 +11,18 @@ project (subspacegame)
 enable_language(C)
 enable_language(CXX)
 
-include_directories(${SHARED_SOURCE_DIR})
-
 if (WIN32)
-    # Disable compiler features that depend on the standard library
-    add_compile_options(/GS-) # no buffer security check
-    STRING (REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}") # no runtime checks
+    # Use static runtime to avoid conflicts with FTL's DLL imports
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
+
+include_directories(${SHARED_SOURCE_DIR})
 
 add_subdirectory(../lib lib)
 
 include (../lib/cx/cmake/werror.cmake)
 
 if(WIN32)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB /ENTRY:entry")
     set(GAME_OSDEP
         win32/codegen/asm.c
         win32/codegen/codegen.c
@@ -202,8 +200,9 @@ target_compile_definitions(subspacegame PRIVATE SUBSPACE_GAME $<$<CONFIG:Release
 target_link_libraries(subspacegame disasm minicrt)
 if (WIN32)
     target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/win32)
-    target_link_libraries(subspacegame ${CMAKE_CURRENT_SOURCE_DIR}/tlsarray.lib kernel32 ws2_32)
+    target_link_libraries(subspacegame kernel32 ws2_32)
     set_target_properties(subspacegame PROPERTIES LINK_FLAGS "/INCREMENTAL:NO")
+    target_compile_definitions(subspacegame PRIVATE SUBSYSTEM_WINDOWS _UNICODE UNICODE)
     target_compile_options(subspacegame PRIVATE "$<$<CONFIG:Release>:/Zi>")
     target_link_options(subspacegame PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
 endif()

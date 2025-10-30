@@ -35,7 +35,7 @@ static char* nextp(char* p)
     return p2;
 }
 
-int __stdcall entry()
+int WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nShowCmd)
 {
     const char* wincmdline = GetCommandLineA();
     char* cmdline          = sstrdup(wincmdline);
