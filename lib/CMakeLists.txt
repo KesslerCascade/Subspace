@@ -3,6 +3,7 @@ set(SKIP_INSTALL_ALL 1)
 if (BUILD_GAME)
     add_subdirectory(disasm)
     add_subdirectory(minicrt)
+    add_subdirectory(cx)
 else()
     set(as_subproject ZLIB)
 

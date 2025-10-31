@@ -25,11 +25,6 @@ void osSetCurrentDir(const char* dir)
     sfree(dirw);
 }
 
-void osSleep(int msec)
-{
-    SleepEx(msec, true);
-}
-
 void osExit(int retcode)
 {
     ExitProcess(retcode);

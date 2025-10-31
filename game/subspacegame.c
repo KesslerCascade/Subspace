@@ -1,8 +1,11 @@
+#include <cx/platform/os.h>
+#include <cx/string.h>
+#include <cx/sys.h>
+#include <cx/time.h>
+
 #include "netsocket.h"
 
 #include "subspacegame.h"
-// NOTE: the entry point (i.e. "main" equivalent) is not located here, but is instead in entry.c in
-// one of the playform-specific subdirectories
 
 #include "control/cmds.h"
 #include "control/controlclient.h"
@@ -19,32 +22,38 @@
 
 #include "minicrt.h"
 
+DEFINE_ENTRY_POINT
+
 SubspaceGameSettings settings = {
     .addr = 0x7f000001,   // 127.0.0.1
 };
 GameGlobalState gs;
 GameGlobalContext gc;
 
-static void parseArgs(int argc, char* argv[])
+static void parseArgs(void)
 {
-    for (int i = 1; i < argc; i++) {
-        if (!stricmp(argv[i], "-addr") && i + 1 < argc) {
-            settings.addr = ntohl(inet_addr(argv[++i]));
+    int argc = saSize(cmdArgs);
+    for (int i = 0; i < argc; i++) {
+        if (strEq(cmdArgs.a[i], _S"-addr") && i + 1 < argc) {
+            settings.addr = ntohl(inet_addr(strC(cmdArgs.a[++i])));
         }
-        if (!stricmp(argv[i], "-port") && i + 1 < argc) {
-            settings.port = atoi(argv[++i]);
+        if (strEq(cmdArgs.a[i], _S"-port") && i + 1 < argc) {
+            strToInt32(&settings.port, cmdArgs.a[++i], 10, true);
         }
-        if (!stricmp(argv[i], "-cookie") && i + 2 < argc) {
-            settings.cookie = strtol(argv[++i], NULL, 16) << 16;
-            settings.cookie |= strtol(argv[++i], NULL, 16);
+        if (strEq(cmdArgs.a[i], _S"-cookie") && i + 2 < argc) {
+            int32 temp = 0;
+            strToInt32(&temp, cmdArgs.a[++i], 16, true);
+            settings.cookie = (uint32_t)(temp << 16);
+            strToInt32(&temp, cmdArgs.a[++i], 16, true);
+            settings.cookie |= (uint32_t)temp;
         }
     }
 }
 
 entrypoint ftlentry;
-int sscmain(int argc, char* argv[])
+int entryPoint()
 {
-    parseArgs(argc, argv);
+    parseArgs();
     netInit();
 
     if (settings.port == 0 || settings.cookie == 0) {
@@ -135,7 +144,7 @@ void sscmain2(void)
     while (!gs.clearToStart) {
         controlClientProcessInbound();
         controlClientProcessOutbound();
-        osSleep(1);
+        osSleep(timeFromMsec(1));
 
         // ensure we don't get stuck here if the connection closes
         if (!control.sock || control.closed) {
