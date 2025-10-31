@@ -15,3 +15,4 @@ void osYield();
 void osSleep(int64 time);
 int osPhysicalCPUs();
 int osLogicalCPUs();
+bool osGenRandom(uint8* buffer, uint32 size);

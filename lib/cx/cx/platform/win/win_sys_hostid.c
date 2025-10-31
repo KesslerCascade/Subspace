@@ -1,9 +1,9 @@
 #include "cx/sys/hostid_private.h"
+#include "cx/digest/digest.h"
+#include "cx/platform/os.h"
+#include "cx/platform/win.h"
 #include "cx/string.h"
 #include "cx/utils/scratch.h"
-#include "cx/platform/win.h"
-
-#include <mbedtls/entropy.h>
 
 typedef int (WINAPI *GetSystemFirmwareTable_t)(DWORD FirmwareTableProviderSignature, DWORD FirmwareTableID, PVOID pFirmwareTableBuffer, DWORD BufferSize);
 
@@ -34,7 +34,7 @@ static uint8 uuid_blacklist[][16] = {
     { 0x44, 0x45, 0x4c, 0x4c, 0x00, 0x00, 0x10, 0x20, 0x80, 0x20, 0x80, 0xc0, 0x4f, 0x20, 0x20, 0x20 },
 };
 
-static int32 hostIdTrySMBIOS(mbedtls_md_context_t *shactx)
+static int32 hostIdTrySMBIOS(Digest* shactx)
 {
     int32 ret = 0;
     char *buf = 0;
@@ -87,7 +87,7 @@ static int32 hostIdTrySMBIOS(mbedtls_md_context_t *shactx)
             // to hash, it doesn't matter. A given system will always be consistent
             // about the ordering it uses so just hash it as-is.
 
-            mbedtls_md_update(shactx, uuid, 16);
+            digestUpdate(shactx, uuid, 16);
             ret = HID_SourceBIOSUUID;
             goto out;
         }
@@ -107,7 +107,7 @@ out:
     return ret;
 }
 
-static int32 hostIdTryRegistry(HKEY hive, int32 retval, mbedtls_md_context_t *shactx)
+static int32 hostIdTryRegistry(HKEY hive, int32 retval, Digest* shactx)
 {
     int32 ret = 0;
     HKEY key;
@@ -119,7 +119,7 @@ static int32 hostIdTryRegistry(HKEY hive, int32 retval, mbedtls_md_context_t *sh
             if (sz == 64) {
                 uint8 *buf = scratchGet(sz);
                 RegQueryValueExW(key, L"HostId", NULL, NULL, (uint8*)buf, &sz);
-                mbedtls_md_update(shactx, buf, sz);
+                digestUpdate(shactx, buf, sz);
                 ret = retval;
             }
         }
@@ -127,17 +127,21 @@ static int32 hostIdTryRegistry(HKEY hive, int32 retval, mbedtls_md_context_t *sh
         // couldn't get good data from registry, try to create it
         if (!ret) {
             RegCloseKey(key);
-            if (RegCreateKeyExW(hive, L"SOFTWARE\\CX", 0, NULL, 0,
-                                STANDARD_RIGHTS_REQUIRED | KEY_SET_VALUE, NULL, &key, NULL) == ERROR_SUCCESS) {
-                mbedtls_entropy_context entropy;
+            if (RegCreateKeyExW(hive,
+                                L"SOFTWARE\\CX",
+                                0,
+                                NULL,
+                                0,
+                                STANDARD_RIGHTS_REQUIRED | KEY_SET_VALUE,
+                                NULL,
+                                &key,
+                                NULL) == ERROR_SUCCESS) {
                 uint8 randbuf[64];
 
-                mbedtls_entropy_init(&entropy);
-                mbedtls_entropy_func(&entropy, (unsigned char*)randbuf, sizeof(randbuf));
-                mbedtls_entropy_free(&entropy);
+                osGenRandom((uint8*)randbuf, sizeof(randbuf));
 
                 if (RegSetValueExW(key, L"HostId", 0, REG_BINARY, randbuf, sizeof(randbuf)) == ERROR_SUCCESS) {
-                    mbedtls_md_update(shactx, randbuf, sizeof(randbuf));
+                    digestUpdate(shactx, randbuf, sizeof(randbuf));
                     ret = retval;
                 }
             }
@@ -148,7 +152,7 @@ static int32 hostIdTryRegistry(HKEY hive, int32 retval, mbedtls_md_context_t *sh
     return ret;
 }
 
-int32 hostIdPlatformInit(mbedtls_md_context_t *shactx)
+int32 hostIdPlatformInit(Digest* shactx)
 {
     int32 ret = 0;
     HKEY key;
@@ -173,7 +177,7 @@ int32 hostIdPlatformInit(mbedtls_md_context_t *shactx)
             RegQueryValueExW(key, L"MachineGuid", NULL, NULL, (uint8*)buf, &sz);
             string guid = 0;
             strFromUTF16(&guid, buf, cstrLenw(buf));
-            mbedtls_md_update(shactx, strC(guid), strLen(guid));
+            digestUpdate(shactx, (uint8*)strC(guid), strLen(guid));
             strDestroy(&guid);
             ret = HID_SourceCrypto;
         }
@@ -183,12 +187,12 @@ int32 hostIdPlatformInit(mbedtls_md_context_t *shactx)
     return ret;
 }
 
-int32 hostIdPlatformInitFallback(mbedtls_md_context_t *shactx)
+int32 hostIdPlatformInitFallback(Digest* shactx)
 {
     // ultimate panic fallback
     char buf[MAX_COMPUTERNAME_LENGTH + 1];
     DWORD bufsz = sizeof(buf);
     GetComputerNameA(buf, &bufsz);
-    mbedtls_md_update(shactx, buf, cstrLen(buf));
+    digestUpdate(shactx, buf, (uint32)cstrLen(buf));
     return HID_SourceComputerName;
 }

@@ -8,6 +8,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux
 	../cx/platform/unix/unix_error.c
 	../cx/platform/unix/unix_fs_file.c
 	../cx/platform/unix/unix_fs_fs.c
+	../cx/platform/unix/unix_random.c
 	../cx/platform/unix/unix_os.c
 	../cx/platform/unix/unix_time_clock.c)
     if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -25,6 +26,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	../cx/platform/win/win_fs_file.c
 	../cx/platform/win/win_fs_fs.c
 	../cx/platform/win/win_futex.c
+	../cx/platform/win/win_random.c
 	../cx/platform/win/win_os.c
 	../cx/platform/win/win_time_clock.c)
 else()

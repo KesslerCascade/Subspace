@@ -3,15 +3,16 @@
 #endif
 
 #include "cx/sys/hostid_private.h"
+#include "cx/digest/digest.h"
+#include "cx/platform/os.h"
 #include "cx/string.h"
-#include <mbedtls/entropy.h>
 
 #include <unistd.h>
 #include <fcntl.h>
 #include <ctype.h>
 #include <sys/stat.h>
 
-static bool readIdFile(const char *name, mbedtls_md_context_t *shactx, bool exact)
+static bool readIdFile(const char* name, Digest* shactx, bool exact)
 {
     bool ret = false;
     int fd = open(name, O_RDONLY);
@@ -33,7 +34,7 @@ static bool readIdFile(const char *name, mbedtls_md_context_t *shactx, bool exac
     if (sz == 0)
         goto out;
 
-    mbedtls_md_update(shactx, buf, sz);
+    digestUpdate(shactx, buf, sz);
     ret = true;
 
 out:
@@ -41,7 +42,7 @@ out:
     return ret;
 }
 
-static bool getPerUserId(mbedtls_md_context_t *shactx)
+static bool getPerUserId(Digest* shactx)
 {
     bool ret = false;
     const char *home = getenv("HOME");
@@ -64,15 +65,12 @@ static bool getPerUserId(mbedtls_md_context_t *shactx)
 
         int fd = open(strC(userfile), O_WRONLY | O_CREAT | O_TRUNC, 0755);
         if (fd >= 0) {
-            mbedtls_entropy_context entropy;
             uint8 randbuf[64];
 
-            mbedtls_entropy_init(&entropy);
-            mbedtls_entropy_func(&entropy, (unsigned char*)randbuf, sizeof(randbuf));
-            mbedtls_entropy_free(&entropy);
+            osGenRandom(randbuf, sizeof(randbuf));
 
             if (write(fd, randbuf, 64) == 64) {
-                mbedtls_md_update(shactx, randbuf, sizeof(randbuf));
+                digestUpdate(shactx, randbuf, sizeof(randbuf));
                 ret = true;
             }
             close(fd);
@@ -84,7 +82,7 @@ static bool getPerUserId(mbedtls_md_context_t *shactx)
     return ret;
 }
 
-int32 hostIdPlatformInit(mbedtls_md_context_t *shactx)
+int32 hostIdPlatformInit(Digest* shactx)
 {
     if (readIdFile("/etc/hostid", shactx, false))
         return HID_SourceMachineFile;
@@ -96,12 +94,12 @@ int32 hostIdPlatformInit(mbedtls_md_context_t *shactx)
     return 0;
 }
 
-int32 hostIdPlatformInitFallback(mbedtls_md_context_t *shactx)
+int32 hostIdPlatformInitFallback(Digest* shactx)
 {
     // ultimate panic fallback
     char buf[256];
     gethostname(buf, 255);
     buf[255] = 0;           // just in case it's exactly 255
-    mbedtls_md_update(shactx, (uint8*)buf, cstrLen(buf));
+    digestUpdate(shactx, (uint8*)buf, cstrLen(buf));
     return HID_SourceComputerName;
 }
