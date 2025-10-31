@@ -1,4 +1,5 @@
 #include <cx/utils/murmur.h>
+#include <cx/utils/lazyinit.h>
 
 #ifdef WIN32
 #include <windows.h>
@@ -14,7 +15,7 @@
 
 static uint32_t murmur_seed;
 
-static lazy_init murmur_is_init;
+static LazyInitState murmur_is_init;
 static void initSeed(void* unused)
 {
 #ifdef WIN32

@@ -160,7 +160,7 @@ void sendFeatureState(SubspaceFeature* feat, int replyto)
 {
     ControlMsg* msg  = controlNewMsg("FeatureState", 3);
     msg->hdr.replyid = replyto;
-    controlMsgStr(msg, 0, "feature", feat->name);
+    controlMsgStr(msg, 0, "feature", (strref)feat->name);
     controlMsgBool(msg, 1, "available", feat->available);
     controlMsgBool(msg, 2, "enabled", feat->enabled);
     controlClientQueue(msg);
@@ -181,9 +181,7 @@ void fillValidateFeatures(ControlField* featf)
     for (uint32_t i = 0; i < feathash.nslots; i++) {
         SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
         if (feat && feat->available) {
-            featf->d.cfd_str_arr               = srealloc(featf->d.cfd_str_arr,
-                                            sizeof(char*) * (featf->count + 1));
-            featf->d.cfd_str_arr[featf->count] = sstrdup(feat->name);
+            saPush(&featf->d.cfd_str_arr, strref, (strref)feat->name);
             featf->count++;
         }
     }

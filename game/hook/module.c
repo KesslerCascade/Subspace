@@ -1,8 +1,10 @@
 #include "module.h"
 
+#include <cx/utils/lazyinit.h>
+
 // bookkeeping for per-module info
 
-static lazy_init modulehash_is_init;
+static LazyInitState modulehash_is_init;
 static lock_t modulehash_lock;
 static hashtbl modulehash;
 
@@ -63,7 +65,7 @@ static void modulehash_init(void* dummy)
 
 ModuleInfo* moduleInfo(addr_t base)
 {
-    lazyinit(&modulehash_is_init, modulehash_init, NULL);
+    lazyInit(&modulehash_is_init, modulehash_init, NULL);
     lock_acq(&modulehash_lock);
 
     ModuleInfo* mi = hashtbl_get(&modulehash, base);

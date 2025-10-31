@@ -18,7 +18,7 @@ bool runLogSend(LogEntSpec* spec, ...)
         return false;
 
     ControlMsg* msg = controlNewMsg("RunLog", 4 + spec->numParams);
-    controlMsgStr(msg, 0, "id", spec->id);
+    controlMsgStr(msg, 0, "id", (strref)spec->id);
 
     WorldManager* world = CApp_world(theApp);
     controlMsgInt(msg, 1, "sector", WorldManager_worldLevel(world) + 1);
@@ -40,7 +40,7 @@ bool runLogSend(LogEntSpec* spec, ...)
         if (spec->paramTypes[i] == LP_INT)
             controlMsgInt(msg, 4 + i, tmpbuf, va_arg(args, int));
         else if (spec->paramTypes[i] == LP_STRING)
-            controlMsgStr(msg, 4 + i, tmpbuf, va_arg(args, const char*));
+            controlMsgStr(msg, 4 + i, tmpbuf, (strref)va_arg(args, const char*));
         else
             va_arg(args, int);
     }

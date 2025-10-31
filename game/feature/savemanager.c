@@ -43,7 +43,7 @@ void saveManagerAutoSave(WorldManager* world)
 
     // notify main process to pick up the save file
     ControlMsg* msg = controlNewMsg("AutoSave", 1);
-    controlMsgStr(msg, 0, "filename", gs.saveFileOverride);
+    controlMsgStr(msg, 0, "filename", (strref)gs.saveFileOverride);
     msg->priority = 100;   // AutoSave should happen last after everything else this frame
     controlClientQueue(msg);
 

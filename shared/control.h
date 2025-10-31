@@ -1,11 +1,7 @@
 #pragma once
 
-#ifndef SUBSPACE_GAME
-#include <cx/string.h>
 #include <cx/serialize/streambuf.h>
-#else
-#include <sbuflite.h>
-#endif
+#include <cx/string.h>
 
 #include "net.h"
 #include <stdint.h>
@@ -89,13 +85,8 @@ typedef struct ControlField {
         double* cfd_float64_arr;
         bool cfd_bool;
         bool* cfd_bool_arr;
-#ifdef SUBSPACE_GAME
-        char* cfd_str;
-        char** cfd_str_arr;
-#else
         string cfd_str;
         sa_string cfd_str_arr;
-#endif
         void* cfd_raw;
     } d;
 } ControlField;
@@ -165,11 +156,7 @@ void controlMsgFloat64(ControlMsg* msg, int nfield, const char* name, double val
 void controlMsgBool(ControlMsg* msg, int nfield, const char* name, bool val);
 void controlMsgInt64(ControlMsg* msg, int nfield, const char* name, int64_t val);
 void controlMsgUInt64(ControlMsg* msg, int nfield, const char* name, uint64_t val);
-#ifdef SUBSPACE_GAME
-void controlMsgStr(ControlMsg* msg, int nfield, const char* name, const char* val);
-#else
 void controlMsgStr(ControlMsg* msg, int nfield, const char* name, strref val);
-#endif
 void controlMsgRaw(ControlMsg* msg, int nfield, const char* name, void* val, int valsz);
 
 ControlField* controlMsgFindField(ControlMsg* msg, const char* name);

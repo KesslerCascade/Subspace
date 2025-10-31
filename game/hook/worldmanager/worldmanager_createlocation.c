@@ -48,7 +48,7 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
         controlMsgInt(msg, 2, "visit", MAX(visits, 1));
         controlMsgInt(msg, 3, "x", (int)pos->x);
         controlMsgInt(msg, 4, "y", (int)pos->y);
-        controlMsgStr(msg, 5, "event", eventname ? eventname->buf : "");
+        controlMsgStr(msg, 5, "event", eventname ? (strref)eventname->buf : (strref)"");
 
         msg->priority = 2;   // ensure this comes after NewGame and Sector
         controlClientQueue(msg);

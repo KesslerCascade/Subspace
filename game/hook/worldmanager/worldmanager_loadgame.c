@@ -42,8 +42,8 @@ void subspace_WorldManager_LoadGame_post(WorldManager* self, basic_string* file)
 
     if (shipType && shipName && seed) {
         ControlMsg* msg = controlNewMsg("LoadGame", 5);
-        controlMsgStr(msg, 0, "ship", shipType->buf);
-        controlMsgStr(msg, 1, "name", shipName->data.buf);
+        controlMsgStr(msg, 0, "ship", (strref)shipType->buf);
+        controlMsgStr(msg, 1, "name", (strref)shipName->data.buf);
         controlMsgInt(msg, 2, "seed", seed);
         controlMsgInt(msg, 3, "difficulty", g_Settings_difficulty);
         controlMsgInt(msg, 4, "beacons", stats[1].current);

@@ -18,7 +18,7 @@ subspace_StarMap_GenerateMap_post(Location* ret, StarMap* self, bool bTutorial, 
         ControlMsg* msg = controlNewMsg("Sector", 4);
         controlMsgInt(msg, 0, "num", StarMap_worldLevel(self) + 1);
         controlMsgInt(msg, 1, "seed", StarMap_currentSectorSeed(self));
-        controlMsgStr(msg, 2, "type", Sector_description_type(cur)->buf);
+        controlMsgStr(msg, 2, "type", (strref)Sector_description_type(cur)->buf);
         controlMsgBool(msg, 3, "secret", StarMap_bSecretSector(self));
         msg->priority = 1;   // make sure this gets sent after NewGame
         controlClientQueue(msg);

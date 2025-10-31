@@ -234,7 +234,7 @@ void timeWarpRender()
         fadeTimer += speedFactorReal;
 
         GL_Color textcolor;
-        float abounce = sin(colorTimer / 32 * 3.1415) / 2 + 1;
+        float abounce = ftl_sin(colorTimer / 32 * 3.1415) / 2 + 1;
         textcolor.r   = lerp(warpTextColors[0].r, warpTextColors[1].r, abounce);
         textcolor.g   = lerp(warpTextColors[0].g, warpTextColors[1].g, abounce);
         textcolor.b   = lerp(warpTextColors[0].b, warpTextColors[1].b, abounce);
@@ -257,7 +257,7 @@ void timeWarpRender()
 
         char buf[64];
         if (gs.timeWarpActive)
-            snprintf(buf, sizeof(buf), "Time Warp: %gx", gs.warpFactor);
+            ftl_snprintf(buf, sizeof(buf), "Time Warp: %gx", gs.warpFactor);
         else
             strcpy(buf, "Time Warp: Canceled!");
 

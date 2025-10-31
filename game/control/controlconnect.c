@@ -1,3 +1,4 @@
+#include <cx/string.h>
 #include "netsocket.h"
 
 #include "feature/feature.h"
@@ -44,7 +45,7 @@ void controlSendGameStart(ControlState* cs)
     strcpy(mh.cmd, "GameStart");
     strcpy(vf.h.name, "ver");
     vf.h.ftype   = CF_STRING;
-    vf.d.cfd_str = (char*)subspace_version_str;
+    strDup(&vf.d.cfd_str, (strref)subspace_version_str);
 
     strcpy(majvf.h.name, "major");
     majvf.h.ftype   = CF_INT;
@@ -97,7 +98,7 @@ int controlRecvLaunchCmd(ControlState* cs)
 
     for (int i = 0; i < hdr.nfields; i++) {
         ControlField f;
-        f.d.cfd_str = strbuf;
+        strDup(&f.d.cfd_str, (strref)strbuf);
         f.count     = MAX_PATH;
         if (!controlGetField(cs, &f, CF_ALLOC_PRE))
             return RLC_Error;
@@ -108,22 +109,23 @@ int controlRecvLaunchCmd(ControlState* cs)
                 return RLC_Error;
         }
         if (!strcmp(f.h.name, "gamedir")) {
-            settings.gameDir = sstrdup(f.d.cfd_str);
+            settings.gameDir = sstrdup(strC(f.d.cfd_str));
         }
         if (!strcmp(f.h.name, "gameprogram")) {
-            settings.gameProgram = sstrdup(f.d.cfd_str);
+            settings.gameProgram = sstrdup(strC(f.d.cfd_str));
         }
         if (!strcmp(f.h.name, "gamepath")) {
-            settings.gamePath = sstrdup(f.d.cfd_str);
+            settings.gamePath = sstrdup(strC(f.d.cfd_str));
         }
         if (!strcmp(f.h.name, "saveoverride")) {
             // FTL needs this to end in a backslash, so ensure that it does
-            if (f.d.cfd_str[strlen(f.d.cfd_str) - 1] == '\\') {
-                settings.saveOverride = sstrdup(f.d.cfd_str);
+            char* strbuf = strBuffer(&f.d.cfd_str, 0);
+            if (strbuf[strLen(f.d.cfd_str) - 1] == '\\') {
+                settings.saveOverride = sstrdup(strC(f.d.cfd_str));
             } else {
-                size_t len            = strlen(f.d.cfd_str);
+                size_t len            = strLen(f.d.cfd_str);
                 settings.saveOverride = smalloc(len + 2);
-                memcpy(settings.saveOverride, f.d.cfd_str, len);
+                memcpy(settings.saveOverride, strbuf, len);
                 settings.saveOverride[len]     = '\\';
                 settings.saveOverride[len + 1] = '\0';
             }
@@ -157,7 +159,7 @@ void controlSendValidate(ControlState* cs, bool success, int failreason)
         strcpy(featf->h.name, "features");
         featf->h.ftype       = CF_STRING;
         featf->h.flags       = CF_ARRAY;
-        featf->d.cfd_str_arr = smalloc(sizeof(char*));
+        saInit(&featf->d.cfd_str_arr, string, 16);
 
         fillValidateFeatures(featf);
     } else {

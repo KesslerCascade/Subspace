@@ -1,3 +1,5 @@
+#include <cx/thread/atomic.h>
+
 #include "controlclient.h"
 #include "messagequeue.h"
 #include "osdep.h"
@@ -5,7 +7,6 @@
 #include "version.h"
 
 #include "ftl/stdlib.h"
-#include "atomic.h"
 #include "minicrt.h"
 #include "net.h"
 

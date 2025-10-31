@@ -31,8 +31,8 @@ void subspace_WorldManager_CreateNewGame_post(WorldManager* self)
 
         if (shipType && shipName && seed) {
             ControlMsg* msg = controlNewMsg("NewGame", 4);
-            controlMsgStr(msg, 0, "ship", shipType->buf);
-            controlMsgStr(msg, 1, "name", shipName->data.buf);
+            controlMsgStr(msg, 0, "ship", (strref)shipType->buf);
+            controlMsgStr(msg, 1, "name", (strref)shipName->data.buf);
             controlMsgInt(msg, 2, "seed", seed);
             controlMsgInt(msg, 3, "difficulty", g_Settings_difficulty);
             controlClientQueue(msg);

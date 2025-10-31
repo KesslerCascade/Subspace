@@ -1,3 +1,5 @@
+#include <cx/utils/lazyinit.h>
+
 // very simple allocator that doesn't need the C runtime
 // it's not particularly fast
 #ifdef WIN32
@@ -73,11 +75,11 @@ sm_chunk_free_t chunkfree_default = sm_win32_chunk_free;
 #endif
 /* OS DEPENDENT SECTION ENDS */
 
-static lazy_init sm_is_init;
+static LazyInitState sm_is_init;
 
 static void sm_init(void)
 {
-    lazyinit(&sm_is_init, _sm_os_init, NULL);
+    lazyInit(&sm_is_init, _sm_os_init, NULL);
 }
 
 static void freelist_insert(sm_chunk_t* chunk, sm_blk_t* blk)

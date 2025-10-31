@@ -156,18 +156,10 @@ static int32_t writeOneVal(StreamBuffer* sb, int typ, void* v, size_t rawsz)
         ret = 1;
         break;
     case CF_STRING: {
-#ifdef SUBSPACE_GAME
-        uint32_t len = strlen(*(char**)v);
-#else
         uint32_t len = strLen(*(strref*)v);
-#endif
         uint16_t ssz = min(len, 65536);   // TODO: Some kind of safety check here
         sbufPWrite(sb, (uint8_t*)&ssz, 2);
-#ifdef SUBSPACE_GAME
-        sbufPWrite(sb, *(char**)v, ssz);
-#else
         sbufPWriteStr(sb, *(strref*)v);
-#endif
         ret = len + 2;
         break;
     }
@@ -196,11 +188,7 @@ bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** field
             // special case, have to count all the strings, plus lengths
             dsize = 4;
             for (uint32_t j = 0; j < fields[i]->count; j++) {
-#ifdef SUBSPACE_GAME
-                dsize += strlen(fields[i]->d.cfd_str_arr[j]) + 2;
-#else
                 dsize += strLen(fields[i]->d.cfd_str_arr.a[j]) + 2;
-#endif
             }
         } else {
             switch (cfh->ftype) {
@@ -216,11 +204,7 @@ bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** field
                 dsize = 1;
                 break;
             case CF_STRING:
-#ifdef SUBSPACE_GAME
-                dsize = strlen(fields[i]->d.cfd_str) + 2;
-#else
                 dsize = strLen(fields[i]->d.cfd_str) + 2;
-#endif
                 break;
             case CF_RAW:
                 dsize = fields[i]->count;
@@ -268,11 +252,7 @@ bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** field
                     pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_bool_arr[j], 0);
                     break;
                 case CF_STRING:
-#ifdef SUBSPACE_GAME
-                    pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_str_arr[j], 0);
-#else
                     pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_str_arr.a[j], 0);
-#endif
                     break;
                 }
             }
@@ -376,20 +356,11 @@ static bool parseField(StreamBuffer* sb, int ftype, void* dest, int allocmode, s
         if (*pad < len)
             return false;
 
-#ifdef SUBSPACE_GAME
-        char* ptr = allocBytes(len + 1, dest, allocmode, count);
-        if (!ptr)
-            return false;
-
-        sbufCRead(sb, ptr, len, &didread);
-        ptr[len]      = '\0';
-        *(char**)dest = ptr;
-#else
         string nstr  = 0;
         uint8_t* buf = strBuffer(&nstr, len);
         sbufCRead(sb, buf, len, &didread);
         *(string*)dest = nstr;
-#endif
+
         *pad -= len;
         return true;
     }
@@ -459,15 +430,8 @@ bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
                 return false;
             break;
         case CF_STRING:
-#ifdef SUBSPACE_GAME
-            field->d.cfd_str_arr = (char**)
-                allocBytes(field->count * sizeof(char*), NULL, allocmode, 0);
-            if (!field->d.cfd_str_arr)
-                return false;
-#else
             saInit(&field->d.cfd_str_arr, string, field->count);
             saSetSize(&field->d.cfd_str_arr, field->count);
-#endif
             break;
         }
 
@@ -505,16 +469,12 @@ bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
                 success = parseField(sb, hdr->ftype, &field->d.cfd_bool_arr[j], allocmode, &pad, 0);
                 break;
             case CF_STRING:
-#ifdef SUBSPACE_GAME
-                success = parseField(sb, hdr->ftype, &field->d.cfd_str_arr[j], allocmode, &pad, 0);
-#else
                 success = parseField(sb,
                                      hdr->ftype,
                                      &field->d.cfd_str_arr.a[j],
                                      allocmode,
                                      &pad,
                                      0);
-#endif
                 break;
             }
             if (!success)
@@ -606,24 +566,13 @@ void controlFieldFree(ControlField* field, int allocmode)
             freeBytes(field->d.cfd_bool_arr, allocmode);
             break;
         case CF_STRING:
-#ifdef SUBSPACE_GAME
-            for (uint32_t i = 0; i < field->count; i++) {
-                freeBytes(field->d.cfd_str_arr[i], allocmode);
-            }
-            freeBytes(field->d.cfd_str_arr, allocmode);
-#else
             saDestroy(&field->d.cfd_str_arr);
-#endif
             break;
         }
     } else {
         switch (field->h.ftype) {
         case CF_STRING:
-#ifdef SUBSPACE_GAME
-            freeBytes(field->d.cfd_str, allocmode);
-#else
             strDestroy(&field->d.cfd_str);
-#endif
             break;
         case CF_RAW:
             freeBytes(field->d.cfd_raw, allocmode);
@@ -762,22 +711,6 @@ void controlMsgUInt64(ControlMsg* msg, int nfield, const char* name, uint64_t va
     f->d.cfd_uint64 = val;
 }
 
-#ifdef SUBSPACE_GAME
-void controlMsgStr(ControlMsg* msg, int nfield, const char* name, const char* val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype = CF_STRING;
-
-    size_t sz    = strlen(val) + 1;
-    f->d.cfd_str = allocBytes(sz, NULL, CF_ALLOC_AUTO, 0);
-    if (!f->d.cfd_str)
-        return;
-    memcpy(f->d.cfd_str, val, sz);
-}
-#else
 void controlMsgStr(ControlMsg* msg, int nfield, const char* name, strref val)
 {
     if (nfield > msg->hdr.nfields)
@@ -787,7 +720,6 @@ void controlMsgStr(ControlMsg* msg, int nfield, const char* name, strref val)
     f->h.ftype = CF_STRING;
     strDup(&f->d.cfd_str, val);
 }
-#endif
 
 void controlMsgRaw(ControlMsg* msg, int nfield, const char* name, void* val, int valsz)
 {

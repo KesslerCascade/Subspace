@@ -1,3 +1,4 @@
+#include <cx/utils/lazyinit.h>
 #include <windows.h>
 #include "minicrt.h"
 
@@ -59,7 +60,7 @@ __declspec(allocate(".rdata$T")) extern const IMAGE_TLS_DIRECTORY _tls_used = {
 
 #define imageptr ptr(imagebase)
 
-static lazy_init libhash_is_init;
+static LazyInitState libhash_is_init;
 static lock_t liblock;
 static hashtbl libhash;
 
@@ -71,7 +72,7 @@ static void libhash_init(void* unused)
 
 HMODULE getLib(const char* name)
 {
-    lazyinit(&libhash_is_init, libhash_init, NULL);
+    lazyInit(&libhash_is_init, libhash_init, NULL);
 
     HMODULE ret = NULL;
     lock_acq(&liblock);

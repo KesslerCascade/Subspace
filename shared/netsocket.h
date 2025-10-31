@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cx/cx.h>
 #include "net.h"
 
 #ifdef WIN32

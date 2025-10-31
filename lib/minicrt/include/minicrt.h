@@ -133,22 +133,6 @@ void lock_init(lock_t* lck);
 void lock_acq(lock_t* lck);
 void lock_rel(lock_t* lck);
 
-typedef struct lazy_init {
-    unsigned char init;
-    unsigned char initProgress;
-} lazy_init;
-
-typedef void (*lazy_init_callback_t)(void* user);
-
-void lazyinit_internal(unsigned char* init, unsigned char* initProgress,
-                       lazy_init_callback_t initfunc, void* user);
-
-static inline void lazyinit(lazy_init* state, lazy_init_callback_t initfunc, void* user)
-{
-    if (!state->init)
-        lazyinit_internal(&state->init, &state->initProgress, initfunc, user);
-}
-
 typedef struct hashtbl_ent {
     union {
         uintptr_t key_int;

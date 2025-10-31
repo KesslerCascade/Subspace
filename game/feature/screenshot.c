@@ -70,13 +70,13 @@ static int ss_write_thread(void* data)
 
     ControlMsg* msg = controlNewMsg("Screenshot", 14);
     controlMsgBool(msg, 0, "auto", ss->automatic);
-    controlMsgStr(msg, 1, "filename", ss->fn);
+    controlMsgStr(msg, 1, "filename", (strref)ss->fn);
     controlMsgInt(msg, 2, "w", ss->w);
     controlMsgInt(msg, 3, "h", ss->h);
-    controlMsgStr(msg, 4, "ship", ss->shiptype);
-    controlMsgStr(msg, 5, "name", ss->shipname);
+    controlMsgStr(msg, 4, "ship", (strref)ss->shiptype);
+    controlMsgStr(msg, 5, "name", (strref)ss->shipname);
     controlMsgInt(msg, 6, "sector", ss->sector);
-    controlMsgStr(msg, 7, "sectortype", ss->sectortype);
+    controlMsgStr(msg, 7, "sectortype", (strref)ss->sectortype);
     controlMsgInt(msg, 8, "beacon", ss->beacon);
     controlMsgUInt(msg, 9, "seed", ss->seed);
     controlMsgInt(msg, 10, "difficulty", ss->difficulty);

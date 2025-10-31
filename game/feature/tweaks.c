@@ -72,7 +72,7 @@ void tweaksFinalizeSave()
         basic_string_set(&nfile, gs.saveFileOverride);
 
         basic_string ofile;
-        ofile.buf = malloc(sfile.len + 14);
+        ofile.buf = ftl_malloc(sfile.len + 14);
         memcpy(ofile.buf, sfile.buf, sfile.len);
         memcpy(ofile.buf + sfile.len, ".subspace-old", 14);
         ofile.len = sfile.len + 13;
