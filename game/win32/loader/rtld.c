@@ -29,6 +29,9 @@ static char _resources[256 * 1024];
 // and copy them from the exe.
 __declspec(thread) char _tls[4096];
 
+// No longer needed with C runtime now setting up TLS for us
+#if 0
+
 // ----- TLS stuff that is normally handled by msvcrt
 ULONG _tls_index = 0;
 #pragma data_seg(".tls")
@@ -47,6 +50,8 @@ __declspec(allocate(".rdata$T")) extern const IMAGE_TLS_DIRECTORY _tls_used = {
 };
 #pragma data_seg()
 // ----- end TLS stuff
+
+#endif
 
 #define ReadOrFail(f, d, dr)                                         \
     if (!ReadFile(f, &(d), sizeof(d), &dr, NULL) || dr != sizeof(d)) \
@@ -424,7 +429,7 @@ static int copyTLS(addr_t imagebase, IMAGE_DATA_DIRECTORY* data)
            tlsinfo->EndAddressOfRawData - tlsinfo->StartAddressOfRawData);
 
     // Hack to make linker not discard the symbol as unused
-    (void)_tls_used;
+    // (void)_tls_used;
 
     return 1;
 }
