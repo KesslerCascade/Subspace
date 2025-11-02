@@ -95,6 +95,8 @@ if(WIN32)
     set(CMAKE_WIN32_EXECUTABLE true)
 endif()
 
+add_cxautogen(hook/moduleinfo.cxh)
+
 add_executable(subspacegame
     control/controlclient.c
     control/controlconnect.c
@@ -122,9 +124,10 @@ add_executable(subspacegame
     ftl/graphics/colors.c
     ftl/ftl.c
     ftl/struct.c
-    hook/addrsort.c
     hook/disasmtrace.c
     hook/module.c
+    hook/moduleinfo.c
+    hook/moduleinfo.cxh
     hook/string.c
     hook/symbol.c
     hook/achievementtracker/achievementtracker_onloop.c
@@ -194,7 +197,7 @@ add_executable(subspacegame
     ${SHARED_SOURCE_DIR}/logentspec.c
     ${SHARED_SOURCE_DIR}/net.c
     ${GAME_OSDEP})
-target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_compile_definitions(subspacegame PRIVATE SUBSPACE_GAME $<$<CONFIG:Release>:SUBSPACE_RELEASE>)
 target_link_libraries(subspacegame disasm minicrt cx)
 if (WIN32)

@@ -1,5 +1,4 @@
 add_library(minicrt STATIC
-    hashtbl.c
     lock.c
     mem.c
     minicrt.c

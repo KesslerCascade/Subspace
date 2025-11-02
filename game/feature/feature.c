@@ -6,15 +6,17 @@
 #include "patch/patch.h"
 #include "subspacegame.h"
 
-static hashtbl feathash;
+static hashtable feathash;
+static bool feathash_init;
 
 void registerFeature(SubspaceFeature* feature)
 {
-    if (!feathash.ents) {
-        hashtbl_init(&feathash, 8, HT_STRING_KEYS);
+    if (!feathash_init) {
+        htInit(&feathash, string, ptr, 8);
+        feathash_init = true;
     }
 
-    hashtbl_add(&feathash, feature->name, feature);
+    htInsert(&feathash, strref, (strref)feature->name, ptr, feature);
 
     // register the feature's keybinds
     KeyBind* bind = feature->keybinds;
@@ -40,7 +42,8 @@ void registerAllFeatures()
 
 SubspaceFeature* getFeature(const char* name)
 {
-    void* val = hashtbl_get(&feathash, name);
+    void* val = NULL;
+    htFind(feathash, strref, (strref)name, ptr, &val);
     return (SubspaceFeature*)val;
 }
 
@@ -139,8 +142,8 @@ bool enableFeature(SubspaceFeature* feat, bool enabled)
 void validateAllFeatures(PatchState* ps)
 {
     bool ret = true;
-    for (uint32_t i = 0; i < feathash.nslots; i++) {
-        SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
+    foreach (hashtable, hti, feathash) {
+        SubspaceFeature* feat = (SubspaceFeature*)htiVal(ptr, hti);
         if (feat)
             validateFeature(feat, ps);
     }
@@ -149,8 +152,8 @@ void validateAllFeatures(PatchState* ps)
 void patchAllFeatures(PatchState* ps)
 {
     bool ret = true;
-    for (uint32_t i = 0; i < feathash.nslots; i++) {
-        SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
+    foreach (hashtable, hti, feathash) {
+        SubspaceFeature* feat = (SubspaceFeature*)htiVal(ptr, hti);
         if (feat)
             patchFeature(feat, ps);
     }
@@ -168,8 +171,8 @@ void sendFeatureState(SubspaceFeature* feat, int replyto)
 
 void sendAllFeatureState()
 {
-    for (uint32_t i = 0; i < feathash.nslots; i++) {
-        SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
+    foreach (hashtable, hti, feathash) {
+        SubspaceFeature* feat = (SubspaceFeature*)htiVal(ptr, hti);
         if (feat) {
             sendFeatureState(feat, 0);
         }
@@ -178,8 +181,8 @@ void sendAllFeatureState()
 
 void fillValidateFeatures(ControlField* featf)
 {
-    for (uint32_t i = 0; i < feathash.nslots; i++) {
-        SubspaceFeature* feat = hashtbl_get_slot(&feathash, i);
+    foreach (hashtable, hti, feathash) {
+        SubspaceFeature* feat = (SubspaceFeature*)htiVal(ptr, hti);
         if (feat && feat->available) {
             saPush(&featf->d.cfd_str_arr, strref, (strref)feat->name);
             featf->count++;

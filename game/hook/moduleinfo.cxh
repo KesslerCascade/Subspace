@@ -1,0 +1,59 @@
+class ModuleInfo {
+    // Hash table of exported function names to function addresses
+    // VAL: int
+    hashtable:string:uintptr exporthash;
+
+    // Hash table of library names to hash table of imported function names to import function jump
+    // table entries
+    // VAL: hashtbl[int]
+    [caseinsensitive] hashtable:string:hashtable importhash;
+
+    // Hash table of function addresses to address list of all places that function is the target of
+    // a relative CALL instruction. Note this points to the function address, not the start of the
+    // CALL instruction.
+    // VAL: SArray(uintptr)
+    hashtable:uintptr:sarray relcallhash;
+
+    // Hash table of string values to addresses in the string table
+    // VAL: SArray(uintptr)
+    hashtable:string:sarray stringhash;
+
+    // Hash table of addresses that have been found to be valid strings; used to know which pointers
+    // can be safely followed during code analysis.
+    // VAL: char* (loc in module)
+    hashtable:uintptr:ptr stringlochash;
+
+    // Hash table of string values to address list of all instructions in the code section that
+    // reference the string
+    // VAL: SArray(uintptr)
+    hashtable:string:uintptr stringrefhash;
+
+    // Hash table of all relocations for fast lookup during code analysis. Also records the original
+    // value of the pointer, though it's not currently used for anything.
+    // VAL: addr_t
+    hashtable:uintptr:uintptr relochash;
+
+    // Hash table of pointer targets to address list of all pointers with that value, including
+    // pointers in static data.
+    // VAL: SArray(uintptr)
+    hashtable:uintptr:sarray ptrhash;
+
+    // Hash table of pointer targets to address list of all *instructions* in the code section that
+    // reference that destination
+    // VAL: SArray(uintptr)
+    hashtable:uintptr:sarray ptrrefhash;
+
+    // Hash table of function addresses to address list of all instructions in the code section that
+    // call it.
+    // VAL: SArray(uintptr)
+    hashtable:uintptr:sarray funccallhash;
+
+    // Sorted list of addresses of known/suspected functions. This includes functions that are the
+    // target of relative CALls, as well as addresses in the code section that are referenced by
+    // pointers in the data section, which are likely to be function pointers of vtables.
+    [sorted] sarray:uintptr funclist;
+
+    bool analyzed;
+
+    factory create();
+}

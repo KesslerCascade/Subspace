@@ -1,3 +1,5 @@
+#include <cx/cx.h>
+
 #include "kernel32_overrides.h"
 
 #include "minicrt.h"

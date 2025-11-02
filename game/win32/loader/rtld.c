@@ -1,3 +1,5 @@
+#include <cx/container.h>
+#include <cx/string.h>
 #include <cx/utils/lazyinit.h>
 #include <windows.h>
 #include "minicrt.h"
@@ -62,12 +64,12 @@ __declspec(allocate(".rdata$T")) extern const IMAGE_TLS_DIRECTORY _tls_used = {
 
 static LazyInitState libhash_is_init;
 static lock_t liblock;
-static hashtbl libhash;
+static hashtable libhash;
 
 static void libhash_init(void* unused)
 {
     lock_init(&liblock);
-    hashtbl_init(&libhash, 32, HT_STRING_KEYS | HT_CASE_INSENSITIVE);
+    htInit(&libhash, string, ptr, 32, HT_CaseInsensitive);
 }
 
 HMODULE getLib(const char* name)
@@ -76,11 +78,10 @@ HMODULE getLib(const char* name)
 
     HMODULE ret = NULL;
     lock_acq(&liblock);
-    ret = (HMODULE)hashtbl_get(&libhash, name);
-    if (!ret) {
+    if (!htFind(libhash, strref, (strref)name, ptr, &ret)) {
         ret = LoadLibraryA(name);
         if (ret) {
-            hashtbl_set(&libhash, name, ret);
+            htInsert(&libhash, strref, (strref)name, ptr, ret);
         }
     }
     lock_rel(&liblock);

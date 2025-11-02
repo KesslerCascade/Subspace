@@ -169,10 +169,10 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
                     } else if (dts.op->argstr[i]) {
                         // for a string we have to check every stringtable match because
                         // duplicate strings exist
-                        AddrList* valid = findAllStrings(base, dts.op->argstr[i]);
+                        AddrList* valid = findAllStrings(base, (strref)dts.op->argstr[i]);
                         bool strmatch   = false;
-                        for (uint32_t j = 0; j < valid->num; j++) {
-                            if (disasm.arg[i].addr == valid->addrs[j])
+                        for (uint32_t j = 0; valid && j < saSize(*valid); j++) {
+                            if (disasm.arg[i].addr == valid->a[j])
                                 strmatch = true;
                         }
                         if (!strmatch)
@@ -377,14 +377,14 @@ bool disasmTrace(addr_t base, DisasmTrace* trace)
     bool success   = false;
     addr_t saddr   = 0;
     ModuleInfo* mi = moduleInfo(base);
-    AddrList* al;
+    AddrList* al   = NULL;
     uint32_t i;
 
     if (trace->csym) {
         saddr = _symAddr(base, trace->csym);
     }
     if (!saddr && trace->cstr) {
-        saddr = findString(base, trace->cstr);
+        saddr = findString(base, (strref)trace->cstr);
     }
     if (!saddr && trace->c != DTRACE_FUNCS)   // nowhere to search :(
         return false;
@@ -393,27 +393,29 @@ bool disasmTrace(addr_t base, DisasmTrace* trace)
     case DTRACE_ADDR:
         return checkCandidate(base, trace, saddr);
     case DTRACE_REFS:
-        al = hashtbl_get(&mi->ptrrefhash, saddr);
+        al = addrListFindByPtr(mi->ptrrefhash, saddr);
         break;
     case DTRACE_STRREFS:
-        al = hashtbl_get(&mi->stringrefhash, saddr);
+        al = addrListFindByPtr(mi->stringrefhash, saddr);
         break;
     case DTRACE_CALLS:
-        al = hashtbl_get(&mi->funccallhash, saddr);
+        al = addrListFindByPtr(mi->funccallhash, saddr);
         break;
     case DTRACE_FUNCS:
-        al = mi->funclist;
+        al = &mi->funclist;
         break;
     }
 
     if (al) {
-        for (i = 0; i < al->num; i++) {
+        for (i = 0; i < saSize(*al); i++) {
             addr_t checkaddr = 0;
             if (trace->mod == DTRACE_MOD_FUNCSTART) {
                 // this trace wants to look at the start of the function containing the reference
-                addrListSortedFind(mi->funclist, al->addrs[i], &checkaddr);
+                int checkidx = saFind(mi->funclist, uintptr, al->a[i], SA_Inexact);
+                if (checkidx != -1 && checkidx > 0)
+                    checkaddr = al->a[checkidx - 1];   // function start address
             } else {
-                checkaddr = al->addrs[i];
+                checkaddr = al->a[i];
             }
 
             if (checkaddr && checkCandidate(base, trace, checkaddr))

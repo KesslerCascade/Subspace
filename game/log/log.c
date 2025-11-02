@@ -53,7 +53,7 @@ void log_str(int level, const char* str)
         ControlField f2 = { 0 };
         strcpy(f2.h.name, "msg");
         f2.h.ftype   = CF_STRING;
-        f2.d.cfd_str = (char*)str;
+        strDup(&f2.d.cfd_str, (strref)str);
 
         ControlField* fields[2] = { &f1, &f2 };
         controlPutMsg(&control, &hdr, fields);

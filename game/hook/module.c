@@ -1,152 +1,99 @@
 #include "module.h"
 
+#include <cx/string.h>
+#include <cx/thread.h>
 #include <cx/utils/lazyinit.h>
+#include "log/log.h"
 
 // bookkeeping for per-module info
 
 static LazyInitState modulehash_is_init;
-static lock_t modulehash_lock;
-static hashtbl modulehash;
+static Mutex modulehash_lock;
+static hashtable modulehash;
 
-AddrList* addrListCreate(void)
+static bool no_more_analysis;
+
+AddrList* addrListFindByPtr(hashtable ht, addr_t addr)
 {
-    AddrList* l = smalloc(sizeof(AddrList));
-    l->num      = 0;
-    l->addrs    = smalloc(16 * sizeof(addr_t));
-    return l;
+    htelem elem = htFind(ht, uintptr, addr, none, NULL);
+    if (elem)
+        return (AddrList*)hteValPtr(ht, sarray, elem);
+    return NULL;
 }
 
-void addrListAdd(AddrList* l, addr_t addr)
+AddrList* addrListFindByStr(hashtable ht, strref str)
 {
-    l->num++;
-    l->addrs             = srealloc(l->addrs, (((l->num + 15) >> 4) << 4) * sizeof(addr_t));
-    l->addrs[l->num - 1] = addr;
+    htelem elem = htFind(ht, strref, str, none, NULL);
+    if (elem)
+        return (AddrList*)hteValPtr(ht, sarray, elem);
+    return NULL;
 }
 
-void addrListDestroy(AddrList* l)
+void addrListAddByPtr(hashtable* ht, addr_t addr, addr_t val)
 {
-    sfree(l->addrs);
-    sfree(l);
-}
-
-uint32_t addrListSortedFind(AddrList* l, addr_t addr, addr_t* prev)
-{
-    int mid, low = 0, high = (int)l->num;
-    uint32_t best = 0;
-    addr_t* addrs = l->addrs;
-
-    while (low <= high) {
-        mid = low + ((high - low) >> 1);
-
-        if (addrs[mid] == addr) {
-            // oops, we didn't really expect to find it, but there's an exact match
-            if (prev)
-                *prev = addr;
-            return mid;
-        }
-
-        if (addrs[mid] < addr) {
-            best = mid;
-            low  = mid + 1;
-        } else
-            high = mid - 1;
+    htelem elem = htFind(*ht, uintptr, addr, none, NULL);
+    if (!elem) {
+        sa_uintptr nsa;
+        saInit(&nsa, uintptr, 8);
+        elem = htInsert(ht, uintptr, addr, sarray, nsa);
+        saDestroy(&nsa);
     }
 
-    if (prev)
-        *prev = addrs[best];
-    return best;
+    sa_uintptr* l = (sa_uintptr*)hteValPtr(*ht, sarray, elem);
+    saPush(l, uintptr, val);
+}
+
+void addrListAddByStr(hashtable* ht, strref str, addr_t val)
+{
+    htelem elem = htFind(*ht, strref, str, none, NULL);
+    if (!elem) {
+        sa_uintptr nsa;
+        saInit(&nsa, uintptr, 8);
+        elem = htInsert(ht, strref, str, sarray, nsa);
+        saDestroy(&nsa);
+    }
+
+    sa_uintptr* l = (sa_uintptr*)hteValPtr(*ht, sarray, elem);
+    saPush(l, uintptr, val);
 }
 
 static void modulehash_init(void* dummy)
 {
-    hashtbl_init(&modulehash, 8, 0);
-    lock_init(&modulehash_lock);
+    htInit(&modulehash, uintptr, object, 16);
+    mutexInit(&modulehash_lock);
 }
 
 ModuleInfo* moduleInfo(addr_t base)
 {
     lazyInit(&modulehash_is_init, modulehash_init, NULL);
-    lock_acq(&modulehash_lock);
+    ModuleInfo* mi = NULL;
 
-    ModuleInfo* mi = hashtbl_get(&modulehash, base);
-    if (!mi) {
-        mi = scalloc(1, sizeof(ModuleInfo));
-        hashtbl_set(&modulehash, base, mi);
-    }
-
-    if (!mi->init) {
-        hashtbl_init(&mi->exporthash, 256, HT_STRING_KEYS);
-        hashtbl_init(&mi->importhash, 8, HT_STRING_KEYS | HT_CASE_INSENSITIVE);
-        hashtbl_init(&mi->stringhash, 256, HT_STRING_KEYS);
-        hashtbl_init(&mi->stringrefhash, 256, HT_STRING_KEYS);
-        hashtbl_init(&mi->stringlochash, 256, 0);
-        hashtbl_init(&mi->relochash, 256, 0);
-        hashtbl_init(&mi->ptrhash, 256, 0);
-        hashtbl_init(&mi->ptrrefhash, 256, 0);
-        hashtbl_init(&mi->relcallhash, 256, 0);
-        hashtbl_init(&mi->funccallhash, 256, 0);
-        mi->funclist = addrListCreate();
-        analyzeModule(base, mi);
-        addrListSort(mi->funclist);
-        mi->init = true;
-    }
-
-    lock_rel(&modulehash_lock);
-    return mi;
-}
-
-static void importhash_clear(hashtbl* tbl)
-{
-    for (int j = 0; j < tbl->nslots; j++) {
-        hashtbl* imtbl = (hashtbl*)hashtbl_get_slot(tbl, j);
-        if (imtbl) {
-            hashtbl_destroy(imtbl);
-            sfree(imtbl);
+    withMutex (&modulehash_lock) {
+        if (!htFind(modulehash, uintptr, base, object, &mi, HT_Borrow)) {
+            ModuleInfo* ninfo = moduleinfoCreate();
+            htInsert(&modulehash, uintptr, base, object, ninfo);
+            mi = ninfo;   // borrow the ref owned by the hashtable
+            objRelease(&ninfo);
         }
-    }
-}
 
-static void addrlisthash_clear(hashtbl* tbl)
-{
-    for (int j = 0; j < tbl->nslots; j++) {
-        AddrList* l = (AddrList*)hashtbl_get_slot(tbl, j);
-        if (l)
-            addrListDestroy(l);
+        if (!mi->analyzed && !no_more_analysis) {
+            analyzeModule(base, mi);
+            mi->analyzed = true;
+        }
+
+#ifdef _DEBUG
+        if (!mi->analyzed && no_more_analysis) {
+            log_fmt(LOG_Debug, "Module at %p already analyzed", (void*)base);
+        }
+#endif
     }
+    return mi;
 }
 
 void cleanupAnalysis()
 {
-    lock_acq(&modulehash_lock);
-    for (int i = 0; i < modulehash.nslots; i++) {
-        ModuleInfo* mi = (ModuleInfo*)hashtbl_get_slot(&modulehash, i);
-        if (mi) {
-            hashtbl_destroy(&mi->exporthash);
-            importhash_clear(&mi->importhash);
-            hashtbl_destroy(&mi->importhash);
-            addrlisthash_clear(&mi->stringhash);
-            hashtbl_destroy(&mi->stringhash);
-            addrlisthash_clear(&mi->stringrefhash);
-            hashtbl_destroy(&mi->stringrefhash);
-            hashtbl_destroy(&mi->stringlochash);
-            hashtbl_destroy(&mi->relochash);
-            addrlisthash_clear(&mi->ptrhash);
-            hashtbl_destroy(&mi->ptrhash);
-            addrlisthash_clear(&mi->ptrrefhash);
-            hashtbl_destroy(&mi->ptrrefhash);
-            addrlisthash_clear(&mi->relcallhash);
-            hashtbl_destroy(&mi->relcallhash);
-            addrlisthash_clear(&mi->funccallhash);
-            hashtbl_destroy(&mi->funccallhash);
-            addrListDestroy(mi->funclist);
-            sfree(mi);
-#ifdef _DEBUG
-            modulehash.ents[i].data = (void*)0xdeadc0de;   // crash if something tries to use the
-                                                           // module info after this point
-#else
-            modulehash.ents[i].data = NULL;
-#endif
-        }
+    withMutex (&modulehash_lock) {
+        htClear(&modulehash);
+        no_more_analysis = true;
     }
-    lock_rel(&modulehash_lock);
 }

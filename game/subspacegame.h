@@ -1,4 +1,6 @@
 #pragma once
+#include <cx/container.h>
+#include <cx/string.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "proto.h"

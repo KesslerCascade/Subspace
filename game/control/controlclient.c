@@ -23,7 +23,7 @@ typedef struct ControlClient {
     MessageQueue* outbound_secondary;
     bool outbound_pending;
     bool outbound_ready;
-    hashtbl handlers;
+    hashtable handlers;
 } ControlClient;
 
 ControlState control;
@@ -100,9 +100,8 @@ static int controlThread(void* data)
                     ControlMsg* msg = controlGetMsg(&control, CF_ALLOC_AUTO);
 
                     lock_acq(&client.lock);
-                    controlclientcb_t cb = (controlclientcb_t)_hashtbl_get(&client.handlers,
-                                                                           (uintptr_t)msg->hdr.cmd);
-                    if (cb) {
+                    controlclientcb_t cb;
+                    if (htFind(client.handlers, strref, (strref)msg->hdr.cmd, ptr, &cb)) {
                         msgqAdd(client.inbound, msg, cb);
                     } else {
                         controlMsgFree(msg, CF_ALLOC_AUTO);
@@ -141,7 +140,7 @@ bool controlClientStart(void)
         return false;
 
     lock_init(&client.lock);
-    hashtbl_init(&client.handlers, 16, HT_STRING_KEYS);
+    htInit(&client.handlers, string, ptr, 16);
     client.inbound            = msgqCreate(16, true);
     client.inbound_secondary  = msgqCreate(16, true);
     client.outbound           = msgqCreate(16, false);
@@ -210,7 +209,7 @@ void controlClientProcessOutbound(void)
 void controlClientRegister(const char* cmd, controlclientcb_t cb)
 {
     lock_acq(&client.lock);
-    hashtbl_add(&client.handlers, cmd, cb);
+    htInsert(&client.handlers, strref, (strref)cmd, ptr, cb);
     lock_rel(&client.lock);
 }
 

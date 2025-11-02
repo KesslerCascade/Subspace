@@ -2,27 +2,26 @@
 #include "minicrt.h"
 
 static bool bindreg_init;
-static hashtbl bindreg;
+static hashtable bindreg;
 static KeyBind* bindkey[KEYCODE_MAX];
 
 bool kbRegisterBind(SubspaceFeature* owner, KeyBind* kb)
 {
     if (!bindreg_init) {
         bindreg_init = true;
-        hashtbl_init(&bindreg, 32, HT_STRING_KEYS);
+        htInit(&bindreg, string, ptr, 32);
     }
 
     kb->owner = owner;
-    hashtbl_add(&bindreg, kb->name, kb);
+    htInsert(&bindreg, strref, (strref)kb->name, ptr, kb);
 
     return true;
 }
 
 bool kbBindKey(const char* name, int key)
 {
-    KeyBind* bind = (KeyBind*)hashtbl_get(&bindreg, name);
-
-    if (!bind)
+    KeyBind* bind = NULL;
+    if (!htFind(bindreg, strref, (strref)name, ptr, &bind))
         return false;
 
     if (bind->key > 0) {
