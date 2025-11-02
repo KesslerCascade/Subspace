@@ -122,7 +122,7 @@ static bool scanRelocs(addr_t base, ModuleInfo* mi, hashtable* functrackers)
             offset &= (1 << 12) - 1;
             if (rtype == IMAGE_REL_BASED_HIGHLOW) {
                 long* addr = dwprva(base, reloc->VirtualAddress + offset);
-                htInsert(&mi->relochash, uintptr, addr, uintptr, *addr);
+                htInsert(&mi->relochash, uintptr, (uintptr)addr, uintptr, *addr);
                 addrListAddByPtr(&mi->ptrhash, *addr, (addr_t)addr);
 
                 // if the pointer points to something in the code segment, it's probably a function

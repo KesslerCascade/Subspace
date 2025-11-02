@@ -1,4 +1,5 @@
 #include <cx/utils/lazyinit.h>
+#include <cx/thread.h>
 
 // very simple allocator that doesn't need the C runtime
 // it's not particularly fast
@@ -125,7 +126,7 @@ void sm_init_heap(sm_heap_t* heap, sm_chunk_alloc_t chunkalloc, sm_chunk_free_t 
     heap->chunkalloc = chunkalloc;
     heap->chunkfree  = chunkfree;
     heap->chunklist  = NULL;
-    lock_init(&heap->lock);
+    mutexInit(&heap->lock);
 }
 
 void* smalloc_heap(sm_heap_t* heap, unsigned int sz)
@@ -137,7 +138,7 @@ void* smalloc_heap(sm_heap_t* heap, unsigned int sz)
     sz = align_up(MAX(sz, MIN_ALLOC_SZ), sizeof(void*));   // align everything to pointer size
 
     // Try twice, once just checking freelist, then another after adding OS memory
-    lock_acq(&heap->lock);
+    mutexAcquire(&heap->lock);
     for (int _retry = 0; !ret && _retry < 2; _retry++) {
         // just walk the freelist to try to find a block that's big enough.
         // inefficient, but ok for very basic usage
@@ -180,7 +181,7 @@ void* smalloc_heap(sm_heap_t* heap, unsigned int sz)
         if (!ret && _retry == 0)
             get_new_chunk(heap, sz + BLOCK_OFFSET + CHUNK_OFFSET);
     }
-    lock_rel(&heap->lock);
+    mutexRelease(&heap->lock);
     return ret;
 }
 
@@ -234,7 +235,7 @@ void sfree_heap(sm_heap_t* heap, void* ptr)
 
     sm_blk_t* blk = (sm_blk_t*)((uintptr_t)ptr - BLOCK_OFFSET);
 
-    lock_acq(&heap->lock);
+    mutexAcquire(&heap->lock);
     // find the chunk that this block belongs to
     sm_chunk_t** chunkprevnext = &heap->chunklist;
     sm_chunk_t* chunk          = heap->chunklist;
@@ -284,5 +285,5 @@ void sfree_heap(sm_heap_t* heap, void* ptr)
     // if chunk is NULL it means we were passed a pointer that doesn't belong to this heap!
     // assert(chunk);
 
-    lock_rel(&heap->lock);
+    mutexRelease(&heap->lock);
 }

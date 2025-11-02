@@ -38,7 +38,7 @@ static bool symFindOne(addr_t base, Symbol* sym, SymbolFind* find)
         }
         break;
     case SYMBOL_FIND_STRING:
-        addr = findString(base, find->str);
+        addr = findString(base, (strref)find->str);
         if (addr != 0) {
             sym->addr     = addr;
             sym->resolved = true;

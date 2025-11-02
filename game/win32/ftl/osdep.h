@@ -1,8 +1,9 @@
 #pragma once
 
-#include <windows.h>
 #include "ftl/ftl.h"
 #include "hook/function.h"
+
+#include <windows.h>
 
 typedef int (*FUNCTYPE(WinMain))(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine,
                                  int nShowCmd);

@@ -63,12 +63,12 @@ __declspec(allocate(".rdata$T")) extern const IMAGE_TLS_DIRECTORY _tls_used = {
 #define imageptr ptr(imagebase)
 
 static LazyInitState libhash_is_init;
-static lock_t liblock;
+static Mutex liblock;
 static hashtable libhash;
 
 static void libhash_init(void* unused)
 {
-    lock_init(&liblock);
+    mutexInit(&liblock);
     htInit(&libhash, string, ptr, 32, HT_CaseInsensitive);
 }
 
@@ -77,14 +77,14 @@ HMODULE getLib(const char* name)
     lazyInit(&libhash_is_init, libhash_init, NULL);
 
     HMODULE ret = NULL;
-    lock_acq(&liblock);
-    if (!htFind(libhash, strref, (strref)name, ptr, &ret)) {
-        ret = LoadLibraryA(name);
-        if (ret) {
-            htInsert(&libhash, strref, (strref)name, ptr, ret);
+    withMutex (&liblock) {
+        if (!htFind(libhash, strref, (strref)name, ptr, &ret)) {
+            ret = LoadLibraryA(name);
+            if (ret) {
+                htInsert(&libhash, strref, (strref)name, ptr, ret);
+            }
         }
     }
-    lock_rel(&liblock);
     return ret;
 }
 

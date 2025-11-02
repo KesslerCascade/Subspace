@@ -1,8 +1,8 @@
-#include <windows.h>
-
+#include "osdep.h"
 #include "int64.h"
 #include "minicrt.h"
-#include "osdep.h"
+
+#include <windows.h>
 
 static int64_t curFrameTime;
 

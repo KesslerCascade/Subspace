@@ -1,11 +1,13 @@
-#include <windows.h>
+#include <cx/cx.h>
 
 #include "win32/kernel32_overrides.h"
-#include "rtld.h"
 #include "minicrt.h"
+#include "rtld.h"
+
+#include <windows.h>
 
 enum {
-    OVERRIDE_NONE = 0,
+    OVERRIDE_NONE     = 0,
     OVERRIDE_KERNEL32 = 1,
 };
 
@@ -34,8 +36,8 @@ static DWORD overrideKernel32(const char* name)
 DWORD overrideProcAddress(int module, const char* name)
 {
     switch (module & OVERRIDE_ALL_MASK) {
-        case OVERRIDE_KERNEL32:
-            return overrideKernel32(name);
+    case OVERRIDE_KERNEL32:
+        return overrideKernel32(name);
     }
     return 0;
 }

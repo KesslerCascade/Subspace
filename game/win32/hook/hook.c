@@ -112,7 +112,7 @@ bool _replaceFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* replac
 // pointers to the string.
 int replaceString(addr_t base, const char* from, const char* to)
 {
-    AddrList* al = findAllStrings(base, from);
+    AddrList* al = findAllStrings(base, (strref)from);
 
     int count = 0;
     for (uint32_t i = 0; al && i < saSize(*al); i++) {

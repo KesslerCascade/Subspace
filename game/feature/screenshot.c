@@ -23,7 +23,7 @@
 #include "screenshot.h"
 
 static bool currentScreenshotAuto;
-static lock_t soundlock;
+static Mutex soundlock;
 static bool soundlock_init;
 static bool screenshotSound;
 
@@ -85,9 +85,9 @@ static int ss_write_thread(void* data)
     controlMsgInt(msg, 13, "rev", g_version_rev);
     controlClientQueue(msg);
 
-    lock_acq(&soundlock);
-    screenshotSound = true;
-    lock_rel(&soundlock);
+    withMutex (&soundlock) {
+        screenshotSound = true;
+    }
 
     free(ss->shiptype);
     free(ss->shipname);
@@ -227,14 +227,14 @@ void screenshotCheckSound(void)
     ScreenshotSettings* settings = Screenshot_feature.settings;
 
     if (!soundlock_init) {
-        lock_init(&soundlock);
+        mutexInit(&soundlock);
         soundlock_init = true;
     }
 
-    lock_acq(&soundlock);
+    mutexAcquire(&soundlock);
     bool playsound  = screenshotSound;
     screenshotSound = false;
-    lock_rel(&soundlock);
+    mutexRelease(&soundlock);
 
     if (playsound && settings->sound) {
         // use a unique mix of 2 select sounds

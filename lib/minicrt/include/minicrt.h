@@ -1,5 +1,8 @@
 #pragma once
 
+#include <cx/cx.h>
+#include <cx/thread/mutex.h>
+
 #include <stdarg.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -103,7 +106,7 @@ typedef struct sm_heap_t {
     sm_chunk_alloc_t chunkalloc;
     sm_chunk_free_t chunkfree;
     uintptr_t rngstate;
-    lock_t lock;
+    Mutex lock;
 } sm_heap_t;
 extern sm_heap_t default_heap;
 extern sm_chunk_alloc_t chunkalloc_default;
@@ -128,7 +131,3 @@ void sfree_heap(sm_heap_t* heap, void* ptr);
 #define strdup  sstrdup
 #define _strdup sstrdup
 #endif
-
-void lock_init(lock_t* lck);
-void lock_acq(lock_t* lck);
-void lock_rel(lock_t* lck);

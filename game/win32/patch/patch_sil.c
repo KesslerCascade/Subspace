@@ -1,9 +1,10 @@
-#include <windows.h>
 #include "ftl/ftl.h"
 #include "ftl/sil.h"
 #include "hook/hook.h"
 #include "patch/patch.h"
 #include "win32/winmain.h"
+
+#include <windows.h>
 
 DECLSYM(opengl_sys_texture_lock_wrong_cmp);
 

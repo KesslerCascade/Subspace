@@ -11,5 +11,5 @@ void cmdBindKey(ControlMsg* msg)
     if (!(fkey && fkey->h.ftype == CF_INT) || fkey->d.cfd_int >= KEYCODE_MAX)
         return;
 
-    kbBindKey(fname->d.cfd_str, fkey->d.cfd_int);
+    kbBindKey(strC(fname->d.cfd_str), fkey->d.cfd_int);
 }

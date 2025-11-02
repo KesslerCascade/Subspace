@@ -7,7 +7,7 @@ void cmdEnableFeature(ControlMsg* msg)
 
     ControlField* fname = controlMsgFindField(msg, "feature");
     if (fname && fname->h.ftype == CF_STRING)
-        feat = getFeature(fname->d.cfd_str);
+        feat = getFeature(strC(fname->d.cfd_str));
 
     if (!feat)
         return;

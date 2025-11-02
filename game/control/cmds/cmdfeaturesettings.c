@@ -8,7 +8,7 @@ void cmdFeatureSettings(ControlMsg* msg)
 
     ControlField* fname = controlMsgFindField(msg, "feature");
     if (fname && fname->h.ftype == CF_STRING)
-        feat = getFeature(fname->d.cfd_str);
+        feat = getFeature(strC(fname->d.cfd_str));
 
     if (!feat || !feat->settings || !feat->settingsspec)
         return;
@@ -36,7 +36,7 @@ void cmdFeatureSettings(ControlMsg* msg)
                 case CF_STRING:
                     if (*(char**)dest)
                         sfree(*(char**)dest);
-                    *(char**)dest = sstrdup(field->d.cfd_str);
+                    *(char**)dest = sstrdup(strC(field->d.cfd_str));
                     break;
                 }
                 break;
