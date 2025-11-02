@@ -12,8 +12,6 @@
 #include "patch/patchlist.h"
 #include "tweaks.h"
 
-#include "minicrt.h"
-
 static basic_string creditsStr;
 static vector creditsVec;
 
@@ -50,9 +48,9 @@ void tweaksPrepareSave()
         FileHelper_getSaveFile(&sfile);
 
         if (gs.saveFileOverride)
-            free(gs.saveFileOverride);   // shouldn't be possible? but don't leak anyway
+            xa_free(gs.saveFileOverride);   // shouldn't be possible? but don't leak anyway
 
-        gs.saveFileOverride = malloc(sfile.len + 14);
+        gs.saveFileOverride = xa_malloc(sfile.len + 14);
         memcpy(gs.saveFileOverride, sfile.buf, sfile.len);
         memcpy(gs.saveFileOverride + sfile.len, ".subspace-new", 14);
         basic_string_destroy(&sfile);
@@ -97,7 +95,7 @@ void tweaksFinalizeSave()
         basic_string_destroy(&ofile);
         basic_string_destroy(&nfile);
 
-        free(gs.saveFileOverride);
+        xa_free(gs.saveFileOverride);
         gs.saveFileOverride = NULL;
     }
 }

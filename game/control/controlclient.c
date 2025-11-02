@@ -5,7 +5,6 @@
 #include "version.h"
 
 #include "ftl/stdlib.h"
-#include "minicrt.h"
 #include "net.h"
 
 typedef struct ControlClient {

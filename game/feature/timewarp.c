@@ -55,7 +55,7 @@ static void doTheTimeWarpAgain()
     // Adjust FPS target, but only for faster than normal time.
     // We cap the tick time at the original to ensure we don't go below 60 FPS when in slow
     // motion mode.
-    g_TargetFrameTimeMS = MIN(baseFrameTime / gs.warpFactor, baseFrameTime);
+    g_TargetFrameTimeMS = min(baseFrameTime / gs.warpFactor, baseFrameTime);
     lastTime            = CFPS_GetTime(FPSControl);
     warpFrames          = 0;
     warpTime            = 0;
@@ -100,7 +100,7 @@ bool timeWarpIncrease()
     firstTap = false;
 
     float oldfactor = gs.warpFactor;
-    gs.warpFactor   = MIN(MIN(gs.warpFactor * 2, MAX_WARP_FACTOR), settings->maxwarp);
+    gs.warpFactor   = min(min(gs.warpFactor * 2, MAX_WARP_FACTOR), settings->maxwarp);
     doTheTimeWarpAgain();
 
     if (gs.warpFactor > 0.99 && gs.warpFactor < 1.01)
@@ -132,7 +132,7 @@ bool timeWarpDecrease()
     firstTap = false;
 
     float oldfactor = gs.warpFactor;
-    gs.warpFactor   = MAX(gs.warpFactor / 2, MIN_WARP_FACTOR);
+    gs.warpFactor   = max(gs.warpFactor / 2, MIN_WARP_FACTOR);
     doTheTimeWarpAgain();
 
     if (gs.warpFactor > 0.99 && gs.warpFactor < 1.01)
@@ -164,10 +164,10 @@ void timeWarpEnd()
 float timeWarpAdjustSpeedFactor(float orig)
 {
     // SpeedFactor is capped to 0.5 to prevent things like projectiles warping past shields
-    float speedFactor = MIN(orig * gs.warpFactor, 0.5);
+    float speedFactor = min(orig * gs.warpFactor, 0.5);
 
     warpFrames++;
-    int warpFrameCheck = MAX((int)(2 * gs.warpFactor), 5);
+    int warpFrameCheck = max((int)(2 * gs.warpFactor), 5);
 
     // calculate the actual warp factor based on real time elapsed vs advanced game time,
     // but don't do it every frame because GetTime calls QueryPerformanceCounter a couple times
@@ -184,7 +184,7 @@ float timeWarpAdjustSpeedFactor(float orig)
         // warps
         if (gs.warpFactor > 1) {
             double frameTimeAdj   = 0;
-            double idealFrameTime = MIN(baseFrameTime / gs.warpFactor, baseFrameTime);
+            double idealFrameTime = min(baseFrameTime / gs.warpFactor, baseFrameTime);
 
             avgFrameMS = frameTime /
                 (double)warpFrameCheck;   // actually the average over the last few frames
@@ -193,7 +193,7 @@ float timeWarpAdjustSpeedFactor(float orig)
             else if (avgFrameMS < idealFrameTime * 0.98)
                 frameTimeAdj = avgFrameMS / 1000;
 
-            g_TargetFrameTimeMS = MAX(MIN(g_TargetFrameTimeMS + frameTimeAdj, baseFrameTime), 0);
+            g_TargetFrameTimeMS = max(min(g_TargetFrameTimeMS + frameTimeAdj, baseFrameTime), 0);
         }
     }
 
@@ -251,7 +251,7 @@ void timeWarpRender()
             else
                 textcolor.a = 0.85;
         } else {
-            textcolor.a = MAX(1 - (fadeTimer / 16), 0);
+            textcolor.a = max(1 - (fadeTimer / 16), 0);
         }
         textcolor.a *= fade;
 

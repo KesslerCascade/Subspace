@@ -20,8 +20,6 @@
 #include "osdep.h"
 #include "version.h"
 
-#include "minicrt.h"
-
 DEFINE_ENTRY_POINT
 
 SubspaceGameSettings settings = {

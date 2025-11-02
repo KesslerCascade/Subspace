@@ -4,7 +4,6 @@
 #include "subspacegame.h"
 
 #include <stdarg.h>
-#include "minicrt.h"
 
 static bool useclient  = false;
 static int logmaxlevel = LOG_Count;
@@ -36,9 +35,7 @@ void log_str(int level, const char* str)
 
         strcpy(msg->fields[1]->h.name, "msg");
         msg->fields[1]->h.ftype   = CF_STRING;
-        size_t len                = strlen(str);
-        msg->fields[1]->d.cfd_str = malloc(len + 1);
-        memcpy(msg->fields[1]->d.cfd_str, str, len + 1);
+        strDup(&msg->fields[1]->d.cfd_str, (strref)str);
 
         controlClientQueue(msg);
 
@@ -69,7 +66,7 @@ void log_fmt(int level, const char* fmt, ...)
 
     va_list arp;
     va_start(arp, fmt);
-    xvsnprintf(buf, 1024, fmt, arp);
+    vsnprintf(buf, 1024, fmt, arp);
     va_end(arp);
     log_str(level, buf);
 }

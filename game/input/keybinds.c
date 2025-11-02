@@ -1,5 +1,4 @@
 #include "keybinds.h"
-#include "minicrt.h"
 
 static bool bindreg_init;
 static hashtable bindreg;

@@ -1,8 +1,8 @@
 #include <cx/container.h>
 #include <cx/string.h>
+#include <cx/thread.h>
 #include <cx/utils/lazyinit.h>
 #include <windows.h>
-#include "minicrt.h"
 
 #include "rtld.h"
 
@@ -467,11 +467,11 @@ addr_t loadExe(const char* filename)
     int needreloc = 0;
 
     int fnlen          = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-    wchar_t* filenamew = smalloc(fnlen * sizeof(wchar_t));
+    wchar_t* filenamew = xaAlloc(fnlen * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, filename, -1, filenamew, fnlen);
 
     imagebase = (addr_t)LoadLibraryExW(filenamew, NULL, DONT_RESOLVE_DLL_REFERENCES);
-    sfree(filenamew);
+    xaFree(filenamew);
     if (!imagebase)
         goto done;
 
@@ -516,7 +516,7 @@ addr_t loadExe(const char* filename)
     int needreloc = 0;
 
     int fnlen          = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-    wchar_t* filenamew = smalloc(fnlen * sizeof(wchar_t));
+    wchar_t* filenamew = xaAlloc(fnlen * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, filename, -1, filenamew, fnlen);
 
     hFile = CreateFileW(filenamew,
@@ -526,7 +526,7 @@ addr_t loadExe(const char* filename)
                         OPEN_EXISTING,
                         FILE_ATTRIBUTE_NORMAL,
                         0);
-    sfree(filenamew);
+    xaFree(filenamew);
     if (!GetFileSizeEx(hFile, &sz))
         goto fail;
 

@@ -35,7 +35,7 @@ static bool scanExports(addr_t base, hashtable* tbl)
 
 static void addImportTracker(hashtable* tbl, const char* lib, const char* funcname, addr_t loc)
 {
-    ImportTrackerEnt* ent = smalloc(sizeof(ImportTrackerEnt));
+    ImportTrackerEnt* ent = xaAlloc(sizeof(ImportTrackerEnt));
     ent->lib              = lib;
     ent->funcname         = funcname;
 
@@ -168,7 +168,7 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtable* importtrackers,
     p = code.start;
     while (p < code.end) {
         bool added = false;
-        ulong ilen = Disasm((char*)p, MIN(MAXCMDSIZE, code.end - p), addr(p), &disasm, DISASM_FILE);
+        ulong ilen = Disasm((char*)p, min(MAXCMDSIZE, code.end - p), addr(p), &disasm, DISASM_FILE);
 
         // if this is a relative call, record it
         if (*(uint8_t*)p == 0xe8 ||   // E8 = relative CALL NEAR
@@ -254,7 +254,7 @@ static void checkFunctions(addr_t base, hashtable* trackers, AddrList* funcs)
 
             // disassemble the first instruction
             ulong ilen = Disasm((char*)addr,
-                                MIN(MAXCMDSIZE, code.end - addr),
+                                min(MAXCMDSIZE, code.end - addr),
                                 addr,
                                 &disasm,
                                 DISASM_FILE);
@@ -289,7 +289,7 @@ bool analyzeModule(addr_t base, ModuleInfo* mi)
 
     foreach (hashtable, hti, importtrackers) {
         ImportTrackerEnt* trk = htiVal(ptr, hti);
-        sfree(trk);
+        xaFree(trk);
     }
     htDestroy(&importtrackers);
 

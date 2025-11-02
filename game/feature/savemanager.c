@@ -23,21 +23,21 @@ void saveManagerAutoSave(WorldManager* world)
     FileHelper_getSaveFile(&sfile);
 
     if (gs.saveFileOverride)
-        free(gs.saveFileOverride);   // shouldn't be possible? but don't leak anyway
+        xa_free(gs.saveFileOverride);   // shouldn't be possible? but don't leak anyway
 
-    char* tempfn = malloc(1024);
+    char* tempfn = xa_malloc(1024);
     if (!osAbsolutePathUTF8(sfile.buf, tempfn, 1024)) {
-        free(tempfn);
+        xa_free(tempfn);
         basic_string_destroy(&sfile);
         return;
     }
     size_t len = strlen(tempfn);
 
-    gs.saveFileOverride = malloc(len + 19);
+    gs.saveFileOverride = xa_malloc(len + 19);
     memcpy(gs.saveFileOverride, tempfn, len);
-    xsnprintf(gs.saveFileOverride + len, 19, ".subspace-%08d", lcg_random() % 100000000);
+    snprintf(gs.saveFileOverride + len, 19, ".subspace-%08d", lcg_random() % 100000000);
     basic_string_destroy(&sfile);
-    free(tempfn);
+    xa_free(tempfn);
 
     WorldManager_SaveGame(world);
 
@@ -47,7 +47,7 @@ void saveManagerAutoSave(WorldManager* world)
     msg->priority = 100;   // AutoSave should happen last after everything else this frame
     controlClientQueue(msg);
 
-    free(gs.saveFileOverride);
+    xa_free(gs.saveFileOverride);
     gs.saveFileOverride   = NULL;
     gs.autoSaveInProgress = false;
 }

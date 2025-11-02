@@ -2,6 +2,7 @@
 #include <cx/container.h>
 #include <cx/string.h>
 #include <cx/thread.h>
+#include <cx/utils/compare.h>
 
 #include <stdbool.h>
 #include <stdint.h>

@@ -29,7 +29,7 @@ bool runLogSend(LogEntSpec* spec, ...)
     if (spec == &Log_Sector)
         beacons++;
 
-    controlMsgInt(msg, 2, "beacons", MAX(beacons, 1));
+    controlMsgInt(msg, 2, "beacons", max(beacons, 1));
     controlMsgFloat64(msg, 3, "gametime", gs.gameTime);
 
     va_list args;

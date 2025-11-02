@@ -199,7 +199,7 @@ add_executable(subspacegame
     ${GAME_OSDEP})
 target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_compile_definitions(subspacegame PRIVATE SUBSPACE_GAME $<$<CONFIG:Release>:SUBSPACE_RELEASE>)
-target_link_libraries(subspacegame disasm minicrt cx)
+target_link_libraries(subspacegame disasm cx)
 if (WIN32)
     target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/win32)
     target_link_libraries(subspacegame kernel32 ws2_32)

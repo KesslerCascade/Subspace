@@ -43,9 +43,9 @@ void invAdd(InventoryType typ, const char* name, InventoryLocation where)
 {
     if (nitems >= nalloc) {
         nalloc = nalloc ? nalloc * 2 : 8;
-        items  = realloc(items, nalloc * sizeof(InvItem));
+        items  = xa_realloc(items, nalloc * sizeof(InvItem));
     }
-    items[nitems].name   = strdup(name);
+    items[nitems].name   = xa_strdup(name);
     items[nitems].typ    = typ;
     items[nitems].loc    = where;
     items[nitems].ignore = false;
@@ -66,7 +66,7 @@ bool invRemove(InventoryType typ, const char* name, InventoryLocation where)
     for (int i = nitems - 1; i >= 0; --i) {
         if (!items[i].ignore && typ == items[i].typ &&
             (where == INVL_Any || items[i].loc == where) && strcmp(items[i].name, name) == 0) {
-            free((void*)items[i].name);
+            xa_free((void*)items[i].name);
             memcpy(&items[i], &items[i + 1], (nitems - i - 1) * sizeof(InvItem));
             nitems--;
 
@@ -92,7 +92,7 @@ void invRemoveAll(void)
                        items[i].name,
                        InventoryLocationNames[items[i].loc]);
 
-            free((void*)items[i].name);
+            xa_free((void*)items[i].name);
             memcpy(&items[i], &items[i + 1], (nitems - i - 1) * sizeof(InvItem));
             nitems--;
         }
@@ -121,9 +121,9 @@ void invClearIgnore(void)
 void invReset(void)
 {
     for (int i = 0; i < nitems; i++) {
-        free((void*)items[i].name);
+        xa_free((void*)items[i].name);
     }
-    free(items);
+    xa_free(items);
     items  = NULL;
     nitems = 0;
     nalloc = 0;

@@ -22,7 +22,7 @@ static void invScanReset(void)
 {
     for (int i = 0; i < scount; i++) {
         if (sitems[i].name)
-            free((void*)sitems[i].name);
+            xa_free((void*)sitems[i].name);
         sitems[i].name = NULL;
         sitems[i].typ  = 0;
         sitems[i].loc  = 0;
@@ -35,7 +35,7 @@ static void invScanAdd(InventoryType typ, const char* name, InventoryLocation lo
     if (scount >= SCAN_SLOTS)
         return;
 
-    sitems[scount].name = strdup(name);
+    sitems[scount].name = xa_strdup(name);
     sitems[scount].typ  = typ;
     sitems[scount].loc  = loc;
     scount++;
@@ -128,7 +128,7 @@ static void invScanPopulateCargo(CommandGui* gui)
 
     int cargoid      = Equipment_cargoId(eq);
     uintptr_t start  = (uintptr_t)cargo->start + Equipment_cargoId(eq) * sizeof(void*);
-    uintptr_t finish = MIN((uintptr_t)cargo->finish,
+    uintptr_t finish = min((uintptr_t)cargo->finish,
                            (uintptr_t)start + 4 * sizeof(void*));   // max 4 cargo
     for (EquipmentBox** eb = (EquipmentBox**)start; eb < (EquipmentBox**)finish; eb++) {
         invScanPopulateEquipBox(*eb, INVL_Cargo);

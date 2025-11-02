@@ -1,6 +1,5 @@
 #include "control/cmds.h"
 #include "feature/feature.h"
-#include "minicrt.h"
 
 void cmdFeatureSettings(ControlMsg* msg)
 {
@@ -35,8 +34,8 @@ void cmdFeatureSettings(ControlMsg* msg)
                     break;
                 case CF_STRING:
                     if (*(char**)dest)
-                        sfree(*(char**)dest);
-                    *(char**)dest = sstrdup(strC(field->d.cfd_str));
+                        xaFree(*(char**)dest);
+                    *(char**)dest = xa_strdup(strC(field->d.cfd_str));
                     break;
                 }
                 break;

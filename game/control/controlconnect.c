@@ -6,8 +6,6 @@
 #include "controlconnect.h"
 #include "subspacegame.h"
 
-#include "minicrt.h"
-
 bool controlConnect(socket_t* sock)
 {
     struct sockaddr_in addr   = { 0 };
@@ -109,22 +107,22 @@ int controlRecvLaunchCmd(ControlState* cs)
                 return RLC_Error;
         }
         if (!strcmp(f.h.name, "gamedir")) {
-            settings.gameDir = sstrdup(strC(f.d.cfd_str));
+            settings.gameDir = xa_strdup(strC(f.d.cfd_str));
         }
         if (!strcmp(f.h.name, "gameprogram")) {
-            settings.gameProgram = sstrdup(strC(f.d.cfd_str));
+            settings.gameProgram = xa_strdup(strC(f.d.cfd_str));
         }
         if (!strcmp(f.h.name, "gamepath")) {
-            settings.gamePath = sstrdup(strC(f.d.cfd_str));
+            settings.gamePath = xa_strdup(strC(f.d.cfd_str));
         }
         if (!strcmp(f.h.name, "saveoverride")) {
             // FTL needs this to end in a backslash, so ensure that it does
             char* strbuf = strBuffer(&f.d.cfd_str, 0);
             if (strbuf[strLen(f.d.cfd_str) - 1] == '\\') {
-                settings.saveOverride = sstrdup(strC(f.d.cfd_str));
+                settings.saveOverride = xa_strdup(strC(f.d.cfd_str));
             } else {
                 size_t len            = strLen(f.d.cfd_str);
-                settings.saveOverride = smalloc(len + 2);
+                settings.saveOverride = xaAlloc(len + 2);
                 memcpy(settings.saveOverride, strbuf, len);
                 settings.saveOverride[len]     = '\\';
                 settings.saveOverride[len + 1] = '\0';
@@ -139,7 +137,7 @@ int controlRecvLaunchCmd(ControlState* cs)
 void controlSendValidate(ControlState* cs, bool success, int failreason)
 {
     ControlMsg* msg;
-    msg = controlAllocMsg(3, CF_ALLOC_SALLOC);
+    msg = controlAllocMsg(3, CF_ALLOC_AUTO);
 
     strcpy(msg->hdr.cmd, "Validate");
     controlMsgBool(msg, 0, "result", success);
@@ -150,7 +148,7 @@ void controlSendValidate(ControlState* cs, bool success, int failreason)
         verf->h.ftype          = CF_INT;
         verf->h.flags          = CF_ARRAY;
         verf->count            = 3;
-        verf->d.cfd_int_arr    = smalloc(sizeof(int) * 3);
+        verf->d.cfd_int_arr    = xaAlloc(sizeof(int) * 3);
         verf->d.cfd_int_arr[0] = g_version_major;
         verf->d.cfd_int_arr[1] = g_version_minor;
         verf->d.cfd_int_arr[2] = g_version_rev;
@@ -169,7 +167,7 @@ void controlSendValidate(ControlState* cs, bool success, int failreason)
 
     controlPutMsg(cs, &msg->hdr, msg->fields);
     while (controlSend(cs)) {}
-    controlMsgFree(msg, CF_ALLOC_SALLOC);
+    controlMsgFree(msg, CF_ALLOC_AUTO);
 }
 
 int controlStartupHandshake(ControlState* cs)

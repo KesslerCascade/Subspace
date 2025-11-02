@@ -54,7 +54,7 @@ static int ss_write_thread(void* data)
     // flip the image, remote alpha channel
 
     size_t bsz         = ss->w * ss->h * 3;
-    uint8_t* processed = malloc(bsz);
+    uint8_t* processed = xa_malloc(bsz);
 
     for (int y = 0; y < ss->h; y++) {
         uint8_t* srcrow  = &ss->buf[y * ss->w * 4];
@@ -66,7 +66,7 @@ static int ss_write_thread(void* data)
         }
     }
     osWriteFile(ss->fn, processed, bsz);
-    free(processed);
+    xa_free(processed);
 
     ControlMsg* msg = controlNewMsg("Screenshot", 14);
     controlMsgBool(msg, 0, "auto", ss->automatic);
@@ -89,12 +89,12 @@ static int ss_write_thread(void* data)
         screenshotSound = true;
     }
 
-    free(ss->shiptype);
-    free(ss->shipname);
-    free(ss->sectortype);
-    free(ss->fn);
-    free(ss->buf);
-    free(ss);
+    xa_free(ss->shiptype);
+    xa_free(ss->shipname);
+    xa_free(ss->sectortype);
+    xa_free(ss->fn);
+    xa_free(ss->buf);
+    xa_free(ss);
 
     return 0;
 }
@@ -107,20 +107,20 @@ static char* makeScreenshotFilename(void)
     basic_string_reset(&sfile);
     subspace_FileHelper_getUserFolder(&sfile);
 
-    char* tempfn = malloc(1024);
-    ret          = malloc(1024);
+    char* tempfn = xa_malloc(1024);
+    ret          = xa_malloc(1024);
     strcpy(tempfn, sfile.buf);
     size_t len = strlen(sfile.buf);
-    xsnprintf(tempfn + len, 1024 - len, "sshot-%08d.raw", lcg_random() % 100000000);
+    snprintf(tempfn + len, 1024 - len, "sshot-%08d.raw", lcg_random() % 100000000);
     if (!osAbsolutePathUTF8(tempfn, ret, 1024)) {
-        free(tempfn);
-        free(ret);
+        xa_free(tempfn);
+        xa_free(ret);
         basic_string_destroy(&sfile);
         return NULL;
     }
 
     basic_string_destroy(&sfile);
-    free(tempfn);
+    xa_free(tempfn);
     return ret;
 }
 
@@ -138,19 +138,19 @@ static void screenshotMetadata(SSInfo* ss)
     StatTracker* stats       = ScoreKeeper_stats(SKeeper);
 
     if (shipType && shipName && sector && stats) {
-        ss->shiptype   = strdup(shipType->buf);
-        ss->shipname   = strdup(shipName->data.buf);
-        ss->sectortype = strdup(Sector_description_type(sector)->buf);
+        ss->shiptype   = xa_strdup(shipType->buf);
+        ss->shipname   = xa_strdup(shipName->data.buf);
+        ss->sectortype = xa_strdup(Sector_description_type(sector)->buf);
         ss->difficulty = g_Settings_difficulty;
         ss->sector     = StarMap_worldLevel(map);
         ss->beacon     = stats[1].current;
         ss->seed       = StarMap_sectorMapSeed(map);
     } else {
-        ss->shiptype      = malloc(1);
+        ss->shiptype      = xa_malloc(1);
         ss->shiptype[0]   = 0;
-        ss->shipname      = malloc(1);
+        ss->shipname      = xa_malloc(1);
         ss->shipname[0]   = 0;
-        ss->sectortype    = malloc(1);
+        ss->sectortype    = xa_malloc(1);
         ss->sectortype[0] = 0;
         ss->difficulty    = 0;
         ss->sector        = 0;
@@ -169,17 +169,17 @@ void saveScreenshotFramebuf(int* fb)
     if (!data)
         return;
 
-    SSInfo* ss = malloc(sizeof(SSInfo));
+    SSInfo* ss = xa_malloc(sizeof(SSInfo));
     ss->fn     = makeScreenshotFilename();
     if (!ss->fn) {
-        free(ss);
+        xa_free(ss);
         return;
     }
 
     ss->w        = texture_width(tex);
     ss->h        = texture_height(tex);
     size_t dsize = ss->w * ss->h * 4;
-    ss->buf      = malloc(dsize);
+    ss->buf      = xa_malloc(dsize);
     memcpy(ss->buf, data, dsize);
     texture_unlock(tex);
 
@@ -190,10 +190,10 @@ void saveScreenshotFramebuf(int* fb)
 
 void saveScreenshotFallback(void)
 {
-    SSInfo* ss = malloc(sizeof(SSInfo));
+    SSInfo* ss = xa_malloc(sizeof(SSInfo));
     ss->fn     = makeScreenshotFilename();
     if (!ss->fn) {
-        free(ss);
+        xa_free(ss);
         return;
     }
 
@@ -205,7 +205,7 @@ void saveScreenshotFallback(void)
     ss->w        = CApp_screen_x(theApp) - modx * 2 - barx * 2;
     ss->h        = CApp_screen_y(theApp) - mody * 2 - bary * 2;
     size_t dsize = ss->w * ss->h * 4;
-    ss->buf      = malloc(dsize);
+    ss->buf      = xa_malloc(dsize);
     sys_graphics_read_pixels(modx + barx, mody + bary, ss->w, ss->h, ss->w, ss->buf);
 
     ss->automatic = currentScreenshotAuto;

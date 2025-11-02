@@ -19,10 +19,10 @@ void practiceSetSave(const char* fn)
         return;
 
     if (gs.practiceSave)
-        free(gs.practiceSave);
+        xa_free(gs.practiceSave);
 
     int l           = strlen(fn);
-    gs.practiceSave = malloc(l + 1);
+    gs.practiceSave = xa_malloc(l + 1);
     memcpy(gs.practiceSave, fn, l + 1);
 }
 

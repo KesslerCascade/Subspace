@@ -1,5 +1,4 @@
 #include "disasm.h"
-#include "minicrt.h"
 
 #include "hook/hook.h"
 #include "hook/module.h"

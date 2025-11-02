@@ -2,7 +2,6 @@
 #include <stdbool.h>
 #include "loader/imgutil.h"
 #include "disasm.h"
-#include "minicrt.h"
 
 // helpers for assembling code statefully
 

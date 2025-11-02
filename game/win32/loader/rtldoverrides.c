@@ -1,7 +1,6 @@
 #include <cx/cx.h>
 
 #include "win32/kernel32_overrides.h"
-#include "minicrt.h"
 #include "rtld.h"
 
 #include <windows.h>

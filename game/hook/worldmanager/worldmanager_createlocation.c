@@ -45,7 +45,7 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
 
         controlMsgInt(msg, 0, "sector", WorldManager_worldLevel(world) + 1);
         controlMsgInt(msg, 1, "beacons", ScoreKeeper_stats(SKeeper)[1].current);
-        controlMsgInt(msg, 2, "visit", MAX(visits, 1));
+        controlMsgInt(msg, 2, "visit", max(visits, 1));
         controlMsgInt(msg, 3, "x", (int)pos->x);
         controlMsgInt(msg, 4, "y", (int)pos->y);
         controlMsgStr(msg, 5, "event", eventname ? (strref)eventname->buf : (strref)"");
@@ -57,7 +57,7 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
     if (RunTracker_feature.enabled) {
         if (eventname) {
             int visits = Location_visited(loc);
-            runLogSend(&Log_Event, eventname->buf, 1, MAX(visits, 1));
+            runLogSend(&Log_Event, eventname->buf, 1, max(visits, 1));
         }
     }
 

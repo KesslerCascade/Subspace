@@ -94,12 +94,10 @@ typedef struct ControlField {
 typedef struct ControlMsg ControlMsg;
 
 enum CFALLOCMODE_ENUM {
-    CF_ALLOC_AUTO = 0, // controlRecv allocates using standard system malloc (or game malloc)
-    CF_ALLOC_NEVER,    // never allocate; just fail to receive strings and raw data
-#ifdef SUBSPACE_GAME
-    CF_ALLOC_SALLOC,   // controlRecv allocates using smalloc (slow), must be free using sfree
-#endif
-    CF_ALLOC_PRE,      // caller preallocates space or provides a static buffer and sets size accordingly
+    CF_ALLOC_AUTO = 0,   // controlRecv allocates using xalloc
+    CF_ALLOC_NEVER,      // never allocate; just fail to receive strings and raw data
+    CF_ALLOC_PRE,        // caller preallocates space or provides a static buffer and sets size
+                         // accordingly
 };
 
 // for allocating and receiving an entire message at once

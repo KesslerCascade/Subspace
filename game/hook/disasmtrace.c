@@ -95,7 +95,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
 
     dts.p     = start;
     bool fail = false;
-    unwind    = smalloc(sizeof(DisasmTraceState) * MAX_UNWIND);
+    unwind    = xaAlloc(sizeof(DisasmTraceState) * MAX_UNWIND, XA_Zero);
 
 #if defined(_DEBUG) && defined(WIN32)
     if (trace == _debug_trace && IsDebuggerPresent()) {
@@ -147,7 +147,7 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
         // pseudo-ops are done, we're disassembling something!
 
         ulong isize = Disasm((uint8_t*)dts.p,
-                             MIN(MAXCMDSIZE, code.end - dts.p),
+                             min(MAXCMDSIZE, code.end - dts.p),
                              dts.p,
                              &disasm,
                              DISASM_FILE);
@@ -349,12 +349,12 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
             }
         }
 
-        dts.skipmin = MAX(dts.skipmin - 1, 0);
-        dts.skipmax = MAX(dts.skipmax - 1, 0);
+        dts.skipmin = max(dts.skipmin - 1, 0);
+        dts.skipmax = max(dts.skipmax - 1, 0);
         dts.p += isize;
     }
 
-    sfree(unwind);
+    xaFree(unwind);
 
     // check if we made it all the way to the end of the sequence
     if (dts.op->op != DT_FINISH)

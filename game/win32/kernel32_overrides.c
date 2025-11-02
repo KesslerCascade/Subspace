@@ -2,7 +2,6 @@
 
 #include "kernel32_overrides.h"
 
-#include "minicrt.h"
 #include "subspacegame.h"
 
 // override GetModuleFileName to return the path to the FTL executable, not to the Subspace client

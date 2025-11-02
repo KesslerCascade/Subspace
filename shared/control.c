@@ -1,22 +1,8 @@
-#ifndef SUBSPACE_GAME
-#define XALLOC_REMAP_MALLOC
-#endif
+#include <cx/time.h>
+#include <cx/xalloc.h>
 
 #include "control.h"
 #include "netsocket.h"
-
-#ifdef SUBSPACE_GAME
-#include "ftl/stdlib.h"
-#include "minicrt.h"
-#include "osdep.h"
-#define control_malloc smalloc
-#define control_free   sfree
-#else
-#include <cx/time.h>
-#include <cx/xalloc.h>
-#define control_malloc xa_malloc
-#define control_free   xa_free
-#endif
 
 #define TCPBUF_SEND 65536
 #define TCPBUF_RECV 65536
@@ -56,7 +42,7 @@ void controlInit(ControlState* cs, socket_t sock)
         cs->init    = true;
         // just some temporary space, mostly for the game portion so it doesn't have to call smalloc
         // a lot
-        cs->tmprecv = control_malloc(TCPBUF_RECV);
+        cs->tmprecv = xaAlloc(TCPBUF_RECV);
 
         cs->recvbuf = sbufCreate(TCPBUF_RECV * 4);
         cs->sendbuf = sbufCreate(TCPBUF_SEND * 4);
@@ -292,11 +278,7 @@ static void* allocBytes(size_t sz, void* orig, int allocmode, uint32_t count)
 {
     switch (allocmode) {
     case CF_ALLOC_AUTO:
-        return malloc(sz);
-#ifdef SUBSPACE_GAME
-    case CF_ALLOC_SALLOC:
-        return smalloc(sz);
-#endif
+        return xaAlloc(sz, XA_Zero);
     case CF_ALLOC_PRE:
         if (sz <= count)
             return *((void**)orig);
@@ -310,13 +292,8 @@ static void freeBytes(void* ptr, int allocmode)
 {
     switch (allocmode) {
     case CF_ALLOC_AUTO:
-        free(ptr);
+        xaFree(ptr);
         break;
-#ifdef SUBSPACE_GAME
-    case CF_ALLOC_SALLOC:
-        sfree(ptr);
-        break;
-#endif
     }
 }
 
@@ -749,7 +726,7 @@ void controlStateDestroy(ControlState* cs)
 {
     // we assume that the socket is closed and abandoned
     if (cs->init) {
-        control_free(cs->tmprecv);
+        xaFree(cs->tmprecv);
 
         sbufPFinish(cs->sendbuf);
         sbufCFinish(cs->sendbuf);
