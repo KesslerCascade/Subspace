@@ -1,47 +1,43 @@
 #include "control/cmds.h"
 #include "feature/feature.h"
 
-void cmdFeatureSettings(ControlMsg* msg)
+void cmdFeatureSettings(ControlMsg* msg, hashtable fields)
 {
     SubspaceFeature* feat = NULL;
 
-    ControlField* fname = controlMsgFindField(msg, "feature");
-    if (fname && fname->h.ftype == CF_STRING)
-        feat = getFeature(strC(fname->d.cfd_str));
+    strref fname = cfieldString(fields, _S "feature");
+    if (!strEmpty(fname))
+        feat = getFeature(strC(fname));
 
     if (!feat || !feat->settings || !feat->settingsspec)
         return;
 
-    for (int i = 1; i < msg->hdr.nfields; i++) {
-        ControlField* field     = msg->fields[i];
-        FeatureSettingsEnt* ent = feat->settingsspec->ent;
-        while (ent->name) {
-            if (!strcmp(ent->name, field->h.name)) {
-                void* dest = (void*)((uintptr_t)feat->settings + ent->off);
+    FeatureSettingsEnt* ent = feat->settingsspec->ent;
+    while (ent->name) {
+        void* dest = (void*)((uintptr_t)feat->settings + ent->off);
 
-                switch (ent->type) {
-                case CF_INT:
-                    *(int*)dest = field->d.cfd_int;
-                    break;
-                case CF_BOOL:
-                    *(bool*)dest = field->d.cfd_bool;
-                    break;
-                case CF_FLOAT32:
-                    *(float*)dest = field->d.cfd_float32;
-                    break;
-                case CF_FLOAT64:
-                    *(double*)dest = field->d.cfd_float64;
-                    break;
-                case CF_STRING:
-                    if (*(char**)dest)
-                        xaFree(*(char**)dest);
-                    *(char**)dest = xa_strdup(strC(field->d.cfd_str));
-                    break;
-                }
-                break;
-            }
-
-            ent++;
+        switch (ent->type) {
+        case CF_INT:
+            cfieldVal(int32, fields, (strref)ent->name, (int*)dest);
+            break;
+        case CF_BOOL:
+            cfieldVal(bool, fields, (strref)ent->name, (bool*)dest);
+            break;
+        case CF_FLOAT32:
+            cfieldVal(float32, fields, (strref)ent->name, (float*)dest);
+            break;
+        case CF_FLOAT64:
+            cfieldVal(float64, fields, (strref)ent->name, (double*)dest);
+            break;
+        case CF_STRING:
+            if (*(char**)dest)
+                xaFree(*(char**)dest);
+            strref s      = cfieldString(fields, (strref)ent->name);
+            *(char**)dest = s ? xa_strdup(strC(s)) : NULL;
+            break;
         }
+        break;
+
+        ent++;
     }
 }

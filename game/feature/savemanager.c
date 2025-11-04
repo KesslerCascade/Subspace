@@ -42,8 +42,8 @@ void saveManagerAutoSave(WorldManager* world)
     WorldManager_SaveGame(world);
 
     // notify main process to pick up the save file
-    ControlMsg* msg = controlNewMsg("AutoSave", 1);
-    controlMsgStr(msg, 0, "filename", (strref)gs.saveFileOverride);
+    ControlMsg* msg = controlMsgCreate(_S"AutoSave");
+    cfieldSet(msg, _S"filename", strref, (strref)gs.saveFileOverride);
     msg->priority = 100;   // AutoSave should happen last after everything else this frame
     controlClientQueue(msg);
 

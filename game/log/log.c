@@ -25,35 +25,15 @@ void log_str(int level, const char* str)
     if (level > logmaxlevel)
         return;
 
+    ControlMsg* msg = controlMsgCreate(_S"Log");
+    cfieldSet(msg, _S"level", int32, level);
+    cfieldSet(msg, _S"msg", strref, (strref)str);
+
     if (useclient) {
-        ControlMsg* msg = controlAllocMsg(2, CF_ALLOC_AUTO);
-        strcpy(msg->hdr.cmd, "Log");
-
-        strcpy(msg->fields[0]->h.name, "level");
-        msg->fields[0]->h.ftype   = CF_INT;
-        msg->fields[0]->d.cfd_int = level;
-
-        strcpy(msg->fields[1]->h.name, "msg");
-        msg->fields[1]->h.ftype   = CF_STRING;
-        strDup(&msg->fields[1]->d.cfd_str, (strref)str);
-
         controlClientQueue(msg);
-
     } else {
-        ControlMsgHeader hdr = { .cmd = "Log", .nfields = 2 };
-
-        ControlField f1 = { 0 };
-        strcpy(f1.h.name, "level");
-        f1.h.ftype   = CF_INT;
-        f1.d.cfd_int = level;
-
-        ControlField f2 = { 0 };
-        strcpy(f2.h.name, "msg");
-        f2.h.ftype   = CF_STRING;
-        strDup(&f2.d.cfd_str, (strref)str);
-
-        ControlField* fields[2] = { &f1, &f2 };
-        controlPutMsg(&control, &hdr, fields);
+        controlSendMsg(&control, msg);
+        controlMsgDestroy(msg);
     }
 }
 

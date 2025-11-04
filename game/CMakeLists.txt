@@ -194,6 +194,7 @@ add_executable(subspacegame
     subspacegame.c
     version.c
     ${SHARED_SOURCE_DIR}/control.c
+    ${SHARED_SOURCE_DIR}/controlfields.c
     ${SHARED_SOURCE_DIR}/logentspec.c
     ${SHARED_SOURCE_DIR}/net.c
     ${GAME_OSDEP})

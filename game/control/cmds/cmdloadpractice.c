@@ -1,11 +1,11 @@
 #include "control/cmds.h"
 #include "feature/practicemode.h"
 
-void cmdLoadPractice(ControlMsg* msg)
+void cmdLoadPractice(ControlMsg* msg, hashtable fields)
 {
-    ControlField* fsavepath = controlMsgFindField(msg, "savepath");
-    if (fsavepath && fsavepath->h.ftype == CF_STRING) {
-        practiceSetSave(strC(fsavepath->d.cfd_str));
+    strref savepath = cfieldString(fields, _S"savepath");
+    if (!strEmpty(savepath)) {
+        practiceSetSave(strC(savepath));
         gs.practiceLoadSave = true;
     }
 }

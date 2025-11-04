@@ -1,9 +1,9 @@
 #include "control/cmds.h"
 #include "feature/runtracker.h"
 
-void cmdRunTrackerUpd(ControlMsg* msg)
+void cmdRunTrackerUpd(ControlMsg* msg, hashtable fields)
 {
-    ControlField* frecording = controlMsgFindField(msg, "recording");
-    if (frecording && frecording->h.ftype == CF_BOOL)
-        runTrackerHandleUpdate(frecording->d.cfd_bool);
+    bool recording = false;
+    if (cfieldVal(bool, fields, _S"recording", &recording))
+        runTrackerHandleUpdate(recording);
 }

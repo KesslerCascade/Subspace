@@ -31,7 +31,7 @@ static int save_action(Ihandle* ih)
     GameInst* inst        = ss ? subspaceGame(ss) : NULL;
     ControlClient* client = inst ? objAcquireFromWeak(ControlClient, inst->client) : NULL;
     if (client) {
-        ControlMsg* msg = controlNewMsg("SaveAndQuit", 0);
+        ControlMsg* msg = controlMsgCreate(_S"SaveAndQuit");
         cclientQueue(client, msg);
 
         shouldquit = true;

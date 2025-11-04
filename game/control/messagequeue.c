@@ -35,7 +35,7 @@ void msgqAdd(MessageQueue* queue, ControlMsg* msg, controlclientcb_t cb)
 void msgqClear(MessageQueue* queue)
 {
     for (int i = 0; i < queue->nmsgs; i++) {
-        controlMsgFree(queue->msgs[i], CF_ALLOC_AUTO);
+        controlMsgDestroy(queue->msgs[i]);
         queue->msgs[i] = NULL;
         if (queue->cbs)
             queue->cbs[i] = NULL;

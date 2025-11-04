@@ -21,7 +21,7 @@ int subspace_CApp_OnLoop_pre(CApp* self)
     osNextFrame();                   // record the current time for anything that uses it this frame
     controlClientProcessInbound();   // process any incoming control messages
 
-    return 1;   // we do want to execute the original CApp::OnLoop
+    return 1;                        // we do want to execute the original CApp::OnLoop
 }
 
 void subspace_CApp_OnLoop_post(CApp* self)
@@ -41,17 +41,16 @@ void subspace_CApp_OnLoop_post(CApp* self)
         statschanged = NUM_STATS;
 
     if (statschanged) {
-        ControlMsg* msg = controlNewMsg("Stats", statschanged);
+        ControlMsg* msg = controlMsgCreate(_S"Stats");
 
-        int f = 0;
         if (gs.sendAllStats || stats[0].current != lastStats[0])
-            controlMsgInt(msg, f++, "ships", stats[0].current);
+            cfieldSet(msg, _S"ships", int32, stats[0].current);
         if (gs.sendAllStats || stats[1].current != lastStats[1])
-            controlMsgInt(msg, f++, "beacons", stats[1].current);
+            cfieldSet(msg, _S"beacons", int32, stats[1].current);
         if (gs.sendAllStats || stats[2].current != lastStats[2])
-            controlMsgInt(msg, f++, "scrap", stats[2].current);
+            cfieldSet(msg, _S"scrap", int32, stats[2].current);
         if (gs.sendAllStats || stats[3].current != lastStats[3])
-            controlMsgInt(msg, f++, "crew", stats[3].current);
+            cfieldSet(msg, _S"crew", int32, stats[3].current);
         controlClientQueue(msg);
 
         for (int i = 0; i < NUM_STATS; i++) {
@@ -62,7 +61,7 @@ void subspace_CApp_OnLoop_post(CApp* self)
     gs.sendAllStats = false;
 
     if (RunTracker_feature.enabled) {
-        gc.curScrapSource = NULL;
+        gc.curScrapSource  = NULL;
         gc.curDamageSource = NULL;
     }
 

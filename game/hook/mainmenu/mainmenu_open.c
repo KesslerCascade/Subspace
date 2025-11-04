@@ -11,8 +11,8 @@
 
 int subspace_MenuMenu_Open_pre(MainMenu* self)
 {
-    ControlMsg* msg = controlNewMsg("GameState", 1);
-    controlMsgInt(msg, 0, "state", GAME_MENU);
+    ControlMsg* msg = controlMsgCreate(_S"GameState");
+    cfieldSet(msg, _S"state", int32, GAME_MENU);
     controlClientQueue(msg);
 
     // if we were practicing, going to the main menu cancels it

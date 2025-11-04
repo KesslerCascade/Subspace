@@ -134,8 +134,8 @@ void sscmain2(void)
     log_str(LOG_Info, "Communication thread started");
     sendAllFeatureState();
 
-    ControlMsg* msg = controlNewMsg("GameReady", 1);
-    controlMsgBool(msg, 0, "start", 1);
+    ControlMsg* msg = controlMsgCreate(_S"GameReady");
+    cfieldSet(msg, _S"start", bool, true);
     controlClientQueue(msg);
 
     // loop until we get the all-clear

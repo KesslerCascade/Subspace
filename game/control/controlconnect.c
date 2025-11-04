@@ -36,38 +36,21 @@ void controlDisconnect(socket_t* sock)
 
 void controlSendGameStart(ControlState* cs)
 {
-    ControlMsgHeader mh = { 0 };
-    ControlField vf = { 0 }, majvf = { 0 }, minvf = { 0 }, cookief = { 0 };
+    ControlMsg* msg = controlMsgCreate(_S "GameStart");
 
-    mh.nfields = 4;
-    strcpy(mh.cmd, "GameStart");
-    strcpy(vf.h.name, "ver");
-    vf.h.ftype   = CF_STRING;
-    strDup(&vf.d.cfd_str, (strref)subspace_version_str);
+    cfieldSet(msg, _S"ver", strref, (strref)subspace_version_str);
+    cfieldSet(msg, _S"major", int32, subspace_version_maj);
+    cfieldSet(msg, _S"minor", int32, subspace_version_min);
+    cfieldSet(msg, _S"cookie", uint32, settings.cookie);
 
-    strcpy(majvf.h.name, "major");
-    majvf.h.ftype   = CF_INT;
-    majvf.d.cfd_int = subspace_version_maj;
-
-    strcpy(minvf.h.name, "minor");
-    minvf.h.ftype   = CF_INT;
-    minvf.d.cfd_int = subspace_version_min;
-
-    strcpy(cookief.h.name, "cookie");
-    cookief.h.ftype    = CF_INT;
-    cookief.h.flags    = CF_UNSIGNED;
-    cookief.d.cfd_uint = settings.cookie;
-
-    ControlField* fields[4] = { &vf, &majvf, &minvf, &cookief };
-    controlPutMsg(cs, &mh, fields);
-    while (controlSend(cs)) {}
+    controlSendMsg(cs, msg);
+    while (controlSendBuffer(cs)) {}
+    controlMsgDestroy(msg);
 }
 
-// simple handler for getting the startup information packet decoded before we have nicities like
-// the client thread or better memory allocation up and running
-static char strbuf[MAX_PATH];
 int controlRecvLaunchCmd(ControlState* cs)
 {
+    int ret     = RLC_Error;
     int retries = 5;
     fd_set rset;
     struct timeval sto = { 0 };
@@ -84,90 +67,83 @@ int controlRecvLaunchCmd(ControlState* cs)
             return RLC_Timeout;
     }
 
-    ControlMsgHeader hdr;
-    if (!controlGetHeader(cs, &hdr))
-        return RLC_Error;
+    ControlMsg* msg = controlRecvMsg(cs);
+    if (!msg)
+        goto out;   // RLC_Error
 
-    if (!strcmp(hdr.cmd, "Exit"))
-        return RLC_Exit;
-
-    if (strcmp(hdr.cmd, "Launch") != 0)
-        return RLC_Error;
-
-    for (int i = 0; i < hdr.nfields; i++) {
-        ControlField f;
-        strDup(&f.d.cfd_str, (strref)strbuf);
-        f.count     = MAX_PATH;
-        if (!controlGetField(cs, &f, CF_ALLOC_PRE))
-            return RLC_Error;
-
-        if (!strcmp(f.h.name, "launchmode")) {
-            settings.mode = f.d.cfd_int;
-            if (settings.mode < LAUNCH_PLAY || settings.mode > LAUNCH_VALIDATE)
-                return RLC_Error;
-        }
-        if (!strcmp(f.h.name, "gamedir")) {
-            settings.gameDir = xa_strdup(strC(f.d.cfd_str));
-        }
-        if (!strcmp(f.h.name, "gameprogram")) {
-            settings.gameProgram = xa_strdup(strC(f.d.cfd_str));
-        }
-        if (!strcmp(f.h.name, "gamepath")) {
-            settings.gamePath = xa_strdup(strC(f.d.cfd_str));
-        }
-        if (!strcmp(f.h.name, "saveoverride")) {
-            // FTL needs this to end in a backslash, so ensure that it does
-            char* strbuf = strBuffer(&f.d.cfd_str, 0);
-            if (strbuf[strLen(f.d.cfd_str) - 1] == '\\') {
-                settings.saveOverride = xa_strdup(strC(f.d.cfd_str));
-            } else {
-                size_t len            = strLen(f.d.cfd_str);
-                settings.saveOverride = xaAlloc(len + 2);
-                memcpy(settings.saveOverride, strbuf, len);
-                settings.saveOverride[len]     = '\\';
-                settings.saveOverride[len + 1] = '\0';
-            }
-        }
+    if (!strcmp(msg->hdr.cmd, "Exit")) {
+        ret = RLC_Exit;
+        goto out;
     }
 
-    controlRecvDone(cs);
-    return RLC_Launch;
+    if (strcmp(msg->hdr.cmd, "Launch") != 0)
+        goto out;   // RLC_Error
+
+    settings.mode = cfieldValD(int32, msg->fields, _S"launchmode", -1);
+    if (settings.mode < LAUNCH_PLAY || settings.mode > LAUNCH_VALIDATE)
+        goto out;   // RLC_Error;
+
+    strref str       = cfieldString(msg->fields, _S"gamedir");
+    settings.gameDir = xa_strdup(strC(str));
+
+    str                  = cfieldString(msg->fields, _S"gameprogram");
+    settings.gameProgram = xa_strdup(strC(str));
+
+    str               = cfieldString(msg->fields, _S"gamepath");
+    settings.gamePath = xa_strdup(strC(str));
+
+    str = cfieldString(msg->fields, _S"saveoverride");
+    if (!strEmpty(str)) {
+        // FTL needs this to end in a backslash, so ensure that it does
+        char* strbuf = strBuffer(&str, 0);
+        if (strbuf[strLen(str) - 1] == '\\') {
+            settings.saveOverride = xa_strdup(strC(str));
+        } else {
+            size_t len            = strLen(str);
+            settings.saveOverride = xaAlloc(len + 2);
+            memcpy(settings.saveOverride, strbuf, len);
+            settings.saveOverride[len]     = '\\';
+            settings.saveOverride[len + 1] = '\0';
+        }
+        strDestroy(&str);
+    }
+
+    ret = RLC_Launch;
+
+out:
+    controlMsgDestroy(msg);
+    return ret;
 }
 
 void controlSendValidate(ControlState* cs, bool success, int failreason)
 {
     ControlMsg* msg;
-    msg = controlAllocMsg(3, CF_ALLOC_AUTO);
-
-    strcpy(msg->hdr.cmd, "Validate");
-    controlMsgBool(msg, 0, "result", success);
+    msg = controlMsgCreate(_S "Validate");
+    cfieldSet(msg, _S"result", bool, success);
 
     if (success) {
-        ControlField* verf = msg->fields[1];
-        strcpy(verf->h.name, "ver");
-        verf->h.ftype          = CF_INT;
-        verf->h.flags          = CF_ARRAY;
-        verf->count            = 3;
-        verf->d.cfd_int_arr    = xaAlloc(sizeof(int) * 3);
-        verf->d.cfd_int_arr[0] = g_version_major;
-        verf->d.cfd_int_arr[1] = g_version_minor;
-        verf->d.cfd_int_arr[2] = g_version_rev;
+        sa_int32 ver;
+        saInit(&ver, int32, 3);
+        saPush(&ver, int32, g_version_major);
+        saPush(&ver, int32, g_version_minor);
+        saPush(&ver, int32, g_version_rev);
+        htInsert(&msg->fields, strref, _S"ver", stvar, stvar(sarray, ver));
+        saDestroy(&ver);
 
-        ControlField* featf = msg->fields[2];
-        strcpy(featf->h.name, "features");
-        featf->h.ftype       = CF_STRING;
-        featf->h.flags       = CF_ARRAY;
-        saInit(&featf->d.cfd_str_arr, string, 16);
-
-        fillValidateFeatures(featf);
+        sa_string features;
+        saInit(&features, string, 16);
+        fillValidateFeatures(&features);
+        htInsert(&msg->fields, strref, _S"features", stvar, stvar(sarray, features));
+        saDestroy(&features);
     } else {
-        controlMsgInt(msg, 1, "reason", failreason);
-        controlMsgInt(msg, 2, "unused", 0);
+        cfieldSet(msg, _S"reason", int32, failreason);
+        cfieldSet(msg, _S"unused", int32, 0);   // TODO: can remove now that we don't need to know
+                                              // number of fields ahead of time?
     }
 
-    controlPutMsg(cs, &msg->hdr, msg->fields);
-    while (controlSend(cs)) {}
-    controlMsgFree(msg, CF_ALLOC_AUTO);
+    controlSendMsg(cs, msg);
+    while (controlSendBuffer(cs)) {}
+    controlMsgDestroy(msg);
 }
 
 int controlStartupHandshake(ControlState* cs)
@@ -196,16 +172,9 @@ void controlSendLaunchFail(ControlState* cs, int failreason)
         return;
     }
 
-    ControlMsgHeader mh = { 0 };
-    ControlField ff     = { 0 };
-
-    mh.nfields = 1;
-    strcpy(mh.cmd, "LaunchFail");
-    strcpy(ff.h.name, "reason");
-    ff.h.ftype   = CF_INT;
-    ff.d.cfd_int = failreason;
-
-    ControlField* fields[1] = { &ff };
-    controlPutMsg(cs, &mh, fields);
-    while (controlSend(cs)) {}
+    ControlMsg* msg = controlMsgCreate(_S "LaunchFail");
+    cfieldSet(msg, _S"reason", int32, failreason);
+    controlSendMsg(cs, msg);
+    while (controlSendBuffer(cs)) {}
+    controlMsgDestroy(msg);
 }

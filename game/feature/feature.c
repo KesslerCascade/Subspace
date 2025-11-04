@@ -160,11 +160,11 @@ void patchAllFeatures(PatchState* ps)
 
 void sendFeatureState(SubspaceFeature* feat, int replyto)
 {
-    ControlMsg* msg  = controlNewMsg("FeatureState", 3);
+    ControlMsg* msg  = controlMsgCreate(_S"FeatureState");
     msg->hdr.replyid = replyto;
-    controlMsgStr(msg, 0, "feature", (strref)feat->name);
-    controlMsgBool(msg, 1, "available", feat->available);
-    controlMsgBool(msg, 2, "enabled", feat->enabled);
+    cfieldSet(msg, _S"feature", strref, (strref)feat->name);
+    cfieldSet(msg, _S"available", bool, feat->available);
+    cfieldSet(msg, _S"enabled", bool, feat->enabled);
     controlClientQueue(msg);
 }
 
@@ -178,13 +178,12 @@ void sendAllFeatureState()
     }
 }
 
-void fillValidateFeatures(ControlField* featf)
+void fillValidateFeatures(sa_string* featlist)
 {
     foreach (hashtable, hti, feathash) {
         SubspaceFeature* feat = (SubspaceFeature*)htiVal(ptr, hti);
         if (feat && feat->available) {
-            saPush(&featf->d.cfd_str_arr, strref, (strref)feat->name);
-            featf->count++;
+            saPush(featlist, strref, (strref)feat->name);
         }
     }
 }

@@ -1,19 +1,18 @@
 #include "control/cmds.h"
 #include "feature/feature.h"
 
-void cmdEnableFeature(ControlMsg* msg)
+void cmdEnableFeature(ControlMsg* msg, hashtable fields)
 {
     SubspaceFeature* feat = NULL;
 
-    ControlField* fname = controlMsgFindField(msg, "feature");
-    if (fname && fname->h.ftype == CF_STRING)
-        feat = getFeature(strC(fname->d.cfd_str));
+    strref fname = cfieldString(fields, _S "feature");
+    if (!strEmpty(fname))
+        feat = getFeature(strC(fname));
 
     if (!feat)
         return;
 
-    ControlField* fenabled = controlMsgFindField(msg, "enabled");
-    if (fenabled && fenabled->h.ftype == CF_BOOL) {
-        enableFeature(feat, fenabled->d.cfd_bool);
-    }
+    bool enabled;
+    if (cfieldVal(bool, fields, _S "enabled", &enabled))
+        enableFeature(feat, enabled);
 }

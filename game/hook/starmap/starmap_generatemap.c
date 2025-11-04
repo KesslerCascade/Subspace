@@ -15,11 +15,11 @@ subspace_StarMap_GenerateMap_post(Location* ret, StarMap* self, bool bTutorial, 
     gs.gameTime = 0;
 
     if (cur) {
-        ControlMsg* msg = controlNewMsg("Sector", 4);
-        controlMsgInt(msg, 0, "num", StarMap_worldLevel(self) + 1);
-        controlMsgInt(msg, 1, "seed", StarMap_currentSectorSeed(self));
-        controlMsgStr(msg, 2, "type", (strref)Sector_description_type(cur)->buf);
-        controlMsgBool(msg, 3, "secret", StarMap_bSecretSector(self));
+        ControlMsg* msg = controlMsgCreate(_S"Sector");
+        cfieldSet(msg, _S"num", int32, StarMap_worldLevel(self) + 1);
+        cfieldSet(msg, _S"seed", int32, StarMap_currentSectorSeed(self));
+        cfieldSet(msg, _S"type", strref, (strref)Sector_description_type(cur)->buf);
+        cfieldSet(msg, _S"secret", bool, StarMap_bSecretSector(self));
         msg->priority = 1;   // make sure this gets sent after NewGame
         controlClientQueue(msg);
 

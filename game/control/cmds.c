@@ -11,7 +11,7 @@ DECLCMD(SaveAndQuit);
 DECLCMD(RunTrackerUpd);
 DECLCMD(LoadPractice);
 
-#define REGCMD(cmdname) controlClientRegister(#cmdname, cmd##cmdname)
+#define REGCMD(cmdname) controlClientRegister(_S #cmdname, cmd##cmdname)
 
 void registerCmds()
 {

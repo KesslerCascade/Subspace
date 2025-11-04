@@ -75,7 +75,7 @@ static int controlThread(void* data)
                 for (int i = 0; i < oqueue->nmsgs; i++) {
                     ControlMsg* msg = oqueue->msgs[i];
                     if (msg->priority == curprio) {
-                        controlPutMsg(&control, &msg->hdr, msg->fields);
+                        controlSendMsg(&control, msg);
                     } else {
                         // get the smallest higher priority to be sent next
                         if (msg->priority > curprio && msg->priority < nextprio)
@@ -89,19 +89,19 @@ static int controlThread(void* data)
         }
 
         if (isconn) {
-            controlSend(&control);
+            controlSendBuffer(&control);
 
             // read any inbound messages and queue them
             if (FD_ISSET(control.sock, &rset)) {
                 while (controlMsgReady(&control)) {
-                    ControlMsg* msg = controlGetMsg(&control, CF_ALLOC_AUTO);
+                    ControlMsg* msg = controlRecvMsg(&control);
 
                     withMutex (&client.lock) {
                         controlclientcb_t cb;
                         if (htFind(client.handlers, strref, (strref)msg->hdr.cmd, ptr, &cb)) {
                             msgqAdd(client.inbound, msg, cb);
                         } else {
-                            controlMsgFree(msg, CF_ALLOC_AUTO);
+                            controlMsgDestroy(msg);
                         }
                     }
                 }
@@ -182,7 +182,7 @@ void controlClientProcessInbound(void)
 
     for (int i = 0; i < queue->nmsgs; i++) {
         if (queue->cbs[i])
-            queue->cbs[i](queue->msgs[i]);
+            queue->cbs[i](queue->msgs[i], queue->msgs[i]->fields);
     }
     msgqClear(queue);
 }
@@ -203,10 +203,10 @@ void controlClientProcessOutbound(void)
         controlClientNotify();
 }
 
-void controlClientRegister(const char* cmd, controlclientcb_t cb)
+void controlClientRegister(strref cmd, controlclientcb_t cb)
 {
     withMutex (&client.lock) {
-        htInsert(&client.handlers, strref, (strref)cmd, ptr, cb);
+        htInsert(&client.handlers, strref, cmd, ptr, cb);
     }
 }
 

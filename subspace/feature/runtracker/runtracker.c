@@ -92,8 +92,8 @@ void RunTracker_sendUpdate(_In_ RunTracker* self, bool recording)
     ControlClient* client = inst ? objAcquireFromWeak(ControlClient, inst->client) : NULL;
 
     if (client) {
-        ControlMsg* msg = controlNewMsg("RunTrackerUpd", 1);
-        controlMsgBool(msg, 0, "recording", recording);
+        ControlMsg* msg = controlMsgCreate(_S"RunTrackerUpd");
+        cfieldSet(msg, _S"recording", bool, recording);
         cclientQueue(client, msg);
     }
 

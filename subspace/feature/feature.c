@@ -75,9 +75,9 @@ void SubspaceFeature_enable(_In_ SubspaceFeature* self, bool enabled)
             if (enabled)
                 featureSendAllSettings(self, client);
 
-            ControlMsg* emsg = controlNewMsg("EnableFeature", 2);
-            controlMsgStr(emsg, 0, "feature", self->name);
-            controlMsgBool(emsg, 1, "enabled", enabled);
+            ControlMsg* emsg = controlMsgCreate(_S"EnableFeature");
+            cfieldSet(emsg, _S"feature", string, self->name);
+            cfieldSet(emsg, _S"enabled", bool, enabled);
             cclientQueue(client, emsg);
 
             objRelease(&client);
@@ -108,40 +108,27 @@ void SubspaceFeature_setAvailable(_In_ SubspaceFeature* self, bool available)
     strDestroy(&epath);
 }
 
-static bool sendSettingVal(ControlMsg* msg, int field, const char* fname, stvar* val)
+static void sendSettingVal(ControlMsg* msg, strref fname, stvar* val)
 {
-    switch (stGetId(val->type)) {
-    case STypeId_bool:
-        controlMsgBool(msg, field, fname, val->data.st_bool);
-        return true;
-    case STypeId_int64:
-        // parsed from json... have to figure out whether it's signed or unsigned
-        if (val->data.st_int64 < 0)
-            controlMsgInt(msg, field, fname, (int32)val->data.st_int64);
-        else if (val->data.st_int64 > 0x7fffffffULL)
-            controlMsgUInt(msg, field, fname, (uint32)val->data.st_int64);
-        else
-            controlMsgInt(msg, field, fname, (int32)val->data.st_int64);
-
-        return true;
-    case STypeId_int32:
-        controlMsgInt(msg, field, fname, val->data.st_int32);
-        return true;
-    case STypeId_uint32:
-        controlMsgUInt(msg, field, fname, val->data.st_uint32);
-        return true;
-    case STypeId_float32:
-        controlMsgFloat32(msg, field, fname, val->data.st_float32);
-        return true;
-    case STypeId_float64:
-        controlMsgFloat64(msg, field, fname, val->data.st_float64);
-        return true;
-    case STypeId_string:
-        controlMsgStr(msg, field, fname, val->data.st_string);
-        return true;
+    if (stvarIs(val, int64)) {
+        // parsed from json... have to figure out whether it's signed or unsigned int32
+        if (val->data.st_int64 >= INT32_MIN && val->data.st_int64 <= INT32_MAX) {
+            cfieldSet(msg, fname, int32, (int32)val->data.st_int64);
+        } else if (val->data.st_int64 >= 0 && val->data.st_int64 <= UINT32_MAX) {
+            cfieldSet(msg, fname, uint32, (uint32)val->data.st_int64);
+        } else {
+            cfieldSet(msg, fname, int64, val->data.st_int64);
+        }
+    } else if (STYPE_CLASS(stGetId(val->type)) == STCLASS_INT ||
+               STYPE_CLASS(stGetId(val->type)) == STCLASS_UINT ||
+               STYPE_CLASS(stGetId(val->type)) == STCLASS_FLOAT || stvarIs(val, string)) {
+        // for other basic types just send as-is
+        htInsert(&msg->fields, strref, fname, stvar, *val);
+    } else {
+        return;
     }
 
-    return false;
+    // do not send hashtables, objects, or other complex types
 }
 
 void SubspaceFeature_sendSetting(_In_ SubspaceFeature* self, ControlClient* client,
@@ -152,9 +139,9 @@ void SubspaceFeature_sendSetting(_In_ SubspaceFeature* self, ControlClient* clie
     if (!ssdGet(self->settings, name, &val))
         return;
 
-    ControlMsg* msg = controlNewMsg("FeatureSettings", 2);
-    controlMsgStr(msg, 0, "feature", self->name);
-    sendSettingVal(msg, 1, strC(name), &val);
+    ControlMsg* msg = controlMsgCreate(_S"FeatureSettings");
+    cfieldSet(msg, _S"feature", string, self->name);
+    sendSettingVal(msg, name, &val);
     cclientQueue(client, msg);
     stvarDestroy(&val);
 }
@@ -168,12 +155,11 @@ void SubspaceFeature_sendAllSettings(_In_ SubspaceFeature* self, ControlClient* 
         if (count < 1)
             break;
 
-        msg = controlNewMsg("FeatureSettings", count + 1);
+        msg = controlMsgCreate(_S"FeatureSettings");
 
-        int n = 1;
-        controlMsgStr(msg, 0, "feature", self->name);
+        cfieldSet(msg, _S"feature", string, self->name);
         foreach (ssd, iter, idx, name, val, self->settings) {
-            sendSettingVal(msg, n++, strC(name), val);
+            sendSettingVal(msg, name, val);
         }
     }
 

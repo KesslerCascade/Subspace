@@ -37,21 +37,21 @@ void cmdGameStart(GameInst* inst, ControlClient* client, ControlMsg* msg, hashta
         ssdStringOut(ss->settings, _S"ftl/saveoverride", &saveovr);
         int nargs = strEmpty(saveovr) ? 4 : 5;
 
-        ControlMsg* rmsg  = controlNewMsg("Launch", nargs);
+        ControlMsg* rmsg  = controlMsgCreate(_S"Launch");
         string tmpstr     = 0;
         rmsg->hdr.replyid = msg->hdr.msgid;
-        controlMsgInt(rmsg, 0, "launchmode", inst->mode);
+        cfieldSet(rmsg, _S"launchmode", int32, inst->mode);
 
         pathParent(&tmpstr, inst->exepath);
         pathToPlatform(&tmpstr, tmpstr);
-        controlMsgStr(rmsg, 1, "gamedir", tmpstr);
+        cfieldSet(rmsg, _S"gamedir", string, tmpstr);
 
         pathFilename(&tmpstr, inst->exepath);
         pathToPlatform(&tmpstr, tmpstr);
-        controlMsgStr(rmsg, 2, "gameprogram", tmpstr);
+        cfieldSet(rmsg, _S"gameprogram", string, tmpstr);
 
         pathToPlatform(&tmpstr, inst->exepath);
-        controlMsgStr(rmsg, 3, "gamepath", tmpstr);
+        cfieldSet(rmsg, _S"gamepath", string, tmpstr);
 
         if (!strEmpty(saveovr)) {
             if (strEq(saveovr, _S"[User]")) {
@@ -60,7 +60,7 @@ void cmdGameStart(GameInst* inst, ControlClient* client, ControlMsg* msg, hashta
                 pathMakeAbsolute(&saveovr, saveovr);
                 pathToPlatform(&tmpstr, saveovr);
             }
-            controlMsgStr(rmsg, 4, "saveoverride", tmpstr);
+            cfieldSet(rmsg, _S"saveoverride", string, tmpstr);
         }
 
         strDestroy(&saveovr);
@@ -74,7 +74,7 @@ void cmdGameStart(GameInst* inst, ControlClient* client, ControlMsg* msg, hashta
         }
 
         // Something wrong with this client, tell it to exit
-        ControlMsg* rmsg  = controlNewMsg("Exit", 0);
+        ControlMsg* rmsg  = controlMsgCreate(_S"Exit");
         rmsg->hdr.replyid = msg->hdr.msgid;
         cclientQueue(client, rmsg);
     }

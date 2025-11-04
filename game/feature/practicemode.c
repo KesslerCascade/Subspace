@@ -56,8 +56,8 @@ void practiceLoad()
         // without this the game stays at the menu after loading
         MainMenu_Close(menu);
 
-        ControlMsg* msg = controlNewMsg("GameState", 1);
-        controlMsgInt(msg, 0, "state", GAME_PRACTICE);
+        ControlMsg* msg = controlMsgCreate(_S"GameState");
+        cfieldSet(msg, _S"state", int32, GAME_PRACTICE);
         controlClientQueue(msg);
     }
 }

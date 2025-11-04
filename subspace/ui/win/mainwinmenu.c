@@ -72,8 +72,8 @@ static int menu_load_practice(Ihandle* ih)
             ControlClient* client = inst ? objAcquireFromWeak(ControlClient, inst->client) : NULL;
 
             if (client && vfsExist(win->ss->rootfs, savepath)) {
-                ControlMsg* msg = controlNewMsg("LoadPractice", 1);
-                controlMsgStr(msg, 0, "savepath", (strref)val);
+                ControlMsg* msg = controlMsgCreate(_S"LoadPractice");
+                cfieldSet(msg, _S"savepath", strref, (strref)val);
                 cclientQueue(client, msg);
             }
 

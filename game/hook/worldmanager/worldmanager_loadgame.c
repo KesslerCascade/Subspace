@@ -41,16 +41,16 @@ void subspace_WorldManager_LoadGame_post(WorldManager* self, basic_string* file)
     StatTracker* stats       = ScoreKeeper_stats(SKeeper);
 
     if (shipType && shipName && seed) {
-        ControlMsg* msg = controlNewMsg("LoadGame", 5);
-        controlMsgStr(msg, 0, "ship", (strref)shipType->buf);
-        controlMsgStr(msg, 1, "name", (strref)shipName->data.buf);
-        controlMsgInt(msg, 2, "seed", seed);
-        controlMsgInt(msg, 3, "difficulty", g_Settings_difficulty);
-        controlMsgInt(msg, 4, "beacons", stats[1].current);
+        ControlMsg* msg = controlMsgCreate(_S"LoadGame");
+        cfieldSet(msg, _S"ship", strref, (strref)shipType->buf);
+        cfieldSet(msg, _S"name", strref, (strref)shipName->data.buf);
+        cfieldSet(msg, _S"seed", int32, seed);
+        cfieldSet(msg, _S"difficulty", int32, g_Settings_difficulty);
+        cfieldSet(msg, _S"beacons", int32, stats[1].current);
         controlClientQueue(msg);
 
-        msg = controlNewMsg("GameState", 1);
-        controlMsgInt(msg, 0, "state", GAME_RUN);
+        msg = controlMsgCreate(_S"GameState");
+        cfieldSet(msg, _S"state", int32, GAME_RUN);
         controlClientQueue(msg);
     }
 

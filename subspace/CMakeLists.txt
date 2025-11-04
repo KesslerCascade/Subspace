@@ -90,7 +90,6 @@ add_cxautogen(${SUBSPACE_AUTOGEN})
 add_executable(subspace
     control/cmds.c
     control/controlclient.c
-    control/controlfields.c
     control/controlserver.c
     control/controltask.c
     control/cmds/cmdautosave.c
@@ -196,6 +195,7 @@ add_executable(subspace
     version.c
     ../lib/cx/cx/cx.natvis
     ${SHARED_SOURCE_DIR}/control.c
+    ${SHARED_SOURCE_DIR}/controlfields.c
     ${SHARED_SOURCE_DIR}/logentspec.c
     ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_AUTOGEN})

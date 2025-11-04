@@ -68,21 +68,21 @@ static int ss_write_thread(void* data)
     osWriteFile(ss->fn, processed, bsz);
     xa_free(processed);
 
-    ControlMsg* msg = controlNewMsg("Screenshot", 14);
-    controlMsgBool(msg, 0, "auto", ss->automatic);
-    controlMsgStr(msg, 1, "filename", (strref)ss->fn);
-    controlMsgInt(msg, 2, "w", ss->w);
-    controlMsgInt(msg, 3, "h", ss->h);
-    controlMsgStr(msg, 4, "ship", (strref)ss->shiptype);
-    controlMsgStr(msg, 5, "name", (strref)ss->shipname);
-    controlMsgInt(msg, 6, "sector", ss->sector);
-    controlMsgStr(msg, 7, "sectortype", (strref)ss->sectortype);
-    controlMsgInt(msg, 8, "beacon", ss->beacon);
-    controlMsgUInt(msg, 9, "seed", ss->seed);
-    controlMsgInt(msg, 10, "difficulty", ss->difficulty);
-    controlMsgInt(msg, 11, "major", g_version_major);
-    controlMsgInt(msg, 12, "minor", g_version_minor);
-    controlMsgInt(msg, 13, "rev", g_version_rev);
+    ControlMsg* msg = controlMsgCreate(_S"Screenshot");
+    cfieldSet(msg, _S"auto", bool, ss->automatic);
+    cfieldSet(msg, _S"filename", strref, (strref)ss->fn);
+    cfieldSet(msg, _S"w", int32, ss->w);
+    cfieldSet(msg, _S"h", int32, ss->h);
+    cfieldSet(msg, _S"ship", strref, (strref)ss->shiptype);
+    cfieldSet(msg, _S"name", strref, (strref)ss->shipname);
+    cfieldSet(msg, _S"sector", int32, ss->sector);
+    cfieldSet(msg, _S"sectortype", strref, (strref)ss->sectortype);
+    cfieldSet(msg, _S"beacon", int32, ss->beacon);
+    cfieldSet(msg, _S"seed", uint32, ss->seed);
+    cfieldSet(msg, _S"difficulty", int32, ss->difficulty);
+    cfieldSet(msg, _S"major", int32, g_version_major);
+    cfieldSet(msg, _S"minor", int32, g_version_minor);
+    cfieldSet(msg, _S"rev", int32, g_version_rev);
     controlClientQueue(msg);
 
     withMutex (&soundlock) {
