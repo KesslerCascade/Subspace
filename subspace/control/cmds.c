@@ -39,7 +39,7 @@ void registerCmds(ControlServer* csvr)
     REGCMDI(GameState);
     REGCMDI(LaunchFail);
     REGCMDI(Loading);
-    REGCMD(Log);
+    REGCMDREQ(Log, csvr->logs);
     REGCMDREQI(NewGame, csvr->gameEvents);
     REGCMDREQI(LoadGame, csvr->gameEvents);
     REGCMDREQI(Sector, csvr->gameEvents);

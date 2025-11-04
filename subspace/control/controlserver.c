@@ -240,6 +240,7 @@ void ControlServer_destroy(_In_ ControlServer* self)
     saDestroy(&self->clients);
     rwlockDestroy(&self->handler_lock);
     htDestroy(&self->handlers);
+    objRelease(&self->logs);
     objRelease(&self->preGameReady);
     objRelease(&self->gameEvents);
     // Autogen ends -------

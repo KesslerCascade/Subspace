@@ -21,6 +21,7 @@ typedef void (*controlservercb_t)(GameInst *inst, ControlClient *client, Control
 
     RWLock handler_lock;
     hashtable:string:object handlers;
+    object:TRFifo logs;     // keep logs in order received
     object:TRFifo preGameReady;
     object:TRFifo gameEvents;   // game events that should be processed in order
 
