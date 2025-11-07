@@ -372,15 +372,27 @@ static bool checkCandidate(addr_t base, DisasmTrace* trace, addr_t start)
     return true;
 }
 
+static void addList(sa_uintptr* tocheck, AddrList* al)
+{
+    if (!al)
+        return;
+
+    for (int i = 0; al && i < saSize(*al); i++) {
+        saPush(tocheck, uintptr, al->a[i]);
+    }
+}
+
 bool disasmTrace(addr_t base, DisasmTrace* trace)
 {
     bool success   = false;
     addr_t saddr   = 0;
     ModuleInfo* mi = moduleInfo(base);
-    AddrList* al   = NULL;
+    sa_uintptr tocheck;
     uint32_t i;
 
-    if (trace->csym) {
+    saInit(&tocheck, uintptr, 4);
+
+    if (trace->csym)
         saddr = _symAddr(base, trace->csym);
     }
     if (!saddr && trace->cstr) {
@@ -391,37 +403,49 @@ bool disasmTrace(addr_t base, DisasmTrace* trace)
 
     switch (trace->c) {
     case DTRACE_ADDR:
-        return checkCandidate(base, trace, saddr);
+        if (saddr)
+            saPush(&tocheck, uintptr, saddr);
+        break;
     case DTRACE_REFS:
-        al = addrListFindByPtr(mi->ptrrefhash, saddr);
+        if (saddr)
+            addList(&tocheck, addrListFindByPtr(mi->ptrrefhash, saddr));
         break;
-    case DTRACE_STRREFS:
-        al = addrListFindByPtr(mi->stringrefhash, saddr);
-        break;
+    case DTRACE_STRREFS: {
+        AddrList* sl = findAllStrings(base, (strref)trace->cstr);
+        for (i = 0; sl && i < saSize(*sl); i++) {
+            addList(&tocheck, addrListFindByPtr(mi->stringrefhash, sl->a[i]));
+        }
+    } break;
     case DTRACE_CALLS:
-        al = addrListFindByPtr(mi->funccallhash, saddr);
+        if (saddr)
+            addList(&tocheck, addrListFindByPtr(mi->funccallhash, saddr));
         break;
     case DTRACE_FUNCS:
-        al = &mi->funclist;
+        addList(&tocheck, &mi->funclist);
         break;
     }
 
-    if (al) {
-        for (i = 0; i < saSize(*al); i++) {
-            addr_t checkaddr = 0;
-            if (trace->mod == DTRACE_MOD_FUNCSTART) {
-                // this trace wants to look at the start of the function containing the reference
-                int checkidx = saFind(mi->funclist, uintptr, al->a[i], SA_Inexact);
-                if (checkidx != -1 && checkidx > 0)
-                    checkaddr = al->a[checkidx - 1];   // function start address
-            } else {
-                checkaddr = al->a[i];
-            }
-
-            if (checkaddr && checkCandidate(base, trace, checkaddr))
-                return true;
+    for (i = 0; i < saSize(tocheck); i++) {
+        addr_t checkaddr = 0;
+        // if (trace == &ShipManager_DamageBeam_trace) {
+        //  log_fmt(LOG_Verbose, "  Checking candidate at 0x%08x", al->a[i] - base);
+        //}
+        if (trace->mod == DTRACE_MOD_FUNCSTART) {
+            // this trace wants to look at the start of the function containing the reference
+            int checkidx = saFind(mi->funclist, uintptr, tocheck.a[i], SA_Inexact);
+            if (checkidx != -1 && checkidx > 0)
+                checkaddr = mi->funclist.a[checkidx - 1];   // function start address
+            // if (trace == &ShipManager_DamageBeam_trace) {
+            //  log_fmt(LOG_Verbose, "  Function start at 0x%08x", checkaddr - base);
+            //}
+        } else {
+            checkaddr = tocheck.a[i];
         }
+
+        if (checkaddr && checkCandidate(base, trace, checkaddr))
+            return true;
     }
+    saDestroy(&tocheck);
 
     return false;
 }
