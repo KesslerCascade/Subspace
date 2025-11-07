@@ -188,7 +188,7 @@ add_executable(subspacegame
     input/keyboard.c
     inventory/inventory.c
     inventory/invscan.c
-    log/log.c
+    log/gamelog.c
     util/lcg.c
     patch/patch.c
     subspacegame.c

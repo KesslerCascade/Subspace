@@ -29,6 +29,7 @@ _objinit_guaranteed bool ControlServer_init(_In_ ControlServer* self)
 {
     self->preGameReady = trfifoCreate();
     self->gameEvents   = trfifoCreate();
+    self->logs         = trfifoCreate();
 
     // Autogen begins -----
     saInit(&self->clients, object, 1);

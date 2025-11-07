@@ -1,6 +1,6 @@
 #include "control/cmds.h"
 
-void cmdLog(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
+void cmdLogMsg(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtable fields)
 {
     int32 level   = cfieldValD(int32, fields, _S"level", LOG_Count);
     string logmsg = 0;

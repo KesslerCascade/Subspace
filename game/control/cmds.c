@@ -1,7 +1,7 @@
 #include "cmds.h"
 #include "control/controlclient.h"
 
-#define DECLCMD(cmdname) void cmd##cmdname(ControlMsg* msg)
+#define DECLCMD(cmdname) void cmd##cmdname(ControlMsg* msg, hashtable fields)
 
 DECLCMD(ClearToStart);
 DECLCMD(EnableFeature);

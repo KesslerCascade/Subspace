@@ -3,7 +3,7 @@
 #include <cx/string.h>
 #include <cx/thread.h>
 #include <cx/utils/lazyinit.h>
-#include "log/log.h"
+#include "log/gamelog.h"
 
 // bookkeeping for per-module info
 
@@ -83,7 +83,7 @@ ModuleInfo* moduleInfo(addr_t base)
 
 #ifdef _DEBUG
         if (!mi->analyzed && no_more_analysis) {
-            log_fmt(LOG_Debug, "Module at %p already analyzed", (void*)base);
+            logFmt(Debug, _S"Module at ${uint(hex)} already analyzed", stvar(uintptr, base));
         }
 #endif
     }

@@ -48,7 +48,7 @@ static void pushUnwind(DisasmTraceState* dts, DisasmTraceState* unwind, int* nun
     if (dts->skipmax < 1 || *nunwind >= MAX_UNWIND) {
 #ifdef _DEBUG
         if (*nunwind >= MAX_UNWIND)
-            log_str(LOG_Verbose, "Unwind stack is full!");
+            logStr(Verbose, "Unwind stack is full!");
 #endif
         return;
     }

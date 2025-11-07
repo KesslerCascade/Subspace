@@ -14,7 +14,7 @@
 #include "ftl/ftl.h"
 #include "hook/module.h"
 #include "loader/loader.h"
-#include "log/log.h"
+#include "log/gamelog.h"
 #include "patch/patch.h"
 #include "control.h"
 #include "osdep.h"
@@ -70,12 +70,19 @@ int entryPoint()
     if (lcmd != RLC_Launch)
         return (lcmd != RLC_Exit);
 
+    gameLogRegister();
+    logFmt(Info,
+           _S"Subspace Game Loader ${string} starting up!",
+           stvar(strref, (strref)subspace_version_str));
+
     osSetCurrentDir(settings.gameDir);
-    log_fmt(LOG_Info, "Loading executable:  %s", settings.gamePath);
+    logFmt(Info, _S"Loading executable:  ${string}", stvar(strref, (strref)settings.gamePath));
     ftlbase = loadProgram(settings.gamePath);
+    gameLogSend();
 
     if (!ftlbase) {
-        log_str(LOG_Error, "Failed to load game executable!");
+        logStr(Error, _S"Failed to load game executable!");
+        gameLogSend();
         controlSendLaunchFail(&control, LAUNCH_FAIL_NOEXE);
         return 1;
     }
@@ -84,23 +91,28 @@ int entryPoint()
 
     PatchState ps;
     if (!patchBegin(&ps, ftlbase)) {
-        log_str(LOG_Error, "Patching failed to initialize");
+        logStr(Error, _S"Patching failed to initialize");
+        gameLogSend();
         controlSendLaunchFail(&control, LAUNCH_FAIL_OTHER);
         return 1;
     }
 
     patchValidateSeq(&ps, OSDepPatches);
+    gameLogSend();
     validateAllFeatures(&ps);
+    gameLogSend();
 
     if (!patchApplySeq(&ps, OSDepPatches) || !patchFeature(&Base_feature, &ps)) {
-        log_str(LOG_Error, "Required patches failed");
+        logStr(Error, _S"Required patches failed");
+        gameLogSend();
         controlSendLaunchFail(&control, LAUNCH_FAIL_REQPATCH);
         return 1;
     }
     patchAllFeatures(&ps);
 
     if (!patchEnd(&ps)) {
-        log_str(LOG_Error, "Patching failed to complete");
+        logStr(Error, _S"Patching failed to complete");
+        gameLogSend();
         controlSendLaunchFail(&control, LAUNCH_FAIL_OTHER);
         return 1;
     }
@@ -130,8 +142,8 @@ void sscmain2(void)
 {
     controlClientStart();
     registerCmds();
-    log_client();
-    log_str(LOG_Info, "Communication thread started");
+    gameLogSwitchToClientQueue();
+    logStr(Info, _S"Communication thread started");
     sendAllFeatureState();
 
     ControlMsg* msg = controlMsgCreate(_S"GameReady");

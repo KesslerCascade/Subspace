@@ -4,7 +4,7 @@
 #include "hook/string.h"
 
 #ifdef SYMBOL_DEBUG
-#include "log/log.h"
+#include "log/gamelog.h"
 #endif
 
 static void symFindVirtual(addr_t base, Symbol* sym, SymbolFind* find)
@@ -67,7 +67,7 @@ bool _symResolve(addr_t base, Symbol* sym)
 
 #ifdef SYMBOL_DEBUG
     if (!sym->resolved && !sym->warned) {
-        log_fmt(LOG_Warn, "Failed to resolve symbol \"%s\"", sym->name);
+        logFmt(Warn, _S"Failed to resolve symbol \"${string}\"", stvar(strref, (strref)sym->name));
         sym->warned = true;
     }
 #endif

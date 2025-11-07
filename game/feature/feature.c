@@ -2,7 +2,7 @@
 #include "control/controlclient.h"
 #include "hook/symbol.h"
 #include "input/keybinds.h"
-#include "log/log.h"
+#include "log/gamelog.h"
 #include "patch/patch.h"
 #include "subspacegame.h"
 
@@ -75,9 +75,11 @@ bool validateFeature(SubspaceFeature* feat, PatchState* ps)
 
 out:
     if (feat->valid) {
-        log_fmt(LOG_Verbose, "Feature succesfully validated: %s", feat->name);
+        logFmt(Verbose,
+               _S"Feature succesfully validated: ${string}",
+               stvar(strref, (strref)feat->name));
     } else {
-        log_fmt(LOG_Warn, "Feature failed to validate: %s", feat->name);
+        logFmt(Warn, _S"Feature failed to validate: ${string}", stvar(strref, (strref)feat->name));
     }
     return feat->valid;
 }
@@ -112,9 +114,11 @@ bool patchFeature(SubspaceFeature* feat, PatchState* ps)
     feat->available = true;
 out:
     if (feat->available) {
-        log_fmt(LOG_Verbose, "Feature succesfully patched: %s", feat->name);
+        logFmt(Verbose,
+               _S"Feature succesfully patched: ${string}",
+               stvar(strref, (strref)feat->name));
     } else {
-        log_fmt(LOG_Warn, "Feature failed to patch: %s", feat->name);
+        logFmt(Warn, _S"Feature failed to patch: ${string}", stvar(strref, (strref)feat->name));
     }
     return feat->available;
 }

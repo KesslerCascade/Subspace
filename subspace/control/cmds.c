@@ -10,7 +10,7 @@ DECLCMD(GameState);
 DECLCMD(LaunchFail);
 DECLCMD(LoadGame);
 DECLCMD(Loading);
-DECLCMD(Log);
+DECLCMD(LogMsg);
 DECLCMD(NewGame);
 DECLCMD(RunLog);
 DECLCMD(Sector);
@@ -39,7 +39,7 @@ void registerCmds(ControlServer* csvr)
     REGCMDI(GameState);
     REGCMDI(LaunchFail);
     REGCMDI(Loading);
-    REGCMDREQ(Log, csvr->logs);
+    REGCMDREQ(LogMsg, csvr->logs);
     REGCMDREQI(NewGame, csvr->gameEvents);
     REGCMDREQI(LoadGame, csvr->gameEvents);
     REGCMDREQI(Sector, csvr->gameEvents);
