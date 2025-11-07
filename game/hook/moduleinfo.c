@@ -18,7 +18,7 @@ _objinit_guaranteed bool ModuleInfo_init(_In_ ModuleInfo* self)
     htInit(&self->relcallhash, uintptr, sarray, 16);
     htInit(&self->stringhash, string, sarray, 16);
     htInit(&self->stringlochash, uintptr, ptr, 16);
-    htInit(&self->stringrefhash, string, uintptr, 16);
+    htInit(&self->stringrefhash, uintptr, sarray, 16);
     htInit(&self->relochash, uintptr, uintptr, 16);
     htInit(&self->ptrhash, uintptr, sarray, 16);
     htInit(&self->ptrrefhash, uintptr, sarray, 16);

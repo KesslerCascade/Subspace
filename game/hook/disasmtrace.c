@@ -1,14 +1,14 @@
-#if defined(_DEBUG) && defined(WIN32)
-#include <windows.h>
-#endif
-
 #include "disasmtrace.h"
 
 #include "hook/module.h"
 #include "hook/string.h"
 #include "hook/symbol.h"
-#include "log/log.h"
+#include "log/gamelog.h"
 #include "disasm.h"
+
+#if defined(_DEBUG) && defined(WIN32)
+#include <windows.h>
+#endif
 
 #define MAX_UNWIND 16
 
@@ -48,7 +48,7 @@ static void pushUnwind(DisasmTraceState* dts, DisasmTraceState* unwind, int* nun
     if (dts->skipmax < 1 || *nunwind >= MAX_UNWIND) {
 #ifdef _DEBUG
         if (*nunwind >= MAX_UNWIND)
-            logStr(Verbose, "Unwind stack is full!");
+            logStr(Verbose, _S"Unwind stack is full!");
 #endif
         return;
     }

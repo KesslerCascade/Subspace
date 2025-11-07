@@ -26,7 +26,7 @@ class ModuleInfo {
     // Hash table of string values to address list of all instructions in the code section that
     // reference the string
     // VAL: SArray(uintptr)
-    hashtable:string:uintptr stringrefhash;
+    hashtable:uintptr:sarray stringrefhash;
 
     // Hash table of all relocations for fast lookup during code analysis. Also records the original
     // value of the pointer, though it's not currently used for anything.

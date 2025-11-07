@@ -1,3 +1,5 @@
+#include <cx/log.h>
+
 #include "hook/module.h"
 
 #include "hook/hook.h"
@@ -49,6 +51,11 @@ static bool scanImports(addr_t base, hashtable* tbl)
     IMAGE_IMPORT_DESCRIPTOR* imp = datadirptr(base, data, IMAGE_IMPORT_DESCRIPTOR);
     IMAGE_IMPORT_DESCRIPTOR* end = datadirend(base, data, IMAGE_IMPORT_DESCRIPTOR);
 
+    logFmt(Diag,
+           _S"Scanning import table (${0uint(8,hex)}-${0uint(8,hex)})",
+           stvar(uintptr, (uintptr)imp - base),
+           stvar(uintptr, (uintptr)end - base));
+
     while (imp < end && imp->Name) {
         DWORD* lookup       = dwprva(base,
                                imp->OriginalFirstThunk ? imp->OriginalFirstThunk : imp->FirstThunk);
@@ -71,24 +78,55 @@ static bool scanImports(addr_t base, hashtable* tbl)
 
         ++imp;
     }
+
+    logFmt(Diag, _S"Found ${int} imports", stvar(int32, htSize(*tbl)));
+
     return 1;
 }
 
 static bool scanStrings(addr_t base, ModuleInfo* mi)
 {
     SegInfo rdata;
+    sa_uintptr relocs;
     if (!getRDataSeg(base, &rdata))
         return false;
 
-    char* s = (char*)rdata.start;
-    char* p = s;
-    char* e = (char*)rdata.end;
+    logFmt(Diag,
+           _S"Scanning rdata segment (${0uint(8,hex)}-${0uint(8,hex)}) for strings",
+           stvar(uintptr, rdata.start - base),
+           stvar(uintptr, rdata.end - base));
+
+    // build a sorted list of relocation addresses
+    saInit(&relocs, uintptr, 1024, SA_Sorted);
+    foreach (hashtable, hti, mi->relochash) {
+        saPush(&relocs, uintptr, htiKey(uintptr, hti));
+    }
+
+    int nptrs      = 0;
+    int32 curreloc = 0;
+    int32 nrelocs  = saSize(relocs);
+    char* s        = (char*)rdata.start;
+    char* p        = s;
+    char* e        = (char*)rdata.end;
     while (p < e) {
+        if (curreloc < nrelocs) {
+            // fast forward the relocation array to the current position
+            while (relocs.a[curreloc] < (uintptr)p) curreloc++;
+            if ((uintptr)p == relocs.a[curreloc]) {
+                // this is actually a pointer, not a string
+                // skip over it
+                p += 4;
+                s = p;
+                ++nptrs;
+                continue;
+            }
+        }
+
         char c = *p;
         p++;
         if (c == '\0') {
             if (p - s >= 4) {
-                htInsert(&mi->stringlochash, strref, (strref)s, ptr, s);
+                htInsert(&mi->stringlochash, uintptr, (uintptr)s, ptr, s);
                 addrListAddByStr(&mi->stringhash, (strref)s, (addr_t)s);
             }
             s = p;
@@ -97,6 +135,14 @@ static bool scanStrings(addr_t base, ModuleInfo* mi)
             s = p;
         }
     }
+
+    logFmt(Diag,
+           _S"Found ${int} strings in ${int} locations (skipped over ${int} pointers)",
+           stvar(int32, htSize(mi->stringhash)),
+           stvar(int32, htSize(mi->stringlochash)),
+           stvar(int32, nptrs));
+
+    saDestroy(&relocs);
 
     return true;
 }
@@ -114,6 +160,11 @@ static bool scanRelocs(addr_t base, ModuleInfo* mi, hashtable* functrackers)
 
     if (!getCodeSeg(base, &code))
         return false;
+
+    logFmt(Diag,
+           _S"Scanning relocation table (${0uint(8,hex)}-${0uint(8,hex)})",
+           stvar(uintptr, (uintptr)reloc - base),
+           stvar(uintptr, (uintptr)end - base));
 
     while (reloc < end && reloc->SizeOfBlock) {
         for (i = sizeof(IMAGE_BASE_RELOCATION); i < reloc->SizeOfBlock; i += sizeof(WORD)) {
@@ -133,6 +184,8 @@ static bool scanRelocs(addr_t base, ModuleInfo* mi, hashtable* functrackers)
         }
         reloc = (IMAGE_BASE_RELOCATION*)((char*)reloc + reloc->SizeOfBlock);
     }
+
+    logFmt(Diag, _S"Found ${int} relocations", stvar(int32, htSize(mi->relochash)));
 
     return true;
 }
@@ -276,13 +329,14 @@ bool analyzeModule(addr_t base, ModuleInfo* mi)
     hashtable functrackers;
     htInit(&functrackers, uintptr, int32, 64);
 
+    logBatchBegin();
     if (!scanImports(base, &importtrackers))
         return false;
     if (!scanExports(base, &mi->exporthash))
         return false;
-    if (!scanStrings(base, mi))
-        return false;
     if (!scanRelocs(base, mi, &functrackers))
+        return false;
+    if (!scanStrings(base, mi))
         return false;
     if (!scanCode(base, mi, &importtrackers, &functrackers))
         return false;
@@ -295,6 +349,7 @@ bool analyzeModule(addr_t base, ModuleInfo* mi)
 
     checkFunctions(base, &functrackers, &mi->funclist);
     htDestroy(&functrackers);
+    logBatchEnd();
 
     return true;
 }
