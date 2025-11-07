@@ -15,8 +15,10 @@ static Event _log_done_event;
 static int logthread_func(_Inout_ Thread *self)
 {
     sa_LogEntry ents;
+    sa_LogDest sent;
     uint32 batchid = 0;
     saInit(&ents, ptr, 16);
+    saInit(&sent, ptr, 16, SA_Sorted);
 
     while (thrLoop(self)) {
         bool empty = false;
@@ -35,6 +37,7 @@ static int logthread_func(_Inout_ Thread *self)
         mutexAcquire(&_log_op_lock);
         foreach(sarray, ent__idx, LogEntry*, ent, ents) {
             ++batchid;
+            saClear(&sent);
             while (ent) {
                 LogEntry *next = ent->_next;
 
@@ -45,17 +48,27 @@ static int logthread_func(_Inout_ Thread *self)
                         if (ent->level <= dest->maxlevel &&
                             applyCatFilter(dest->catfilter, ent->cat)) {
                             // dispatch to log destination
-                            dest->func(ent->level,
-                                       ent->cat,
-                                       ent->timestamp,
-                                       ent->msg,
-                                       batchid,
-                                       dest->userdata);
+                            dest->msgfunc(ent->level,
+                                          ent->cat,
+                                          ent->timestamp,
+                                          ent->msg,
+                                          batchid,
+                                          dest->userdata);
+
+                            // remember that we've sent something to this destination for this batch
+                            saPush(&sent, ptr, dest, SA_Unique);
                         }
                     }
                 }
                 logDestroyEnt(ent);
                 ent = next;         // process the rest of the batch
+            }
+
+            // notify relevant destinations that the batch is done
+            foreach (sarray, dest_idx, LogDest*, dest, sent) {
+                if (dest->batchfunc) {
+                    dest->batchfunc(batchid, dest->userdata);
+                }
             }
         }
         mutexRelease(&_log_op_lock);
@@ -69,6 +82,7 @@ static int logthread_func(_Inout_ Thread *self)
         }
     }
 
+    saDestroy(&sent);
     saDestroy(&ents);
 
     return 0;

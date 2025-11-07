@@ -114,6 +114,10 @@ add_executable(cxautogen
 
 target_compile_definitions(cxautogen PRIVATE CX_BUILDING_CXAUTOGEN)
 
+if (CX_USE_SYSTEM_MALLOC)
+    target_compile_definitions(cxautogen PRIVATE XALLOC_USE_SYSTEM_MALLOC)
+endif()
+
 target_link_libraries(cxautogen ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} mimalloc pcre2-8-object)
 target_include_directories(cxautogen PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} SYSTEM PUBLIC ${CX_TOP_SOURCE_DIR} ${CX_TOP_SOURCE_DIR}/cx/include ${CX_TOP_BINARY_DIR})
 set_property(TARGET cxautogen PROPERTY FOLDER "utils")

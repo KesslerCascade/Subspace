@@ -8,18 +8,21 @@
 sa_LogDest _log_dests;
 
 _Use_decl_annotations_
-LogDest *logRegisterDest(int maxlevel, LogCategory *catfilter, LogDestFunc dest, void *userdata)
+LogDest* logRegisterDest(int maxlevel, LogCategory* catfilter, LogDestMsg msgfunc,
+                         LogDestBatchDone batchfunc, LogDestClose closefunc, void* userdata)
 {
     logCheckInit();
     if (!atomicLoad(bool, &_log_running, Acquire))
         return NULL;
 
-    LogDest *ndest = xaAlloc(sizeof(LogDest), XA_Zero);
+    LogDest* ndest = xaAlloc(sizeof(LogDest), XA_Zero);
 
-    ndest->maxlevel = maxlevel;
+    ndest->maxlevel  = maxlevel;
     ndest->catfilter = catfilter;
-    ndest->func = dest;
-    ndest->userdata = userdata;
+    ndest->msgfunc   = msgfunc;
+    ndest->batchfunc = batchfunc;
+    ndest->closefunc = closefunc;
+    ndest->userdata  = userdata;
 
     mutexAcquire(&_log_op_lock);
     saPush(&_log_dests, ptr, ndest);
@@ -30,7 +33,7 @@ LogDest *logRegisterDest(int maxlevel, LogCategory *catfilter, LogDestFunc dest,
 }
 
 _Use_decl_annotations_
-bool logUnregisterDestLocked(LogDest *dhandle)
+bool logUnregisterDestLocked(LogDest* dhandle)
 {
     bool ret = false;
 
@@ -50,7 +53,7 @@ bool logUnregisterDestLocked(LogDest *dhandle)
 }
 
 _Use_decl_annotations_
-bool logUnregisterDest(LogDest *dhandle)
+bool logUnregisterDest(LogDest* dhandle)
 {
     logCheckInit();
     if (!atomicLoad(bool, &_log_running, Acquire))
@@ -62,7 +65,8 @@ bool logUnregisterDest(LogDest *dhandle)
     mutexRelease(&_log_op_lock);
 
     // notify dest that it's no longer needed
-    dhandle->func(-1, NULL, 0, NULL, 0, dhandle->userdata);
+    if (dhandle->closefunc)
+        dhandle->closefunc(dhandle->userdata);
     xaFree(dhandle);
     return ret;
 }

@@ -425,7 +425,7 @@ static int test_tqtest_monitor(bool dedicated)
     logRestart();   // only needed for alltests; shutdown may have previously been called
     LogMembufData *mbuf = logmembufCreate(65536);
     moncat = logCreateCat(_S"MonitorTest", true);
-    logRegisterDest(LOG_Diag, moncat, logmembufDest, mbuf);
+    logmembufRegister(LOG_Diag, moncat, mbuf);
 
     // reuse the sched test, but with the monitor enabled
     is_monitor_test = dedicated ? 2 : 1;

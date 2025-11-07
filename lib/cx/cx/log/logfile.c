@@ -4,11 +4,12 @@
 #endif
 
 #include "logfile.h"
-#include <cx/fs/path.h>
 #include <cx/container.h>
-#include <cx/time.h>
 #include <cx/format.h>
+#include <cx/fs/path.h>
+#include <cx/log/logdefer.h>
 #include <cx/string.h>
+#include <cx/time.h>
 #include <cx/utils.h>
 
 typedef struct LogFileData {
@@ -22,7 +23,6 @@ typedef struct LogFileData {
     int numseen;
     int64 lastrotate;
     int64 cursize;
-    uint32 lastbatch;
 } LogFileData;
 
 #ifdef _PLATFORM_WIN
@@ -341,22 +341,12 @@ static void formatDate(_In_ LogFileData *lfd, _Inout_ string *out, int64 timesta
 
 // this function is always called from the log thread and does not need to worry about concurrency
 _Use_decl_annotations_
-void logfileDest(int level, LogCategory *cat, int64 timestamp, strref msg, uint32 batchid, void *userdata)
+void logfileMsgFunc(int level, LogCategory* cat, int64 timestamp, strref msg, uint32 batchid,
+                    void* userdata)
 {
     LogFileData *lfd = (LogFileData*)userdata;
     if (!lfd)
         return;
-
-    if (level == -1) {
-        // we're being asked to close the log and quit
-        logfileDestroy(lfd);
-        return;
-    }
-
-    // don't rotate log files in the middle of a batch
-    if (batchid != lfd->lastbatch)
-        checkRotate(lfd);
-    lfd->lastbatch = batchid;
 
     string logline = 0;
     string logdate = 0, loglevel = 0, logcat = 0, logspaces = 0;
@@ -416,4 +406,50 @@ void logfileDest(int level, LogCategory *cat, int64 timestamp, strref msg, uint3
     vfsWrite(lfd->curfile, (void*)strC(logline), strLen(logline), NULL);
     lfd->cursize += strLen(logline);
     strDestroy(&logline);
+}
+
+_Use_decl_annotations_
+void logfileBatchFunc(uint32 batchid, void* userdata)
+{
+    LogFileData* lfd = (LogFileData*)userdata;
+    if (!lfd)
+        return;
+
+    // do log file rotation between batches
+    checkRotate(lfd);
+}
+
+_Use_decl_annotations_
+void logfileCloseFunc(void* userdata)
+{
+    LogFileData* lfd = (LogFileData*)userdata;
+    if (!lfd)
+        return;
+
+    // we're being asked to close the log and quit
+    logfileDestroy(lfd);
+}
+
+_Use_decl_annotations_
+LogDest* logfileRegister(int maxlevel, LogCategory* catfilter, LogFileData* logfile)
+{
+    return logRegisterDest(maxlevel,
+                           catfilter,
+                           logfileMsgFunc,
+                           logfileBatchFunc,
+                           logfileCloseFunc,
+                           logfile);
+}
+
+_Use_decl_annotations_
+LogDest* logfileRegisterWithDefer(int maxlevel, LogCategory* catfilter, LogFileData* logfile,
+                                  LogDest* deferdest)
+{
+    return logRegisterDestWithDefer(maxlevel,
+                                    catfilter,
+                                    logfileMsgFunc,
+                                    logfileBatchFunc,
+                                    logfileCloseFunc,
+                                    logfile,
+                                    deferdest);
 }

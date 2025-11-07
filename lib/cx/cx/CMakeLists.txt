@@ -4,8 +4,6 @@ find_package (Threads REQUIRED)
 include (${CX_TOP_SOURCE_DIR}/cmake/werror.cmake)
 include (${CX_TOP_SOURCE_DIR}/cmake/buildtype.cmake)
 
-option (CX_USE_SYSTEM_MALLOC "Use system allocator rather than mimalloc" OFF)
-
 add_subdirectory(closure)
 add_subdirectory(container)
 add_subdirectory(debug)

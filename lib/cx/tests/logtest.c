@@ -1,11 +1,11 @@
-#include <stdio.h>
 #include <cx/log.h>
+#include <cx/platform/os.h>
 #include <cx/string.h>
 #include <cx/thread.h>
-#include <cx/platform/os.h>
+#include <stdio.h>
 
 #include <cx/time.h>
-#define TEST_FILE logtest
+#define TEST_FILE  logtest
 #define TEST_FUNCS logtest_funcs
 #include "common.h"
 
@@ -14,14 +14,16 @@ static Event logtestevent;
 typedef struct LogTestData {
     int test;
     int count;
+    int batches;
     bool fail;
-    LogCategory *lastcat;
+    LogCategory* lastcat;
 } LogTestData;
 
-static void testdest(int level, LogCategory *cat, int64 timestamp, strref msg, uint32 batchid, void *userdata)
+static void testdest(int level, LogCategory* cat, int64 timestamp, strref msg, uint32 batchid,
+                     void* userdata)
 {
-    LogTestData *td = (LogTestData*)userdata;
-    bool signal = true;
+    LogTestData* td = (LogTestData*)userdata;
+    bool signal     = true;
 
     td->count++;
     td->lastcat = cat;
@@ -31,27 +33,25 @@ static void testdest(int level, LogCategory *cat, int64 timestamp, strref msg, u
     } else if (td->test == 2) {
         td->fail = !strEq(msg, _S"Notice test");
     } else if (td->test == 3) {
-        signal = (td->count == 2);
+        signal   = (td->count == 2);
         td->fail = !strEq(msg, _S"Info test") && !strEq(msg, _S"Notice test");
     } else if (td->test == 4) {
         // should NOT receive this test
         td->fail = true;
     } else if (td->test == 5) {
-        signal = (td->count == 2);
+        signal   = (td->count == 2);
         td->fail = !strEq(msg, _S"Error test");
-    } else if (td->test == 1000 && level == -1) {
-        td->fail = false;
     } else if (td->test == 20) {
-        signal = (td->count == 16);
+        signal   = false;
         td->fail = false;
     } else if (td->test == 21) {
-        signal = (td->count == 1600);
+        signal   = false;
         td->fail = false;
     } else if (td->test == 31) {
-        signal = (td->count == 5);
+        signal   = (td->count == 5);
         td->fail = !(td->count == 5);
     } else if (td->test == 32) {
-        signal = (td->count == 3);
+        signal   = (td->count == 3);
         td->fail = !(td->count == 3);
     } else {
         td->fail = true;
@@ -61,40 +61,56 @@ static void testdest(int level, LogCategory *cat, int64 timestamp, strref msg, u
         eventSignal(&logtestevent);
 }
 
+static void testdestbatch(uint32 batchid, void* userdata)
+{
+    LogTestData* td = (LogTestData*)userdata;
+
+    td->batches++;
+    eventSignal(&logtestevent);
+}
+
+static void testdestclose(void* userdata)
+{
+    LogTestData* td = (LogTestData*)userdata;
+
+    if (td->test == 1000)
+        td->fail = false;
+}
+
 static int test_log_levels()
 {
-    int ret = 0;
+    int ret        = 0;
     LogTestData td = { 0 };
     eventInit(&logtestevent);
 
     logRestart();   // only needed for alltests; shutdown may have previously been called
 
-    LogMembufData *lmd = logmembufCreate(4096);
-    logRegisterDest(LOG_Verbose, NULL, logmembufDest, lmd);
-    logRegisterDest(LOG_Info, NULL, testdest, &td);
-    logRegisterDest(LOG_Error, NULL, testdest, &td);
+    LogMembufData* lmd = logmembufCreate(4096);
+    logmembufRegister(LOG_Verbose, NULL, lmd);
+    logRegisterDest(LOG_Info, NULL, testdest, NULL, NULL, &td);
+    logRegisterDest(LOG_Error, NULL, testdest, NULL, NULL, &td);
 
-    td.test = 1;
+    td.test  = 1;
     td.count = 0;
-    td.fail = true;
+    td.fail  = true;
     logStr(Info, _S"Info test");
     if (!eventWaitTimeout(&logtestevent, timeS(1)))
         ret = 1;
     if (td.fail || td.count != 1)
         ret = 1;
 
-    td.test = 2;
+    td.test  = 2;
     td.count = 0;
-    td.fail = true;
+    td.fail  = true;
     logStr(Notice, _S"Notice test");
     if (!eventWaitTimeout(&logtestevent, timeS(1)))
         ret = 1;
     if (td.fail || td.count != 1)
         ret = 1;
 
-    td.test = 3;
+    td.test  = 3;
     td.count = 0;
-    td.fail = true;
+    td.fail  = true;
     logStr(Info, _S"Info test");
     logStr(Notice, _S"Notice test");
     if (!eventWaitTimeout(&logtestevent, timeS(1)))
@@ -103,16 +119,16 @@ static int test_log_levels()
         ret = 1;
 
     // should NOT be received by the destination
-    td.test = 4;
+    td.test  = 4;
     td.count = 0;
-    td.fail = false;
+    td.fail  = false;
     logStr(Verbose, _S"Verbose test");
     osSleep(timeMS(100));
     if (td.fail || td.count != 0)
         ret = 1;
 
     // should be received by both destinations
-    td.test = 5;
+    td.test  = 5;
     td.count = 0;
     logStr(Verbose, _S"Verbose test 2");
     logStr(Verbose, _S"Verbose test 3");
@@ -132,16 +148,15 @@ static int test_log_levels()
     return ret;
 }
 
-
 static int test_log_shutdown()
 {
-    int ret = 0;
+    int ret        = 0;
     LogTestData td = { 0 };
     eventInit(&logtestevent);
 
     logRestart();   // only needed for alltests; shutdown may have previously been called
 
-    logRegisterDest(LOG_Info, NULL, testdest, &td);
+    logRegisterDest(LOG_Info, NULL, testdest, NULL, testdestclose, &td);
 
     td.test = 1000;
     td.fail = true;
@@ -155,46 +170,46 @@ static int test_log_shutdown()
 
 static int test_log_batch()
 {
-    int ret = 0;
+    int ret        = 0;
     LogTestData td = { 0 };
     eventInit(&logtestevent);
 
     logRestart();   // only needed for alltests; shutdown may have previously been called
 
-    LogMembufData *lmd = logmembufCreate(128 * 1024);
-    logRegisterDest(LOG_Verbose, NULL, logmembufDest, lmd);
-    logRegisterDest(LOG_Info, NULL, testdest, &td);
-    logRegisterDest(LOG_Error, NULL, testdest, &td);
+    LogMembufData* lmd = logmembufCreate(128 * 1024);
+    logmembufRegister(LOG_Verbose, NULL, lmd);
+    logRegisterDest(LOG_Info, NULL, testdest, testdestbatch, NULL, &td);
+    logRegisterDest(LOG_Error, NULL, testdest, testdestbatch, NULL, &td);
 
-    td.test = 20;
+    td.test  = 20;
     td.count = 0;
-    td.fail = true;
+    td.fail  = true;
     logBatchBegin();
     for (int i = 0; i < 16; i++) {
         logFmt(Info, _S"${string} test", stvar(string, _S"Info"));
     }
-    if (td.count != 0)
+    if (td.count != 0 || td.batches != 0)
         ret = 1;
     logBatchEnd();
     if (!eventWaitTimeout(&logtestevent, timeS(1)))
         ret = 1;
-    if (td.fail || td.count != 16)
+    if (td.fail || td.count != 16 || td.batches != 1)
         ret = 1;
 
-    td.test = 21;
+    td.test  = 21;
     td.count = 0;
-    td.fail = true;
+    td.fail  = true;
     logBatchBegin();
     for (int i = 0; i < 1600; i++) {
         logFmt(Info, _S"${string} ${string}", stvar(strref, _S"Info"), stvar(strref, _S"test"));
     }
     osSleep(timeMS(100));
-    if (td.count != 0)
+    if (td.count != 0 || td.batches != 1)
         ret = 1;
     logBatchEnd();
     if (!eventWaitTimeout(&logtestevent, timeS(1)))
         ret = 1;
-    if (td.fail || td.count != 1600)
+    if (td.fail || td.count != 1600 || td.batches != 2)
         ret = 1;
 
     if (lmd->cur != 46864)
@@ -214,19 +229,19 @@ static int test_log_categories()
 
     logRestart();   // only needed for alltests; shutdown may have previously been called
 
-    LogMembufData *lmd = logmembufCreate(4096);
-    LogCategory *cat1 = logCreateCat(_S"cat1", false);
-    LogCategory *cat2 = logCreateCat(_S"cat2", true);
-    LogCategory *cat3 = logCreateCat(_S"cat3", true);
-    logRegisterDest(LOG_Verbose, NULL, logmembufDest, lmd);
-    logRegisterDest(LOG_Info, NULL, testdest, &td);
-    logRegisterDest(LOG_Info, cat1, testdest, &td);
-    logRegisterDest(LOG_Info, cat2, testdest, &td);
+    LogMembufData* lmd = logmembufCreate(4096);
+    LogCategory* cat1  = logCreateCat(_S"cat1", false);
+    LogCategory* cat2  = logCreateCat(_S"cat2", true);
+    LogCategory* cat3  = logCreateCat(_S"cat3", true);
+    logmembufRegister(LOG_Verbose, NULL, lmd);
+    logRegisterDest(LOG_Info, NULL, testdest, NULL, NULL, &td);
+    logRegisterDest(LOG_Info, cat1, testdest, NULL, NULL, &td);
+    logRegisterDest(LOG_Info, cat2, testdest, NULL, NULL, &td);
 
     // should only be received by the NULL filter
-    td.test = 1;
+    td.test  = 1;
     td.count = 0;
-    td.fail = true;
+    td.fail  = true;
     logStr(Info, _S"Info test");
     if (!eventWaitTimeout(&logtestevent, timeS(1)))
         ret = 1;
@@ -235,9 +250,9 @@ static int test_log_categories()
 
     // should be received by cat1 and NULL filter
     td.lastcat = NULL;
-    td.test = 3;
-    td.count = 0;
-    td.fail = true;
+    td.test    = 3;
+    td.count   = 0;
+    td.fail    = true;
     logStrC(Info, cat1, _S"Info test");
     if (!eventWaitTimeout(&logtestevent, timeS(1)))
         ret = 1;
@@ -246,9 +261,9 @@ static int test_log_categories()
 
     // should ONLY be received by cat2 filter
     td.lastcat = NULL;
-    td.test = 1;
-    td.count = 0;
-    td.fail = false;
+    td.test    = 1;
+    td.count   = 0;
+    td.fail    = false;
     logStrC(Info, cat2, _S"Info test");
     if (!eventWaitTimeout(&logtestevent, timeS(1)))
         ret = 1;
@@ -257,9 +272,9 @@ static int test_log_categories()
 
     // should not be received by ANY destination
     td.lastcat = NULL;
-    td.test = 4;
-    td.count = 0;
-    td.fail = false;
+    td.test    = 4;
+    td.count   = 0;
+    td.fail    = false;
     logStrC(Info, cat3, _S"Info test");
     osSleep(timeMS(100));
     if (td.fail || td.count != 0 || td.lastcat != NULL)
@@ -276,21 +291,21 @@ static int test_log_categories()
 
 static int test_log_defer()
 {
-    int ret = 0;
+    int ret        = 0;
     LogTestData td = { 0 };
     eventInit(&logtestevent);
 
     logRestart();   // only needed for alltests; shutdown may have previously been called
 
-    LogDeferData *ldata1 = logDeferCreate();
-    LogDeferData *ldata2 = logDeferCreate();
+    LogDeferData* ldata1 = logDeferCreate();
+    LogDeferData* ldata2 = logDeferCreate();
 
-    LogDest *ldd1 = logRegisterDest(LOG_Verbose, NULL, logDeferDest, ldata1);
-    LogDest *ldd2 = logRegisterDest(LOG_Verbose, NULL, logDeferDest, ldata2);
+    LogDest* ldd1 = logDeferRegister(LOG_Verbose, NULL, ldata1);
+    LogDest* ldd2 = logDeferRegister(LOG_Verbose, NULL, ldata2);
 
-    td.test = 31;
+    td.test  = 31;
     td.count = 0;
-    td.fail = true;
+    td.fail  = true;
 
     logStr(Info, _S"Info test");
     logStr(Notice, _S"Notice test");
@@ -310,9 +325,9 @@ static int test_log_defer()
     // real destination instead, but we are specifically are testing the defer handoff.
     logFlush();
 
-    LogMembufData *lmd = logmembufCreate(4096);
-    logRegisterDestWithDefer(LOG_Verbose, NULL, logmembufDest, lmd, ldd1);
-    logRegisterDestWithDefer(LOG_Info, NULL, testdest, &td, ldd2);
+    LogMembufData* lmd = logmembufCreate(4096);
+    logmembufRegisterWithDefer(LOG_Verbose, NULL, lmd, ldd1);
+    logRegisterDestWithDefer(LOG_Info, NULL, testdest, NULL, NULL, &td, ldd2);
 
     // Specifically check for 5 events. The Verbose level entry went into the defer buffer
     // because it was registered at that level, but should have been filtered before going to
@@ -322,9 +337,9 @@ static int test_log_defer()
     if (td.fail || td.count != 5)
         ret = 1;
 
-    td.test = 32;
+    td.test  = 32;
     td.count = 0;
-    td.fail = true;
+    td.fail  = true;
     logStr(Info, _S"Info test");
     logStr(Notice, _S"Notice test");
     logStr(Warn, _S"Warn test");
@@ -344,10 +359,10 @@ static int test_log_defer()
 }
 
 testfunc logtest_funcs[] = {
-    { "levels", test_log_levels },
-    { "shutdown", test_log_shutdown },
-    { "batch", test_log_batch },
+    { "levels",     test_log_levels     },
+    { "shutdown",   test_log_shutdown   },
+    { "batch",      test_log_batch      },
     { "categories", test_log_categories },
-    { "defer", test_log_defer },
-    { 0, 0 }
+    { "defer",      test_log_defer      },
+    { 0,            0                   }
 };
