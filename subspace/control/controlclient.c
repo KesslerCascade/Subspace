@@ -31,6 +31,7 @@ _objinit_guaranteed bool ControlClient_init(_In_ ControlClient* self)
     prqInitDynamic(&self->outbound, 16, 32, 0, 0, 0);
 
     // Autogen begins -----
+    htInit(&self->logbatch, uint32, sarray, 16);
     return true;
     // Autogen ends -------
 }
@@ -48,6 +49,7 @@ void ControlClient_destroy(_In_ ControlClient* self)
     // Autogen begins -----
     objDestroyWeak(&self->svr);
     objDestroyWeak(&self->inst);
+    htDestroy(&self->logbatch);
     // Autogen ends -------
 }
 

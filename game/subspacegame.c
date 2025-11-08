@@ -102,12 +102,18 @@ int entryPoint()
     validateAllFeatures(&ps);
     gameLogSend();
 
+    logBatchBegin();
+    logStr(Info, _S"Applying required patches");
     if (!patchApplySeq(&ps, OSDepPatches) || !patchFeature(&Base_feature, &ps)) {
         logStr(Error, _S"Required patches failed");
+        logBatchEnd();
         gameLogSend();
         controlSendLaunchFail(&control, LAUNCH_FAIL_REQPATCH);
         return 1;
     }
+    logBatchEnd();
+    gameLogSend();
+
     patchAllFeatures(&ps);
 
     if (!patchEnd(&ps)) {
@@ -119,10 +125,13 @@ int entryPoint()
 
     switch (settings.mode) {
     case LAUNCH_PLAY:
+        logStr(Verbose, _S"Calling main FTL entry point");
         ftlentry = getProgramEntry(ftlbase);
         ftlentry();
         break;
     case LAUNCH_VALIDATE:
+        logStr(Verbose, _S"Sending validation results and exiting");
+        gameLogSend();
         controlSendValidate(&control, true, 0);
         controlDisconnect(&sock);
         break;
@@ -140,6 +149,7 @@ int cleanupthread(void* unused)
 
 void sscmain2(void)
 {
+    gameLogSend();
     controlClientStart();
     registerCmds();
     gameLogSwitchToClientQueue();

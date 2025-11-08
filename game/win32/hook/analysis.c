@@ -51,6 +51,7 @@ static bool scanImports(addr_t base, hashtable* tbl)
     IMAGE_IMPORT_DESCRIPTOR* imp = datadirptr(base, data, IMAGE_IMPORT_DESCRIPTOR);
     IMAGE_IMPORT_DESCRIPTOR* end = datadirend(base, data, IMAGE_IMPORT_DESCRIPTOR);
 
+    logBatchBegin();
     logFmt(Diag,
            _S"Scanning import table (${0uint(8,hex)}-${0uint(8,hex)})",
            stvar(uintptr, (uintptr)imp - base),
@@ -80,6 +81,7 @@ static bool scanImports(addr_t base, hashtable* tbl)
     }
 
     logFmt(Diag, _S"Found ${int} imports", stvar(int32, htSize(*tbl)));
+    logBatchEnd();
 
     return 1;
 }
@@ -91,8 +93,9 @@ static bool scanStrings(addr_t base, ModuleInfo* mi)
     if (!getRDataSeg(base, &rdata))
         return false;
 
+    logBatchBegin();
     logFmt(Diag,
-           _S"Scanning rdata segment (${0uint(8,hex)}-${0uint(8,hex)}) for strings",
+           _S"Scanning rdata segment (${0uint(8,hex)}-${0uint(8,hex)})",
            stvar(uintptr, rdata.start - base),
            stvar(uintptr, rdata.end - base));
 
@@ -141,6 +144,7 @@ static bool scanStrings(addr_t base, ModuleInfo* mi)
            stvar(int32, htSize(mi->stringhash)),
            stvar(int32, htSize(mi->stringlochash)),
            stvar(int32, nptrs));
+    logBatchEnd();
 
     saDestroy(&relocs);
 
@@ -161,6 +165,7 @@ static bool scanRelocs(addr_t base, ModuleInfo* mi, hashtable* functrackers)
     if (!getCodeSeg(base, &code))
         return false;
 
+    logBatchBegin();
     logFmt(Diag,
            _S"Scanning relocation table (${0uint(8,hex)}-${0uint(8,hex)})",
            stvar(uintptr, (uintptr)reloc - base),
@@ -186,6 +191,7 @@ static bool scanRelocs(addr_t base, ModuleInfo* mi, hashtable* functrackers)
     }
 
     logFmt(Diag, _S"Found ${int} relocations", stvar(int32, htSize(mi->relochash)));
+    logBatchEnd();
 
     return true;
 }
@@ -217,6 +223,12 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtable* importtrackers,
         return false;
     if (!getRDataSeg(base, &rdata))
         return false;
+
+    logBatchBegin();
+    logFmt(Diag,
+           _S"Scanning code segment (${0uint(8,hex)}-${0uint(8,hex)})",
+           stvar(uintptr, (uintptr)code.start - base),
+           stvar(uintptr, (uintptr)code.end - base));
 
     p = code.start;
     while (p < code.end) {
@@ -283,6 +295,15 @@ static bool scanCode(addr_t base, ModuleInfo* mi, hashtable* importtrackers,
         p += ilen;
     }
 
+    logFmt(Diag,
+           _S"Found ${int} relative call/jump destinations",
+           stvar(int32, htSize(mi->relcallhash)));
+    logFmt(Diag, _S"Found ${int} call destinations", stvar(int32, htSize(mi->funccallhash)));
+    logFmt(Diag, _S"Found ${int} imported symbol references", stvar(int32, htSize(mi->importhash)));
+    logFmt(Diag, _S"Found ${int} string references", stvar(int32, htSize(mi->stringrefhash)));
+    logFmt(Diag, _S"Found ${int} pointer references", stvar(int32, htSize(mi->ptrrefhash)));
+    logBatchEnd();
+
     return true;
 }
 
@@ -293,6 +314,9 @@ static void checkFunctions(addr_t base, hashtable* trackers, AddrList* funcs)
 
     if (!getCodeSeg(base, &code))
         return;
+
+    logBatchBegin();
+    logFmt(Diag, _S"Checking ${int} potential functions", stvar(int32, htSize(*trackers)));
 
     foreach (hashtable, hti, *trackers) {
         int32 typ;
@@ -320,36 +344,50 @@ static void checkFunctions(addr_t base, hashtable* trackers, AddrList* funcs)
             saPush(funcs, uintptr, addr);
         }
     }
+
+    logFmt(Diag, _S"Identified ${int} functions", stvar(int32, saSize(*funcs)));
+    logBatchEnd();
 }
 
 bool analyzeModule(addr_t base, ModuleInfo* mi)
 {
+    bool ret = false;
     hashtable importtrackers;
     htInit(&importtrackers, uintptr, ptr, 64);
     hashtable functrackers;
     htInit(&functrackers, uintptr, int32, 64);
 
     logBatchBegin();
-    if (!scanImports(base, &importtrackers))
-        return false;
-    if (!scanExports(base, &mi->exporthash))
-        return false;
-    if (!scanRelocs(base, mi, &functrackers))
-        return false;
-    if (!scanStrings(base, mi))
-        return false;
-    if (!scanCode(base, mi, &importtrackers, &functrackers))
-        return false;
+    logStr(Info, _S"Starting code analysis");
 
+    if (!scanImports(base, &importtrackers))
+        goto out;
+    if (!scanExports(base, &mi->exporthash))
+        goto out;
+    if (!scanRelocs(base, mi, &functrackers))
+        goto out;
+    if (!scanStrings(base, mi))
+        goto out;
+    if (!scanCode(base, mi, &importtrackers, &functrackers))
+        goto out;
+
+    checkFunctions(base, &functrackers, &mi->funclist);
+
+    ret = true;
+
+out:
+    if (ret)
+        logStr(Info, _S"Code analysis complete");
+    else
+        logStr(Error, _S"Code analysis failed");
+    logBatchEnd();
+
+    htDestroy(&functrackers);
     foreach (hashtable, hti, importtrackers) {
         ImportTrackerEnt* trk = htiVal(ptr, hti);
         xaFree(trk);
     }
     htDestroy(&importtrackers);
 
-    checkFunctions(base, &functrackers, &mi->funclist);
-    htDestroy(&functrackers);
-    logBatchEnd();
-
-    return true;
+    return ret;
 }

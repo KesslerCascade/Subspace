@@ -101,6 +101,7 @@ add_executable(subspace
     control/cmds/cmdlaunchfail.c
     control/cmds/cmdloadgame.c
     control/cmds/cmdloading.c
+    control/cmds/cmdlogbatch.c
     control/cmds/cmdlogmsg.c
     control/cmds/cmdnewgame.c
     control/cmds/cmdrunlog.c

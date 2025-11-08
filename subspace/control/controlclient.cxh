@@ -2,6 +2,13 @@
 #include "subspace.h"
 #include <cx/thread/prqueue.h>
 
+typedef struct GameLogMsg {
+    int64 timestamp;
+    int level;
+    string msg;
+} GameLogMsg;
+saDeclare(GameLogMsg);
+
 class ControlServer;
 class GameInst;
 [methodprefix cclient] class ControlClient
@@ -9,6 +16,7 @@ class GameInst;
     Subspace *ss;
     weak:ControlServer svr;
     weak:GameInst inst;
+    hashtable:uint32:sarray logbatch;
     ControlState state;
     PrQueue outbound;
 

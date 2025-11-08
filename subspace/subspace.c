@@ -374,7 +374,7 @@ int entryPoint()
 
     // create defer buffer to capture any early log messages
     LogDeferData* dd  = logDeferCreate();
-    LogDest* deferbuf = logRegisterDest(LOG_Debug, NULL, logDeferDest, dd);
+    LogDest* deferbuf = logDeferRegister(LOG_Debug, NULL, dd);
 
     filesys = vfsCreateFromFS();
     if (!filesys)

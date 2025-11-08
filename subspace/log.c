@@ -27,7 +27,7 @@ bool logOpen(VFS *vfs, string filename, LogDest **defer)
     logdata = logfileCreate(vfs, filename, &config);
     if (!logdata)
         return false;
-    dest   = logRegisterDestWithDefer(LOG_Debug, NULL, logfileDest, logdata, *defer);
+    dest   = logfileRegisterWithDefer(LOG_Debug, NULL, logdata, *defer);
     *defer = NULL;
     return dest;
 }

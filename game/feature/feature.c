@@ -145,21 +145,29 @@ bool enableFeature(SubspaceFeature* feat, bool enabled)
 void validateAllFeatures(PatchState* ps)
 {
     bool ret = true;
+
+    logBatchBegin();
+    logStr(Info, _S"Validating all features");
     foreach (hashtable, hti, feathash) {
         SubspaceFeature* feat = (SubspaceFeature*)htiVal(ptr, hti);
         if (feat)
             validateFeature(feat, ps);
     }
+    logBatchEnd();
 }
 
 void patchAllFeatures(PatchState* ps)
 {
     bool ret = true;
+
+    logBatchBegin();
+    logStr(Info, _S"Patching all features");
     foreach (hashtable, hti, feathash) {
         SubspaceFeature* feat = (SubspaceFeature*)htiVal(ptr, hti);
         if (feat)
             patchFeature(feat, ps);
     }
+    logBatchEnd();
 }
 
 void sendFeatureState(SubspaceFeature* feat, int replyto)
