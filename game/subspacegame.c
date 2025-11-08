@@ -74,6 +74,7 @@ int entryPoint()
     logFmt(Info,
            _S"Subspace Game Loader ${string} starting up!",
            stvar(strref, (strref)subspace_version_str));
+    logStr(Info, settings.mode == LAUNCH_PLAY ? _S"Launch Mode: PLAY" : _S"Launch Mode: VALIDATE");
 
     osSetCurrentDir(settings.gameDir);
     logFmt(Info, _S"Loading executable:  ${string}", stvar(strref, (strref)settings.gamePath));
@@ -153,7 +154,7 @@ void sscmain2(void)
     controlClientStart();
     registerCmds();
     gameLogSwitchToClientQueue();
-    logStr(Info, _S"Communication thread started");
+    logStr(Verbose, _S"Communication thread started");
     sendAllFeatureState();
 
     ControlMsg* msg = controlMsgCreate(_S"GameReady");
