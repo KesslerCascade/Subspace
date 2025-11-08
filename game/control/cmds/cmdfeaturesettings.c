@@ -36,7 +36,6 @@ void cmdFeatureSettings(ControlMsg* msg, hashtable fields)
             *(char**)dest = s ? xa_strdup(strC(s)) : NULL;
             break;
         }
-        break;
 
         ent++;
     }
