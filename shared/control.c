@@ -2,6 +2,10 @@
 #include <cx/time.h>
 #include <cx/xalloc.h>
 
+#ifdef SUBSPACE_GAME
+#include "osdep.h"
+#endif
+
 #include "control.h"
 #include "netsocket.h"
 
