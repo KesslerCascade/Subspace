@@ -394,12 +394,6 @@ bool disasmTrace(addr_t base, DisasmTrace* trace)
 
     if (trace->csym)
         saddr = _symAddr(base, trace->csym);
-    }
-    if (!saddr && trace->cstr) {
-        saddr = findString(base, (strref)trace->cstr);
-    }
-    if (!saddr && trace->c != DTRACE_FUNCS)   // nowhere to search :(
-        return false;
 
     switch (trace->c) {
     case DTRACE_ADDR:
@@ -427,17 +421,11 @@ bool disasmTrace(addr_t base, DisasmTrace* trace)
 
     for (i = 0; i < saSize(tocheck); i++) {
         addr_t checkaddr = 0;
-        // if (trace == &ShipManager_DamageBeam_trace) {
-        //  log_fmt(LOG_Verbose, "  Checking candidate at 0x%08x", al->a[i] - base);
-        //}
         if (trace->mod == DTRACE_MOD_FUNCSTART) {
             // this trace wants to look at the start of the function containing the reference
             int checkidx = saFind(mi->funclist, uintptr, tocheck.a[i], SA_Inexact);
             if (checkidx != -1 && checkidx > 0)
                 checkaddr = mi->funclist.a[checkidx - 1];   // function start address
-            // if (trace == &ShipManager_DamageBeam_trace) {
-            //  log_fmt(LOG_Verbose, "  Function start at 0x%08x", checkaddr - base);
-            //}
         } else {
             checkaddr = tocheck.a[i];
         }
