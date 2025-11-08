@@ -193,6 +193,7 @@ bool _controlEncodeMsg(ControlState* cs, ControlMsgHeader* hdr, hashtable fields
 
         if (arrtype == stTypeId(string) && count > 0) {
             // special case, have to count all the strings, plus lengths
+            ncf.h.ftype = CF_STRING;
             dsize = 4;
             for (uint32_t j = 0; j < saSize(val->data.st_sarray); j++) {
                 sa_string* arr = (sa_string*)&val->data.st_sarray;

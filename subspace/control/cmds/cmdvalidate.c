@@ -21,11 +21,14 @@ void cmdValidate(GameInst* inst, ControlClient* client, ControlMsg* msg, hashtab
 
             if (htFind(fields, strref, _S"features", stvar, &val, HT_Borrow)) {
                 if (stvarIs(&val, sarray)) {
-                    string* feats = (string*)val.data.st_sarray.a;
-                    for (int i = 0; i < saSize(val.data.st_sarray); i++) {
-                        ClientFeature* nf = clientfeatureCreate(feats[i]);
-                        nf->available     = true;
-                        htInsertC(&inst->features, strref, nf->name, object, &nf);
+                    sa_string* arr = (sa_string*)&val.data.st_sarray;
+                    if (saElemType(*arr) == stType(string)) {
+                        string* feats = (string*)arr->a;
+                        for (int i = 0; i < saSize(*arr); i++) {
+                            ClientFeature* nf = clientfeatureCreate(feats[i]);
+                            nf->available     = true;
+                            htInsertC(&inst->features, strref, nf->name, object, &nf);
+                        }
                     }
                 }
             }
