@@ -1,4 +1,6 @@
 #include <cx/container.h>
+#include <cx/fs.h>
+#include <cx/platform/win/win_fs.h>
 #include <cx/string.h>
 #include <cx/thread.h>
 #include <cx/utils/lazyinit.h>
@@ -459,19 +461,14 @@ addr_t getSymbol(addr_t imagebase, const char* name)
 
 // LoadLibrary-based loader for debugging
 
-addr_t loadExe(const char* filename)
+addr_t loadExe(strref filename)
 {
     EXE_HEADERS hdr;
     addr_t imagebase = 0;
     IMAGE_NT_HEADERS* nthdr;
     int needreloc = 0;
 
-    int fnlen          = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-    wchar_t* filenamew = xaAlloc(fnlen * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, filename, -1, filenamew, fnlen);
-
-    imagebase = (addr_t)LoadLibraryExW(filenamew, NULL, DONT_RESOLVE_DLL_REFERENCES);
-    xaFree(filenamew);
+    imagebase = (addr_t)LoadLibraryExW(fsPathToNT(filename), NULL, DONT_RESOLVE_DLL_REFERENCES);
     if (!imagebase)
         goto done;
 
@@ -506,7 +503,7 @@ fail:
 #else
 
 // native loader
-addr_t loadExe(const char* filename)
+addr_t loadExe(strref filename)
 {
     HANDLE hFile;
     LARGE_INTEGER sz;
@@ -515,18 +512,13 @@ addr_t loadExe(const char* filename)
     IMAGE_NT_HEADERS* nthdr;
     int needreloc = 0;
 
-    int fnlen          = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-    wchar_t* filenamew = xaAlloc(fnlen * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, filename, -1, filenamew, fnlen);
-
-    hFile = CreateFileW(filenamew,
+    hFile = CreateFileW(fsPathToNT(filename),
                         GENERIC_READ,
                         FILE_SHARE_READ,
                         NULL,
                         OPEN_EXISTING,
                         FILE_ATTRIBUTE_NORMAL,
                         0);
-    xaFree(filenamew);
     if (!GetFileSizeEx(hFile, &sz))
         goto fail;
 

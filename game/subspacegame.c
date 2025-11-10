@@ -76,8 +76,8 @@ int entryPoint()
            stvar(strref, (strref)subspace_version_str));
     logStr(Info, settings.mode == LAUNCH_PLAY ? _S"Launch Mode: PLAY" : _S"Launch Mode: VALIDATE");
 
-    osSetCurrentDir(settings.gameDir);
-    logFmt(Info, _S"Loading executable:  ${string}", stvar(strref, (strref)settings.gamePath));
+    fsSetCurDir(settings.gameDir);
+    logFmt(Info, _S"Loading executable:  ${string}", stvar(strref, settings.gamePath));
     ftlbase = loadProgram(settings.gamePath);
     gameLogSend();
 

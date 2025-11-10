@@ -10,7 +10,6 @@ extern void osWriteDbg(const char* str);
 #endif
 
 void osShowError(const char* str);
-void osSetCurrentDir(const char* dir);
 
 bool osWriteFile(const char* fn, uint8_t* buf, size_t sz);
 

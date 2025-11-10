@@ -83,29 +83,18 @@ int controlRecvLaunchCmd(ControlState* cs)
     if (settings.mode < LAUNCH_PLAY || settings.mode > LAUNCH_VALIDATE)
         goto out;   // RLC_Error;
 
-    strref str       = cfieldString(msg->fields, _S"gamedir");
-    settings.gameDir = xa_strdup(strC(str));
+    strDup(&settings.gameDir, cfieldString(msg->fields, _S"gamedir"));
+    strDup(&settings.gameProgram, cfieldString(msg->fields, _S"gameprogram"));
+    strDup(&settings.gamePath, cfieldString(msg->fields, _S"gamepath"));
 
-    str                  = cfieldString(msg->fields, _S"gameprogram");
-    settings.gameProgram = xa_strdup(strC(str));
-
-    str               = cfieldString(msg->fields, _S"gamepath");
-    settings.gamePath = xa_strdup(strC(str));
-
-    str = cfieldString(msg->fields, _S"saveoverride");
+    strref str = cfieldString(msg->fields, _S"saveoverride");
     if (!strEmpty(str)) {
         // FTL needs this to end in a backslash, so ensure that it does
-        char* strbuf = strBuffer(&str, 0);
-        if (strbuf[strLen(str) - 1] == '\\') {
-            settings.saveOverride = xa_strdup(strC(str));
+        if (strEndsWith(str, _S"\\") || strEndsWith(str, _S"/")) {
+            strDup(&settings.saveOverride, str);
         } else {
-            size_t len            = strLen(str);
-            settings.saveOverride = xaAlloc(len + 2);
-            memcpy(settings.saveOverride, strbuf, len);
-            settings.saveOverride[len]     = '\\';
-            settings.saveOverride[len + 1] = '\0';
+            strConcat(&settings.saveOverride, str, _S"\\");
         }
-        strDestroy(&str);
     }
 
     ret = RLC_Launch;

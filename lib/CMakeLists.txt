@@ -2,10 +2,13 @@ set(SKIP_INSTALL_ALL 1)
 
 if (BUILD_GAME)
     add_subdirectory(disasm)
+
+    set(CX_TLS OFF CACHE INTERNAL "Build mbedTLS cryptography library" FORCE)
     add_subdirectory(cx)
 else()
     set(as_subproject ZLIB)
 
+    set(CX_TLS OFF CACHE INTERNAL "Build mbedTLS cryptography library" FORCE)
     add_subdirectory(cx)
 
     set(BUILD_SHARED_LIBS OFF CACHE INTERNAL "Build shared libraries" FORCE)

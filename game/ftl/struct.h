@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cx/cx.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include "ftl/types.h"
@@ -33,6 +34,7 @@ typedef struct basic_string {
 
 void basic_string_reset(basic_string* str);
 void basic_string_set(basic_string* str, const char* src);
+void basic_string_set_str(basic_string* str, strref src);
 void basic_string_destroy(basic_string* str);
 
 typedef struct vector {

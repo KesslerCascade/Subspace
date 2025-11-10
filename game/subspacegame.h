@@ -70,10 +70,10 @@ typedef struct SubspaceGameSettings {
     int port;
     uint32_t cookie;     // unique ID to track game instances
 
-    char* gameDir;       // root directory where the game is located
-    char* gameProgram;   // name of the game executable
-    char* gamePath;      // full path to game executable
-    char* saveOverride;
+    string gameDir;      // root directory where the game is located
+    string gameProgram;   // name of the game executable
+    string gamePath;      // full path to game executable
+    string saveOverride;
 
     LaunchMode mode;
 } SubspaceGameSettings;

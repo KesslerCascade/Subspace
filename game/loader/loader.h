@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cx/cx.h>
 #include <stdbool.h>
 #include <stdint.h>
 
@@ -13,7 +14,7 @@ typedef struct SegInfo {
 
 typedef (*entrypoint)();
 
-addr_t loadProgram(const char* filename);
+addr_t loadProgram(strref filename);
 entrypoint getProgramEntry(addr_t baseaddr);
 
 bool getCodeSeg(addr_t baseaddr, SegInfo* si);

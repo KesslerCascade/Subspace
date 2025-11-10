@@ -1,9 +1,10 @@
 #pragma once
+#include <cx/cx.h>
 #include "imgutil.h"
 
 #include <windows.h>
 
-addr_t loadExe(const char* filename);
+addr_t loadExe(strref filename);
 int importResources(addr_t base);
 int importTLSInitializers(addr_t base);
 

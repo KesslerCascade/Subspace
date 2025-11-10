@@ -15,16 +15,6 @@ void osWriteDbg(const char* str)
 }
 #endif
 
-void osSetCurrentDir(const char* dir)
-{
-    int dlen      = MultiByteToWideChar(CP_UTF8, 0, dir, -1, NULL, 0);
-    wchar_t* dirw = xaAlloc(dlen * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, dir, -1, dirw, dlen);
-
-    SetCurrentDirectoryW(dirw);
-    xaFree(dirw);
-}
-
 void osExit(int retcode)
 {
     ExitProcess(retcode);
