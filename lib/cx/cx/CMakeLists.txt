@@ -74,14 +74,16 @@ add_library(cx STATIC
     ${CX_NATVIS_FILES}
     ${CX_CMAKE_FILES})
 
-target_link_libraries(cx ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} mimalloc)
+target_link_libraries(cx ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
 target_include_directories(cx SYSTEM PUBLIC ${CX_TOP_SOURCE_DIR} ${CX_TOP_SOURCE_DIR}/cx/include ${CX_TOP_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_compile_definitions(cx PRIVATE UNICODE _UNICODE)
 if (CX_COMPILER_IS_MSVC)
     target_link_options(cx PUBLIC /NATVIS:${CMAKE_CURRENT_SOURCE_DIR}/cx.natvis)
 endif()
 
-if (CX_USE_SYSTEM_MALLOC)
+if (CX_MIMALLOC)
+    target_link_libraries(cx mimalloc)
+else()
     target_compile_definitions(cx PRIVATE XALLOC_USE_SYSTEM_MALLOC)
 endif()
 

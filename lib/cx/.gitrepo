@@ -6,7 +6,7 @@
 [subrepo]
 	remote = https://github.com/Number5ix/cx.git
 	branch = master
-	commit = 2a70c22662375ea63efd85767eee3433855f287b
+	commit = 6e1aad4cdabdf1721078b30c70ba2c4e2be25be3
 	parent = a74b55c3fb8f505b1a10cf1528d8af4c66f30a02
 	method = merge
 	cmdver = 0.4.7

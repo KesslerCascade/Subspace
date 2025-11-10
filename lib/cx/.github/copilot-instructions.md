@@ -197,7 +197,7 @@ xaRelease(&data);  // Frees and sets data = NULL
 1. **Strings**: Always initialize to `0`, use `strDestroy()` to free
 2. **Containers**: Always initialize to `{ 0 }` or `0`, use destructor macros
 3. **Objects**: Use `objRelease()`, not manual `free()`
-4. **Mimalloc**: Default allocator (can override with `CX_USE_SYSTEM_MALLOC`)
+4. **Mimalloc**: Default allocator (can override by turning off `CX_MIMALLOC`)
 
 ### Type Safety
 - **Always pass type parameters**: `saPush(&arr, int32, val)` not just `saPush(&arr, val)`

@@ -3,7 +3,10 @@
 #include "xalloc.h"
 #include <cx/platform/base.h>
 #include <cx/utils/lazyinit.h>
+
+#ifndef XALLOC_USE_SYSTEM_MALLOC
 #include <mimalloc.h>
+#endif
 
 extern LazyInitState _xaInitState;
 

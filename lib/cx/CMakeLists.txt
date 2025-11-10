@@ -30,8 +30,7 @@ endif()
 
 option(CX_LUA "Build Lua scripting engine and cxlua library" ${CX_LUA_DEFAULT})
 option(CX_TLS "Build mbedTLS cryptography library" ${CX_TLS_DEFAULT})
-
-option(CX_USE_SYSTEM_MALLOC "Use system allocator rather than mimalloc" OFF)
+option(CX_MIMALLOC "Use mimalloc rather than system allocator" ON)
 
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/cxauto.cmake)
 include (${CMAKE_CURRENT_SOURCE_DIR}/cmake/organize_targets.cmake)

@@ -5,6 +5,7 @@
 
 include (${CX_TOP_SOURCE_DIR}/cmake/buildtype.cmake)
 
+if (CX_MIMALLOC)
 set(MI_OVERRIDE          OFF CACHE INTERNAL "Override the standard malloc interface (e.g. define entry points for malloc() etc)" FORCE)
 set(MI_OSX_INTERPOSE     OFF CACHE INTERNAL "Use interpose to override standard malloc on macOS" FORCE)
 set(MI_OSX_ZONE          OFF CACHE INTERNAL "Use malloc zone to override standard malloc on macOS" FORCE)
@@ -25,7 +26,9 @@ target_compile_definitions(mimalloc-objlib PRIVATE
     $<${isrelease}:MI_DEBUG=0>
     $<${isrelease}:MI_SECURE=4>)
 add_library(mimalloc ALIAS mimalloc-objlib)
+endif() # CX_MIMALLOC
 
+if (CX_TLS)
 set(ENABLE_PROGRAMS OFF CACHE INTERNAL "Build Mbed TLS programs." FORCE)
 set(ENABLE_TESTING  OFF CACHE INTERNAL "Build Mbed TLS tests." FORCE)
 
@@ -47,6 +50,7 @@ target_compile_definitions(mbedcrypto PRIVATE
     $<${isdebug}:DEBUG_LEVEL=2>
     $<${isdev}:DEBUG_LEVEL=1>
     $<${isrelease}:DEBUG_LEVEL=0>)
+endif() # CX_TLS
 
 set(PCRE2_SHOW_REPORT     OFF CACHE INTERNAL "Show the final configuration report" FORCE)
 set(PCRE2_BUILD_PCRE2GREP OFF CACHE INTERNAL "Build pcre2grep" FORCE)
@@ -61,6 +65,6 @@ target_include_directories(pcre2-8-object PRIVATE ${CX_TOP_SOURCE_DIR})
 
 if (CX_LUA)
 add_subdirectory(lua)
-endif()
+endif() # CX_LUA
 
 organize_targets(CLEAR_FOLDER PREPEND 3rdparty)
