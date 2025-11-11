@@ -13,7 +13,7 @@ extern SubspaceFeature Tweaks_feature;
 typedef struct ControlField ControlField;
 
 void registerFeature(SubspaceFeature* feature);
-SubspaceFeature* getFeature(const char* name);
+SubspaceFeature* getFeature(strref name);
 
 bool validateFeature(SubspaceFeature* feat, PatchState* ps);
 bool patchFeature(SubspaceFeature* feat, PatchState* ps);

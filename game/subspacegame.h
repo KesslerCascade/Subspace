@@ -32,7 +32,7 @@ extern const char* subspace_version_series;
 extern const char* subspace_version_str;
 
 typedef struct FeatureSettingsEnt {
-    const char* name;
+    strref name;
     int type;   // same as control message types
     size_t off;
 } FeatureSettingsEnt;
@@ -49,7 +49,7 @@ typedef struct SubspaceFeature {
     bool available;   // is this feature available -- i.e. did all the necessary patches apply?
     bool enabled;   // is the feature enabled? Doesn't mean that it's active right now, just enabled
 
-    const char* name;   // name of the feature
+    strref name;    // name of the feature
     featureValidate_t validate;
     featurePatch_t patch;
     featureEnable_t enable;

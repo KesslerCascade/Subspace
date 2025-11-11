@@ -168,22 +168,22 @@ Patch* Tweaks_patches[] = {
 
 FeatureSettingsSpec Tweaks_spec = {
     .size = sizeof(TweaksSettings),
-    .ent  = { { .name = "targetfps", .type = CF_INT, .off = offsetof(TweaksSettings, targetfps) },
-             { .name = "preserveload",
+    .ent  = { { .name = _S"targetfps", .type = CF_INT, .off = offsetof(TweaksSettings, targetfps) },
+             { .name = _S"preserveload",
                 .type = CF_BOOL,
                 .off  = offsetof(TweaksSettings, preserveload) },
-             { .name = "savecompat", .type = CF_BOOL, .off = offsetof(TweaksSettings, savecompat) },
-             { .name = "postgamesave",
+             { .name = _S"savecompat", .type = CF_BOOL, .off = offsetof(TweaksSettings, savecompat) },
+             { .name = _S"postgamesave",
                 .type = CF_BOOL,
                 .off  = offsetof(TweaksSettings, postgamesave) },
-             { .name = "creditsmusic",
+             { .name = _S"creditsmusic",
                 .type = CF_BOOL,
                 .off  = offsetof(TweaksSettings, creditsmusic) },
              { 0 } }
 };
 
 SubspaceFeature Tweaks_feature = {
-    .name            = "Tweaks",
+    .name            = _S"Tweaks",
     .enable          = tweaks_Enable,
     .settingsspec    = &Tweaks_spec,
     .requiredPatches = Tweaks_patches,

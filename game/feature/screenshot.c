@@ -330,23 +330,23 @@ static void screenshot_take_cb(int key, int flags)
 }
 
 static KeyBind Screenshot_keybinds[] = {
-    { .name = "screenshot_take", .context = KB_CTX_GAME, .func = screenshot_take_cb },
+    { .name = _S"screenshot_take", .context = KB_CTX_GAME, .func = screenshot_take_cb },
     { 0 }
 };
 
 FeatureSettingsSpec Screenshot_spec = {
     .size = sizeof(ScreenshotSettings),
-    .ent  = { { .name = "sound", .type = CF_BOOL, .off = offsetof(ScreenshotSettings, sound) },
-             { .name = "hidemouse",
+    .ent  = { { .name = _S"sound", .type = CF_BOOL, .off = offsetof(ScreenshotSettings, sound) },
+             { .name = _S"hidemouse",
                 .type = CF_BOOL,
                 .off  = offsetof(ScreenshotSettings, hidemouse) },
-             { .name = "hidepause",
+             { .name = _S"hidepause",
                 .type = CF_BOOL,
                 .off  = offsetof(ScreenshotSettings, hidepause) },
-             { .name = "hideinfoblock",
+             { .name = _S"hideinfoblock",
                 .type = CF_BOOL,
                 .off  = offsetof(ScreenshotSettings, hideinfoblock) },
-             { .name = "events", .type = CF_INT, .off = offsetof(ScreenshotSettings, events) },
+             { .name = _S"events", .type = CF_INT, .off = offsetof(ScreenshotSettings, events) },
              { 0 } }
 };
 
@@ -367,7 +367,7 @@ Patch* Screenshot_patches[] = {
 };
 
 SubspaceFeature Screenshot_feature = {
-    .name            = "Screenshot",
+    .name            = _S"Screenshot",
     .keybinds        = Screenshot_keybinds,
     .requiredPatches = Screenshot_patches,
     .settingsspec    = &Screenshot_spec,

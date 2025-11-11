@@ -29,7 +29,7 @@ static void frameadv_key_advance_cb(int key, int flags)
 }
 
 static KeyBind FrameAdv_keybinds[] = {
-    { .name      = "frameadv_advance",
+    { .name      = _S"frameadv_advance",
      .context   = KB_CTX_GAME,
      .flags_exc = KB_JUMPING,
      .func      = frameadv_key_advance_cb },
@@ -52,7 +52,7 @@ Patch* FrameAdv_patches[] = { &patch_CommandGui_KeyDown,
                               0 };
 
 SubspaceFeature FrameAdv_feature = {
-    .name            = "FrameAdv",
+    .name            = _S"FrameAdv",
     .enable          = frameAdv_Enable,
     .keybinds        = FrameAdv_keybinds,
     .requiredPatches = FrameAdv_patches,

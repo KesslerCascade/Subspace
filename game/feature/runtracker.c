@@ -93,7 +93,7 @@ Patch* RunTracker_patches[] = {
 };
 
 SubspaceFeature RunTracker_feature = {
-    .name            = "RunTracker",
+    .name            = _S"RunTracker",
     .enable          = runTracker_Enable,
     .requiredPatches = RunTracker_patches,
     .requiredSymbols = { &SYM(freetype_easy_printRightAlign),

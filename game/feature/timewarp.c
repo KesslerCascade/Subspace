@@ -320,15 +320,15 @@ static void timewarp_key_cancel_cb(int key, int flags)
 }
 
 static KeyBind TimeWarp_keybinds[] = {
-    { .name      = "timewarp_increase",
+    { .name      = _S"timewarp_increase",
      .context   = KB_CTX_GAME,
      .flags_exc = KB_JUMPING,
      .func      = timewarp_key_increase_cb },
-    { .name      = "timewarp_decrease",
+    { .name      = _S"timewarp_decrease",
      .context   = KB_CTX_GAME,
      .flags_exc = KB_JUMPING,
      .func      = timewarp_key_decrease_cb },
-    { .name      = "timewarp_cancel",
+    { .name      = _S"timewarp_cancel",
      .context   = KB_CTX_GAME,
      .flags_exc = KB_JUMPING | KB_PAUSED,
      .func      = timewarp_key_cancel_cb },
@@ -362,16 +362,16 @@ Patch* TimeWarp_patches[] = {
 
 FeatureSettingsSpec TimeWarp_spec = {
     .size = sizeof(TimeWarpSettings),
-    .ent  = { { .name = "maxwarp", .type = CF_INT, .off = offsetof(TimeWarpSettings, maxwarp) },
-             { .name = "allowslowmo",
+    .ent  = { { .name = _S"maxwarp", .type = CF_INT, .off = offsetof(TimeWarpSettings, maxwarp) },
+             { .name = _S"allowslowmo",
                 .type = CF_BOOL,
                 .off  = offsetof(TimeWarpSettings, allowslowmo) },
-             { .name = "doubletap", .type = CF_INT, .off = offsetof(TimeWarpSettings, doubletap) },
+             { .name = _S"doubletap", .type = CF_INT, .off = offsetof(TimeWarpSettings, doubletap) },
              { 0 } }
 };
 
 SubspaceFeature TimeWarp_feature = {
-    .name            = "TimeWarp",
+    .name            = _S"TimeWarp",
     .patch           = timeWarp_Patch,
     .enable          = timeWarp_Enable,
     .keybinds        = TimeWarp_keybinds,

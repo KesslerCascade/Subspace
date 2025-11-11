@@ -61,7 +61,7 @@ Patch* NumericHull_patches[] = { &patch_TextLibrary_GetText,
                                  0 };
 
 SubspaceFeature NumericHull_feature = {
-    .name            = "NumericHull",
+    .name            = _S"NumericHull",
     .requiredPatches = NumericHull_patches,
     .requiredSymbols = { &SYM(ShipManager_ship_offset), &SYM(Ship_hullIntegrity_offset), 0 }
 };

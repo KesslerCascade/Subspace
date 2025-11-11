@@ -7,7 +7,7 @@ void cmdEnableFeature(ControlMsg* msg, hashtable fields)
 
     strref fname = cfieldString(fields, _S "feature");
     if (!strEmpty(fname))
-        feat = getFeature(strC(fname));
+        feat = getFeature(fname);
 
     if (!feat)
         return;

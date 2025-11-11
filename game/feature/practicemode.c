@@ -101,8 +101,8 @@ static void practicemode_key_cheats_cb(int key, int flags)
 }
 
 static KeyBind PracticeMode_keybinds[] = {
-    { .name = "practicemode_revert", .context = KB_CTX_GAME, .func = practicemode_key_revert_cb },
-    { .name      = "practicemode_cheats",
+    { .name = _S"practicemode_revert", .context = KB_CTX_GAME, .func = practicemode_key_revert_cb },
+    { .name      = _S"practicemode_cheats",
      .context   = KB_CTX_GAME,
      .flags_exc = KB_JUMPING,
      .func      = practicemode_key_cheats_cb },
@@ -122,7 +122,7 @@ Patch* PracticeMode_patches[] = {
 };
 
 SubspaceFeature PracticeMode_feature = {
-    .name            = "PracticeMode",
+    .name            = _S"PracticeMode",
     .enable          = practiceMode_Enable,
     .requiredPatches = PracticeMode_patches,
     .keybinds        = PracticeMode_keybinds,

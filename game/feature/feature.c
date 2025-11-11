@@ -16,7 +16,7 @@ void registerFeature(SubspaceFeature* feature)
         feathash_init = true;
     }
 
-    htInsert(&feathash, strref, (strref)feature->name, ptr, feature);
+    htInsert(&feathash, strref, feature->name, ptr, feature);
 
     // register the feature's keybinds
     KeyBind* bind = feature->keybinds;
@@ -40,10 +40,10 @@ void registerAllFeatures()
     registerFeature(&Tweaks_feature);
 }
 
-SubspaceFeature* getFeature(const char* name)
+SubspaceFeature* getFeature(strref name)
 {
     void* val = NULL;
-    htFind(feathash, strref, (strref)name, ptr, &val);
+    htFind(feathash, strref, name, ptr, &val);
     return (SubspaceFeature*)val;
 }
 
@@ -75,11 +75,9 @@ bool validateFeature(SubspaceFeature* feat, PatchState* ps)
 
 out:
     if (feat->valid) {
-        logFmt(Verbose,
-               _S"Feature succesfully validated: ${string}",
-               stvar(strref, (strref)feat->name));
+        logFmt(Verbose, _S"Feature succesfully validated: ${string}", stvar(strref, feat->name));
     } else {
-        logFmt(Warn, _S"Feature failed to validate: ${string}", stvar(strref, (strref)feat->name));
+        logFmt(Warn, _S"Feature failed to validate: ${string}", stvar(strref, feat->name));
     }
     return feat->valid;
 }
@@ -114,11 +112,9 @@ bool patchFeature(SubspaceFeature* feat, PatchState* ps)
     feat->available = true;
 out:
     if (feat->available) {
-        logFmt(Verbose,
-               _S"Feature succesfully patched: ${string}",
-               stvar(strref, (strref)feat->name));
+        logFmt(Verbose, _S"Feature succesfully patched: ${string}", stvar(strref, feat->name));
     } else {
-        logFmt(Warn, _S"Feature failed to patch: ${string}", stvar(strref, (strref)feat->name));
+        logFmt(Warn, _S"Feature failed to patch: ${string}", stvar(strref, feat->name));
     }
     return feat->available;
 }
@@ -174,7 +170,7 @@ void sendFeatureState(SubspaceFeature* feat, int replyto)
 {
     ControlMsg* msg  = controlMsgCreate(_S"FeatureState");
     msg->hdr.replyid = replyto;
-    cfieldSet(msg, _S"feature", strref, (strref)feat->name);
+    cfieldSet(msg, _S"feature", strref, feat->name);
     cfieldSet(msg, _S"available", bool, feat->available);
     cfieldSet(msg, _S"enabled", bool, feat->enabled);
     controlClientQueue(msg);
@@ -195,7 +191,7 @@ void fillValidateFeatures(sa_string* featlist)
     foreach (hashtable, hti, feathash) {
         SubspaceFeature* feat = (SubspaceFeature*)htiVal(ptr, hti);
         if (feat && feat->available) {
-            saPush(featlist, strref, (strref)feat->name);
+            saPush(featlist, strref, feat->name);
         }
     }
 }

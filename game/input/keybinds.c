@@ -12,15 +12,15 @@ bool kbRegisterBind(SubspaceFeature* owner, KeyBind* kb)
     }
 
     kb->owner = owner;
-    htInsert(&bindreg, strref, (strref)kb->name, ptr, kb);
+    htInsert(&bindreg, strref, kb->name, ptr, kb);
 
     return true;
 }
 
-bool kbBindKey(const char* name, int key)
+bool kbBindKey(strref name, int key)
 {
     KeyBind* bind = NULL;
-    if (!htFind(bindreg, strref, (strref)name, ptr, &bind))
+    if (!htFind(bindreg, strref, name, ptr, &bind))
         return false;
 
     if (bind->key > 0) {

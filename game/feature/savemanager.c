@@ -58,6 +58,6 @@ Patch* SaveManager_patches[] = { &patch_FileHelper_getSaveFile,
                                  &patch_WorldManager_CreateLocation,
                                  0 };
 
-SubspaceFeature SaveManager_feature = { .name            = "SaveManager",
+SubspaceFeature SaveManager_feature = { .name            = _S"SaveManager",
                                         .requiredPatches = SaveManager_patches,
                                         .requiredSymbols = { 0 } };

@@ -8,5 +8,5 @@ void cmdBindKey(ControlMsg* msg, hashtable fields)
     if (strEmpty(fname) || fkey == -1 || fkey >= KEYCODE_MAX)
         return;
 
-    kbBindKey(strC(fname), fkey);
+    kbBindKey(fname, fkey);
 }

@@ -7,7 +7,7 @@ void cmdFeatureSettings(ControlMsg* msg, hashtable fields)
 
     strref fname = cfieldString(fields, _S "feature");
     if (!strEmpty(fname))
-        feat = getFeature(strC(fname));
+        feat = getFeature(fname);
 
     if (!feat || !feat->settings || !feat->settingsspec)
         return;
@@ -18,22 +18,19 @@ void cmdFeatureSettings(ControlMsg* msg, hashtable fields)
 
         switch (ent->type) {
         case CF_INT:
-            cfieldVal(int32, fields, (strref)ent->name, (int*)dest);
+            cfieldVal(int32, fields, ent->name, (int*)dest);
             break;
         case CF_BOOL:
-            cfieldVal(bool, fields, (strref)ent->name, (bool*)dest);
+            cfieldVal(bool, fields, ent->name, (bool*)dest);
             break;
         case CF_FLOAT32:
-            cfieldVal(float32, fields, (strref)ent->name, (float*)dest);
+            cfieldVal(float32, fields, ent->name, (float*)dest);
             break;
         case CF_FLOAT64:
-            cfieldVal(float64, fields, (strref)ent->name, (double*)dest);
+            cfieldVal(float64, fields, ent->name, (double*)dest);
             break;
         case CF_STRING:
-            if (*(char**)dest)
-                xaFree(*(char**)dest);
-            strref s      = cfieldString(fields, (strref)ent->name);
-            *(char**)dest = s ? xa_strdup(strC(s)) : NULL;
+            strDup((string*)dest, cfieldString(fields, ent->name));
             break;
         }
 
