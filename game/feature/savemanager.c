@@ -1,3 +1,4 @@
+#include <cx/format.h>
 #include "ftl/stdlib.h"
 
 #include "control/controlclient.h"
@@ -22,9 +23,6 @@ void saveManagerAutoSave(WorldManager* world)
     basic_string_reset(&sfile);
     FileHelper_getSaveFile(&sfile);
 
-    if (gs.saveFileOverride)
-        xa_free(gs.saveFileOverride);   // shouldn't be possible? but don't leak anyway
-
     char* tempfn = xa_malloc(1024);
     if (!osAbsolutePathUTF8(sfile.buf, tempfn, 1024)) {
         xa_free(tempfn);
@@ -33,9 +31,10 @@ void saveManagerAutoSave(WorldManager* world)
     }
     size_t len = strlen(tempfn);
 
-    gs.saveFileOverride = xa_malloc(len + 19);
-    memcpy(gs.saveFileOverride, tempfn, len);
-    snprintf(gs.saveFileOverride + len, 19, ".subspace-%08d", lcg_random() % 100000000);
+    strFormat(&gs.saveFileOverride,
+              _S"${string}.subspace-${0int(8)}",
+              stvar(strref, (strref)tempfn),
+              stvar(int32, lcg_random() % 100000000));
     basic_string_destroy(&sfile);
     xa_free(tempfn);
 
@@ -43,12 +42,11 @@ void saveManagerAutoSave(WorldManager* world)
 
     // notify main process to pick up the save file
     ControlMsg* msg = controlMsgCreate(_S"AutoSave");
-    cfieldSet(msg, _S"filename", strref, (strref)gs.saveFileOverride);
+    cfieldSet(msg, _S"filename", strref, gs.saveFileOverride);
     msg->priority = 100;   // AutoSave should happen last after everything else this frame
     controlClientQueue(msg);
 
-    xa_free(gs.saveFileOverride);
-    gs.saveFileOverride   = NULL;
+    strDestroy(&gs.saveFileOverride);
     gs.autoSaveInProgress = false;
 }
 

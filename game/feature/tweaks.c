@@ -47,12 +47,7 @@ void tweaksPrepareSave()
         basic_string_reset(&sfile);
         FileHelper_getSaveFile(&sfile);
 
-        if (gs.saveFileOverride)
-            xa_free(gs.saveFileOverride);   // shouldn't be possible? but don't leak anyway
-
-        gs.saveFileOverride = xa_malloc(sfile.len + 14);
-        memcpy(gs.saveFileOverride, sfile.buf, sfile.len);
-        memcpy(gs.saveFileOverride + sfile.len, ".subspace-new", 14);
+        strConcat(&gs.saveFileOverride, (strref)sfile.buf, _S".subspace-new");
         basic_string_destroy(&sfile);
     }
 }
@@ -61,13 +56,13 @@ void tweaksFinalizeSave()
 {
     // NOTE: We do NOT check settings here; once that check is performed in tweaksPrepareSave, we're
     // committed
-    if (gs.saveFileOverride) {
+    if (!strEmpty(gs.saveFileOverride)) {
         basic_string sfile;
         basic_string_reset(&sfile);
         FileHelper_getSaveFile(&sfile);
 
         basic_string nfile;
-        basic_string_set(&nfile, gs.saveFileOverride);
+        basic_string_set_str(&nfile, gs.saveFileOverride);
 
         basic_string ofile;
         ofile.buf = ftl_malloc(sfile.len + 14);
@@ -95,8 +90,7 @@ void tweaksFinalizeSave()
         basic_string_destroy(&ofile);
         basic_string_destroy(&nfile);
 
-        xa_free(gs.saveFileOverride);
-        gs.saveFileOverride = NULL;
+        strDestroy(&gs.saveFileOverride);
     }
 }
 
