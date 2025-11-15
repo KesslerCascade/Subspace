@@ -285,9 +285,12 @@ static void strDupIntoStack(_Inout_ strhandle_v o, _In_ strref s)
 _Use_decl_annotations_
 void strDup(_Inout_ strhandle o, _In_opt_ strref s)
 {
-    if (!o || !STR_CHECK_VALID(s)) return;
-    if (*o == s)
+    if (!o || *o == s)
         return;
+    if (!STR_CHECK_VALID(s)) {
+        strDestroy(o);
+        return;
+    }
 
     // special case for duplicating into a stack-allocated string
     // do a copy into the buffer instead
@@ -334,9 +337,12 @@ void strDup(_Inout_ strhandle o, _In_opt_ strref s)
 _Use_decl_annotations_
 void strCopy(_Inout_ strhandle o, _In_opt_ strref s)
 {
-    if (!o || !STR_CHECK_VALID(s)) return;
-    if (*o == s)
+    if (!o || *o == s)
         return;
+    if (!STR_CHECK_VALID(s)) {
+        strDestroy(o);
+        return;
+    }
 
     // special case for copying into a stack-allocated string
     // do a copy into the buffer instead
