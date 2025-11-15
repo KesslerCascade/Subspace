@@ -13,22 +13,17 @@
 #include "input/keybinds.h"
 #include "patch/patchlist.h"
 
-void practiceSetSave(const char* fn)
+void practiceSetSave(strref fn)
 {
     if (!PracticeMode_feature.enabled)
         return;
 
-    if (gs.practiceSave)
-        xa_free(gs.practiceSave);
-
-    int l           = strlen(fn);
-    gs.practiceSave = xa_malloc(l + 1);
-    memcpy(gs.practiceSave, fn, l + 1);
+    strDup(&gs.practiceSave, fn);
 }
 
 void practiceLoad()
 {
-    if (!PracticeMode_feature.enabled || !gs.practiceSave)
+    if (!PracticeMode_feature.enabled || strEmpty(gs.practiceSave))
         return;
 
     WorldManager* world = CApp_world(theApp);
@@ -49,7 +44,7 @@ void practiceLoad()
         }
 
         basic_string fname;
-        basic_string_set(&fname, gs.practiceSave);
+        basic_string_set_str(&fname, gs.practiceSave);
         WorldManager_LoadGame(world, &fname);
         basic_string_destroy(&fname);
 

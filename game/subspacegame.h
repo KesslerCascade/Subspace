@@ -122,7 +122,7 @@ typedef struct GameGlobalState {
     // Practice Mode
     bool practiceMode;
     bool practiceLoadSave;   // load the practice save at the end of the frame when it's safe
-    char* practiceSave;      // current practice save file
+    string practiceSave;     // current practice save file
 
     // Screenshot
     bool screenshotNow;         // take a screenshot at the end of the frame

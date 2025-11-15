@@ -5,7 +5,7 @@ void cmdLoadPractice(ControlMsg* msg, hashtable fields)
 {
     strref savepath = cfieldString(fields, _S"savepath");
     if (!strEmpty(savepath)) {
-        practiceSetSave(strC(savepath));
+        practiceSetSave(savepath);
         gs.practiceLoadSave = true;
     }
 }
