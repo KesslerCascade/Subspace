@@ -1,31 +1,47 @@
 #include "inventory.h"
+#include <cx/utils.h>
 #include "control/runlog.h"
 #include "ftl/stdlib.h"
 #include "subspacegame.h"
 
-static InvItem* items;
-static int nitems;
-static int nalloc;
-
-int invCount(InventoryType typ, const char* name, InventoryLocation where)
+static void InvItem_dtor(stype st, stgeneric* gen, flags_t flags)
 {
-    int count = 0;
+    InvItem* item = (InvItem*)gen->st_opaque;
+    strDestroy(&item->name);
+}
+static sa_InvItem items;
+STypeOps InvItem_ops = { .dtor = InvItem_dtor };
+
+static LazyInitState items_init_state;
+static void items_init(void* unused)
+{
+    saInit(&items, custom(opaque(InvItem), InvItem_ops), 13);
+}
+
+int invCount(InventoryType typ, strref name, InventoryLocation where)
+{
+    lazyInit(&items_init_state, items_init, NULL);
+
+    int count  = 0;
+    int nitems = saSize(items);
     for (int i = 0; i < nitems; i++) {
-        if (!items[i].ignore && typ == items[i].typ &&
-            (where == INVL_Any || items[i].loc == where) && strcmp(items[i].name, name) == 0)
+        if (!items.a[i].ignore && typ == items.a[i].typ &&
+            (where == INVL_Any || items.a[i].loc == where) && strEq(items.a[i].name, name))
             count++;
     }
     return count;
 }
 
-bool invMove(InventoryType typ, const char* name, InventoryLocation from, InventoryLocation to)
+bool invMove(InventoryType typ, strref name, InventoryLocation from, InventoryLocation to)
 {
+    lazyInit(&items_init_state, items_init, NULL);
+
     // iterate backwards to move the most recently added item
-    for (int i = nitems - 1; i >= 0; --i) {
-        if (!items[i].ignore && typ == items[i].typ && (from == INVL_Any || items[i].loc == from) &&
-            strcmp(items[i].name, name) == 0) {
-            from         = items[i].loc;   // for run log
-            items[i].loc = to;
+    for (int i = saSize(items) - 1; i >= 0; --i) {
+        if (!items.a[i].ignore && typ == items.a[i].typ &&
+            (from == INVL_Any || items.a[i].loc == from) && strEq(items.a[i].name, name)) {
+            from           = items.a[i].loc;   // for run log
+            items.a[i].loc = to;
 
             runLogSend(&Log_InvMove,
                        InventoryTypeNames[typ],
@@ -39,39 +55,36 @@ bool invMove(InventoryType typ, const char* name, InventoryLocation from, Invent
     return false;
 }
 
-void invAdd(InventoryType typ, const char* name, InventoryLocation where)
+void invAdd(InventoryType typ, strref name, InventoryLocation where)
 {
-    if (nitems >= nalloc) {
-        nalloc = nalloc ? nalloc * 2 : 8;
-        items  = xa_realloc(items, nalloc * sizeof(InvItem));
-    }
-    items[nitems].name   = xa_strdup(name);
-    items[nitems].typ    = typ;
-    items[nitems].loc    = where;
-    items[nitems].ignore = false;
-    nitems++;
+    lazyInit(&items_init_state, items_init, NULL);
+
+    InvItem nitem = { .typ = typ, .loc = where, .ignore = false };
+    strDup(&nitem.name, name);
+    saPushC(&items, opaque, &nitem);
 
     // don't log when it's populated during saved game load
     if (!gc.loadingGame) {
         runLogSend(&Log_InvAdd,
-                   gc.curInvSource ? gc.curInvSource : "Other",
+                   gc.curInvSource ? gc.curInvSource : _S"Other",
                    InventoryTypeNames[typ],
                    name,
                    InventoryLocationNames[where]);
     }
 }
 
-bool invRemove(InventoryType typ, const char* name, InventoryLocation where)
+bool invRemove(InventoryType typ, strref name, InventoryLocation where)
 {
-    for (int i = nitems - 1; i >= 0; --i) {
-        if (!items[i].ignore && typ == items[i].typ &&
-            (where == INVL_Any || items[i].loc == where) && strcmp(items[i].name, name) == 0) {
-            xa_free((void*)items[i].name);
-            memcpy(&items[i], &items[i + 1], (nitems - i - 1) * sizeof(InvItem));
-            nitems--;
+    lazyInit(&items_init_state, items_init, NULL);
+
+    // remove most recently added matching item
+    for (int i = saSize(items) - 1; i >= 0; --i) {
+        if (!items.a[i].ignore && typ == items.a[i].typ &&
+            (where == INVL_Any || items.a[i].loc == where) && strEq(items.a[i].name, name)) {
+            saRemove(&items, i);
 
             runLogSend(&Log_InvRemove,
-                       gc.curInvSource ? gc.curInvSource : "Other",
+                       gc.curInvSource ? gc.curInvSource : _S"Other",
                        InventoryTypeNames[typ],
                        name,
                        InventoryLocationNames[where]);
@@ -84,28 +97,31 @@ bool invRemove(InventoryType typ, const char* name, InventoryLocation where)
 
 void invRemoveAll(void)
 {
-    for (int i = nitems - 1; i >= 0; --i) {
-        if (!items[i].ignore) {
-            runLogSend(&Log_InvRemove,
-                       gc.curInvSource ? gc.curInvSource : "Other",
-                       InventoryTypeNames[items[i].typ],
-                       items[i].name,
-                       InventoryLocationNames[items[i].loc]);
+    lazyInit(&items_init_state, items_init, NULL);
 
-            xa_free((void*)items[i].name);
-            memcpy(&items[i], &items[i + 1], (nitems - i - 1) * sizeof(InvItem));
-            nitems--;
+    for (int i = saSize(items) - 1; i >= 0; --i) {
+        if (!items.a[i].ignore) {
+            runLogSend(&Log_InvRemove,
+                       gc.curInvSource ? gc.curInvSource : _S"Other",
+                       InventoryTypeNames[items.a[i].typ],
+                       items.a[i].name,
+                       InventoryLocationNames[items.a[i].loc]);
+
+            saRemove(&items, i);
         }
     }
 }
 
-InventoryLocation invFindAndIgnore(InventoryType typ, const char* name, InventoryLocation where)
+InventoryLocation invFindAndIgnore(InventoryType typ, strref name, InventoryLocation where)
 {
+    lazyInit(&items_init_state, items_init, NULL);
+
+    int nitems = saSize(items);
     for (int i = 0; i < nitems; i++) {
-        if (!items[i].ignore && typ == items[i].typ &&
-            (where == INVL_Any || items[i].loc == where) && strcmp(items[i].name, name) == 0) {
-            items[i].ignore = true;
-            return items[i].loc;
+        if (!items.a[i].ignore && typ == items.a[i].typ &&
+            (where == INVL_Any || items.a[i].loc == where) && strEq(items.a[i].name, name)) {
+            items.a[i].ignore = true;
+            return items.a[i].loc;
         }
     }
     return INVL_Count;
@@ -113,18 +129,16 @@ InventoryLocation invFindAndIgnore(InventoryType typ, const char* name, Inventor
 
 void invClearIgnore(void)
 {
-    for (int i = 0; i < nitems; i++) {
-        items[i].ignore = false;
+    lazyInit(&items_init_state, items_init, NULL);
+
+    for (int i = saSize(items) - 1; i >= 0; i--) {
+        items.a[i].ignore = false;
     }
 }
 
 void invReset(void)
 {
-    for (int i = 0; i < nitems; i++) {
-        xa_free((void*)items[i].name);
-    }
-    xa_free(items);
-    items  = NULL;
-    nitems = 0;
-    nalloc = 0;
+    lazyInit(&items_init_state, items_init, NULL);
+
+    saClear(&items);
 }

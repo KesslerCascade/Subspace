@@ -13,32 +13,24 @@
 #include "ftl/worldmanager.h"
 #include "invscan.h"
 
-// up to 4 weapons, 3 drones, 4 cargo, 1 overflow, 1 augment overflow
-#define SCAN_SLOTS 13
-static InvItem sitems[SCAN_SLOTS];
-static int scount;
+// size to 13 by default -- up to 4 weapons, 3 drones, 4 cargo, 1 overflow, 1 augment overflow
+static sa_InvItem sitems;
+static bool sitems_init = false;
 
 static void invScanReset(void)
 {
-    for (int i = 0; i < scount; i++) {
-        if (sitems[i].name)
-            xa_free((void*)sitems[i].name);
-        sitems[i].name = NULL;
-        sitems[i].typ  = 0;
-        sitems[i].loc  = 0;
+    if (!sitems_init) {
+        saInit(&sitems, custom(opaque(InvItem), InvItem_ops), 13);
+        sitems_init = true;
     }
-    scount = 0;
+    saClear(&sitems);
 }
 
 static void invScanAdd(InventoryType typ, const char* name, InventoryLocation loc)
 {
-    if (scount >= SCAN_SLOTS)
-        return;
-
-    sitems[scount].name = xa_strdup(name);
-    sitems[scount].typ  = typ;
-    sitems[scount].loc  = loc;
-    scount++;
+    InvItem nitem = { .typ = typ, .loc = loc };
+    strDup(&nitem.name, name);
+    saPushC(&sitems, opaque, &nitem);
 }
 
 static void invScanPopulateWeapons(ShipManager* sm)
@@ -183,9 +175,10 @@ void invScan(void)
     }
 
     // Phase 2: process each item found
+    int scount = saSize(sitems);
     for (int i = 0; i < scount; i++) {
-        if (sitems[i].name)
-            invScanProcessItem(&sitems[i]);
+        if (sitems.a[i].name)
+            invScanProcessItem(&sitems.a[i]);
     }
 
     // Phase 3: anything left in the stored inventory doesn't exist anymore
