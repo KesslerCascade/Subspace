@@ -13,7 +13,7 @@ bool ShipSystem_GetExploded_post(bool ret, ShipSystem *self)
         // This function is a one-shot; if it return true it also resets the flag in the system structure.
         // Because we can't do pre/post on it we have to reset the source in ShipManager::DamageHull
         if (ret)
-            eventSourceSet(Damage, &systemExplodedSrc, "SystemDestroyed");
+            eventSourceSet(Damage, &systemExplodedSrc, _S"SystemDestroyed");
     }
 
     return ret;

@@ -40,7 +40,7 @@ bool runLogSend(LogEntSpec* spec, ...)
         if (spec->paramTypes[i] == LP_INT)
             cfieldSet(msg, (strref)tmpbuf, int32, va_arg(args, int));
         else if (spec->paramTypes[i] == LP_STRING)
-            cfieldSet(msg, (strref)tmpbuf, strref, (strref)va_arg(args, const char*));
+            cfieldSet(msg, (strref)tmpbuf, strref, va_arg(args, strref));
         else
             va_arg(args, int);
     }

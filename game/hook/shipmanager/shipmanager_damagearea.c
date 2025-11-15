@@ -21,14 +21,14 @@ bool ShipManager_DamageArea_pre(ShipManager* self, Pointf location, Damage damag
             // Projectile::CollisionCheck something better can be done there.
             if (damage.selfId == -1 && damage.iDamage == 3 && damage.iShieldPiercing == 5 &&
                 damage.breachChance == 10 && damage.fireChance == 0)
-                eventSourceSet(Damage, &areasrc, "ASB");
+                eventSourceSet(Damage, &areasrc, _S"ASB");
             else if (damage.iDamage == 1 && damage.iShieldPiercing == 0 && damage.fireChance == 2 &&
                      damage.breachChance == 1)
-                eventSourceSet(Damage, &areasrc, "Asteroid");
+                eventSourceSet(Damage, &areasrc, _S"Asteroid");
             else if (damage.iShieldPiercing >= 5)
-                eventSourceSet(Damage, &areasrc, "Missile");
+                eventSourceSet(Damage, &areasrc, _S"Missile");
             else
-                eventSourceSet(Damage, &areasrc, "Projectile");   // something else
+                eventSourceSet(Damage, &areasrc, _S"Projectile");   // something else
         }
     }
 

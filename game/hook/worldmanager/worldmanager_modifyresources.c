@@ -15,8 +15,8 @@ int subspace_WorldManager_ModifyResources_pre(WorldManager* self, LocationEvent*
     if (RunTracker_feature.enabled)
         invScan();
 
-    eventSourceSet(Scrap, &eventsrc_scrap, "Event");
-    eventSourceSet(Inv, &eventsrc_inv, "Event");
+    eventSourceSet(Scrap, &eventsrc_scrap, _S"Event");
+    eventSourceSet(Inv, &eventsrc_inv, _S"Event");
 
     return 1;
 }

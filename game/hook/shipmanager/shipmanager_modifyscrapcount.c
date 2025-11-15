@@ -21,7 +21,7 @@ int ShipManager_ModifyScrapCount_pre(ShipManager* self, int amount, bool income)
         }
 
         // for hull repair
-        eventSourceSet(Damage, &repairsrc, "RepairArm");
+        eventSourceSet(Damage, &repairsrc, _S"RepairArm");
     }
 
     return 1;
@@ -33,10 +33,10 @@ void ShipManager_ModifyScrapCount_post(ShipManager* self, int amount, bool incom
         WorldManager* world            = CApp_world(theApp);
         CompleteShip* playerShip       = world ? WorldManager_playerShip(world) : NULL;
         ShipManager* playerShipManager = playerShip ? CompleteShip_shipManager(playerShip) : NULL;
-        const char* src                = gc.curScrapSource ? gc.curScrapSource : "Other";
+        strref src                     = gc.curScrapSource ? gc.curScrapSource : _S"Other";
 
         if (income)
-            src = "Event";
+            src = _S"Event";
 
         if (amount != 0 && self == playerShipManager) {
             int deltaScrap = ShipManager_currentScrap(self) - pre_currentScrap;

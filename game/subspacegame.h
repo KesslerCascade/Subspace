@@ -135,9 +135,9 @@ typedef struct GameGlobalContext {
     bool loadingGame;
     bool loadingBossShip;
     bool inGameOverLoop;
-    const char* curScrapSource;
-    const char* curDamageSource;
-    const char* curInvSource;
+    string curScrapSource;
+    string curDamageSource;
+    string curInvSource;
 } GameGlobalContext;
 
 extern SubspaceGameSettings settings;

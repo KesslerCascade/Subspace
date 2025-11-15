@@ -9,7 +9,7 @@ static EventSource flaresrc;
 int ShipManager_SunDamage_pre(ShipManager* self)
 {
     if (RunTracker_feature.enabled) {
-        eventSourceSet(Damage, &flaresrc, "SolarFlare");
+        eventSourceSet(Damage, &flaresrc, _S"SolarFlare");
     }
 
     return 1;

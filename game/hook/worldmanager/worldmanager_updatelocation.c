@@ -17,9 +17,9 @@ int WorldManager_UpdateLocation_pre(WorldManager* self, LocationEvent* event)
     gs.waitInProgress = false;
 
     if (RunTracker_feature.enabled) {
-        eventSourceSet(Damage, &eventsrc_damage, "Event");
-        eventSourceSet(Scrap, &eventsrc_scrap, "Event");
-        eventSourceSet(Inv, &eventsrc_inv, "Event");
+        eventSourceSet(Damage, &eventsrc_damage, _S"Event");
+        eventSourceSet(Scrap, &eventsrc_scrap, _S"Event");
+        eventSourceSet(Inv, &eventsrc_inv, _S"Event");
 
         basic_string* eventname = event ? LocationEvent_eventName(event) : NULL;
         if (eventname) {

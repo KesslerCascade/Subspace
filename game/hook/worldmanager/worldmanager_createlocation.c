@@ -20,7 +20,7 @@ int WorldManager_CreateLocation_pre(WorldManager* self, Location* loc)
 
     if (RunTracker_feature.enabled && !gc.loadingGame) {
         // any damage that happens during this call is event damage
-        eventSourceSet(Damage, &eventsrc, "Event");
+        eventSourceSet(Damage, &eventsrc, _S"Event");
     }
 
     return 1;

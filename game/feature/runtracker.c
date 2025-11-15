@@ -15,19 +15,19 @@
 
 static bool recording = false;
 
-void _eventSourceSet(EventSource* es, const char** cur, const char* src)
+void _eventSourceSet(EventSource* es, string* cur, strref src)
 {
     if (!es->set) {
-        es->prev = *cur;
-        es->set  = true;
-        *cur     = src;
+        strDup(&es->prev, *cur);
+        strDup(cur, src);
+        es->set = true;
     }
 }
-void _eventSourceFinish(EventSource* es, const char** cur)
+void _eventSourceFinish(EventSource* es, string* cur)
 {
     if (es->set) {
-        *cur     = es->prev;
-        es->prev = NULL;
+        strDup(cur, es->prev);
+        strDestroy(&es->prev);
         es->set  = false;
     }
 }

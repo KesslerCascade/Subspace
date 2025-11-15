@@ -14,7 +14,7 @@ bool ShipManager_DamageBeam_pre(ShipManager* self, Pointf current, Pointf last, 
         CompleteShip* playerShip       = world ? WorldManager_playerShip(world) : NULL;
         ShipManager* playerShipManager = playerShip ? CompleteShip_shipManager(playerShip) : NULL;
         if (damage.iDamage > 0 && self == playerShipManager) {
-            eventSourceSet(Damage, &beamsrc, "Beam");
+            eventSourceSet(Damage, &beamsrc, _S"Beam");
         }
     }
 

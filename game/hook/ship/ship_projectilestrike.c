@@ -37,7 +37,7 @@ void Ship_ProjectileStrike_post(Ship* self, int roomId, float damage)
         CompleteShip* playerCS         = world ? WorldManager_playerShip(world) : NULL;
         ShipManager* playerShipManager = playerCS ? CompleteShip_shipManager(playerCS) : NULL;
         Ship* playerShip = playerShipManager ? ShipManager_ship(playerShipManager) : NULL;
-        const char* src  = gc.curDamageSource ? gc.curDamageSource : "Projectile";
+        strref src                     = gc.curDamageSource ? gc.curDamageSource : _S"Projectile";
 
         if (damage > 0 && self == playerShip) {
             int deltaHull = pre_currentHull - max(Ship_hullIntegrity(self), 0);

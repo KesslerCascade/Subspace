@@ -61,8 +61,8 @@ void subspace_CApp_OnLoop_post(CApp* self)
     gs.sendAllStats = false;
 
     if (RunTracker_feature.enabled) {
-        gc.curScrapSource  = NULL;
-        gc.curDamageSource = NULL;
+        strDestroy(&gc.curScrapSource);
+        strDestroy(&gc.curDamageSource);
     }
 
     if (SaveManager_feature.enabled && gs.autoSaveNow)
