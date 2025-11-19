@@ -50,6 +50,7 @@ extern Patch patch_ShipManager_DamageArea;
 extern Patch patch_ShipManager_DamageBeam;
 extern Patch patch_ShipManager_DamageHull;
 extern Patch patch_ShipSystem_GetExploded;
+extern Patch patch_WeaponSystem_OnLoop;
 extern Patch patch_WorldManager_LoadGame;
 extern Patch patch_WorldManager_ModifyResources;
 extern Patch patch_WorldManager_PrepareAutoSave;

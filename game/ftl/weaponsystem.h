@@ -5,6 +5,10 @@
 #include "hook/function.h"
 
 extern DisasmTrace WeaponSystem_PowerWeapon_trace;
+extern DisasmTrace WeaponSystem_OnLoop_trace;
+
+typedef void (*FUNCTYPE(WeaponSystem_OnLoop))(WeaponSystem* self);
+DECLFUNC(WeaponSystem_OnLoop);
 
 typedef bool (*FUNCTYPE(WeaponSystem_PowerWeapon))(WeaponSystem* self, ProjectileFactory* weapon,
                                                    bool userDriven, bool force);

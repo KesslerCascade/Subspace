@@ -177,6 +177,7 @@ add_executable(subspacegame
     hook/starmap/starmap_updatedangerzone.c
     hook/storebox/itemstorebox_purchase.c
     hook/textlibrary/textlibrary_gettext.c
+    hook/weaponsystem/weaponsystem_onloop.c
     hook/worldmanager/worldmanager_createlocation.c
     hook/worldmanager/worldmanager_createnewgame.c
     hook/worldmanager/worldmanager_createship.c
