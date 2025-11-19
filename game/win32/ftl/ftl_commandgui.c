@@ -224,6 +224,17 @@ DisasmTrace CommandGui_RunCommand_DRONE_trace = {
     .out  = { &SYM(Equipment_AddDrone) }
 };
 
+DisasmTrace CommandGui_RunCommand_DRONES_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "DRONES ",
+    .ops  = { { DT_OP(SKIP), .imin = 20, .imax = 26 },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ShipManager::ModifyDroneCount
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_ModifyDroneCount) }
+};
+
 INITWRAP(CommandGui_IsPaused);
 Symbol SYM(CommandGui_IsPaused) = {
     SYMNAME("CommandGui::IsPaused"),

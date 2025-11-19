@@ -18,6 +18,7 @@ extern DisasmTrace CommandGui_RunCommand_DELETE_trace;
 extern DisasmTrace CommandGui_RunCommand_SHIP_trace;
 extern DisasmTrace CommandGui_RunCommand_WEAPON_trace;
 extern DisasmTrace CommandGui_RunCommand_DRONE_trace;
+extern DisasmTrace CommandGui_RunCommand_DRONES_trace;
 extern DisasmTrace CommandGui_Restart_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace;
 extern DisasmTrace CommandGui_CheckGameOver_trace_2;

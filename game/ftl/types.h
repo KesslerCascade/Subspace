@@ -6,6 +6,7 @@
 typedef struct Blueprint Blueprint;
 typedef struct AugmentBlueprint AugmentBlueprint;
 typedef struct DroneBlueprint DroneBlueprint;
+typedef struct ItemBlueprint ItemBlueprint;
 typedef struct ShipBlueprint ShipBlueprint;
 typedef struct WeaponBlueprint WeaponBlueprint;
 
@@ -20,6 +21,16 @@ typedef struct Ship Ship;
 typedef struct ShipSystem ShipSystem;
 typedef struct DroneSystem DroneSystem;
 typedef struct WeaponSystem WeaponSystem;
+
+// StoreBox derived classes
+typedef struct StoreBox StoreBox;
+typedef struct AugmentStoreBox AugmentStoreBox;
+typedef struct CrewStoreBox CrewStoreBox;
+typedef struct DroneStoreBox DroneStoreBox;
+typedef struct ItemStoreBox ItemStoreBox;
+typedef struct RepairStoreBox RepairStoreBox;
+typedef struct SystemStoreBox SystemStoreBox;
+typedef struct WeaponStoreBox WeaponStoreBox;
 
 // Non-hierarchical types
 typedef struct AchievementTracker AchievementTracker;

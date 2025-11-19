@@ -43,3 +43,17 @@ Symbol SYM(DroneSystem_drones_offset) = {
     SYMNAME("DroneSystem->drones"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_GetDroneTotal_trace }, { 0 } }
 };
+
+Symbol SYM(DroneSystem_ModifyDroneCount) = {
+    SYMNAME("DroneSystem::ModifyDroneCount"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_ModifyDroneCount_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11DroneSystem16ModifyDroneCountEi" },
+             { 0 } }
+};
+
+FuncInfo FUNCINFO(DroneSystem_ModifyDroneCount) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_VOID
+};

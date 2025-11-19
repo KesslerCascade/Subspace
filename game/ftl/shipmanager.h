@@ -14,6 +14,7 @@ extern DisasmTrace ShipManager_PowerWeapon_trace;
 extern DisasmTrace ShipManager_GetWeaponTotal_trace;
 extern DisasmTrace ShipManager_AddDrone_trace;
 extern DisasmTrace ShipManager_GetDroneTotal_trace;
+extern DisasmTrace ShipManager_ModifyDroneCount_trace;
 
 typedef bool (*FUNCTYPE(ShipManager_OnInit))(ShipManager* ship, ShipBlueprint* bluePrint,
                                              int level);
@@ -43,6 +44,11 @@ DECLFUNC(ShipManager_JumpArrive);
 typedef int (*FUNCTYPE(ShipManager_GetDroneCount))(ShipManager* ship);
 DECLFUNC(ShipManager_GetDroneCount);
 #define ShipManager_GetDroneCount(self) FCALL(ftlbase, ShipManager_GetDroneCount, self)
+
+typedef void (*FUNCTYPE(ShipManager_ModifyDroneCount))(ShipManager* ship, int amount);
+DECLFUNC(ShipManager_ModifyDroneCount);
+#define ShipManager_ModifyDroneCount(self, amount) \
+    FCALL(ftlbase, ShipManager_ModifyDroneCount, self, amount)
 
 typedef int (*FUNCTYPE(ShipManager_GetMissileCount))(ShipManager* ship);
 DECLFUNC(ShipManager_GetMissileCount);
@@ -133,3 +139,6 @@ DECLFUNC(ShipManager_AddDrone);
 DECLSYM(ShipManager_droneSystem_offset);
 #define ShipManager_droneSystem(self) \
     (MEMBER(ftlbase, ShipManager, self, DroneSystem*, droneSystem))
+
+typedef void (*FUNCTYPE(ShipManager_AddItem))(ShipManager* self, ItemBlueprint* item);
+DECLFUNC(ShipManager_AddItem);

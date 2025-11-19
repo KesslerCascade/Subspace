@@ -4,6 +4,7 @@
 #include "ftl/animationtracker.h"
 #include "ftl/capp.h"
 #include "ftl/soundcontrol.h"
+#include "ftl/storebox.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -27,6 +28,21 @@ FuncInfo FUNCINFO(AchievementTracker_OnLoop) = { .nargs   = 1,
                                    .stdcall = true,
                                    .args    = { { 4, ARG_PTR, REG_ECX, false } },
                                    .rettype = RET_VOID };
+
+Symbol SYM(AchievementTracker_SetFlag) = {
+    SYMNAME("AchievementTracker::SetFlag"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &StoreBox_Purchase_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name =
+                    "_ZN18AchievementTracker7SetFlagENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(AchievementTracker_SetFlag) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } },
+    .rettype = RET_VOID
+};
 
 INITWRAP(AchievementTracker_ResetFlags);
 Symbol SYM(AchievementTracker_ResetFlags) = {

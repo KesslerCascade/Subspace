@@ -70,6 +70,7 @@ if(WIN32)
         win32/ftl/ftl_starmap.c
         win32/ftl/ftl_startup.c
         win32/ftl/ftl_stdlib.c
+        win32/ftl/ftl_storebox.c
         win32/ftl/ftl_textlibrary.c
         win32/ftl/ftl_tutorialmanager.c
         win32/ftl/ftl_waypoints.c
