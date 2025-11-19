@@ -59,9 +59,24 @@ DisasmTrace ItemStoreBox_Purchase_trace = {
     .out  = { &SYM(ItemStoreBox_Purchase) }
 };
 
+// alternate version for builds (1.6.8, 1.6.9) that don't inline the StoreBox::Purchase call
+DisasmTrace ItemStoreBox_Purchase_trace_2 = {
+    .c    = DTRACE_CALLS,
+    .csym = &SYM(ShipManager_AddItem),
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 7, .imax = 15 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(StoreBox_Purchase) } },
+             { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(ShipManager_AddItem) } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ItemStoreBox_Purchase) }
+};
+
 Symbol SYM(ItemStoreBox_Purchase) = {
     SYMNAME("ItemStoreBox::Purchase"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ItemStoreBox_Purchase_trace },
+             { .type = SYMBOL_FIND_DISASM, .disasm = &ItemStoreBox_Purchase_trace_2 },
              { .type = SYMBOL_FIND_EXPORT, .name = "_ZN12ItemStoreBox8PurchaseEv" },
              { 0 } }
 };
