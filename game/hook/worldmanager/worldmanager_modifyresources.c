@@ -1,22 +1,27 @@
 #include "feature/runtracker.h"
 #include "ftl/worldmanager.h"
-#include "inventory/invscan.h"
+#include "inventory/inventory.h"
+#include "inventory/resources.h"
 
 #include "hook/hook.h"
 #include "patch/patchlist.h"
 
 static EventSource eventsrc_scrap;
 static EventSource eventsrc_inv;
+static EventSource eventsrc_resource;
 
 // ---- Hooks ----------------
 
 int subspace_WorldManager_ModifyResources_pre(WorldManager* self, LocationEvent* event)
 {
-    if (RunTracker_feature.enabled)
+    if (RunTracker_feature.enabled) {
         invScan();
+        resourceScan();
+    }
 
     eventSourceSet(Scrap, &eventsrc_scrap, _S"Event");
     eventSourceSet(Inv, &eventsrc_inv, _S"Event");
+    eventSourceSet(Resource, &eventsrc_resource, _S"Event");
 
     return 1;
 }
@@ -24,11 +29,14 @@ int subspace_WorldManager_ModifyResources_pre(WorldManager* self, LocationEvent*
 LocationEvent* subspace_WorldManager_ModifyResources_post(LocationEvent* ret, WorldManager* self,
                                                           LocationEvent* event)
 {
-    if (RunTracker_feature.enabled)
+    if (RunTracker_feature.enabled) {
         invScan();
+        resourceScan();
+    }
 
     eventSourceFinish(Scrap, &eventsrc_scrap);
     eventSourceFinish(Inv, &eventsrc_inv);
+    eventSourceFinish(Resource, &eventsrc_resource);
 
     return ret;
 }

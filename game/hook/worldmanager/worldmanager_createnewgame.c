@@ -9,7 +9,8 @@
 #include "ftl/starmap.h"
 #include "ftl/tutorialmanager.h"
 #include "ftl/worldmanager.h"
-#include "inventory/invscan.h"
+#include "inventory/inventory.h"
+#include "inventory/resources.h"
 #include "proto.h"
 #include "subspacegame.h"
 
@@ -56,6 +57,11 @@ void subspace_WorldManager_CreateNewGame_post(WorldManager* self)
         invReset();
         invScan();
         eventSourceFinish(Inv, &origsrc);
+
+        eventSourceSet(Resource, &origsrc, _S"Starting");
+        resourceReset();
+        resourceScan();
+        eventSourceFinish(Resource, &origsrc);
     }
 
     gs.sendAllStats = true;

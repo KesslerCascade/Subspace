@@ -22,3 +22,5 @@ InventoryLocation invFindAndIgnore(InventoryType typ, strref name, InventoryLoca
 void invRemoveAll(void);
 void invClearIgnore(void);
 void invReset(void);
+
+void invScan(void);

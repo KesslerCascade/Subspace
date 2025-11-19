@@ -138,6 +138,7 @@ typedef struct GameGlobalContext {
     string curScrapSource;
     string curDamageSource;
     string curInvSource;
+    string curResourceSource;
 } GameGlobalContext;
 
 extern SubspaceGameSettings settings;

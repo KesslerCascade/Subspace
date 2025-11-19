@@ -175,6 +175,7 @@ add_executable(subspacegame
     hook/soundcontrol/soundcontrol_startplaylist.c
     hook/starmap/starmap_generatemap.c
     hook/starmap/starmap_updatedangerzone.c
+    hook/storebox/itemstorebox_purchase.c
     hook/textlibrary/textlibrary_gettext.c
     hook/worldmanager/worldmanager_createlocation.c
     hook/worldmanager/worldmanager_createnewgame.c
@@ -189,6 +190,7 @@ add_executable(subspacegame
     input/keyboard.c
     inventory/inventory.c
     inventory/invscan.c
+    inventory/resources.c
     log/gamelog.c
     util/lcg.c
     patch/patch.c

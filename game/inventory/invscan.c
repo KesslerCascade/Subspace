@@ -11,7 +11,7 @@
 #include "ftl/shipobject.h"
 #include "ftl/weaponsystem.h"
 #include "ftl/worldmanager.h"
-#include "invscan.h"
+#include "inventory.h"
 
 // size to 13 by default -- up to 4 weapons, 3 drones, 4 cargo, 1 overflow, 1 augment overflow
 static sa_InvItem sitems;

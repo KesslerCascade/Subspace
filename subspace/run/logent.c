@@ -36,6 +36,7 @@ static void specinit(void* dummy)
     addspec(&Log_InvAdd);
     addspec(&Log_InvMove);
     addspec(&Log_InvRemove);
+    addspec(&Log_Resource);
 }
 
 void LogEnt_destroy(_In_ LogEnt* self)

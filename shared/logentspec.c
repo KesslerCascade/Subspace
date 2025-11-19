@@ -89,3 +89,11 @@ LogEntSpec Log_InvRemove = {
     .paramTypes = { LP_STRING, LP_STRING, LP_STRING, LP_STRING  },
     .paramNames = { "disp",    "type",    "name",    "location" }
 };
+
+LogEntSpec Log_Resource = {
+    .id         = "Resource",
+    .numParams  = 4,
+    .priority   = 13,
+    .paramTypes = { LP_STRING, LP_STRING, LP_INT,   LP_INT  },
+    .paramNames = { "source",  "type",    "amount", "total" }
+};

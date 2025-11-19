@@ -8,7 +8,8 @@
 #include "ftl/shipmanager.h"
 #include "ftl/starmap.h"
 #include "ftl/worldmanager.h"
-#include "inventory/invscan.h"
+#include "inventory/inventory.h"
+#include "inventory/resources.h"
 #include "proto.h"
 
 #include "hook/hook.h"
@@ -57,6 +58,8 @@ void subspace_WorldManager_LoadGame_post(WorldManager* self, basic_string* file)
     if (RunTracker_feature.enabled) {
         invReset();
         invScan();
+        resourceReset();
+        resourceScan();
     }
 
     gs.sendAllStats = true;

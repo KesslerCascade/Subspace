@@ -29,3 +29,4 @@ extern LogEntSpec Log_Start;
 extern LogEntSpec Log_InvAdd;
 extern LogEntSpec Log_InvMove;
 extern LogEntSpec Log_InvRemove;
+extern LogEntSpec Log_Resource;
