@@ -20,6 +20,7 @@ typedef struct Ship Ship;
 // ShipSystem derived classes
 typedef struct ShipSystem ShipSystem;
 typedef struct DroneSystem DroneSystem;
+typedef struct HackingSystem HackingSystem;
 typedef struct WeaponSystem WeaponSystem;
 
 // StoreBox derived classes

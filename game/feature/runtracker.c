@@ -91,6 +91,9 @@ Patch* RunTracker_patches[] = {
     &patch_WorldManager_ModifyResources,
     &patch_ItemStoreBox_Purchase,
     &patch_WeaponSystem_OnLoop,
+    &patch_DroneSystem_PowerDrone,
+    &patch_HackingSystem_GetSpendDrone,
+    &patch_ShipManager_ModifyDroneCount,
     0
 };
 

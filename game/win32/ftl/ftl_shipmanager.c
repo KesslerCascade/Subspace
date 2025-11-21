@@ -1,6 +1,7 @@
 #include "ftl/commandgui.h"
 #include "ftl/dronesystem.h"
 #include "ftl/equipment.h"
+#include "ftl/hackingsystem.h"
 #include "ftl/ship.h"
 #include "ftl/shipmanager.h"
 #include "ftl/shipstatus.h"
@@ -376,14 +377,32 @@ DisasmTrace ShipManager_OnLoop_trace = {
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ESP } },
                 .argstr = { 0, "reactor" } },
-             { DT_OP(SKIP), .imin = 300, .imax = 650 },
-             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL
+             { DT_OP(SKIP), .imin = 75, .imax = 175 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM2 } },   // this->hackingSystem
+              { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = -2 } },
+                .argout = { DT_OUT_SYM3 } },   // CALL HackingSystem::GetSpendDrone
+              { DT_OP(SKIP), .imin = 1, .imax = 4, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ESP }, { .addr = -1 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(ShipManager_ModifyDroneCount) } },
+             { DT_OP(SKIP), .imin = 5, .imax = 11, .flow = DT_FLOW_JMP_BOTH },
+             { I_CMOVLE },
+             { DT_OP(SKIP), .imin = 125, .imax = 475 },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL
                                                        // ShipSystem::GetExploded
               { I_TEST, .args = { ARG_REG, ARG_REG }, .args = { { REG_AL }, { REG_AL } } },
              { DT_OP(SKIP), .imin = 1, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(ShipManager_DamageHull) } },
              { DT_OP(FINISH) } },
-    .out  = { &SYM(ShipManager_OnLoop),   // DT_OUT_SYM1
+    .out  = { &SYM(ShipManager_OnLoop),                 // DT_OUT_SYM1
+              &SYM(ShipManager_hackingSystem_offset),   // DT_OUT_SYM2
+              &SYM(HackingSystem_GetSpendDrone),        // DT_OUT_SYM3
               &SYM(ShipSystem_GetExploded) }
 };
 
@@ -632,4 +651,83 @@ FuncInfo FUNCINFO(ShipManager_AddItem) = {
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } },
     .rettype = RET_VOID
+};
+
+DisasmTrace ShipManager_PowerDrone_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Shouldn't be powering drones, no drone system\n",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 11, .imax = 19 },
+             { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = -1 } } },
+             { DT_OP(SKIP), .imin = 7, .imax = 15 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ShipManager_droneSystem_offset) } },   // this->droneSystem
+              { DT_OP(SKIP), .imin = 3, .imax = 9, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL DroneSystem::PowerDrone
+              { DT_OP(SKIP), .imin = 5, .imax = 13 },
+             { I_RETN, .argf = { ARG_ADDR }, .args = { { .addr = 0x10 } } },   // 3
+                                                                                // stack
+                                                                                // params
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_PowerDrone),                                     // DT_OUT_SYM1
+              &SYM(DroneSystem_PowerDrone) }
+};
+
+Symbol SYM(ShipManager_PowerDrone) = {
+    SYMNAME("ShipManager::PowerDrone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_PowerDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager10PowerDroneEP5Droneibb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_PowerDrone) = {
+    .nargs   = 5,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false },
+                { 4, ARG_PTR, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+DisasmTrace ShipManager_DePowerDrone_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Shouldn't be powering drones, no drone system\n",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 9, .imax = 17 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_REG },
+                .args   = { { REG_ECX }, { ARG_ADDR } },
+                .argsym = { 0, &SYM(ShipManager_droneSystem_offset) } },   // this->droneSystem
+              { DT_OP(SKIP), .imin = 2, .imax = 7 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL DroneSystem::DePowerDrone
+              { DT_OP(SKIP), .imin = 5, .imax = 13 },
+             { I_RETN, .argf = { ARG_ADDR }, .args = { { .addr = 0x8 } } },   // 2
+                                                                               // stack
+                                                                               // params
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_DePowerDrone),                                  // DT_OUT_SYM1
+              &SYM(DroneSystem_DePowerDrone) }
+};
+
+Symbol SYM(ShipManager_DePowerDrone) = {
+    SYMNAME("ShipManager::DePowerDrone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DePowerDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager12DePowerDroneEP5Droneb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_DePowerDrone) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+Symbol SYM(ShipManager_hackingSystem_offset) = {
+    SYMNAME("ShipManager->hackingSystem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_OnLoop_trace }, { 0 } }
 };

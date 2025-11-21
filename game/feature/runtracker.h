@@ -13,8 +13,9 @@ typedef struct EventSource {
     bool set;
 } EventSource;
 
-// most should be static; special handling needed for this one
+// most should be static; special handling needed for these two
 extern EventSource systemExplodedSrc;
+extern EventSource hackingDroneSrc;
 
 void _eventSourceSet(EventSource* es, string* cur, strref src);
 void _eventSourceFinish(EventSource* es, string* cur);

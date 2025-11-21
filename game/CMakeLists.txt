@@ -49,6 +49,7 @@ if(WIN32)
         win32/ftl/ftl_ftlbutton.c
         win32/ftl/ftl_gameover.c
         win32/ftl/ftl_globals.c
+        win32/ftl/ftl_hackingsystem.c
         win32/ftl/ftl_location.c
         win32/ftl/ftl_mainmenu.c
         win32/ftl/ftl_misc.c
@@ -149,6 +150,7 @@ add_executable(subspacegame
     hook/commandgui/commandgui_onloop.c
     hook/commandgui/commandgui_renderpause.c
     hook/commandgui/commandgui_renderstatic.c
+    hook/dronesystem/dronesystem_powerdrone.c
     hook/filehelper/filehelper_deleteallsavefiles.c
     hook/filehelper/filehelper_deletefile.c
     hook/filehelper/filehelper_getsavefile.c
@@ -156,6 +158,7 @@ add_executable(subspacegame
     hook/ftlbutton/ftlbutton_onrender.c
     hook/gameover/gameover_onloop.c
     hook/gameover/gameover_setvictory.c
+    hook/hackingsystem/hackingsystem_getspenddrone.c
     hook/mainmenu/mainmenu_open.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
@@ -167,6 +170,7 @@ add_executable(subspacegame
     hook/shipmanager/shipmanager_damagebeam.c
     hook/shipmanager/shipmanager_damagehull.c
     hook/shipmanager/shipmanager_jumpleave.c
+    hook/shipmanager/shipmanager_modifydronecount.c
     hook/shipmanager/shipmanager_modifyscrapcount.c
     hook/shipmanager/shipmanager_sundamage.c
     hook/shipstatus/shipstatus_renderhealth.c

@@ -57,3 +57,34 @@ FuncInfo FUNCINFO(DroneSystem_ModifyDroneCount) = {
     .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
     .rettype = RET_VOID
 };
+
+Symbol SYM(DroneSystem_PowerDrone) = {
+    SYMNAME("DroneSystem::PowerDrone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_PowerDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11DroneSystem10PowerDroneEP5Dronebb" },
+             { 0 } }
+};
+
+FuncInfo FUNCINFO(DroneSystem_PowerDrone) = {
+    .nargs   = 4,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false },
+                { 4, ARG_PTR, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+Symbol SYM(DroneSystem_DePowerDrone) = {
+    SYMNAME("DroneSystem::DePowerDrone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DePowerDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11DroneSystem12DePowerDroneEP5Droneb" },
+             { 0 } }
+};
+
+FuncInfo FUNCINFO(DroneSystem_DePowerDrone) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
