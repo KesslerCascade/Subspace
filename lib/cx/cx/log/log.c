@@ -18,45 +18,68 @@ Mutex _log_run_lock;
 hashtable _log_categories;
 
 typedef struct LogBatchTLS {
-    LogEntry *head;
-    LogEntry *tail;
+    LogEntry* head;
+    LogEntry* tail;
     int level;
 } LogBatchTLS;
 static _Thread_local LogBatchTLS _log_batch;
 
 strref LogLevelNames[LOG_Count] = {
-    (strref)"\xE1\xC1\x05""Fatal",
-    (strref)"\xE1\xC1\x05""Error",
-    (strref)"\xE1\xC1\x04""Warn",
-    (strref)"\xE1\xC1\x06""Notice",
-    (strref)"\xE1\xC1\x04""Info",
-    (strref)"\xE1\xC1\x07""Verbose",
-    (strref)"\xE1\xC1\x04""Diag",
-    (strref)"\xE1\xC1\x05""Debug",
-    (strref)"\xE1\xC1\x05""Trace"
+    (strref)"\xE1\xC1\x05"
+            "Fatal",
+    (strref)"\xE1\xC1\x05"
+            "Error",
+    (strref)"\xE1\xC1\x04"
+            "Warn",
+    (strref)"\xE1\xC1\x06"
+            "Notice",
+    (strref)"\xE1\xC1\x04"
+            "Info",
+    (strref)"\xE1\xC1\x07"
+            "Verbose",
+    (strref)"\xE1\xC1\x04"
+            "Diag",
+    (strref)"\xE1\xC1\x05"
+            "Debug",
+    (strref)"\xE1\xC1\x05"
+            "Trace"
 };
 
 strref LogLevelAbbrev[LOG_Count] = {
-    (strref)"\xE1\xC1\x01""F",
-    (strref)"\xE1\xC1\x01""E",
-    (strref)"\xE1\xC1\x01""W",
-    (strref)"\xE1\xC1\x01""N",
-    (strref)"\xE1\xC1\x01""I",
-    (strref)"\xE1\xC1\x01""V",
-    (strref)"\xE1\xC1\x01""D",
-    (strref)"\xE1\xC1\x01""D",
-    (strref)"\xE1\xC1\x01""T"
+    (strref)"\xE1\xC1\x01"
+            "F",
+    (strref)"\xE1\xC1\x01"
+            "E",
+    (strref)"\xE1\xC1\x01"
+            "W",
+    (strref)"\xE1\xC1\x01"
+            "N",
+    (strref)"\xE1\xC1\x01"
+            "I",
+    (strref)"\xE1\xC1\x01"
+            "V",
+    (strref)"\xE1\xC1\x01"
+            "D",
+    (strref)"\xE1\xC1\x01"
+            "D",
+    (strref)"\xE1\xC1\x01"
+            "T"
 };
 
 LazyInitState _logInitState;
-static void logInit(void *dummy)
+static void logInit(void* dummy)
 {
     devAssert(atomicLoad(bool, &_log_running, Acquire) == false);
 
     saInit(&_log_dests, ptr, 8);
     htInit(&_log_categories, ptr, none, 8);
     mutexInit(&_log_op_lock);
-    prqInitDynamic(&_log_queue, LOG_INITIAL_QUEUE_SIZE, LOG_INITIAL_QUEUE_SIZE * 2, LOG_MAX_QUEUE_SIZE, PRQ_Grow_100, PRQ_Grow_100);
+    prqInitDynamic(&_log_queue,
+                   LOG_INITIAL_QUEUE_SIZE,
+                   LOG_INITIAL_QUEUE_SIZE * 2,
+                   LOG_MAX_QUEUE_SIZE,
+                   PRQ_Grow_100,
+                   PRQ_Grow_100);
     logThreadCreate();
 
     atomicStore(bool, &_log_running, true, Release);
@@ -68,20 +91,20 @@ void logCheckInit(void)
 }
 
 _Use_decl_annotations_
-void logDestroyEnt(LogEntry *ent)
+void logDestroyEnt(LogEntry* ent)
 {
     strDestroy(&ent->msg);
     xaFree(ent);
 }
 
 _Use_decl_annotations_
-LogCategory *logCreateCat(strref name, bool priv)
+LogCategory* logCreateCat(strref name, bool priv)
 {
     logCheckInit();
     if (!atomicLoad(bool, &_log_running, Acquire))
         return NULL;
 
-    LogCategory *ret = xaAlloc(sizeof(LogCategory), XA_Zero);
+    LogCategory* ret = xaAlloc(sizeof(LogCategory), XA_Zero);
     strDup(&ret->name, name);
     ret->priv = priv;
 
@@ -91,15 +114,15 @@ LogCategory *logCreateCat(strref name, bool priv)
     return ret;
 }
 
-static void _logStrInternal(int level, _In_ LogCategory *cat, _In_ strref str)
+static void _logStrInternal(int level, int64 timestamp, _In_ LogCategory* cat, _In_ strref str)
 {
-    LogEntry *ent = xaAlloc(sizeof(LogEntry), XA_Zero | XA_Optional(High));
+    LogEntry* ent = xaAlloc(sizeof(LogEntry), XA_Zero | XA_Optional(High));
     if (!ent)
         return;
 
-    ent->timestamp = clockWall();
-    ent->level = level;
-    ent->cat = cat;
+    ent->timestamp = (timestamp != -1) ? timestamp : clockWall();
+    ent->level     = level;
+    ent->cat       = cat;
     strDup(&ent->msg, str);
 
     if (!_log_batch.level) {
@@ -109,7 +132,7 @@ static void _logStrInternal(int level, _In_ LogCategory *cat, _In_ strref str)
         // this thread is preparing a batch
         if (_log_batch.tail) {
             _log_batch.tail->_next = ent;
-            _log_batch.tail = ent;
+            _log_batch.tail        = ent;
         } else {
             _log_batch.head = ent;
             _log_batch.tail = ent;
@@ -118,7 +141,7 @@ static void _logStrInternal(int level, _In_ LogCategory *cat, _In_ strref str)
 }
 
 _Use_decl_annotations_
-void _logStr(int level, LogCategory *cat, strref str)
+void _logStr(int level, int64 timestamp, LogCategory* cat, strref str)
 {
     lazyInit(&_logInitState, logInit, NULL);
 
@@ -129,11 +152,11 @@ void _logStr(int level, LogCategory *cat, strref str)
     if (!atomicLoad(bool, &_log_running, Acquire))
         return;
 
-    _logStrInternal(level, cat, str);
+    _logStrInternal(level, timestamp, cat, str);
 }
 
 _Use_decl_annotations_
-void _logFmt(int level, LogCategory *cat, strref fmtstr, int n, stvar *args)
+void _logFmt(int level, int64 timestamp, LogCategory* cat, strref fmtstr, int n, stvar* args)
 {
     lazyInit(&_logInitState, logInit, NULL);
 
@@ -146,7 +169,7 @@ void _logFmt(int level, LogCategory *cat, strref fmtstr, int n, stvar *args)
 
     string logmsg = 0;
     _strFormat(&logmsg, fmtstr, n, args);
-    _logStrInternal(level, cat, logmsg);
+    _logStrInternal(level, timestamp, cat, logmsg);
     strDestroy(&logmsg);
 }
 
@@ -155,7 +178,7 @@ void logBatchBegin(void)
     logCheckInit();
     if (!atomicLoad(bool, &_log_running, Acquire))
         return;
-    
+
     _log_batch.level++;
 }
 
@@ -190,14 +213,15 @@ void logShutdown(void)
         withMutex (&_log_op_lock) {
             // remove all log destinations
             foreach (sarray, idx, LogDest*, dest, _log_dests) {
-                dest->func(-1, NULL, 0, NULL, 0, dest->userdata);
+                if (dest->closefunc)
+                    dest->closefunc(dest->userdata);
                 xaFree(dest);
             }
             saDestroy(&_log_dests);
             _log_max_level = -1;
-            
+
             // remove all saved categories
-            foreach(hashtable, hti, _log_categories) {
+            foreach (hashtable, hti, _log_categories) {
                 xaFree(htiKey(ptr, hti));
             }
             htDestroy(&_log_categories);
@@ -218,7 +242,7 @@ void logShutdown(void)
 
 void logRestart(void)
 {
-     logCheckInit();
+    logCheckInit();
 
     withMutex (&_log_run_lock) {
         if (atomicLoad(bool, &_log_running, Acquire))

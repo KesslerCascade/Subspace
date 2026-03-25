@@ -90,7 +90,6 @@ add_cxautogen(${SUBSPACE_AUTOGEN})
 add_executable(subspace
     control/cmds.c
     control/controlclient.c
-    control/controlfields.c
     control/controlserver.c
     control/controltask.c
     control/cmds/cmdautosave.c
@@ -102,7 +101,8 @@ add_executable(subspace
     control/cmds/cmdlaunchfail.c
     control/cmds/cmdloadgame.c
     control/cmds/cmdloading.c
-    control/cmds/cmdlog.c
+    control/cmds/cmdlogbatch.c
+    control/cmds/cmdlogmsg.c
     control/cmds/cmdnewgame.c
     control/cmds/cmdrunlog.c
     control/cmds/cmdscreenshot.c
@@ -196,6 +196,7 @@ add_executable(subspace
     version.c
     ../lib/cx/cx/cx.natvis
     ${SHARED_SOURCE_DIR}/control.c
+    ${SHARED_SOURCE_DIR}/controlfields.c
     ${SHARED_SOURCE_DIR}/logentspec.c
     ${SHARED_SOURCE_DIR}/net.c
     ${SUBSPACE_AUTOGEN})

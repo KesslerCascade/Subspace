@@ -17,11 +17,11 @@ bool runLogSend(LogEntSpec* spec, ...)
     if (spec->combat && !controlClientConnected())
         return false;
 
-    ControlMsg* msg = controlNewMsg("RunLog", 4 + spec->numParams);
-    controlMsgStr(msg, 0, "id", spec->id);
+    ControlMsg* msg = controlMsgCreate(_S"RunLog");
+    cfieldSet(msg, _S"id", strref, (strref)spec->id);
 
     WorldManager* world = CApp_world(theApp);
-    controlMsgInt(msg, 1, "sector", WorldManager_worldLevel(world) + 1);
+    cfieldSet(msg, _S"sector", int32, WorldManager_worldLevel(world) + 1);
     int beacons = ScoreKeeper_stats(SKeeper)[1].current;
 
     // special case because the hook that detects a new sector happens before the number of beacons
@@ -29,8 +29,8 @@ bool runLogSend(LogEntSpec* spec, ...)
     if (spec == &Log_Sector)
         beacons++;
 
-    controlMsgInt(msg, 2, "beacons", MAX(beacons, 1));
-    controlMsgFloat64(msg, 3, "gametime", gs.gameTime);
+    cfieldSet(msg, _S"beacons", int32, max(beacons, 1));
+    cfieldSet(msg, _S"gametime", float64, gs.gameTime);
 
     va_list args;
     va_start(args, spec);
@@ -38,9 +38,9 @@ bool runLogSend(LogEntSpec* spec, ...)
     for (int i = 0; i < spec->numParams; i++) {
         tmpbuf[1] = '1' + i;
         if (spec->paramTypes[i] == LP_INT)
-            controlMsgInt(msg, 4 + i, tmpbuf, va_arg(args, int));
+            cfieldSet(msg, (strref)tmpbuf, int32, va_arg(args, int));
         else if (spec->paramTypes[i] == LP_STRING)
-            controlMsgStr(msg, 4 + i, tmpbuf, va_arg(args, const char*));
+            cfieldSet(msg, (strref)tmpbuf, strref, va_arg(args, strref));
         else
             va_arg(args, int);
     }

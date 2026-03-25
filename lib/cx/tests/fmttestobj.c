@@ -107,5 +107,7 @@ void FmtTestClass2_destroy(_In_ FmtTestClass2* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "fmttestobj.auto.inc"
+// clang-format on
 // Autogen ends -------

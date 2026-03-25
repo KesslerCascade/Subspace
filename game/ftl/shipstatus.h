@@ -1,9 +1,8 @@
+#pragma once
+
 #include "ftl/ftl.h"
 #include "ftl/struct.h"
 #include "hook/function.h"
-
-typedef struct ShipStatus ShipStatus;
-typedef struct ShipManager ShipManager;
 
 extern DisasmTrace ShipStatus_RenderEvadeOxygen_trace;
 extern DisasmTrace ShipStatus_LinkShip_trace_v1;

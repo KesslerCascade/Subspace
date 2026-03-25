@@ -33,6 +33,10 @@ static void specinit(void* dummy)
     addspec(&Log_Sector);
     addspec(&Log_Ship);
     addspec(&Log_Start);
+    addspec(&Log_InvAdd);
+    addspec(&Log_InvMove);
+    addspec(&Log_InvRemove);
+    addspec(&Log_Resource);
 }
 
 void LogEnt_destroy(_In_ LogEnt* self)
@@ -85,5 +89,7 @@ LogEnt_create(int64 sectorpoint, int64 savepoint, int64 time, float64 gametime, 
 }
 
 // Autogen begins -----
+// clang-format off
 #include "run/logent.auto.inc"
+// clang-format on
 // Autogen ends -------

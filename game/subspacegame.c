@@ -1,8 +1,11 @@
+#include <cx/platform/os.h>
+#include <cx/string.h>
+#include <cx/sys.h>
+#include <cx/time.h>
+
 #include "netsocket.h"
 
 #include "subspacegame.h"
-// NOTE: the entry point (i.e. "main" equivalent) is not located here, but is instead in entry.c in
-// one of the playform-specific subdirectories
 
 #include "control/cmds.h"
 #include "control/controlclient.h"
@@ -11,13 +14,13 @@
 #include "ftl/ftl.h"
 #include "hook/module.h"
 #include "loader/loader.h"
-#include "log/log.h"
+#include "log/gamelog.h"
 #include "patch/patch.h"
 #include "control.h"
 #include "osdep.h"
 #include "version.h"
 
-#include "minicrt.h"
+DEFINE_ENTRY_POINT
 
 SubspaceGameSettings settings = {
     .addr = 0x7f000001,   // 127.0.0.1
@@ -25,26 +28,30 @@ SubspaceGameSettings settings = {
 GameGlobalState gs;
 GameGlobalContext gc;
 
-static void parseArgs(int argc, char* argv[])
+static void parseArgs(void)
 {
-    for (int i = 1; i < argc; i++) {
-        if (!stricmp(argv[i], "-addr") && i + 1 < argc) {
-            settings.addr = ntohl(inet_addr(argv[++i]));
+    int argc = saSize(cmdArgs);
+    for (int i = 0; i < argc; i++) {
+        if (strEq(cmdArgs.a[i], _S"-addr") && i + 1 < argc) {
+            settings.addr = ntohl(inet_addr(strC(cmdArgs.a[++i])));
         }
-        if (!stricmp(argv[i], "-port") && i + 1 < argc) {
-            settings.port = atoi(argv[++i]);
+        if (strEq(cmdArgs.a[i], _S"-port") && i + 1 < argc) {
+            strToInt32(&settings.port, cmdArgs.a[++i], 10, true);
         }
-        if (!stricmp(argv[i], "-cookie") && i + 2 < argc) {
-            settings.cookie = strtol(argv[++i], NULL, 16) << 16;
-            settings.cookie |= strtol(argv[++i], NULL, 16);
+        if (strEq(cmdArgs.a[i], _S"-cookie") && i + 2 < argc) {
+            int32 temp = 0;
+            strToInt32(&temp, cmdArgs.a[++i], 16, true);
+            settings.cookie = (uint32_t)(temp << 16);
+            strToInt32(&temp, cmdArgs.a[++i], 16, true);
+            settings.cookie |= (uint32_t)temp;
         }
     }
 }
 
 entrypoint ftlentry;
-int sscmain(int argc, char* argv[])
+int entryPoint()
 {
-    parseArgs(argc, argv);
+    parseArgs();
     netInit();
 
     if (settings.port == 0 || settings.cookie == 0) {
@@ -63,12 +70,20 @@ int sscmain(int argc, char* argv[])
     if (lcmd != RLC_Launch)
         return (lcmd != RLC_Exit);
 
-    osSetCurrentDir(settings.gameDir);
-    log_fmt(LOG_Info, "Loading executable:  %s", settings.gamePath);
+    gameLogRegister();
+    logFmt(Info,
+           _S"Subspace Game Loader ${string} starting up!",
+           stvar(strref, (strref)subspace_version_str));
+    logStr(Info, settings.mode == LAUNCH_PLAY ? _S"Launch Mode: PLAY" : _S"Launch Mode: VALIDATE");
+
+    fsSetCurDir(settings.gameDir);
+    logFmt(Info, _S"Loading executable:  ${string}", stvar(strref, settings.gamePath));
     ftlbase = loadProgram(settings.gamePath);
+    gameLogSend();
 
     if (!ftlbase) {
-        log_str(LOG_Error, "Failed to load game executable!");
+        logStr(Error, _S"Failed to load game executable!");
+        gameLogSend();
         controlSendLaunchFail(&control, LAUNCH_FAIL_NOEXE);
         return 1;
     }
@@ -77,33 +92,47 @@ int sscmain(int argc, char* argv[])
 
     PatchState ps;
     if (!patchBegin(&ps, ftlbase)) {
-        log_str(LOG_Error, "Patching failed to initialize");
+        logStr(Error, _S"Patching failed to initialize");
+        gameLogSend();
         controlSendLaunchFail(&control, LAUNCH_FAIL_OTHER);
         return 1;
     }
 
     patchValidateSeq(&ps, OSDepPatches);
+    gameLogSend();
     validateAllFeatures(&ps);
+    gameLogSend();
 
+    logBatchBegin();
+    logStr(Info, _S"Applying required patches");
     if (!patchApplySeq(&ps, OSDepPatches) || !patchFeature(&Base_feature, &ps)) {
-        log_str(LOG_Error, "Required patches failed");
+        logStr(Error, _S"Required patches failed");
+        logBatchEnd();
+        gameLogSend();
         controlSendLaunchFail(&control, LAUNCH_FAIL_REQPATCH);
         return 1;
     }
+    logBatchEnd();
+    gameLogSend();
+
     patchAllFeatures(&ps);
 
     if (!patchEnd(&ps)) {
-        log_str(LOG_Error, "Patching failed to complete");
+        logStr(Error, _S"Patching failed to complete");
+        gameLogSend();
         controlSendLaunchFail(&control, LAUNCH_FAIL_OTHER);
         return 1;
     }
 
     switch (settings.mode) {
     case LAUNCH_PLAY:
+        logStr(Verbose, _S"Calling main FTL entry point");
         ftlentry = getProgramEntry(ftlbase);
         ftlentry();
         break;
     case LAUNCH_VALIDATE:
+        logStr(Verbose, _S"Sending validation results and exiting");
+        gameLogSend();
         controlSendValidate(&control, true, 0);
         controlDisconnect(&sock);
         break;
@@ -121,21 +150,22 @@ int cleanupthread(void* unused)
 
 void sscmain2(void)
 {
+    gameLogSend();
     controlClientStart();
     registerCmds();
-    log_client();
-    log_str(LOG_Info, "Communication thread started");
+    gameLogSwitchToClientQueue();
+    logStr(Verbose, _S"Communication thread started");
     sendAllFeatureState();
 
-    ControlMsg* msg = controlNewMsg("GameReady", 1);
-    controlMsgBool(msg, 0, "start", 1);
+    ControlMsg* msg = controlMsgCreate(_S"GameReady");
+    cfieldSet(msg, _S"start", bool, true);
     controlClientQueue(msg);
 
     // loop until we get the all-clear
     while (!gs.clearToStart) {
         controlClientProcessInbound();
         controlClientProcessOutbound();
-        osSleep(1);
+        osSleep(timeFromMsec(1));
 
         // ensure we don't get stuck here if the connection closes
         if (!control.sock || control.closed) {

@@ -4,8 +4,6 @@
 #include "ftl/completeship.h"
 #include "hook/function.h"
 
-typedef struct BossShip BossShip;
-
 // FTL functions and wrappers below
 
 typedef void (*FUNCTYPE(BossShip_StartStage))(BossShip* self);

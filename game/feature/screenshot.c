@@ -23,7 +23,7 @@
 #include "screenshot.h"
 
 static bool currentScreenshotAuto;
-static lock_t soundlock;
+static Mutex soundlock;
 static bool soundlock_init;
 static bool screenshotSound;
 
@@ -54,7 +54,7 @@ static int ss_write_thread(void* data)
     // flip the image, remote alpha channel
 
     size_t bsz         = ss->w * ss->h * 3;
-    uint8_t* processed = malloc(bsz);
+    uint8_t* processed = xa_malloc(bsz);
 
     for (int y = 0; y < ss->h; y++) {
         uint8_t* srcrow  = &ss->buf[y * ss->w * 4];
@@ -66,35 +66,35 @@ static int ss_write_thread(void* data)
         }
     }
     osWriteFile(ss->fn, processed, bsz);
-    free(processed);
+    xa_free(processed);
 
-    ControlMsg* msg = controlNewMsg("Screenshot", 14);
-    controlMsgBool(msg, 0, "auto", ss->automatic);
-    controlMsgStr(msg, 1, "filename", ss->fn);
-    controlMsgInt(msg, 2, "w", ss->w);
-    controlMsgInt(msg, 3, "h", ss->h);
-    controlMsgStr(msg, 4, "ship", ss->shiptype);
-    controlMsgStr(msg, 5, "name", ss->shipname);
-    controlMsgInt(msg, 6, "sector", ss->sector);
-    controlMsgStr(msg, 7, "sectortype", ss->sectortype);
-    controlMsgInt(msg, 8, "beacon", ss->beacon);
-    controlMsgUInt(msg, 9, "seed", ss->seed);
-    controlMsgInt(msg, 10, "difficulty", ss->difficulty);
-    controlMsgInt(msg, 11, "major", g_version_major);
-    controlMsgInt(msg, 12, "minor", g_version_minor);
-    controlMsgInt(msg, 13, "rev", g_version_rev);
+    ControlMsg* msg = controlMsgCreate(_S"Screenshot");
+    cfieldSet(msg, _S"auto", bool, ss->automatic);
+    cfieldSet(msg, _S"filename", strref, (strref)ss->fn);
+    cfieldSet(msg, _S"w", int32, ss->w);
+    cfieldSet(msg, _S"h", int32, ss->h);
+    cfieldSet(msg, _S"ship", strref, (strref)ss->shiptype);
+    cfieldSet(msg, _S"name", strref, (strref)ss->shipname);
+    cfieldSet(msg, _S"sector", int32, ss->sector);
+    cfieldSet(msg, _S"sectortype", strref, (strref)ss->sectortype);
+    cfieldSet(msg, _S"beacon", int32, ss->beacon);
+    cfieldSet(msg, _S"seed", uint32, ss->seed);
+    cfieldSet(msg, _S"difficulty", int32, ss->difficulty);
+    cfieldSet(msg, _S"major", int32, g_version_major);
+    cfieldSet(msg, _S"minor", int32, g_version_minor);
+    cfieldSet(msg, _S"rev", int32, g_version_rev);
     controlClientQueue(msg);
 
-    lock_acq(&soundlock);
-    screenshotSound = true;
-    lock_rel(&soundlock);
+    withMutex (&soundlock) {
+        screenshotSound = true;
+    }
 
-    free(ss->shiptype);
-    free(ss->shipname);
-    free(ss->sectortype);
-    free(ss->fn);
-    free(ss->buf);
-    free(ss);
+    xa_free(ss->shiptype);
+    xa_free(ss->shipname);
+    xa_free(ss->sectortype);
+    xa_free(ss->fn);
+    xa_free(ss->buf);
+    xa_free(ss);
 
     return 0;
 }
@@ -107,20 +107,20 @@ static char* makeScreenshotFilename(void)
     basic_string_reset(&sfile);
     subspace_FileHelper_getUserFolder(&sfile);
 
-    char* tempfn = malloc(1024);
-    ret          = malloc(1024);
+    char* tempfn = xa_malloc(1024);
+    ret          = xa_malloc(1024);
     strcpy(tempfn, sfile.buf);
     size_t len = strlen(sfile.buf);
-    xsnprintf(tempfn + len, 1024 - len, "sshot-%08d.raw", lcg_random() % 100000000);
+    snprintf(tempfn + len, 1024 - len, "sshot-%08d.raw", lcg_random() % 100000000);
     if (!osAbsolutePathUTF8(tempfn, ret, 1024)) {
-        free(tempfn);
-        free(ret);
+        xa_free(tempfn);
+        xa_free(ret);
         basic_string_destroy(&sfile);
         return NULL;
     }
 
     basic_string_destroy(&sfile);
-    free(tempfn);
+    xa_free(tempfn);
     return ret;
 }
 
@@ -138,19 +138,19 @@ static void screenshotMetadata(SSInfo* ss)
     StatTracker* stats       = ScoreKeeper_stats(SKeeper);
 
     if (shipType && shipName && sector && stats) {
-        ss->shiptype   = strdup(shipType->buf);
-        ss->shipname   = strdup(shipName->data.buf);
-        ss->sectortype = strdup(Sector_description_type(sector)->buf);
+        ss->shiptype   = xa_strdup(shipType->buf);
+        ss->shipname   = xa_strdup(shipName->data.buf);
+        ss->sectortype = xa_strdup(Sector_description_type(sector)->buf);
         ss->difficulty = g_Settings_difficulty;
         ss->sector     = StarMap_worldLevel(map);
         ss->beacon     = stats[1].current;
         ss->seed       = StarMap_sectorMapSeed(map);
     } else {
-        ss->shiptype      = malloc(1);
+        ss->shiptype      = xa_malloc(1);
         ss->shiptype[0]   = 0;
-        ss->shipname      = malloc(1);
+        ss->shipname      = xa_malloc(1);
         ss->shipname[0]   = 0;
-        ss->sectortype    = malloc(1);
+        ss->sectortype    = xa_malloc(1);
         ss->sectortype[0] = 0;
         ss->difficulty    = 0;
         ss->sector        = 0;
@@ -169,17 +169,17 @@ void saveScreenshotFramebuf(int* fb)
     if (!data)
         return;
 
-    SSInfo* ss = malloc(sizeof(SSInfo));
+    SSInfo* ss = xa_malloc(sizeof(SSInfo));
     ss->fn     = makeScreenshotFilename();
     if (!ss->fn) {
-        free(ss);
+        xa_free(ss);
         return;
     }
 
     ss->w        = texture_width(tex);
     ss->h        = texture_height(tex);
     size_t dsize = ss->w * ss->h * 4;
-    ss->buf      = malloc(dsize);
+    ss->buf      = xa_malloc(dsize);
     memcpy(ss->buf, data, dsize);
     texture_unlock(tex);
 
@@ -190,10 +190,10 @@ void saveScreenshotFramebuf(int* fb)
 
 void saveScreenshotFallback(void)
 {
-    SSInfo* ss = malloc(sizeof(SSInfo));
+    SSInfo* ss = xa_malloc(sizeof(SSInfo));
     ss->fn     = makeScreenshotFilename();
     if (!ss->fn) {
-        free(ss);
+        xa_free(ss);
         return;
     }
 
@@ -205,7 +205,7 @@ void saveScreenshotFallback(void)
     ss->w        = CApp_screen_x(theApp) - modx * 2 - barx * 2;
     ss->h        = CApp_screen_y(theApp) - mody * 2 - bary * 2;
     size_t dsize = ss->w * ss->h * 4;
-    ss->buf      = malloc(dsize);
+    ss->buf      = xa_malloc(dsize);
     sys_graphics_read_pixels(modx + barx, mody + bary, ss->w, ss->h, ss->w, ss->buf);
 
     ss->automatic = currentScreenshotAuto;
@@ -227,14 +227,14 @@ void screenshotCheckSound(void)
     ScreenshotSettings* settings = Screenshot_feature.settings;
 
     if (!soundlock_init) {
-        lock_init(&soundlock);
+        mutexInit(&soundlock);
         soundlock_init = true;
     }
 
-    lock_acq(&soundlock);
+    mutexAcquire(&soundlock);
     bool playsound  = screenshotSound;
     screenshotSound = false;
-    lock_rel(&soundlock);
+    mutexRelease(&soundlock);
 
     if (playsound && settings->sound) {
         // use a unique mix of 2 select sounds
@@ -267,18 +267,20 @@ void screenshotCheckDestroyed(void)
     CompleteShip* ecship = pcship ? CompleteShip_enemyShip(pcship) : NULL;
     ShipManager* eship   = ecship ? CompleteShip_shipManager(ecship) : NULL;
     if (eship && ShipManager_bDestroyed(eship)) {
-        if (!enemyDestroyed && screenshotAuto(SSEvent_WinFight)) {
-            enemyDestroyed       = true;
-            gs.screenshotNowAuto = true;
-        } else {
-            // otherwise maybe this is a boss stage, check the specific events for those
-            BossShip* bship = WorldManager_bossShip(world);
-            if (!enemyDestroyed && bship) {
-                if ((BossShip_currentStage(bship) == 1 && screenshotAuto(SSEvent_RFS1)) ||
-                    (BossShip_currentStage(bship) == 2 && screenshotAuto(SSEvent_RFS2)) ||
-                    (BossShip_currentStage(bship) == 3 && screenshotAuto(SSEvent_RFS3))) {
-                    enemyDestroyed       = true;
-                    gs.screenshotNowAuto = true;
+        if (!enemyDestroyed) {
+            if (screenshotAuto(SSEvent_WinFight)) {
+                enemyDestroyed       = true;
+                gs.screenshotNowAuto = true;
+            } else {
+                // otherwise maybe this is a boss stage, check the specific events for those
+                BossShip* bship = WorldManager_bossShip(world);
+                if ((CompleteShip*)bship == ecship) {
+                    if ((BossShip_currentStage(bship) == 1 && screenshotAuto(SSEvent_RFS1)) ||
+                        (BossShip_currentStage(bship) == 2 && screenshotAuto(SSEvent_RFS2)) ||
+                        (BossShip_currentStage(bship) == 3 && screenshotAuto(SSEvent_RFS3))) {
+                        enemyDestroyed       = true;
+                        gs.screenshotNowAuto = true;
+                    }
                 }
             }
         }
@@ -328,23 +330,23 @@ static void screenshot_take_cb(int key, int flags)
 }
 
 static KeyBind Screenshot_keybinds[] = {
-    { .name = "screenshot_take", .context = KB_CTX_GAME, .func = screenshot_take_cb },
+    { .name = _S"screenshot_take", .context = KB_CTX_GAME, .func = screenshot_take_cb },
     { 0 }
 };
 
 FeatureSettingsSpec Screenshot_spec = {
     .size = sizeof(ScreenshotSettings),
-    .ent  = { { .name = "sound", .type = CF_BOOL, .off = offsetof(ScreenshotSettings, sound) },
-             { .name = "hidemouse",
+    .ent  = { { .name = _S"sound", .type = CF_BOOL, .off = offsetof(ScreenshotSettings, sound) },
+             { .name = _S"hidemouse",
                 .type = CF_BOOL,
                 .off  = offsetof(ScreenshotSettings, hidemouse) },
-             { .name = "hidepause",
+             { .name = _S"hidepause",
                 .type = CF_BOOL,
                 .off  = offsetof(ScreenshotSettings, hidepause) },
-             { .name = "hideinfoblock",
+             { .name = _S"hideinfoblock",
                 .type = CF_BOOL,
                 .off  = offsetof(ScreenshotSettings, hideinfoblock) },
-             { .name = "events", .type = CF_INT, .off = offsetof(ScreenshotSettings, events) },
+             { .name = _S"events", .type = CF_INT, .off = offsetof(ScreenshotSettings, events) },
              { 0 } }
 };
 
@@ -365,7 +367,7 @@ Patch* Screenshot_patches[] = {
 };
 
 SubspaceFeature Screenshot_feature = {
-    .name            = "Screenshot",
+    .name            = _S"Screenshot",
     .keybinds        = Screenshot_keybinds,
     .requiredPatches = Screenshot_patches,
     .settingsspec    = &Screenshot_spec,

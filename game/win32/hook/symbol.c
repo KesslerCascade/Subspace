@@ -1,7 +1,7 @@
-#include <windows.h>
-
 #include "hook/symbol.h"
 #include "loader/rtld.h"
+
+#include <windows.h>
 
 void symFindLib(addr_t base, Symbol* sym, SymbolFind* find)
 {

@@ -4,8 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct EventSystem EventSystem;
-
 // FTL functions & wrappers below
 
 DECLSYM(EventSystem_EventManager);

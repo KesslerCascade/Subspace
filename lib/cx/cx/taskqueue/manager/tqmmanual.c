@@ -81,5 +81,7 @@ void TQManualManager_destroy(_In_ TQManualManager* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/manager/tqmmanual.auto.inc"
+// clang-format on
 // Autogen ends -------

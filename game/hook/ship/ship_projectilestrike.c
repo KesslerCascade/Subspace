@@ -9,8 +9,6 @@
 #include "patch/patchlist.h"
 #include "subspacegame.h"
 
-#include "minicrt.h"
-
 // ---- Hooks ----------------
 
 static int pre_currentHull;
@@ -25,7 +23,7 @@ int Ship_ProjectileStrike_pre(Ship* self, int roomId, float damage)
         if (damage > 0 && self == playerShip) {
             // This SHOULD only ever be called on the player's ship, but check anyway just in case
             // something crazy happens.
-            pre_currentHull = MAX(Ship_hullIntegrity(self), 0);
+            pre_currentHull = max(Ship_hullIntegrity(self), 0);
         }
     }
 
@@ -39,10 +37,10 @@ void Ship_ProjectileStrike_post(Ship* self, int roomId, float damage)
         CompleteShip* playerCS         = world ? WorldManager_playerShip(world) : NULL;
         ShipManager* playerShipManager = playerCS ? CompleteShip_shipManager(playerCS) : NULL;
         Ship* playerShip = playerShipManager ? ShipManager_ship(playerShipManager) : NULL;
-        const char* src  = gc.curDamageSource ? gc.curDamageSource : "Projectile";
+        strref src                     = gc.curDamageSource ? gc.curDamageSource : _S"Projectile";
 
         if (damage > 0 && self == playerShip) {
-            int deltaHull = pre_currentHull - MAX(Ship_hullIntegrity(self), 0);
+            int deltaHull = pre_currentHull - max(Ship_hullIntegrity(self), 0);
             if (deltaHull != 0)
                 runLogSend(&Log_HullDamage, src, deltaHull);
         }

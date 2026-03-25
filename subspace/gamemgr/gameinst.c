@@ -194,9 +194,9 @@ void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
             featureSetAvailable(feat, cfeat->available);
 
             if (featureIsEnabled(feat)) {
-                ControlMsg* msg = controlNewMsg("EnableFeature", 2);
-                controlMsgStr(msg, 0, "feature", feat->name);
-                controlMsgBool(msg, 1, "enabled", true);
+                ControlMsg* msg = controlMsgCreate(_S"EnableFeature");
+                cfieldSet(msg, _S"feature", string, feat->name);
+                cfieldSet(msg, _S"enabled", bool, true);
                 cclientQueue(client, msg);
             }
             // cfeat->enabled will be set when the client sends a FeatureState update
@@ -213,7 +213,7 @@ void GameInst_onGameReady(_In_ GameInst* self, ControlClient* client)
     }
 
     // give it the clear to start
-    ControlMsg* msg = controlNewMsg("ClearToStart", 0);
+    ControlMsg* msg = controlMsgCreate(_S"ClearToStart");
     cclientQueue(client, msg);
 
     // update UI because feature availabilty may have changed
@@ -336,5 +336,7 @@ void GameInst_onValidate(_In_ GameInst* self, ControlClient* client)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "gamemgr/gameinst.auto.inc"
+// clang-format on
 // Autogen ends -------

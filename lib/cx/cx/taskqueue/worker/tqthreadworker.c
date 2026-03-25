@@ -147,5 +147,7 @@ void TQThreadWorker_destroy(_In_ TQThreadWorker* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/worker/tqthreadworker.auto.inc"
+// clang-format on
 // Autogen ends -------

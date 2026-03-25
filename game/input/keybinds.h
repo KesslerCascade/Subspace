@@ -24,7 +24,7 @@ typedef struct KeyBind {
     KeyBind* next;      // for chaining by kb manager, do not set
 
     SubspaceFeature* owner;
-    const char* name;
+    strref name;
 
     int key;            // key is sent by the main process and should NOT be set here
 
@@ -36,5 +36,5 @@ typedef struct KeyBind {
 } KeyBind;
 
 bool kbRegisterBind(SubspaceFeature* owner, KeyBind* kb);
-bool kbBindKey(const char *name, int key);
+bool kbBindKey(strref name, int key);
 KeyBind* kbGetBinds(int key);

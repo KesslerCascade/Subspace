@@ -267,5 +267,7 @@ bool TaskQueue__queueMaint(_In_ TaskQueue* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/queue/tqueue.auto.inc"
+// clang-format on
 // Autogen ends -------

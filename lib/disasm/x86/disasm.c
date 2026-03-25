@@ -21,7 +21,6 @@
 #define STRICT
 
 #include <ctype.h>
-#include "minicrt.h"
 #pragma hdrstop
 
 #define MAINPROG

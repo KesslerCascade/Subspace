@@ -75,5 +75,7 @@ void TaskRequiresResource_destroy(_In_ TaskRequiresResource* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/requires/taskrequiresresource.auto.inc"
+// clang-format on
 // Autogen ends -------

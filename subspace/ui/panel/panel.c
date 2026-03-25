@@ -54,5 +54,7 @@ _objinit_guaranteed bool Panel_init(_In_ Panel* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/panel/panel.auto.inc"
+// clang-format on
 // Autogen ends -------

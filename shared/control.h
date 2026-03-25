@@ -1,17 +1,14 @@
 #pragma once
 
-#ifndef SUBSPACE_GAME
-#include <cx/string.h>
+#include <cx/container.h>
 #include <cx/serialize/streambuf.h>
-#else
-#include <sbuflite.h>
-#endif
+#include <cx/string.h>
 
-#include "net.h"
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include "net.h"
 
-#define MAX_CONTROL_MSG (16 * 1024 * 1024)
+#define MAX_CONTROL_MSG   (16 * 1024 * 1024)
 #define MAX_CONTROL_FIELD (4 * 1024 * 1024)
 #define MAX_CONTROL_ARRAY (1024 * 1024)
 
@@ -28,11 +25,12 @@
 //    16 bytes field name (null terminated string)
 //    16-bit type ID
 //        0 = int (32 bit)
-//        1 = 32-bit float
-//        2 = 64-bit float
-//        3 = boolean (1 byte)
-//        4 = string
-//        65536 = raw data
+//        1 = int64 (64 bit)
+//        2 = 32-bit float
+//        3 = 64-bit float
+//        4 = boolean (1 byte)
+//        5 = string
+//        6 = raw binary data
 //    16-bit flags
 //        0x0001 = unsigned integer
 //        0x0100 = Array (32-bit array count follows)
@@ -59,10 +57,7 @@ enum CFTYPE_ENUM {
     CF_RAW   // incompatible with CF_ARRAY
 };
 
-enum CFFLAG_ENUM {
-    CF_UNSIGNED = 0x0001,
-    CF_ARRAY    = 0x0100
-};
+enum CFFLAG_ENUM { CF_UNSIGNED = 0x0001, CF_ARRAY = 0x0100 };
 
 typedef struct ControlFieldHeader {
     uint32_t size;
@@ -74,47 +69,15 @@ typedef struct ControlFieldHeader {
 typedef struct ControlField {
     ControlFieldHeader h;
     uint32_t count;   // for arrays, also raw field size
-    union {
-        int cfd_int;
-        int* cfd_int_arr;
-        unsigned int cfd_uint;
-        unsigned int* cfd_uint_arr;
-        int64_t cfd_int64;
-        int64_t* cfd_int64_arr;
-        uint64_t cfd_uint64;
-        uint64_t* cfd_uint64_arr;
-        float cfd_float32;
-        float* cfd_float32_arr;
-        double cfd_float64;
-        double* cfd_float64_arr;
-        bool cfd_bool;
-        bool* cfd_bool_arr;
-#ifdef SUBSPACE_GAME
-        char* cfd_str;
-        char** cfd_str_arr;
-#else
-        string cfd_str;
-        sa_string cfd_str_arr;
-#endif
-        void* cfd_raw;
-    } d;
+    stvar d;          // field data
 } ControlField;
 
 typedef struct ControlMsg ControlMsg;
 
-enum CFALLOCMODE_ENUM {
-    CF_ALLOC_AUTO = 0, // controlRecv allocates using standard system malloc (or game malloc)
-    CF_ALLOC_NEVER,    // never allocate; just fail to receive strings and raw data
-#ifdef SUBSPACE_GAME
-    CF_ALLOC_SALLOC,   // controlRecv allocates using smalloc (slow), must be free using sfree
-#endif
-    CF_ALLOC_PRE,      // caller preallocates space or provides a static buffer and sets size accordingly
-};
-
 // for allocating and receiving an entire message at once
 typedef struct ControlMsg {
     ControlMsgHeader hdr;
-    ControlField** fields;
+    hashtable fields;
 #ifdef SUBSPACE_GAME
     int priority;   // if multiple messages are sent during the same tick, lower priorities are sent
                     // first
@@ -122,7 +85,7 @@ typedef struct ControlMsg {
 } ControlMsg;
 
 typedef struct ControlState {
-    StreamBuffer *sendbuf;
+    StreamBuffer* sendbuf;
     StreamBuffer* recvbuf;
     socket_t sock;
     uint32_t nextid;
@@ -139,39 +102,54 @@ typedef struct ControlState {
 
 void controlInit(ControlState* cs, socket_t sock);
 
-bool controlSend(ControlState *cs);    // send pending bytes in the buffer
-bool controlMsgReady(ControlState* cs); // true if a message can be received from the buffer
+bool controlSendBuffer(ControlState* cs);   // send pending bytes in the buffer
+bool controlMsgReady(ControlState* cs);     // true if a message can be received from the buffer
 
-// add a message to the output buffer and try to send it
-bool controlPutMsg(ControlState* cs, ControlMsgHeader *hdr, ControlField** fields);
+// add a message to the output buffer
+// for internal use only
+bool _controlEncodeMsg(ControlState* cs, ControlMsgHeader* hdr, hashtable fields);
 
 // decode message parts from a FULLY received message in the buffer (see controlMsgReady)
-bool controlGetHeader(ControlState* cs, ControlMsgHeader* hdr);
-bool controlGetField(ControlState* cs, ControlField* field, int allocmode);
-ControlMsg *controlGetMsg(ControlState* cs, int allocmode);  // must be CF_ALLOC_AUTO or CF_ALLOC_SALLOC
-void controlRecvDone(ControlState* cs);  // finish receiving this message and move on to the next one
+// for internal use only
+bool _controlParseHeader(ControlState* cs, ControlMsgHeader* hdr);
+bool _controlParseField(ControlState* cs, ControlField* field);
+// finish parsing this message and move on to the next one
+// for internal use only
+void _controlParseDone(ControlState* cs);
 
-void controlFieldFree(ControlField* field, int allocmode);
-void controlFieldFreeMulti(uint32_t nfields, ControlField** fields, int allocmode, bool freearr);
-void controlMsgFree(ControlMsg* msg, int allocmode);
-ControlMsg* controlAllocMsg(int nfields, int allocmode);
+// higher level function to parse and return a full message from the receive buffer
+ControlMsg* controlRecvMsg(ControlState* cs);
 
-// Utility functions for building message in auto allocate mode
-ControlMsg* controlNewMsg(const char* cmd, int nfields);
-void controlMsgInt(ControlMsg* msg, int nfield, const char* name, int val);
-void controlMsgUInt(ControlMsg* msg, int nfield, const char* name, unsigned int val);
-void controlMsgFloat32(ControlMsg* msg, int nfield, const char* name, float val);
-void controlMsgFloat64(ControlMsg* msg, int nfield, const char* name, double val);
-void controlMsgBool(ControlMsg* msg, int nfield, const char* name, bool val);
-void controlMsgInt64(ControlMsg* msg, int nfield, const char* name, int64_t val);
-void controlMsgUInt64(ControlMsg* msg, int nfield, const char* name, uint64_t val);
-#ifdef SUBSPACE_GAME
-void controlMsgStr(ControlMsg* msg, int nfield, const char* name, const char* val);
-#else
-void controlMsgStr(ControlMsg* msg, int nfield, const char* name, strref val);
-#endif
-void controlMsgRaw(ControlMsg* msg, int nfield, const char* name, void* val, int valsz);
+// add a message to the output buffer and try to send it
+bool controlSendMsg(ControlState* cs, ControlMsg* msg);
 
-ControlField* controlMsgFindField(ControlMsg* msg, const char* name);
+ControlMsg* controlMsgCreate(strref cmd);
+void controlMsgDestroy(ControlMsg* msg);
 
 void controlStateDestroy(ControlState* cs);
+
+// field conversions
+
+#define DECL_CFIELDVAL(type)  bool _cfieldVal_##type(hashtable fields, strref name, type* out)
+#define DECL_CFIELDVALD(type) type _cfieldValD_##type(hashtable fields, strref name, type def)
+DECL_CFIELDVAL(bool);
+DECL_CFIELDVALD(bool);
+DECL_CFIELDVAL(int32);
+DECL_CFIELDVALD(int32);
+DECL_CFIELDVAL(uint32);
+DECL_CFIELDVALD(uint32);
+DECL_CFIELDVAL(int64);
+DECL_CFIELDVALD(int64);
+DECL_CFIELDVAL(uint64);
+DECL_CFIELDVALD(uint64);
+DECL_CFIELDVAL(float32);
+DECL_CFIELDVALD(float32);
+DECL_CFIELDVAL(float64);
+DECL_CFIELDVALD(float64);
+
+#define cfieldVal(type, fields, name, out)  _cfieldVal_##type(fields, name, out)
+#define cfieldValD(type, fields, name, def) _cfieldValD_##type(fields, name, def)
+strref cfieldString(hashtable fields, strref name);
+
+#define cfieldSet(msg, name, type, val) \
+    htInsert(&msg->fields, strref, name, stvar, stvar(type, val))

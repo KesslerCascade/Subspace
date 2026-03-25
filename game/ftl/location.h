@@ -4,9 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct Location Location;
-typedef struct LocationEvent LocationEvent;
-
 // FTL functions & wrappers below
 
 DECLSYM(Location_event_offset);

@@ -101,5 +101,7 @@ void LoadText_destroy(_In_ LoadText* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "gamedata/loadtext.auto.inc"
+// clang-format on
 // Autogen ends -------

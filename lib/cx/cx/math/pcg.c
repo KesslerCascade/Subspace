@@ -1,6 +1,7 @@
 #include "pcg.h"
 
-#include <mbedtls/entropy.h>
+#include "cx/platform/os.h"
+#include "cx/time/clock.h"
 
 // Somewhat modified version of PCG, coverd by APL below:
 // Extremely fast pseudo RNG with good statistical properties.
@@ -32,13 +33,15 @@ void pcgSeed(PcgState* rng, uint64 initstate, uint64 initseq)
 _Use_decl_annotations_
 void pcgAutoSeed(PcgState* rng)
 {
-    mbedtls_entropy_context entropy;
     uint64_t randbuf[2];
 
-    mbedtls_entropy_init(&entropy);
-    mbedtls_entropy_func(&entropy, (unsigned char*)randbuf, sizeof(randbuf));
-    mbedtls_entropy_free(&entropy);
-
+    if (!osGenRandom((uint8*)randbuf, sizeof(randbuf))) {
+        // Fallback to time-based seeding if osGenRandom fails
+        uint64_t curtime  = clockWall();
+        uint64_t argaddr  = (uint64_t)rng;
+        randbuf[0]        = curtime ^ (argaddr << 3);
+        randbuf[1]        = ~(curtime + argaddr);
+    }
     pcgSeed(rng, randbuf[0], randbuf[1]);
 }
 
@@ -156,7 +159,7 @@ float32 pcgFRange(PcgState *rng, float32 lower, float32 upper)
     float32 range = upper - lower;
     if (range <= 0) return lower;
 
-    return ((float32)pcgRandom(rng) / (float32)UINT_MAX * range) + lower;
+    return ((float32)pcgRandom(rng) / (float32)UINT32_MAX * range) + lower;
 }
 
 _Use_decl_annotations_

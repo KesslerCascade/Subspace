@@ -1,5 +1,6 @@
 #include "control/controlclient.h"
 #include "control/runlog.h"
+#include "feature/runtracker.h"
 #include "ftl/blueprintmanager.h"
 #include "ftl/capp.h"
 #include "ftl/completeship.h"
@@ -8,6 +9,8 @@
 #include "ftl/starmap.h"
 #include "ftl/tutorialmanager.h"
 #include "ftl/worldmanager.h"
+#include "inventory/inventory.h"
+#include "inventory/resources.h"
 #include "proto.h"
 #include "subspacegame.h"
 
@@ -28,23 +31,37 @@ void subspace_WorldManager_CreateNewGame_post(WorldManager* self)
         int seed                 = map ? StarMap_sectorMapSeed(map) : 0;
 
         if (shipType && shipName && seed) {
-            ControlMsg* msg = controlNewMsg("NewGame", 4);
-            controlMsgStr(msg, 0, "ship", shipType->buf);
-            controlMsgStr(msg, 1, "name", shipName->data.buf);
-            controlMsgInt(msg, 2, "seed", seed);
-            controlMsgInt(msg, 3, "difficulty", g_Settings_difficulty);
+            ControlMsg* msg = controlMsgCreate(_S"NewGame");
+            cfieldSet(msg, _S"ship", strref, (strref)shipType->buf);
+            cfieldSet(msg, _S"name", strref, (strref)shipName->data.buf);
+            cfieldSet(msg, _S"seed", int32, seed);
+            cfieldSet(msg, _S"difficulty", int32, g_Settings_difficulty);
             controlClientQueue(msg);
 
-            msg = controlNewMsg("GameState", 1);
-            controlMsgInt(msg, 0, "state", GAME_RUN);
+            msg = controlMsgCreate(_S"GameState");
+            cfieldSet(msg, _S"state", int32, GAME_RUN);
             controlClientQueue(msg);
 
             runLogSend(&Log_Start, shipType->buf, shipName->data.buf, seed, g_Settings_difficulty);
         }
     } else {
-        ControlMsg* msg = controlNewMsg("GameState", 1);
-        controlMsgInt(msg, 0, "state", GAME_TUTORIAL);
+        ControlMsg* msg = controlMsgCreate(_S"GameState");
+        cfieldSet(msg, _S"state", int32, GAME_TUTORIAL);
         controlClientQueue(msg);
+    }
+
+    // save initial ship inventory
+    if (RunTracker_feature.enabled) {
+        EventSource origsrc = { 0 };
+        eventSourceSet(Inv, &origsrc, _S"Starting");
+        invReset();
+        invScan();
+        eventSourceFinish(Inv, &origsrc);
+
+        eventSourceSet(Resource, &origsrc, _S"Starting");
+        resourceReset();
+        resourceScan();
+        eventSourceFinish(Resource, &origsrc);
     }
 
     gs.sendAllStats = true;

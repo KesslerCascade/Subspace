@@ -2,14 +2,14 @@
 #include "hook/hook.h"
 #include "patch/patchlist.h"
 
-static DamageSource flaresrc;
+static EventSource flaresrc;
 
 // ---- Hooks ----------------
 
 int ShipManager_SunDamage_pre(ShipManager* self)
 {
     if (RunTracker_feature.enabled) {
-        damageSourceSet(&flaresrc, "SolarFlare");
+        eventSourceSet(Damage, &flaresrc, _S"SolarFlare");
     }
 
     return 1;
@@ -17,7 +17,7 @@ int ShipManager_SunDamage_pre(ShipManager* self)
 
 void ShipManager_SunDamage_post(ShipManager* self)
 {
-    damageSourceFinish(&flaresrc);
+    eventSourceFinish(Damage, &flaresrc);
 }
 
 // ---- Patch ----------------

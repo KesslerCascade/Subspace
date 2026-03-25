@@ -1,5 +1,10 @@
+#include <cx/container.h>
+#include <cx/fs.h>
+#include <cx/platform/win/win_fs.h>
+#include <cx/string.h>
+#include <cx/thread.h>
+#include <cx/utils/lazyinit.h>
 #include <windows.h>
-#include "minicrt.h"
 
 #include "rtld.h"
 
@@ -29,6 +34,9 @@ static char _resources[256 * 1024];
 // and copy them from the exe.
 __declspec(thread) char _tls[4096];
 
+// No longer needed with C runtime now setting up TLS for us
+#if 0
+
 // ----- TLS stuff that is normally handled by msvcrt
 ULONG _tls_index = 0;
 #pragma data_seg(".tls")
@@ -48,36 +56,37 @@ __declspec(allocate(".rdata$T")) extern const IMAGE_TLS_DIRECTORY _tls_used = {
 #pragma data_seg()
 // ----- end TLS stuff
 
+#endif
+
 #define ReadOrFail(f, d, dr)                                         \
     if (!ReadFile(f, &(d), sizeof(d), &dr, NULL) || dr != sizeof(d)) \
         return 0;
 
 #define imageptr ptr(imagebase)
 
-static lazy_init libhash_is_init;
-static lock_t liblock;
-static hashtbl libhash;
+static LazyInitState libhash_is_init;
+static Mutex liblock;
+static hashtable libhash;
 
 static void libhash_init(void* unused)
 {
-    lock_init(&liblock);
-    hashtbl_init(&libhash, 32, HT_STRING_KEYS | HT_CASE_INSENSITIVE);
+    mutexInit(&liblock);
+    htInit(&libhash, string, ptr, 32, HT_CaseInsensitive);
 }
 
 HMODULE getLib(const char* name)
 {
-    lazyinit(&libhash_is_init, libhash_init, NULL);
+    lazyInit(&libhash_is_init, libhash_init, NULL);
 
     HMODULE ret = NULL;
-    lock_acq(&liblock);
-    ret = (HMODULE)hashtbl_get(&libhash, name);
-    if (!ret) {
-        ret = LoadLibraryA(name);
-        if (ret) {
-            hashtbl_set(&libhash, name, ret);
+    withMutex (&liblock) {
+        if (!htFind(libhash, strref, (strref)name, ptr, &ret)) {
+            ret = LoadLibraryA(name);
+            if (ret) {
+                htInsert(&libhash, strref, (strref)name, ptr, ret);
+            }
         }
     }
-    lock_rel(&liblock);
     return ret;
 }
 
@@ -424,7 +433,7 @@ static int copyTLS(addr_t imagebase, IMAGE_DATA_DIRECTORY* data)
            tlsinfo->EndAddressOfRawData - tlsinfo->StartAddressOfRawData);
 
     // Hack to make linker not discard the symbol as unused
-    (void)_tls_used;
+    // (void)_tls_used;
 
     return 1;
 }
@@ -452,19 +461,14 @@ addr_t getSymbol(addr_t imagebase, const char* name)
 
 // LoadLibrary-based loader for debugging
 
-addr_t loadExe(const char* filename)
+addr_t loadExe(strref filename)
 {
     EXE_HEADERS hdr;
     addr_t imagebase = 0;
     IMAGE_NT_HEADERS* nthdr;
     int needreloc = 0;
 
-    int fnlen          = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-    wchar_t* filenamew = smalloc(fnlen * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, filename, -1, filenamew, fnlen);
-
-    imagebase = (addr_t)LoadLibraryExW(filenamew, NULL, DONT_RESOLVE_DLL_REFERENCES);
-    sfree(filenamew);
+    imagebase = (addr_t)LoadLibraryExW(fsPathToNT(filename), NULL, DONT_RESOLVE_DLL_REFERENCES);
     if (!imagebase)
         goto done;
 
@@ -499,7 +503,7 @@ fail:
 #else
 
 // native loader
-addr_t loadExe(const char* filename)
+addr_t loadExe(strref filename)
 {
     HANDLE hFile;
     LARGE_INTEGER sz;
@@ -508,18 +512,13 @@ addr_t loadExe(const char* filename)
     IMAGE_NT_HEADERS* nthdr;
     int needreloc = 0;
 
-    int fnlen          = MultiByteToWideChar(CP_UTF8, 0, filename, -1, NULL, 0);
-    wchar_t* filenamew = smalloc(fnlen * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, filename, -1, filenamew, fnlen);
-
-    hFile = CreateFileW(filenamew,
+    hFile = CreateFileW(fsPathToNT(filename),
                         GENERIC_READ,
                         FILE_SHARE_READ,
                         NULL,
                         OPEN_EXISTING,
                         FILE_ATTRIBUTE_NORMAL,
                         0);
-    sfree(filenamew);
     if (!GetFileSizeEx(hFile, &sz))
         goto fail;
 

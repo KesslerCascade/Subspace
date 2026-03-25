@@ -1,25 +1,18 @@
-#ifndef SUBSPACE_GAME
-#define XALLOC_REMAP_MALLOC
+#include <cx/stype/stvar.h>
+#include <cx/time.h>
+#include <cx/xalloc.h>
+
+#ifdef SUBSPACE_GAME
+#include "osdep.h"
 #endif
 
 #include "control.h"
 #include "netsocket.h"
 
-#ifdef SUBSPACE_GAME
-#include "ftl/stdlib.h"
-#include "minicrt.h"
-#include "osdep.h"
-#define control_malloc smalloc
-#define control_free   sfree
-#else
-#include <cx/time.h>
-#include <cx/xalloc.h>
-#define control_malloc xa_malloc
-#define control_free   xa_free
-#endif
-
 #define TCPBUF_SEND 65536
 #define TCPBUF_RECV 65536
+
+saDeclare(ControlField);
 
 static const uint8_t syncmagic[4] = { 0x0e, 0x19, 0x01, 0x17 };
 
@@ -54,9 +47,8 @@ void controlInit(ControlState* cs, socket_t sock)
     // control state after reconnecting
     if (!cs->init) {
         cs->init    = true;
-        // just some temporary space, mostly for the game portion so it doesn't have to call smalloc
-        // a lot
-        cs->tmprecv = control_malloc(TCPBUF_RECV);
+        // just some temporary space to avoid reallocating a lot
+        cs->tmprecv = xaAlloc(TCPBUF_RECV);
 
         cs->recvbuf = sbufCreate(TCPBUF_RECV * 4);
         cs->sendbuf = sbufCreate(TCPBUF_SEND * 4);
@@ -69,7 +61,7 @@ void controlInit(ControlState* cs, socket_t sock)
     }
 }
 
-bool controlSend(ControlState* cs)
+bool controlSendBuffer(ControlState* cs)
 {
     bool ret         = false;
     StreamBuffer* sb = cs->sendbuf;
@@ -156,23 +148,15 @@ static int32_t writeOneVal(StreamBuffer* sb, int typ, void* v, size_t rawsz)
         ret = 1;
         break;
     case CF_STRING: {
-#ifdef SUBSPACE_GAME
-        uint32_t len = strlen(*(char**)v);
-#else
         uint32_t len = strLen(*(strref*)v);
-#endif
         uint16_t ssz = min(len, 65536);   // TODO: Some kind of safety check here
         sbufPWrite(sb, (uint8_t*)&ssz, 2);
-#ifdef SUBSPACE_GAME
-        sbufPWrite(sb, *(char**)v, ssz);
-#else
         sbufPWriteStr(sb, *(strref*)v);
-#endif
         ret = len + 2;
         break;
     }
     case CF_RAW:
-        sbufPWrite(sb, v, rawsz);
+        sbufPWrite(sb, *(uint8**)v, rawsz);
         ret = rawsz;
         break;
     }
@@ -180,104 +164,162 @@ static int32_t writeOneVal(StreamBuffer* sb, int typ, void* v, size_t rawsz)
     return ret;
 }
 
-// add a message to the output buffer and try to send it
-bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** fields)
+// add a message to the output buffer
+bool _controlEncodeMsg(ControlState* cs, ControlMsgHeader* hdr, hashtable fields)
 {
+    // sanity check input type
+    if (!(stEq(htKeyType(fields), stType(string)) && stEq(htValType(fields), stType(stvar))))
+        return false;
+
     memcpy(hdr->sync, syncmagic, 4);
     hdr->size  = sizeof(ControlMsgHeader);
     hdr->msgid = cs->nextid++;
 
-    // go through the fields and add up their size
-    for (uint32_t i = 0; i < hdr->nfields; i++) {
-        ControlFieldHeader* cfh = &fields[i]->h;
-        size_t dsize            = 0;
+    sa_ControlField cfs;
+    saInit(&cfs, opaque(ControlField), 4);
 
-        if (cfh->ftype == CF_STRING && (cfh->flags & CF_ARRAY)) {
+    // go through the fields, create the headers, and calculate size
+    foreach (hashtable, hti, fields) {
+        stvar* val   = htiValPtr(stvar, hti);
+        size_t dsize = 0;
+        int32 count  = 0;
+        int arrtype  = stType(none);
+
+        ControlField ncf = { 0 };
+        strCopyOut(htiKey(strref, hti), 0, ncf.h.name, sizeof(ncf.h.name));
+
+        // is this an array?
+        if (stvarIs(val, sarray)) {
+            count   = saSize(val->data.st_sarray);
+            arrtype = stGetId(saElemType(val->data.st_sarray));
+            ncf.h.flags |= CF_ARRAY;
+        }
+
+        if (arrtype == stTypeId(string) && count > 0) {
             // special case, have to count all the strings, plus lengths
+            ncf.h.ftype = CF_STRING;
             dsize = 4;
-            for (uint32_t j = 0; j < fields[i]->count; j++) {
-#ifdef SUBSPACE_GAME
-                dsize += strlen(fields[i]->d.cfd_str_arr[j]) + 2;
-#else
-                dsize += strLen(fields[i]->d.cfd_str_arr.a[j]) + 2;
-#endif
+            for (uint32_t j = 0; j < saSize(val->data.st_sarray); j++) {
+                sa_string* arr = (sa_string*)&val->data.st_sarray;
+                dsize += strLen(arr->a[j]) + 2;
             }
         } else {
-            switch (cfh->ftype) {
-            case CF_INT:
-            case CF_FLOAT32:
+            int typeid = (count == 0 ? stGetId(val->type) : arrtype);
+
+            switch (typeid) {
+            case stTypeId(int32):
+                ncf.h.ftype = CF_INT;
+                dsize       = 4;
+                break;
+            case stTypeId(uint32):
+                ncf.h.ftype = CF_INT;
+                ncf.h.flags |= CF_UNSIGNED;
                 dsize = 4;
                 break;
-            case CF_INT64:
-            case CF_FLOAT64:
+            case stTypeId(float32):
+                ncf.h.ftype = CF_FLOAT32;
+                dsize       = 4;
+                break;
+            case stTypeId(int64):
+                ncf.h.ftype = CF_INT64;
+                dsize       = 8;
+                break;
+            case stTypeId(uint64):
+                ncf.h.ftype = CF_INT64;
+                ncf.h.flags |= CF_UNSIGNED;
                 dsize = 8;
                 break;
-            case CF_BOOL:
-                dsize = 1;
+            case stTypeId(float64):
+                ncf.h.ftype = CF_FLOAT64;
+                dsize       = 8;
                 break;
-            case CF_STRING:
-#ifdef SUBSPACE_GAME
-                dsize = strlen(fields[i]->d.cfd_str) + 2;
-#else
-                dsize = strLen(fields[i]->d.cfd_str) + 2;
-#endif
+            case stTypeId(bool):
+                ncf.h.ftype = CF_BOOL;
+                dsize       = 1;
                 break;
-            case CF_RAW:
-                dsize = fields[i]->count;
+            case stTypeId(string):
+                ncf.h.ftype = CF_STRING;
+                dsize       = strLen(val->data.st_string) + 2;
+                break;
+            case stTypeId(opaque):
+                ncf.h.ftype = CF_RAW;
+                dsize       = stGetSize(val->type);
+                break;
+            default:
+                devFatalError("Unsupported data type for control message field");
             }
 
-            if (cfh->flags & CF_ARRAY) {
-                dsize *= fields[i]->count;
+            if (count > 0) {
+                dsize *= count;
                 dsize += 4;
             }
         }
 
-        cfh->size = sizeof(ControlFieldHeader) + dsize;
+        ncf.h.size = sizeof(ControlFieldHeader) + dsize;
         // align to 4-byte boundary
-        cfh->size = ((cfh->size + 3) / 4) * 4;
-        hdr->size += cfh->size;
+        ncf.h.size = ((ncf.h.size + 3) / 4) * 4;
+
+        ncf.count = (ncf.h.ftype == CF_RAW) ? dsize : count;
+        ncf.d     = *val;
+        hdr->size += ncf.h.size;
+
+        saPush(&cfs, opaque, ncf);
     }
+
+    hdr->nfields = saSize(cfs);
 
     // now write out the message
     StreamBuffer* sb = cs->sendbuf;
     sbufPWrite(sb, (uint8_t*)hdr, sizeof(ControlMsgHeader));
 
-    for (uint32_t i = 0; i < hdr->nfields; i++) {
-        ControlFieldHeader* cfh = &fields[i]->h;
+    for (int32 i = 0; i < saSize(cfs); i++) {
+        ControlField* cf        = &cfs.a[i];
+        ControlFieldHeader* cfh = &cfs.a[i].h;
         int32_t pad             = cfh->size - sizeof(ControlFieldHeader);
 
         sbufPWrite(sb, (uint8_t*)cfh, sizeof(ControlFieldHeader));
         if (cfh->flags & CF_ARRAY) {
-            sbufPWrite(sb, (uint8_t*)&fields[i]->count, 4);
+            sbufPWrite(sb, (uint8_t*)&cf->count, 4);
             pad -= 4;
-            for (uint32_t j = 0; j < fields[i]->count; j++) {
+            for (uint32_t j = 0; j < cf->count; j++) {
                 switch (cfh->ftype) {
                 case CF_INT:
-                    pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_int_arr[j], 0);
+                    pad -= writeOneVal(sb,
+                                       cfh->ftype,
+                                       &((sa_int32*)&cf->d.data.st_sarray)->a[j],
+                                       0);
                     break;
                 case CF_INT64:
-                    pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_int64_arr[j], 0);
+                    pad -= writeOneVal(sb,
+                                       cfh->ftype,
+                                       &((sa_int64*)&cf->d.data.st_sarray)->a[j],
+                                       0);
                     break;
                 case CF_FLOAT32:
-                    pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_float32_arr[j], 0);
+                    pad -= writeOneVal(sb,
+                                       cfh->ftype,
+                                       &((sa_float32*)&cf->d.data.st_sarray)->a[j],
+                                       0);
                     break;
                 case CF_FLOAT64:
-                    pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_float64_arr[j], 0);
+                    pad -= writeOneVal(sb,
+                                       cfh->ftype,
+                                       &((sa_float64*)&cf->d.data.st_sarray)->a[j],
+                                       0);
                     break;
                 case CF_BOOL:
-                    pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_bool_arr[j], 0);
+                    pad -= writeOneVal(sb, cfh->ftype, &((sa_bool*)&cf->d.data.st_sarray)->a[j], 0);
                     break;
                 case CF_STRING:
-#ifdef SUBSPACE_GAME
-                    pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_str_arr[j], 0);
-#else
-                    pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d.cfd_str_arr.a[j], 0);
-#endif
+                    pad -= writeOneVal(sb,
+                                       cfh->ftype,
+                                       &((sa_string*)&cf->d.data.st_sarray)->a[j],
+                                       0);
                     break;
                 }
             }
         } else {
-            pad -= writeOneVal(sb, cfh->ftype, &fields[i]->d, fields[i]->count);
+            pad -= writeOneVal(sb, cfh->ftype, &cf->d.data, cf->count);
         }
 
         for (int k = 0; k < pad; k++) {
@@ -286,12 +328,13 @@ bool controlPutMsg(ControlState* cs, ControlMsgHeader* hdr, ControlField** field
         }
     }
 
-    // try to send the outbound data
-    return controlSend(cs);
+    saDestroy(&cfs);
+
+    return true;
 }
 
 // decode message parts from a FULLY received message in the buffer (see controlMsgReady)
-bool controlGetHeader(ControlState* cs, ControlMsgHeader* hdr)
+bool _controlParseHeader(ControlState* cs, ControlMsgHeader* hdr)
 {
     if (cs->recvhdr || !controlMsgReady(cs))
         return false;
@@ -308,40 +351,7 @@ bool controlGetHeader(ControlState* cs, ControlMsgHeader* hdr)
     return true;
 }
 
-static void* allocBytes(size_t sz, void* orig, int allocmode, uint32_t count)
-{
-    switch (allocmode) {
-    case CF_ALLOC_AUTO:
-        return malloc(sz);
-#ifdef SUBSPACE_GAME
-    case CF_ALLOC_SALLOC:
-        return smalloc(sz);
-#endif
-    case CF_ALLOC_PRE:
-        if (sz <= count)
-            return *((void**)orig);
-        break;
-    }
-
-    return NULL;
-}
-
-static void freeBytes(void* ptr, int allocmode)
-{
-    switch (allocmode) {
-    case CF_ALLOC_AUTO:
-        free(ptr);
-        break;
-#ifdef SUBSPACE_GAME
-    case CF_ALLOC_SALLOC:
-        sfree(ptr);
-        break;
-#endif
-    }
-}
-
-static bool parseField(StreamBuffer* sb, int ftype, void* dest, int allocmode, size_t* pad,
-                       uint32_t count)
+static bool parseField(StreamBuffer* sb, int ftype, void* dest, size_t* pad)
 {
     size_t didread;
     switch (ftype) {
@@ -376,36 +386,26 @@ static bool parseField(StreamBuffer* sb, int ftype, void* dest, int allocmode, s
         if (*pad < len)
             return false;
 
-#ifdef SUBSPACE_GAME
-        char* ptr = allocBytes(len + 1, dest, allocmode, count);
-        if (!ptr)
-            return false;
-
-        sbufCRead(sb, ptr, len, &didread);
-        ptr[len]      = '\0';
-        *(char**)dest = ptr;
-#else
         string nstr  = 0;
         uint8_t* buf = strBuffer(&nstr, len);
         sbufCRead(sb, buf, len, &didread);
         *(string*)dest = nstr;
-#endif
+
         *pad -= len;
         return true;
     }
     case CF_RAW:
         // read everything that's left in the field
-        uint8_t* ptr = allocBytes(*pad, dest, allocmode, count);
-        if (!ptr)
-            return false;
+        uint8_t* ptr = xaAlloc(*pad);
         sbufCRead(sb, ptr, *pad, &didread);
-        *pad = 0;
+        *(void**)dest = ptr;
+        *pad          = 0;
         return true;
     }
     return false;
 }
 
-bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
+bool _controlParseField(ControlState* cs, ControlField* field)
 {
     StreamBuffer* sb = cs->recvbuf;
     size_t didread;
@@ -413,8 +413,7 @@ bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
 
     ControlFieldHeader* hdr = &field->h;
     size_t pad              = hdr->size - sizeof(ControlFieldHeader);
-    if (allocmode != CF_ALLOC_PRE)
-        memset(&field->d, 0, sizeof(field->d));
+    memset(&field->d, 0, sizeof(field->d));
 
     if (hdr->size > MAX_CONTROL_FIELD)
         return false;   // insane
@@ -428,46 +427,38 @@ bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
         if (field->count > MAX_CONTROL_ARRAY)
             return false;   // insane
 
+        field->d.type = stType(sarray);
+
         switch (hdr->ftype) {
         case CF_INT:
-            field->d.cfd_int_arr = (int*)allocBytes(field->count * sizeof(int), NULL, allocmode, 0);
-            if (!field->d.cfd_int_arr)
-                return false;
+            if (field->h.flags & CF_UNSIGNED)
+                saInit(&field->d.data.st_sarray, uint32, field->count);
+            else
+                saInit(&field->d.data.st_sarray, int32, field->count);
+            saSetSize(&field->d.data.st_sarray, field->count);
             break;
         case CF_INT64:
-            field->d.cfd_int64_arr = (int64_t*)
-                allocBytes(field->count * sizeof(int64_t), NULL, allocmode, 0);
-            if (!field->d.cfd_int64_arr)
-                return false;
+            if (field->h.flags & CF_UNSIGNED)
+                saInit(&field->d.data.st_sarray, uint64, field->count);
+            else
+                saInit(&field->d.data.st_sarray, int64, field->count);
+            saSetSize(&field->d.data.st_sarray, field->count);
             break;
         case CF_FLOAT32:
-            field->d.cfd_float32_arr = (float*)
-                allocBytes(field->count * sizeof(float), NULL, allocmode, 0);
-            if (!field->d.cfd_float32_arr)
-                return false;
+            saInit(&field->d.data.st_sarray, float32, field->count);
+            saSetSize(&field->d.data.st_sarray, field->count);
             break;
         case CF_FLOAT64:
-            field->d.cfd_float64_arr = (double*)
-                allocBytes(field->count * sizeof(double), NULL, allocmode, 0);
-            if (!field->d.cfd_float64_arr)
-                return false;
+            saInit(&field->d.data.st_sarray, float64, field->count);
+            saSetSize(&field->d.data.st_sarray, field->count);
             break;
         case CF_BOOL:
-            field->d.cfd_bool_arr = (bool*)
-                allocBytes(field->count * sizeof(bool), NULL, allocmode, 0);
-            if (!field->d.cfd_bool_arr)
-                return false;
+            saInit(&field->d.data.st_sarray, bool, field->count);
+            saSetSize(&field->d.data.st_sarray, field->count);
             break;
         case CF_STRING:
-#ifdef SUBSPACE_GAME
-            field->d.cfd_str_arr = (char**)
-                allocBytes(field->count * sizeof(char*), NULL, allocmode, 0);
-            if (!field->d.cfd_str_arr)
-                return false;
-#else
-            saInit(&field->d.cfd_str_arr, string, field->count);
-            saSetSize(&field->d.cfd_str_arr, field->count);
-#endif
+            saInit(&field->d.data.st_sarray, string, field->count);
+            saSetSize(&field->d.data.st_sarray, field->count);
             break;
         }
 
@@ -475,53 +466,76 @@ bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
             bool success = false;
             switch (hdr->ftype) {
             case CF_INT:
-                success = parseField(sb, hdr->ftype, &field->d.cfd_int_arr[j], allocmode, &pad, 0);
+                success = parseField(sb,
+                                     hdr->ftype,
+                                     &((sa_int32*)&field->d.data.st_sarray)->a[j],
+                                     &pad);
                 break;
             case CF_INT64:
                 success = parseField(sb,
                                      hdr->ftype,
-                                     &field->d.cfd_int64_arr[j],
-                                     allocmode,
-                                     &pad,
-                                     0);
+                                     &((sa_int64*)&field->d.data.st_sarray)->a[j],
+                                     &pad);
                 break;
             case CF_FLOAT32:
                 success = parseField(sb,
                                      hdr->ftype,
-                                     &field->d.cfd_float32_arr[j],
-                                     allocmode,
-                                     &pad,
-                                     0);
+                                     &((sa_float32*)&field->d.data.st_sarray)->a[j],
+                                     &pad);
                 break;
             case CF_FLOAT64:
                 success = parseField(sb,
                                      hdr->ftype,
-                                     &field->d.cfd_float64_arr[j],
-                                     allocmode,
-                                     &pad,
-                                     0);
+                                     &((sa_float64*)&field->d.data.st_sarray)->a[j],
+                                     &pad);
                 break;
             case CF_BOOL:
-                success = parseField(sb, hdr->ftype, &field->d.cfd_bool_arr[j], allocmode, &pad, 0);
-                break;
-            case CF_STRING:
-#ifdef SUBSPACE_GAME
-                success = parseField(sb, hdr->ftype, &field->d.cfd_str_arr[j], allocmode, &pad, 0);
-#else
                 success = parseField(sb,
                                      hdr->ftype,
-                                     &field->d.cfd_str_arr.a[j],
-                                     allocmode,
-                                     &pad,
-                                     0);
-#endif
+                                     &((sa_bool*)&field->d.data.st_sarray)->a[j],
+                                     &pad);
+                break;
+            case CF_STRING:
+                success = parseField(sb,
+                                     hdr->ftype,
+                                     &((sa_string*)&field->d.data.st_sarray)->a[j],
+                                     &pad);
                 break;
             }
             if (!success)
                 return false;
         }
     } else {
-        if (!parseField(sb, hdr->ftype, &field->d, allocmode, &pad, field->count))
+        if (hdr->ftype == CF_RAW)
+            field->count = pad;   // raw field size of whatever's left
+
+        switch (hdr->ftype) {
+        case CF_INT:
+            field->d.type = (hdr->flags & CF_UNSIGNED) ? stType(uint32) : stType(int32);
+            break;
+        case CF_INT64:
+            field->d.type = (hdr->flags & CF_UNSIGNED) ? stType(uint64) : stType(int64);
+            break;
+        case CF_FLOAT32:
+            field->d.type = stType(float32);
+            break;
+        case CF_FLOAT64:
+            field->d.type = stType(float64);
+            break;
+        case CF_BOOL:
+            field->d.type = stType(bool);
+            break;
+        case CF_STRING:
+            field->d.type = stType(string);
+            break;
+        case CF_RAW:
+            field->d.type = _stype_mktype(stTypeId(opaque),
+                                          stTypeFlags(opaque),
+                                          (uint16)field->count);
+            break;
+        }
+
+        if (!parseField(sb, hdr->ftype, &field->d.data, &pad))
             return false;
     }
 
@@ -534,49 +548,48 @@ bool controlGetField(ControlState* cs, ControlField* field, int allocmode)
     return true;
 }
 
-ControlMsg* controlGetMsg(ControlState* cs, int allocmode)
+ControlMsg* controlRecvMsg(ControlState* cs)
 {
-    if (allocmode == CF_ALLOC_NEVER || allocmode == CF_ALLOC_PRE)
-        return NULL;
-
-    ControlMsg* ret = allocBytes(sizeof(ControlMsg), NULL, allocmode, 0);
+    ControlMsg* ret = xaAllocStruct(ControlMsg, XA_Zero);
     if (!ret)
         goto out;
 
-    if (!controlGetHeader(cs, &ret->hdr) || ret->hdr.nfields > MAX_CONTROL_ARRAY) {
-        freeBytes(ret, allocmode);
+    if (!_controlParseHeader(cs, &ret->hdr) || ret->hdr.nfields > MAX_CONTROL_ARRAY) {
+        xaFree(ret);
         ret = NULL;
         goto out;
     }
 
     if (ret->hdr.nfields > 0) {
-        ret->fields = allocBytes(ret->hdr.nfields * sizeof(void*), NULL, allocmode, 0);
-        if (!ret->fields) {
-            freeBytes(ret, allocmode);
-            ret = NULL;
-            goto out;
-        }
+        htInit(&ret->fields, string, stvar, 8);
 
         for (uint32_t i = 0; i < ret->hdr.nfields; i++) {
-            ret->fields[i] = allocBytes(sizeof(ControlField), NULL, allocmode, 0);
-            if (!ret->fields[i] || !controlGetField(cs, ret->fields[i], allocmode)) {
-                for (uint32_t j = 0; j < i; j++) {
-                    freeBytes(ret->fields[j], allocmode);
-                }
-                freeBytes(ret->fields, allocmode);
-                freeBytes(ret, allocmode);
+            ControlField field = { 0 };
+            if (!_controlParseField(cs, &field)) {
+                htDestroy(&ret->fields);
+                xaFree(ret);
                 ret = NULL;
                 goto out;
             }
+
+            htInsertC(&ret->fields, strref, (strref)field.h.name, stvar, &field.d);
         }
     }
 
 out:
-    controlRecvDone(cs);
+    _controlParseDone(cs);
     return ret;
 }
 
-void controlRecvDone(ControlState* cs)
+bool controlSendMsg(ControlState* cs, ControlMsg* msg)
+{
+    if (!_controlEncodeMsg(cs, &msg->hdr, msg->fields))
+        return false;
+
+    return controlSendBuffer(cs);
+}
+
+void _controlParseDone(ControlState* cs)
 {
     StreamBuffer* sb = cs->recvbuf;
     sbufCSkip(sb, cs->left);
@@ -586,238 +599,40 @@ void controlRecvDone(ControlState* cs)
     cs->nfield  = 0;
 }
 
-void controlFieldFree(ControlField* field, int allocmode)
+void controlMsgDestroy(ControlMsg* msg)
 {
-    if (field->h.flags & CF_ARRAY) {
-        switch (field->h.ftype) {
-        case CF_INT:
-            freeBytes(field->d.cfd_int_arr, allocmode);
-            break;
-        case CF_INT64:
-            freeBytes(field->d.cfd_int64_arr, allocmode);
-            break;
-        case CF_FLOAT32:
-            freeBytes(field->d.cfd_float32_arr, allocmode);
-            break;
-        case CF_FLOAT64:
-            freeBytes(field->d.cfd_float64_arr, allocmode);
-            break;
-        case CF_BOOL:
-            freeBytes(field->d.cfd_bool_arr, allocmode);
-            break;
-        case CF_STRING:
-#ifdef SUBSPACE_GAME
-            for (uint32_t i = 0; i < field->count; i++) {
-                freeBytes(field->d.cfd_str_arr[i], allocmode);
-            }
-            freeBytes(field->d.cfd_str_arr, allocmode);
-#else
-            saDestroy(&field->d.cfd_str_arr);
-#endif
-            break;
-        }
-    } else {
-        switch (field->h.ftype) {
-        case CF_STRING:
-#ifdef SUBSPACE_GAME
-            freeBytes(field->d.cfd_str, allocmode);
-#else
-            strDestroy(&field->d.cfd_str);
-#endif
-            break;
-        case CF_RAW:
-            freeBytes(field->d.cfd_raw, allocmode);
-            break;
-        }
+    // special case: fields with an opaque type are owned pointers that need to be freed
+    foreach (hashtable, hti, msg->fields) {
+        stvar* val = htiValPtr(stvar, hti);
+        if (stGetId(val->type) == stTypeId(opaque))
+            xaFree(val->data.st_opaque);
     }
+    htDestroy(&msg->fields);
+    xaFree(msg);
 }
 
-void controlFieldFreeMulti(uint32_t nfields, ControlField** fields, int allocmode, bool freearr)
+ControlMsg* controlMsgCreate(strref cmd)
 {
-    for (uint32_t i = 0; i < nfields; i++) {
-        controlFieldFree(fields[i], allocmode);
-        freeBytes(fields[i], allocmode);
-    }
-    if (freearr && nfields > 0)
-        freeBytes(fields, allocmode);
-}
-
-void controlMsgFree(ControlMsg* msg, int allocmode)
-{
-    controlFieldFreeMulti(msg->hdr.nfields, msg->fields, allocmode, true);
-    freeBytes(msg, allocmode);
-}
-
-ControlMsg* controlAllocMsg(int nfields, int allocmode)
-{
-    if (allocmode == CF_ALLOC_NEVER || allocmode == CF_ALLOC_PRE)
-        return NULL;
-
-    ControlMsg* ret = allocBytes(sizeof(ControlMsg), NULL, allocmode, 0);
-    if (!ret)
-        return NULL;
-#ifdef SUBSPACE_GAME
-    ret->priority = 0;
-#endif
-
-    memset(&ret->hdr, 0, sizeof(ControlMsgHeader));
-    ret->hdr.nfields = nfields;
-    if (nfields > 0) {
-        ret->fields = allocBytes(sizeof(void*) * nfields, NULL, allocmode, 0);
-
-        for (int i = 0; i < nfields; i++) {
-            ret->fields[i] = allocBytes(sizeof(ControlField), NULL, allocmode, 0);
-            memset(ret->fields[i], 0, sizeof(ControlField));
-        }
-    }
-    return ret;
-}
-
-ControlMsg* controlNewMsg(const char* cmd, int nfields)
-{
-    ControlMsg* ret;
-
-    ret = controlAllocMsg(nfields, CF_ALLOC_AUTO);
-    strncpy(ret->hdr.cmd, cmd, sizeof(ret->hdr.cmd) - 1);
-
+    ControlMsg* ret = xaAllocStruct(ControlMsg, XA_Zero);
 #ifdef SUBSPACE_GAME
     // use the current frame time for messages from the game
     ret->hdr.timestamp = osFrameTime();
+    ret->priority      = 0;
 #else
     ret->hdr.timestamp = clockWall();
 #endif
 
+    strCopyOut(cmd, 0, ret->hdr.cmd, sizeof(ret->hdr.cmd));
+    htInit(&ret->fields, string, stvar, 8);
+
     return ret;
-}
-
-void controlMsgInt(ControlMsg* msg, int nfield, const char* name, int val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype   = CF_INT;
-    f->d.cfd_int = val;
-}
-
-void controlMsgUInt(ControlMsg* msg, int nfield, const char* name, unsigned int val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype = CF_INT;
-    f->h.flags |= CF_UNSIGNED;
-    f->d.cfd_uint = val;
-}
-
-void controlMsgFloat32(ControlMsg* msg, int nfield, const char* name, float val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype       = CF_FLOAT32;
-    f->d.cfd_float32 = val;
-}
-
-void controlMsgFloat64(ControlMsg* msg, int nfield, const char* name, double val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype       = CF_FLOAT64;
-    f->d.cfd_float64 = val;
-}
-
-void controlMsgBool(ControlMsg* msg, int nfield, const char* name, bool val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype    = CF_BOOL;
-    f->d.cfd_bool = val;
-}
-
-void controlMsgInt64(ControlMsg* msg, int nfield, const char* name, int64_t val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype     = CF_INT64;
-    f->d.cfd_int64 = val;
-}
-
-void controlMsgUInt64(ControlMsg* msg, int nfield, const char* name, uint64_t val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype = CF_INT64;
-    f->h.flags |= CF_UNSIGNED;
-    f->d.cfd_uint64 = val;
-}
-
-#ifdef SUBSPACE_GAME
-void controlMsgStr(ControlMsg* msg, int nfield, const char* name, const char* val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype = CF_STRING;
-
-    size_t sz    = strlen(val) + 1;
-    f->d.cfd_str = allocBytes(sz, NULL, CF_ALLOC_AUTO, 0);
-    if (!f->d.cfd_str)
-        return;
-    memcpy(f->d.cfd_str, val, sz);
-}
-#else
-void controlMsgStr(ControlMsg* msg, int nfield, const char* name, strref val)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype = CF_STRING;
-    strDup(&f->d.cfd_str, val);
-}
-#endif
-
-void controlMsgRaw(ControlMsg* msg, int nfield, const char* name, void* val, int valsz)
-{
-    if (nfield > msg->hdr.nfields)
-        return;
-    ControlField* f = msg->fields[nfield];
-    strncpy(f->h.name, name, sizeof(f->h.name) - 1);
-    f->h.ftype = CF_RAW;
-
-    f->count     = valsz;
-    f->d.cfd_raw = allocBytes(valsz, NULL, CF_ALLOC_AUTO, 0);
-    if (!f->d.cfd_raw)
-        return;
-    memcpy(f->d.cfd_raw, val, valsz);
-}
-
-ControlField* controlMsgFindField(ControlMsg* msg, const char* name)
-{
-    for (int i = 0; i < msg->hdr.nfields; i++) {
-        if (!strcmp(msg->fields[i]->h.name, name))
-            return msg->fields[i];
-    }
-    return NULL;
 }
 
 void controlStateDestroy(ControlState* cs)
 {
     // we assume that the socket is closed and abandoned
     if (cs->init) {
-        control_free(cs->tmprecv);
+        xaFree(cs->tmprecv);
 
         sbufPFinish(cs->sendbuf);
         sbufCFinish(cs->sendbuf);

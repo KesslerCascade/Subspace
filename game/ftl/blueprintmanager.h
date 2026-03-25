@@ -3,9 +3,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct BlueprintManager BlueprintManager;
-typedef struct ShipBlueprint ShipBlueprint;
-
 // FTL functions & wrappers below
 
 DECLSYM(ShipBlueprint_blueprintName_offset);
@@ -22,3 +19,6 @@ typedef ShipBlueprint* (*FUNCTYPE(BlueprintManager_GetShipBlueprint))(BlueprintM
                                                                       basic_string* name,
                                                                       int sector);
 DECLFUNC(BlueprintManager_GetShipBlueprint);
+
+// fixed offset that is the same across all versions
+#define Blueprint_name(bprint) (&MEMBER_FIXED(ftlbase, Blueprint, bprint, basic_string, 4))

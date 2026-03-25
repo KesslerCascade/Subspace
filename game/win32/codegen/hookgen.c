@@ -2,8 +2,6 @@
 #include "codegen_private.h"
 #include "asm.h"
 
-#include "minicrt.h"
-
 typedef struct HookState {
     const FuncInfo* fi;
     int espoffset;

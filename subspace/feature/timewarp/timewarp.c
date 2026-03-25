@@ -46,10 +46,6 @@ void TimeWarp_applyDefaultSettings(_In_ TimeWarp* self)
     }
 }
 
-extern SettingsPage*
-SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
-extern SettingsPage*
-SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
 extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
 #define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
 SettingsPage* TimeWarp_createSettingsPage(_In_ TimeWarp* self, SubspaceUI* ui)
@@ -58,5 +54,7 @@ SettingsPage* TimeWarp_createSettingsPage(_In_ TimeWarp* self, SubspaceUI* ui)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/timewarp/timewarp.auto.inc"
+// clang-format on
 // Autogen ends -------

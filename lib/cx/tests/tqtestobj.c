@@ -549,5 +549,7 @@ uint32 TQTimeoutTest2_run(_In_ TQTimeoutTest2* self, _In_ TaskQueue* tq, _In_ TQ
 }
 
 // Autogen begins -----
+// clang-format off
 #include "tqtestobj.auto.inc"
+// clang-format on
 // Autogen ends -------

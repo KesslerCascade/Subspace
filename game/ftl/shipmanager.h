@@ -5,14 +5,18 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct ShipManager ShipManager;
-typedef struct ShipBlueprint ShipBlueprint;
-
 // FTL functions & wrappers below
 
 extern DisasmTrace ShipManager_OnLoop_trace;
 extern DisasmTrace ShipManager_DamageHull_trace;
 extern DisasmTrace ShipManager_SunDamage_trace;
+extern DisasmTrace ShipManager_PowerWeapon_trace;
+extern DisasmTrace ShipManager_GetWeaponTotal_trace;
+extern DisasmTrace ShipManager_AddDrone_trace;
+extern DisasmTrace ShipManager_GetDroneTotal_trace;
+extern DisasmTrace ShipManager_ModifyDroneCount_trace;
+extern DisasmTrace ShipManager_PowerDrone_trace;
+extern DisasmTrace ShipManager_DePowerDrone_trace;
 
 typedef bool (*FUNCTYPE(ShipManager_OnInit))(ShipManager* ship, ShipBlueprint* bluePrint,
                                              int level);
@@ -36,9 +40,17 @@ DECLFUNC(ShipManager_Wait);
 typedef void (*FUNCTYPE(ShipManager_JumpLeave))(ShipManager* ship);
 DECLFUNC(ShipManager_JumpLeave);
 
+typedef void (*FUNCTYPE(ShipManager_JumpArrive))(ShipManager* ship);
+DECLFUNC(ShipManager_JumpArrive);
+
 typedef int (*FUNCTYPE(ShipManager_GetDroneCount))(ShipManager* ship);
 DECLFUNC(ShipManager_GetDroneCount);
 #define ShipManager_GetDroneCount(self) FCALL(ftlbase, ShipManager_GetDroneCount, self)
+
+typedef void (*FUNCTYPE(ShipManager_ModifyDroneCount))(ShipManager* ship, int amount);
+DECLFUNC(ShipManager_ModifyDroneCount);
+#define ShipManager_ModifyDroneCount(self, amount) \
+    FCALL(ftlbase, ShipManager_ModifyDroneCount, self, amount)
 
 typedef int (*FUNCTYPE(ShipManager_GetMissileCount))(ShipManager* ship);
 DECLFUNC(ShipManager_GetMissileCount);
@@ -49,22 +61,9 @@ DECLFUNC(ShipManager_ModifyScrapCount);
 #define ShipManager_ModifyScrapCount(self, amount, income) \
     FCALL(ftlbase, ShipManager_GetMissileCount, self, amount, income)
 
-// technically this is a ShipObject method, but it's ShipManager's base class and is always at
-// offset 0
-typedef int (*FUNCTYPE(ShipManager_HasEquipment))(ShipManager* ship, basic_string* blueName);
-DECLFUNC(ShipManager_HasEquipment);
-#define ShipManager_HasEquipment(self, blueName) \
-    FCALL(ftlbase, ShipManager_HasEquipment, self, blueName)
-
-typedef int (*FUNCTYPE(ShipManager_HasAugmentation))(ShipManager* ship, basic_string* augId);
-DECLFUNC(ShipManager_HasAugmentation);
-#define ShipManager_HasAugmentation(self, augId) \
-    FCALL(ftlbase, ShipManager_HasAugmentation, self, augId)
-
-typedef float (*FUNCTYPE(ShipManager_GetAugmentationValue))(ShipManager* ship, basic_string* augId);
-DECLFUNC(ShipManager_GetAugmentationValue);
-#define ShipManager_GetAugmentationValue(self, augId) \
-    FCALL(ftlbase, ShipManager_GetAugmentationValue, self, augId)
+typedef bool (*FUNCTYPE(ShipManager_HasSystem))(ShipManager* ship, int systemId);
+DECLFUNC(ShipManager_HasSystem);
+#define ShipManager_HasSystem(self, systemId) FCALL(ftlbase, ShipManager_HasSystem, self, systemId)
 
 DECLSYM(ShipManager_ship_offset);
 DECLSYM(ShipManager_current_target_offset);
@@ -106,3 +105,58 @@ typedef bool (*FUNCTYPE(ShipManager_DamageBeam))(ShipManager* self, Pointf curre
 DECLFUNC(ShipManager_DamageBeam);
 
 DECLSYM(ShipManager_DamageSystem);
+
+typedef int (*FUNCTYPE(ShipManager_GetWeaponTotal))(ShipManager* self);
+DECLFUNC(ShipManager_GetWeaponTotal);
+#define ShipManager_GetWeaponTotal(self) FCALL(ftlbase, ShipManager_GetWeaponTotal, self)
+
+typedef int (*FUNCTYPE(ShipManager_AddWeapon))(ShipManager* self, WeaponBlueprint* weapon,
+                                               int slot);
+DECLFUNC(ShipManager_AddWeapon);
+#define ShipManager_AddWeapon(self, weapon, slot) \
+    FCALL(ftlbase, ShipManager_AddWeapon, self, weapon, slot)
+
+typedef bool (*FUNCTYPE(ShipManager_DePowerWeapon))(ShipManager* self, ProjectileFactory* weapon,
+                                                    bool userDriven);
+DECLFUNC(ShipManager_DePowerWeapon);
+
+typedef bool (*FUNCTYPE(ShipManager_PowerWeapon))(ShipManager* self, ProjectileFactory* weapon,
+                                                  bool userDriven, bool force);
+DECLFUNC(ShipManager_PowerWeapon);
+
+DECLSYM(ShipManager_weaponSystem_offset);
+#define ShipManager_weaponSystem(self) \
+    (MEMBER(ftlbase, ShipManager, self, WeaponSystem*, weaponSystem))
+
+typedef int (*FUNCTYPE(ShipManager_GetDroneTotal))(ShipManager* self);
+DECLFUNC(ShipManager_GetDroneTotal);
+#define ShipManager_GetDroneTotal(self) FCALL(ftlbase, ShipManager_GetDroneTotal, self)
+
+typedef Drone* (*FUNCTYPE(ShipManager_AddDrone))(ShipManager* self, DroneBlueprint* drone,
+                                                 int slot);
+DECLFUNC(ShipManager_AddDrone);
+#define ShipManager_AddDrone(self, drone, slot) \
+    FCALL(ftlbase, ShipManager_AddDrone, self, drone, slot)
+
+DECLSYM(ShipManager_droneSystem_offset);
+#define ShipManager_droneSystem(self) \
+    (MEMBER(ftlbase, ShipManager, self, DroneSystem*, droneSystem))
+
+typedef void (*FUNCTYPE(ShipManager_AddItem))(ShipManager* self, ItemBlueprint* item);
+DECLFUNC(ShipManager_AddItem);
+
+typedef bool (*FUNCTYPE(ShipManager_DePowerDrone))(ShipManager* self, Drone* drone,
+                                                   bool userDriven);
+DECLFUNC(ShipManager_DePowerDrone);
+
+typedef bool (*FUNCTYPE(ShipManager_PowerDrone))(ShipManager* self, Drone* drone, int roomId,
+                                                 bool userDriven, bool force);
+DECLFUNC(ShipManager_PowerDrone);
+
+DECLSYM(ShipManager_droneSystem_offset);
+#define ShipManager_droneSystem(self) \
+    (MEMBER(ftlbase, ShipManager, self, DroneSystem*, droneSystem))
+
+DECLSYM(ShipManager_hackingSystem_offset);
+#define ShipManager_hackingSystem(self) \
+    (MEMBER(ftlbase, ShipManager, self, HackingSystem*, hackingSystem))

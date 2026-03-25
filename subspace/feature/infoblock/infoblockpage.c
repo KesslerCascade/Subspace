@@ -321,5 +321,7 @@ void InfoBlockPage_save(_In_ InfoBlockPage* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/infoblock/infoblockpage.auto.inc"
+// clang-format on
 // Autogen ends -------

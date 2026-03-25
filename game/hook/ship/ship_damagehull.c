@@ -37,7 +37,7 @@ int Ship_DamageHull_post(int ret, Ship* self, int amount)
         CompleteShip* playerCS         = world ? WorldManager_playerShip(world) : NULL;
         ShipManager* playerShipManager = playerCS ? CompleteShip_shipManager(playerCS) : NULL;
         Ship* playerShip = playerShipManager ? ShipManager_ship(playerShipManager) : NULL;
-        const char* src  = gc.curDamageSource ? gc.curDamageSource : "Other";
+        strref src                     = gc.curDamageSource ? gc.curDamageSource : _S"Other";
 
         if (amount != 0 && self == playerShip) {
             int deltaHull = pre_currentHull - Ship_hullIntegrity(self);

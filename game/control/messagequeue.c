@@ -3,15 +3,15 @@
 
 MessageQueue* msgqCreate(int initsz, bool withcbs)
 {
-    MessageQueue* queue = malloc(sizeof(MessageQueue));
+    MessageQueue* queue = xa_malloc(sizeof(MessageQueue));
     if (!queue)
         return NULL;
 
     queue->maxmsgs = initsz;
     queue->nmsgs   = 0;
-    queue->msgs    = malloc(sizeof(void*) * initsz);
+    queue->msgs    = xa_malloc(sizeof(void*) * initsz);
     if (withcbs)
-        queue->cbs = malloc(sizeof(void*) * initsz);
+        queue->cbs = xa_malloc(sizeof(void*) * initsz);
     else
         queue->cbs = NULL;
 
@@ -22,9 +22,9 @@ void msgqAdd(MessageQueue* queue, ControlMsg* msg, controlclientcb_t cb)
 {
     if (queue->nmsgs == queue->maxmsgs) {
         queue->maxmsgs *= 2;
-        queue->msgs = realloc(queue->msgs, sizeof(void*) * queue->maxmsgs);
+        queue->msgs = xa_realloc(queue->msgs, sizeof(void*) * queue->maxmsgs);
         if (queue->cbs)
-            queue->cbs = realloc(queue->cbs, sizeof(void*) * queue->maxmsgs);
+            queue->cbs = xa_realloc(queue->cbs, sizeof(void*) * queue->maxmsgs);
     }
 
     if (queue->cbs)
@@ -35,7 +35,7 @@ void msgqAdd(MessageQueue* queue, ControlMsg* msg, controlclientcb_t cb)
 void msgqClear(MessageQueue* queue)
 {
     for (int i = 0; i < queue->nmsgs; i++) {
-        controlMsgFree(queue->msgs[i], CF_ALLOC_AUTO);
+        controlMsgDestroy(queue->msgs[i]);
         queue->msgs[i] = NULL;
         if (queue->cbs)
             queue->cbs[i] = NULL;
@@ -46,8 +46,8 @@ void msgqClear(MessageQueue* queue)
 void msgqDestroy(MessageQueue* queue)
 {
     msgqClear(queue);
-    free(queue->msgs);
+    xa_free(queue->msgs);
     if (queue->cbs)
-        free(queue->cbs);
-    free(queue);
+        xa_free(queue->cbs);
+    xa_free(queue);
 }

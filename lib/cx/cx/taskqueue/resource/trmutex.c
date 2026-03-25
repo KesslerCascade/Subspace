@@ -91,5 +91,7 @@ _objfactory_guaranteed TRMutex* TRMutex_create()
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/resource/trmutex.auto.inc"
+// clang-format on
 // Autogen ends -------

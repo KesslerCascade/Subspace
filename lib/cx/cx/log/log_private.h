@@ -1,30 +1,32 @@
 #pragma once
 
-#include "log.h"
 #include <cx/container.h>
 #include <cx/thread.h>
 #include <cx/utils/lazyinit.h>
+#include "log.h"
 
 #define LOG_INITIAL_QUEUE_SIZE 32
-#define LOG_MAX_QUEUE_SIZE 262144
+#define LOG_MAX_QUEUE_SIZE     262144
 
 extern atomic(bool) _log_running;
 extern Mutex _log_run_lock;
 extern Thread* _log_thread;
 
 typedef struct LogDest {
-    LogCategory *catfilter;
-    LogDestFunc func;
-    void *userdata;
+    LogCategory* catfilter;
+    LogDestMsg msgfunc;
+    LogDestBatchDone batchfunc;
+    LogDestClose closefunc;
+    void* userdata;
     int maxlevel;
 } LogDest;
 saDeclarePtr(LogDest);
 
 typedef struct LogEntry LogEntry;
 typedef struct LogEntry {
-    LogEntry *_next;        // chain for log batches, internal use only
+    LogEntry* _next;   // chain for log batches, internal use only
     int64 timestamp;
-    LogCategory *cat;
+    LogCategory* cat;
     string msg;
     int level;
 } LogEntry;
@@ -43,14 +45,14 @@ extern hashtable _log_categories;
 extern LazyInitState _logInitState;
 
 void logCheckInit(void);
-void logDestroyEnt(_In_ LogEntry *ent);
-void logQueueAdd(_In_ LogEntry *ent);
+void logDestroyEnt(_In_ LogEntry* ent);
+void logQueueAdd(_In_ LogEntry* ent);
 void logThreadCreate(void);
 
 // does NOT free dhandle, caller is responsible for that!
-bool logUnregisterDestLocked(_In_ LogDest *dhandle);
+bool logUnregisterDestLocked(_In_ LogDest* dhandle);
 
-_meta_inline bool applyCatFilter(_In_opt_ LogCategory *filtercat, _In_ LogCategory *testcat)
+_meta_inline bool applyCatFilter(_In_opt_ LogCategory* filtercat, _In_ LogCategory* testcat)
 {
     if (!filtercat) {
         // no filter, we want all categories except for private categories

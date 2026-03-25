@@ -121,5 +121,7 @@ _objfactory_guaranteed TRFifo* TRFifo_create()
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/resource/trfifo.auto.inc"
+// clang-format on
 // Autogen ends -------

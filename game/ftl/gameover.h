@@ -4,9 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct GameOver GameOver;
-typedef struct CreditScreen CreditScreen;
-
 extern DisasmTrace GameOver_OnLoop_trace;
 
 // FTL functions & wrappers below

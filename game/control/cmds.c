@@ -1,7 +1,7 @@
 #include "cmds.h"
 #include "control/controlclient.h"
 
-#define DECLCMD(cmdname) void cmd##cmdname(ControlMsg* msg)
+#define DECLCMD(cmdname) void cmd##cmdname(ControlMsg* msg, hashtable fields)
 
 DECLCMD(ClearToStart);
 DECLCMD(EnableFeature);
@@ -11,7 +11,7 @@ DECLCMD(SaveAndQuit);
 DECLCMD(RunTrackerUpd);
 DECLCMD(LoadPractice);
 
-#define REGCMD(cmdname) controlClientRegister(#cmdname, cmd##cmdname)
+#define REGCMD(cmdname) controlClientRegister(_S #cmdname, cmd##cmdname)
 
 void registerCmds()
 {

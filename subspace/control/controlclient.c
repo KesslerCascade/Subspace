@@ -31,6 +31,7 @@ _objinit_guaranteed bool ControlClient_init(_In_ ControlClient* self)
     prqInitDynamic(&self->outbound, 16, 32, 0, 0, 0);
 
     // Autogen begins -----
+    htInit(&self->logbatch, uint32, sarray, 16);
     return true;
     // Autogen ends -------
 }
@@ -39,7 +40,7 @@ void ControlClient_destroy(_In_ ControlClient* self)
 {
     ControlMsg* msg = NULL;
     while (msg = prqPop(&self->outbound)) {
-        controlMsgFree(msg, CF_ALLOC_AUTO);
+        controlMsgDestroy(msg);
     }
     prqDestroy(&self->outbound);
 
@@ -48,6 +49,7 @@ void ControlClient_destroy(_In_ ControlClient* self)
     // Autogen begins -----
     objDestroyWeak(&self->svr);
     objDestroyWeak(&self->inst);
+    htDestroy(&self->logbatch);
     // Autogen ends -------
 }
 
@@ -55,10 +57,10 @@ void ControlClient_send(_In_ ControlClient* self)
 {
     ControlMsg* msg = NULL;
     while (msg = prqPop(&self->outbound)) {
-        controlPutMsg(&self->state, &msg->hdr, msg->fields);
-        controlMsgFree(msg, CF_ALLOC_AUTO);
+        controlSendMsg(&self->state, msg);
+        controlMsgDestroy(msg);
     }
-    controlSend(&self->state);
+    controlSendBuffer(&self->state);
 }
 
 void ControlClient_recv(_In_ ControlClient* self)
@@ -68,7 +70,7 @@ void ControlClient_recv(_In_ ControlClient* self)
         return;
 
     while (controlMsgReady(&self->state)) {
-        ControlMsg* msg = controlGetMsg(&self->state, CF_ALLOC_AUTO);
+        ControlMsg* msg = controlRecvMsg(&self->state);
         if (!msg) {
             objRelease(&svr);
             return;
@@ -82,7 +84,7 @@ void ControlClient_recv(_In_ ControlClient* self)
             logFmt(Info,
                    _S"Unknown command received from client: ${string}",
                    stvar(strref, (strref)msg->hdr.cmd));
-            controlMsgFree(msg, CF_ALLOC_AUTO);
+            controlMsgDestroy(msg);
         }
     };
     objRelease(&svr);
@@ -116,5 +118,7 @@ void ControlClient_queue(_In_ ControlClient* self, ControlMsg* msg)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "control/controlclient.auto.inc"
+// clang-format on
 // Autogen ends -------

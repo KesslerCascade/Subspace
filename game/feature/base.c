@@ -24,7 +24,7 @@ Patch* Base_patches[] = {
 };
 
 SubspaceFeature Base_feature = {
-    .name            = "Base",
+    .name            = _S"Base",
     .requiredPatches = Base_patches,
     .requiredSymbols = { &SYM(crt_malloc),
                         &SYM(crt_free),

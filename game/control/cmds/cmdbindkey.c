@@ -1,15 +1,12 @@
 #include "control/cmds.h"
 #include "input/keybinds.h"
 
-void cmdBindKey(ControlMsg* msg)
+void cmdBindKey(ControlMsg* msg, hashtable fields)
 {
-    ControlField* fname = controlMsgFindField(msg, "name");
-    if (!(fname && fname->h.ftype == CF_STRING))
+    strref fname = cfieldString(fields, _S "name");
+    int32 fkey   = cfieldValD(int32, fields, _S "key", -1);
+    if (strEmpty(fname) || fkey == -1 || fkey >= KEYCODE_MAX)
         return;
 
-    ControlField* fkey = controlMsgFindField(msg, "key");
-    if (!(fkey && fkey->h.ftype == CF_INT) || fkey->d.cfd_int >= KEYCODE_MAX)
-        return;
-
-    kbBindKey(fname->d.cfd_str, fkey->d.cfd_int);
+    kbBindKey(fname, fkey);
 }

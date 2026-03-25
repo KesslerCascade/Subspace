@@ -338,5 +338,7 @@ void TQThreadPoolMonitor_destroy(_In_ TQThreadPoolMonitor* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/monitor/tqtpmonitor.auto.inc"
+// clang-format on
 // Autogen ends -------

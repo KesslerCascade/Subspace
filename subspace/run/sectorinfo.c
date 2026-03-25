@@ -33,5 +33,7 @@ intptr SectorInfo_cmp(_In_ SectorInfo* self, SectorInfo* other, uint32 flags)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "run/sectorinfo.auto.inc"
+// clang-format on
 // Autogen ends -------

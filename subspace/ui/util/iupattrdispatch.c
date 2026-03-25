@@ -59,5 +59,7 @@ void IupAttrDispatch_destroy(_In_ IupAttrDispatch* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/util/iupattrdispatch.auto.inc"
+// clang-format on
 // Autogen ends -------

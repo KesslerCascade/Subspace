@@ -1,3 +1,5 @@
+#include <cx/cx.h>
+
 #include "winmain.h"
 
 #include "ftl/osdep.h"

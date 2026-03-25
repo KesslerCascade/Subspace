@@ -811,7 +811,7 @@ bool writeImpl(string fname, string srcpath, string binpath, bool mixinimpl)
     int err;
     PCRE2_SIZE eoffset;
     pcre2_code* reParentProto =
-        pcre2_compile((PCRE2_SPTR) "^extern [A-Za-z0-9_]+(?:\\s\\**|\\**\\s)([A-Za-z0-9_]+)"
+        pcre2_compile((PCRE2_SPTR) "^extern [A-Za-z0-9_]+(?:\\s+\\**|\\**\\s+)([A-Za-z0-9_]+)"
                                    "\\([^;]*\\);\\s+// parent$",
                       PCRE2_ZERO_TERMINATED,
                       0,
@@ -986,6 +986,7 @@ nextloop:
 
         if (wroteany) {
             sbufPWriteLine(nbf, autogenBeginShort);
+            sbufPWriteLine(nbf, clangOff);
             for (int i = 0; i < saSize(classes); i++) {
                 if (!classes.a[i]->included)
                     writeExternMethods(nbf, classes.a[i]);
@@ -996,6 +997,7 @@ nextloop:
                 pathFilename(&incname, incname);
             strNConcat(&ln, _S"#include \"", incname, _S"\"");
             sbufPWriteLine(nbf, ln);
+            sbufPWriteLine(nbf, clangOn);
             sbufPWriteLine(nbf, autogenEndShort);
         } else {
             sbufPFinish(ibf);
@@ -1005,10 +1007,12 @@ nextloop:
         }
     } else {
         sbufPWriteLine(nbf, autogenBeginShort);
+        sbufPWriteLine(nbf, clangOff);
         for (int i = 0; i < saSize(classes); i++) {
             if (!classes.a[i]->included)
                 writeMixinProtos(nbf, classes.a[i]);
         }
+        sbufPWriteLine(nbf, clangOn);
         sbufPWriteLine(nbf, autogenEndShort);
     }
 

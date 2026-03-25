@@ -751,5 +751,7 @@ void RunHistoryWin_destroy(_In_ RunHistoryWin* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/win/runhistory.auto.inc"
+// clang-format on
 // Autogen ends -------

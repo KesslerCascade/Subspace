@@ -115,5 +115,7 @@ int64 Database_lastId(_In_ Database* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "db/database.auto.inc"
+// clang-format on
 // Autogen ends -------

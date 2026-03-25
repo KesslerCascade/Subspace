@@ -222,5 +222,7 @@ void ComplexArrayType_destroy(_In_ ComplexArrayType* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "objtypes.auto.inc"
+// clang-format on
 // Autogen ends -------

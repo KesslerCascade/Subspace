@@ -19,5 +19,7 @@ void TQMonitor_destroy(_In_ TQMonitor* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/monitor/tqmonitor.auto.inc"
+// clang-format on
 // Autogen ends -------

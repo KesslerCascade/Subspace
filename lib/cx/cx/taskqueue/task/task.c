@@ -61,5 +61,7 @@ bool Task_wait(_In_ Task* self, int64 timeout)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/task/task.auto.inc"
+// clang-format on
 // Autogen ends -------

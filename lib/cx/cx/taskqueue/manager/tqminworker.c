@@ -94,5 +94,7 @@ void TQInWorkerManager_destroy(_In_ TQInWorkerManager* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/manager/tqminworker.auto.inc"
+// clang-format on
 // Autogen ends -------

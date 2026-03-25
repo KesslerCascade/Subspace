@@ -1,5 +1,6 @@
-#include <windows.h>
 #include "subspacegame.h"
+
+#include <windows.h>
 
 void osShowError(const char* str)
 {

@@ -870,6 +870,8 @@ void LogReplay_destroy(_In_ LogReplay* self)
 }
 
 // Autogen begins -----
+// clang-format off
 bool RunInfo_getRunDir(_In_ RunInfo* self, string* out);
 #include "run/runinfo.auto.inc"
+// clang-format on
 // Autogen ends -------

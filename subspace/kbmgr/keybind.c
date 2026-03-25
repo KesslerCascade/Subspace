@@ -24,9 +24,9 @@ _objfactory_guaranteed KeyBind* KeyBind_create(SubspaceFeature* owner, _In_opt_ 
 
 void KeyBind_send(_In_ KeyBind* self, ControlClient* client)
 {
-    ControlMsg* msg = controlNewMsg("BindKey", 2);
-    controlMsgStr(msg, 0, "name", self->name);
-    controlMsgInt(msg, 1, "key", self->ftlkey);
+    ControlMsg* msg = controlMsgCreate(_S"BindKey");
+    cfieldSet(msg, _S"name", string, self->name);
+    cfieldSet(msg, _S"key", int32, self->ftlkey);
     cclientQueue(client, msg);
 }
 
@@ -39,5 +39,7 @@ void KeyBind_destroy(_In_ KeyBind* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "kbmgr/keybind.auto.inc"
+// clang-format on
 // Autogen ends -------

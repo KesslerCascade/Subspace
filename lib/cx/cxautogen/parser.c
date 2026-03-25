@@ -896,15 +896,18 @@ bool parseClass(ParseState* ps, string* tok)
     return true;
 }
 
-bool parseFile(string fname, string* realfn, string srcpath, sa_string searchpath, bool included,
+bool parseFile(strref fname, string* realfn, string srcpath, sa_string searchpath, bool included,
                bool required)
 {
     ParseState ps = { 0 };
 
     string fpath = 0;
+    string tfname = 0;
     strDup(&ps.fname, fname);
-    if (!strEmpty(srcpath))
-        pathJoin(&fname, srcpath, fname);
+    if (!strEmpty(srcpath)) {
+        pathJoin(&tfname, srcpath, fname);
+        fname = tfname;
+    }
     if (pathIsAbsolute(fname)) {
         strDup(&fpath, fname);
     } else {
@@ -946,6 +949,7 @@ bool parseFile(string fname, string* realfn, string srcpath, sa_string searchpat
     if (realfn)
         strDup(realfn, fpath);
     strDestroy(&fpath);
+    strDestroy(&tfname);
 
     ps.context = Context_Global;
     saInit(&ps.tokstack, string, 8);

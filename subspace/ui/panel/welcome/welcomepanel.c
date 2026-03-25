@@ -158,5 +158,7 @@ bool WelcomePanel_make(_In_ WelcomePanel* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/panel/welcome/welcomepanel.auto.inc"
+// clang-format on
 // Autogen ends -------

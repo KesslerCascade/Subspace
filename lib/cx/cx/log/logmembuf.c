@@ -4,32 +4,27 @@
 #endif
 
 #include "logmembuf.h"
-#include <cx/time.h>
 #include <cx/format.h>
+#include <cx/log/logdefer.h>
+#include <cx/time.h>
 
 _Use_decl_annotations_
-LogMembufData *logmembufCreate(uint32 size)
+LogMembufData* logmembufCreate(uint32 size)
 {
-    LogMembufData *ret = xaAlloc(sizeof(LogMembufData), XA_Zero);
-    ret->size = size;
-    ret->buf = xaAlloc(size, XA_Zero);
+    LogMembufData* ret = xaAlloc(sizeof(LogMembufData), XA_Zero);
+    ret->size          = size;
+    ret->buf           = xaAlloc(size, XA_Zero);
     return ret;
 }
 
 // for use with logRegisterDest along with the userdata returned from logmembufCreate
 _Use_decl_annotations_
-void logmembufDest(int level, LogCategory *cat, int64 timestamp, strref msg, uint32 batchid, void *userdata)
+void logmembufMsgFunc(int level, LogCategory* cat, int64 timestamp, strref msg, uint32 batchid,
+                      void* userdata)
 {
-    LogMembufData *lmd = (LogMembufData*)userdata;
+    LogMembufData* lmd = (LogMembufData*)userdata;
     if (!lmd)
         return;
-
-    if (level == -1) {
-        // closing log
-        xaFree(lmd->buf);
-        xaFree(lmd);
-        return;
-    }
 
     TimeParts tp = { 0 };
     timeDecompose(&tp, timestamp);
@@ -39,16 +34,19 @@ void logmembufDest(int level, LogCategory *cat, int64 timestamp, strref msg, uin
         strFormat(&logcat, _S" [${string}]", stvar(strref, cat->name));
     }
 
-    strFormat(&logline, _S"${0int(4)}${0uint(2)}${0uint(2)} ${0uint(2)}${0uint(2)}${0uint(2)} ${string}${string}: ${string}\n",
-              stvar(int32, tp.year),
-              stvar(uint8, tp.month),
-              stvar(uint8, tp.day),
-              stvar(uint8, tp.hour),
-              stvar(uint8, tp.minute),
-              stvar(uint8, tp.second),
-              stvar(strref, LogLevelAbbrev[level]),
-              stvar(string, logcat),
-              stvar(strref, msg));
+    strFormat(
+        &logline,
+        _S
+        "${0int(4)}${0uint(2)}${0uint(2)} ${0uint(2)}${0uint(2)}${0uint(2)} ${string}${string}: ${string}\n",
+        stvar(int32, tp.year),
+        stvar(uint8, tp.month),
+        stvar(uint8, tp.day),
+        stvar(uint8, tp.hour),
+        stvar(uint8, tp.minute),
+        stvar(uint8, tp.second),
+        stvar(strref, LogLevelAbbrev[level]),
+        stvar(string, logcat),
+        stvar(strref, msg));
 
     uint32 len = strLen(logline);
     if (len < lmd->size) {
@@ -64,4 +62,40 @@ void logmembufDest(int level, LogCategory *cat, int64 timestamp, strref msg, uin
 
     strDestroy(&logcat);
     strDestroy(&logline);
+}
+
+_Use_decl_annotations_
+void logmembufCloseFunc(void* userdata)
+{
+    LogMembufData* lmd = (LogMembufData*)userdata;
+    if (!lmd)
+        return;
+
+    // closing log
+    xaFree(lmd->buf);
+    xaFree(lmd);
+}
+
+_Use_decl_annotations_
+LogDest* logmembufRegister(int maxlevel, LogCategory* catfilter, LogMembufData* logfile)
+{
+    return logRegisterDest(maxlevel,
+                           catfilter,
+                           logmembufMsgFunc,
+                           NULL,
+                           logmembufCloseFunc,
+                           logfile);
+}
+
+_Use_decl_annotations_
+LogDest* logmembufRegisterWithDefer(int maxlevel, LogCategory* catfilter, LogMembufData* membuf,
+                                    LogDest* deferdest)
+{
+    return logRegisterDestWithDefer(maxlevel,
+                                    catfilter,
+                                    logmembufMsgFunc,
+                                    NULL,
+                                    logmembufCloseFunc,
+                                    membuf,
+                                    deferdest);
 }

@@ -23,7 +23,6 @@
 #define STRICT
 
 #include <ctype.h>
-#include "minicrt.h"
 #pragma hdrstop
 
 #include "disasm.h"
@@ -884,7 +883,7 @@ retrylongjump:
         if (anyimm == 0) memset(tmask + i + 1 + hasrm + hassib + dispsize, 0xFF, immsize);
     };
     i = i + 1 + hasrm + hassib + dispsize + immsize;
-    jmpoffset = jmpoffset - (i + j + jmpsize);
+    jmpoffset = (jmpsize > 0) ? jmpoffset - (i + j + jmpsize) : 0;
     model->jmpsize = jmpsize;
     model->jmpoffset = jmpoffset;
     model->jmppos = i + j;

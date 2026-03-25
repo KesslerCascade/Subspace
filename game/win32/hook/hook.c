@@ -1,11 +1,11 @@
-#include <windows.h>
 #include "disasm.h"
-#include "minicrt.h"
 
 #include "hook/hook.h"
 #include "hook/module.h"
 #include "hook/string.h"
 #include "loader/rtld.h"
+
+#include <windows.h>
 
 static int replacePointers(addr_t base, addr_t oldfunc, addr_t newfunc)
 {
@@ -18,11 +18,11 @@ static int replacePointers(addr_t base, addr_t oldfunc, addr_t newfunc)
     // disassembling the code.
 
     ModuleInfo* mi = moduleInfo(base);
-    AddrList* fcl  = hashtbl_get(&mi->ptrhash, oldfunc);
+    AddrList* fcl  = addrListFindByPtr(mi->ptrhash, oldfunc);
     int count      = 0;
     if (fcl) {
-        for (uint32_t i = 0; i < fcl->num; i++) {
-            addr_t p      = fcl->addrs[i];
+        for (uint32_t i = 0; i < saSize(*fcl); i++) {
+            addr_t p      = fcl->a[i];
             *(addr_t*)(p) = newfunc;
             ++count;
         }
@@ -36,11 +36,11 @@ static int replacePointers(addr_t base, addr_t oldfunc, addr_t newfunc)
 static int replaceRelcalls(addr_t base, addr_t oldfunc, addr_t newfunc)
 {
     ModuleInfo* mi = moduleInfo(base);
-    AddrList* fcl  = hashtbl_get(&mi->relcallhash, oldfunc);
+    AddrList* fcl  = addrListFindByPtr(mi->relcallhash, oldfunc);
     int count      = 0;
     if (fcl) {
-        for (uint32_t i = 0; i < fcl->num; i++) {
-            addr_t p      = fcl->addrs[i];
+        for (uint32_t i = 0; i < saSize(*fcl); i++) {
+            addr_t p      = fcl->a[i];
             *(addr_t*)(p) = newfunc - (p + 4);
             ++count;
         }
@@ -111,11 +111,11 @@ bool _replaceFunction(addr_t base, addr_t addr, const FuncInfo* fi, void* replac
 // pointers to the string.
 int replaceString(addr_t base, const char* from, const char* to)
 {
-    AddrList* al = findAllStrings(base, from);
+    AddrList* al = findAllStrings(base, (strref)from);
 
     int count = 0;
-    for (uint32_t i = 0; i < al->num; i++) {
-        count += replacePointers(base, al->addrs[i], addr(to));
+    for (uint32_t i = 0; al && i < saSize(*al); i++) {
+        count += replacePointers(base, al->a[i], addr(to));
     }
 
     return count;

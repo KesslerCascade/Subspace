@@ -50,8 +50,6 @@ _objfactory_guaranteed SaveManager* SaveManager_create(Subspace* ss)
     return self;
 }
 
-extern SettingsPage*
-SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
 extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
 #define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
 SettingsPage* SaveManager_createSettingsPage(_In_ SaveManager* self, SubspaceUI* ui)
@@ -221,5 +219,7 @@ void SaveManagerCopy_destroy(_In_ SaveManagerCopy* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/savemanager/savemanager.auto.inc"
+// clang-format on
 // Autogen ends -------

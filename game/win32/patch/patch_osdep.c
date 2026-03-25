@@ -1,9 +1,10 @@
-#include <windows.h>
 #include "ftl/ftl.h"
 #include "ftl/osdep.h"
 #include "hook/hook.h"
 #include "patch/patch.h"
 #include "win32/winmain.h"
+
+#include <windows.h>
 
 static bool apply(addr_t base, Patch* p, PatchState* ps)
 {

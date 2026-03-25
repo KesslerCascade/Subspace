@@ -11,20 +11,18 @@ project (subspacegame)
 enable_language(C)
 enable_language(CXX)
 
-include_directories(${SHARED_SOURCE_DIR})
-
 if (WIN32)
-    # Disable compiler features that depend on the standard library
-    add_compile_options(/GS-) # no buffer security check
-    STRING (REGEX REPLACE "/RTC(su|[1su])" "" CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}") # no runtime checks
+    # Use static runtime to avoid conflicts with FTL's DLL imports
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 endif()
+
+include_directories(${SHARED_SOURCE_DIR})
 
 add_subdirectory(../lib lib)
 
 include (../lib/cx/cmake/werror.cmake)
 
 if(WIN32)
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB /ENTRY:entry")
     set(GAME_OSDEP
         win32/codegen/asm.c
         win32/codegen/codegen.c
@@ -43,24 +41,29 @@ if(WIN32)
         win32/ftl/ftl_combatcontrol.c
         win32/ftl/ftl_commandgui.c
         win32/ftl/ftl_completeship.c
+        win32/ftl/ftl_drone.c
+        win32/ftl/ftl_dronesystem.c
+        win32/ftl/ftl_equipment.c
         win32/ftl/ftl_eventsystem.c
         win32/ftl/ftl_filehelper.c
         win32/ftl/ftl_ftlbutton.c
         win32/ftl/ftl_gameover.c
         win32/ftl/ftl_globals.c
+        win32/ftl/ftl_hackingsystem.c
         win32/ftl/ftl_location.c
         win32/ftl/ftl_mainmenu.c
         win32/ftl/ftl_misc.c
         win32/ftl/ftl_mousecontrol.c
         win32/ftl/ftl_osdep.c
         win32/ftl/ftl_powermanager.c
+        win32/ftl/ftl_projectilefactory.c
         win32/ftl/ftl_resourcecontrol.c
         win32/ftl/ftl_scorekeeper.c
         win32/ftl/ftl_settings.c
-        win32/ftl/ftl_shipmanager.c
         win32/ftl/ftl_ship.c
         win32/ftl/ftl_shipgraph.c
         win32/ftl/ftl_shipmanager.c
+        win32/ftl/ftl_shipobject.c
         win32/ftl/ftl_shipstatus.c
         win32/ftl/ftl_shipsystem.c
         win32/ftl/ftl_sil.c
@@ -68,9 +71,11 @@ if(WIN32)
         win32/ftl/ftl_starmap.c
         win32/ftl/ftl_startup.c
         win32/ftl/ftl_stdlib.c
+        win32/ftl/ftl_storebox.c
         win32/ftl/ftl_textlibrary.c
         win32/ftl/ftl_tutorialmanager.c
         win32/ftl/ftl_waypoints.c
+        win32/ftl/ftl_weaponsystem.c
         win32/ftl/ftl_worldmanager.c
         win32/hook/analysis.c
         win32/hook/export.c
@@ -82,7 +87,6 @@ if(WIN32)
         win32/patch/patch_osdep.c
         win32/patch/patch_sil.c
         win32/d3d.c
-        win32/entry.c
         win32/int64.c
         win32/kernel32_overrides.c
         win32/subspacegame.rc
@@ -92,6 +96,8 @@ if(WIN32)
         win32/winmain.c)
     set(CMAKE_WIN32_EXECUTABLE true)
 endif()
+
+add_cxautogen(hook/moduleinfo.cxh)
 
 add_executable(subspacegame
     control/controlclient.c
@@ -120,9 +126,10 @@ add_executable(subspacegame
     ftl/graphics/colors.c
     ftl/ftl.c
     ftl/struct.c
-    hook/addrsort.c
     hook/disasmtrace.c
     hook/module.c
+    hook/moduleinfo.c
+    hook/moduleinfo.cxh
     hook/string.c
     hook/symbol.c
     hook/achievementtracker/achievementtracker_onloop.c
@@ -143,6 +150,7 @@ add_executable(subspacegame
     hook/commandgui/commandgui_onloop.c
     hook/commandgui/commandgui_renderpause.c
     hook/commandgui/commandgui_renderstatic.c
+    hook/dronesystem/dronesystem_powerdrone.c
     hook/filehelper/filehelper_deleteallsavefiles.c
     hook/filehelper/filehelper_deletefile.c
     hook/filehelper/filehelper_getsavefile.c
@@ -150,16 +158,19 @@ add_executable(subspacegame
     hook/ftlbutton/ftlbutton_onrender.c
     hook/gameover/gameover_onloop.c
     hook/gameover/gameover_setvictory.c
+    hook/hackingsystem/hackingsystem_getspenddrone.c
     hook/mainmenu/mainmenu_open.c
     hook/mousecontrol/mousecontrol_onrender.c
     hook/resourcecontrol/resourcecontrol_renderloadingbar.c
     hook/scorekeeper/scorekeeper_various.c
     hook/ship/ship_damagehull.c
     hook/ship/ship_projectilestrike.c
+    hook/shipmanager/shipmanager_addweapon.c
     hook/shipmanager/shipmanager_damagearea.c
     hook/shipmanager/shipmanager_damagebeam.c
     hook/shipmanager/shipmanager_damagehull.c
     hook/shipmanager/shipmanager_jumpleave.c
+    hook/shipmanager/shipmanager_modifydronecount.c
     hook/shipmanager/shipmanager_modifyscrapcount.c
     hook/shipmanager/shipmanager_sundamage.c
     hook/shipstatus/shipstatus_renderhealth.c
@@ -168,32 +179,41 @@ add_executable(subspacegame
     hook/soundcontrol/soundcontrol_startplaylist.c
     hook/starmap/starmap_generatemap.c
     hook/starmap/starmap_updatedangerzone.c
+    hook/storebox/itemstorebox_purchase.c
     hook/textlibrary/textlibrary_gettext.c
+    hook/weaponsystem/weaponsystem_onloop.c
     hook/worldmanager/worldmanager_createlocation.c
     hook/worldmanager/worldmanager_createnewgame.c
     hook/worldmanager/worldmanager_createship.c
     hook/worldmanager/worldmanager_loadgame.c
+    hook/worldmanager/worldmanager_modifyresources.c
     hook/worldmanager/worldmanager_onloop.c
     hook/worldmanager/worldmanager_prepareautosave.c
     hook/worldmanager/worldmanager_savegame.c
     hook/worldmanager/worldmanager_updatelocation.c
     input/keybinds.c
     input/keyboard.c
-    log/log.c
+    inventory/inventory.c
+    inventory/invscan.c
+    inventory/resources.c
+    log/gamelog.c
     util/lcg.c
     patch/patch.c
     subspacegame.c
     version.c
     ${SHARED_SOURCE_DIR}/control.c
+    ${SHARED_SOURCE_DIR}/controlfields.c
     ${SHARED_SOURCE_DIR}/logentspec.c
     ${SHARED_SOURCE_DIR}/net.c
     ${GAME_OSDEP})
-target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_compile_definitions(subspacegame PRIVATE SUBSPACE_GAME $<$<CONFIG:Release>:SUBSPACE_RELEASE>)
-target_link_libraries(subspacegame disasm minicrt)
+target_link_libraries(subspacegame disasm cx)
 if (WIN32)
     target_include_directories(subspacegame PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/win32)
-    target_link_libraries(subspacegame ${CMAKE_CURRENT_SOURCE_DIR}/tlsarray.lib kernel32 ws2_32)
+    target_link_libraries(subspacegame kernel32 ws2_32)
+    set_target_properties(subspacegame PROPERTIES LINK_FLAGS "/INCREMENTAL:NO")
+    target_compile_definitions(subspacegame PRIVATE SUBSYSTEM_WINDOWS _UNICODE UNICODE)
     target_compile_options(subspacegame PRIVATE "$<$<CONFIG:Release>:/Zi>")
     target_link_options(subspacegame PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
 endif()

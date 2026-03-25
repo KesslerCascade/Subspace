@@ -20,8 +20,8 @@ int subspace_ResourceControl_RenderLoadingBar_pre(ResourceControl* self, float i
 
         if (pct != lastPct) {
             lastPct         = pct;
-            ControlMsg* msg = controlNewMsg("Loading", 1);
-            controlMsgFloat32(msg, 0, "pct", pct);
+            ControlMsg* msg = controlMsgCreate(_S"Loading");
+            cfieldSet(msg, _S"pct", float32, pct);
             controlClientQueue(msg);
         }
     }

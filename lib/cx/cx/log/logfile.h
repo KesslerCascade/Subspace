@@ -46,7 +46,18 @@ typedef struct LogFileConfig {
 
 typedef struct LogFileData LogFileData;
 
-LogFileData *logfileCreate(_Inout_ VFS *vfs, _In_ strref filename, _In_ LogFileConfig *config);
+// -------- High level interface
 
-// for use with logRegisterDest along with the userdata returned from logfileCreate
-void logfileDest(int level, _In_opt_ LogCategory *cat, int64 timestamp, _In_opt_ strref msg, uint32 batchid, _In_opt_ void *userdata);
+LogFileData *logfileCreate(_Inout_ VFS *vfs, _In_ strref filename, _In_ LogFileConfig *config);
+LogDest* logfileRegister(int maxlevel, _In_opt_ LogCategory* catfilter, _In_ LogFileData* logfile);
+LogDest* logfileRegisterWithDefer(int maxlevel, _In_opt_ LogCategory* catfilter,
+                                  _In_ LogFileData* logfile, _In_ LogDest* deferdest);
+
+// -------- Low level interface
+
+// individual callbacks for use with logRegisterDest along with the userdata returned from
+// logfileCreate
+void logfileMsgFunc(int level, _In_opt_ LogCategory* cat, int64 timestamp, _In_opt_ strref msg,
+                    uint32 batchid, _In_opt_ void* userdata);
+void logfileBatchFunc(uint32 batchid, _In_opt_ void* userdata);
+void logfileCloseFunc(_In_opt_ void* userdata);

@@ -1,6 +1,6 @@
 #include "rtld.h"
 
-addr_t loadProgram(const char* filename)
+addr_t loadProgram(strref filename)
 {
     addr_t ret = loadExe(filename);
     if (!ret)

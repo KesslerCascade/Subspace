@@ -218,7 +218,11 @@ if(CMAKE_COMPILER_IS_MSVC)
 endif()
 
 if(WIN32)
-    set(libs ${libs} ws2_32 bcrypt)
+    if (CX_XP_COMPAT)
+        set(libs ${libs} ws2_32)
+    else()
+        set(libs ${libs} ws2_32 bcrypt)
+    endif()
 endif(WIN32)
 
 if(CMAKE_C_COMPILER_ID MATCHES "AppleClang")
@@ -371,6 +375,10 @@ foreach(target IN LISTS target_libraries)
     if(MBEDTLS_USER_CONFIG_FILE)
         target_compile_definitions(${target}
             PUBLIC MBEDTLS_USER_CONFIG_FILE="${MBEDTLS_USER_CONFIG_FILE}")
+    endif()
+    if(CX_XP_COMPAT)
+        target_compile_definitions(${target}
+            PRIVATE MBEDTLS_NO_BCRYPTRANDOM)
     endif()
     if(PROJECT_IS_TOP_LEVEL)
     install(

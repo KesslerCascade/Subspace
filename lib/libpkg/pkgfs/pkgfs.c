@@ -184,5 +184,7 @@ void PkgFS_destroy(_In_ PkgFS* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "pkgfs/pkgfs.auto.inc"
+// clang-format on
 // Autogen ends -------

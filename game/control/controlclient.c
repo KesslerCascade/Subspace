@@ -5,8 +5,6 @@
 #include "version.h"
 
 #include "ftl/stdlib.h"
-#include "atomic.h"
-#include "minicrt.h"
 #include "net.h"
 
 typedef struct ControlClient {
@@ -15,14 +13,14 @@ typedef struct ControlClient {
     socket_t notifysock;   // dummy socket to wake up the thread
     int notifyport;
 
-    lock_t lock;
+    Mutex lock;
     MessageQueue* inbound;
     MessageQueue* outbound;
     MessageQueue* inbound_secondary;
     MessageQueue* outbound_secondary;
     bool outbound_pending;
     bool outbound_ready;
-    hashtbl handlers;
+    hashtable handlers;
 } ControlClient;
 
 ControlState control;
@@ -57,7 +55,7 @@ static int controlThread(void* data)
         }
 
         // swap queues and process any outbound messages
-        lock_acq(&client.lock);
+        mutexAcquire(&client.lock);
         MessageQueue* oqueue = NULL;
         if (client.outbound_ready) {
             // swap queues while locked
@@ -66,7 +64,7 @@ static int controlThread(void* data)
             client.outbound_secondary = oqueue;
             client.outbound_ready     = false;
         }
-        lock_rel(&client.lock);
+        mutexRelease(&client.lock);
 
         if (oqueue) {
             int curprio  = 0;
@@ -77,7 +75,7 @@ static int controlThread(void* data)
                 for (int i = 0; i < oqueue->nmsgs; i++) {
                     ControlMsg* msg = oqueue->msgs[i];
                     if (msg->priority == curprio) {
-                        controlPutMsg(&control, &msg->hdr, msg->fields);
+                        controlSendMsg(&control, msg);
                     } else {
                         // get the smallest higher priority to be sent next
                         if (msg->priority > curprio && msg->priority < nextprio)
@@ -91,22 +89,21 @@ static int controlThread(void* data)
         }
 
         if (isconn) {
-            controlSend(&control);
+            controlSendBuffer(&control);
 
             // read any inbound messages and queue them
             if (FD_ISSET(control.sock, &rset)) {
                 while (controlMsgReady(&control)) {
-                    ControlMsg* msg = controlGetMsg(&control, CF_ALLOC_AUTO);
+                    ControlMsg* msg = controlRecvMsg(&control);
 
-                    lock_acq(&client.lock);
-                    controlclientcb_t cb = (controlclientcb_t)_hashtbl_get(&client.handlers,
-                                                                           (uintptr_t)msg->hdr.cmd);
-                    if (cb) {
-                        msgqAdd(client.inbound, msg, cb);
-                    } else {
-                        controlMsgFree(msg, CF_ALLOC_AUTO);
+                    withMutex (&client.lock) {
+                        controlclientcb_t cb;
+                        if (htFind(client.handlers, strref, (strref)msg->hdr.cmd, ptr, &cb)) {
+                            msgqAdd(client.inbound, msg, cb);
+                        } else {
+                            controlMsgDestroy(msg);
+                        }
                     }
-                    lock_rel(&client.lock);
                 }
             }
         }
@@ -139,8 +136,8 @@ bool controlClientStart(void)
     if (client.notifysock == 0)
         return false;
 
-    lock_init(&client.lock);
-    hashtbl_init(&client.handlers, 16, HT_STRING_KEYS);
+    mutexInit(&client.lock);
+    htInit(&client.handlers, string, ptr, 16);
     client.inbound            = msgqCreate(16, true);
     client.inbound_secondary  = msgqCreate(16, true);
     client.outbound           = msgqCreate(16, false);
@@ -168,24 +165,24 @@ void controlClientNotify(void)
 
 void controlClientQueue(ControlMsg* msg)
 {
-    lock_acq(&client.lock);
-    msgqAdd(client.outbound, msg, NULL);
-    client.outbound_pending = true;
-    lock_rel(&client.lock);
+    withMutex (&client.lock) {
+        msgqAdd(client.outbound, msg, NULL);
+        client.outbound_pending = true;
+    }
 }
 
 void controlClientProcessInbound(void)
 {
-    lock_acq(&client.lock);
+    mutexAcquire(&client.lock);
     // swap queues while locked
     MessageQueue* queue      = client.inbound;
     client.inbound           = client.inbound_secondary;
     client.inbound_secondary = queue;
-    lock_rel(&client.lock);
+    mutexRelease(&client.lock);
 
     for (int i = 0; i < queue->nmsgs; i++) {
         if (queue->cbs[i])
-            queue->cbs[i](queue->msgs[i]);
+            queue->cbs[i](queue->msgs[i], queue->msgs[i]->fields);
     }
     msgqClear(queue);
 }
@@ -193,24 +190,24 @@ void controlClientProcessInbound(void)
 void controlClientProcessOutbound(void)
 {
     bool dosend = false;
-    lock_acq(&client.lock);
-    if (client.outbound_pending) {
-        client.outbound_ready   = true;   // clear to send
-        client.outbound_pending = false;
-        dosend                  = true;
+    withMutex (&client.lock) {
+        if (client.outbound_pending) {
+            client.outbound_ready   = true;   // clear to send
+            client.outbound_pending = false;
+            dosend                  = true;
+        }
     }
-    lock_rel(&client.lock);
 
     // notify client thread to send
     if (dosend)
         controlClientNotify();
 }
 
-void controlClientRegister(const char* cmd, controlclientcb_t cb)
+void controlClientRegister(strref cmd, controlclientcb_t cb)
 {
-    lock_acq(&client.lock);
-    hashtbl_add(&client.handlers, cmd, cb);
-    lock_rel(&client.lock);
+    withMutex (&client.lock) {
+        htInsert(&client.handlers, strref, cmd, ptr, cb);
+    }
 }
 
 bool controlClientConnected(void)

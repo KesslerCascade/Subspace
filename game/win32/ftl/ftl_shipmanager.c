@@ -1,8 +1,12 @@
 #include "ftl/commandgui.h"
+#include "ftl/dronesystem.h"
+#include "ftl/equipment.h"
+#include "ftl/hackingsystem.h"
 #include "ftl/ship.h"
 #include "ftl/shipmanager.h"
 #include "ftl/shipstatus.h"
 #include "ftl/shipsystem.h"
+#include "ftl/weaponsystem.h"
 #include "ftl/worldmanager.h"
 #include "hook/disasmtrace.h"
 
@@ -23,7 +27,7 @@ INITWRAP(ShipManager_GetIsJumping);
 Symbol SYM(ShipManager_GetIsJumping) = {
     SYMNAME("ShipManager::GetIsJumping"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_SpaceBar_trace },
-             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager12GetIsJumpingEv" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager12GetIsJumpingEv" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_GetIsJumping) = { .nargs   = 1,
@@ -118,45 +122,44 @@ Symbol SYM(ShipManager_GetDroneCount) = {
     SYMNAME("ShipManager::GetDroneCount"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v2 },
-             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager13GetDroneCountEv" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager13GetDroneCountEv" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_GetDroneCount) = { .nargs   = 1,
                                                  .stdcall = true,
                                                  .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
+INITWRAP(ShipManager_ModifyDroneCount);
+Symbol SYM(ShipManager_ModifyDroneCount) = {
+    SYMNAME("ShipManager::ModifyDroneCount"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_RunCommand_DRONES_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager16ModifyDroneCountEi" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_ModifyDroneCount) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_VOID
+};
+
 INITWRAP(ShipManager_GetMissileCount);
 Symbol SYM(ShipManager_GetMissileCount) = {
     SYMNAME("ShipManager::GetMissileCount"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v1 },
              { .type = SYMBOL_FIND_DISASM, .disasm = &ShipStatus_LinkShip_trace_v2 },
-             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager15GetMissileCountEv" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager15GetMissileCountEv" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_GetMissileCount) = { .nargs   = 1,
                                                    .stdcall = true,
                                                    .args    = { { 4, ARG_PTR, REG_ECX, false } } };
 
-INITWRAP(ShipManager_HasEquipment);
-Symbol SYM(ShipManager_HasEquipment) = {
-    SYMNAME("ShipManager::HasEquipment"),
-    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_CheckForNewLocation_trace_2 },
-             { .type = SYMBOL_FIND_EXPORT,
-                .name =
-                    "EAX,_ZN10ShipObject12HasEquipmentENSt7__cxx1112basic_stringIcSt11char_traitsIcESaIcEEE" },
-             { 0 } }
-};
-FuncInfo FUNCINFO(ShipManager_HasEquipment) = {
-    .nargs   = 2,
-    .stdcall = true,
-    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } }
-};
-
 INITWRAP(ShipManager_ModifyScrapCount);
 Symbol SYM(ShipManager_ModifyScrapCount) = {
     SYMNAME("ShipManager::ModifyScrapCount"),
     .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &WorldManager_ModifyResources_trace },
-             { .type = SYMBOL_FIND_EXPORT, .name = "EAX,_ZN11ShipManager16ModifyScrapCountEib" },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager16ModifyScrapCountEib" },
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_ModifyScrapCount) = {
@@ -172,7 +175,9 @@ DisasmTrace ShipManager_DamageSystem_trace = {
     .mod  = DTRACE_MOD_FUNCSTART,
     .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
              { DT_OP(SKIP), .imin = 7, .imax = 15 },
-             // just the minimum necessary to disambiguate this from ShipMnaager::PulsarDamage
+             // just the minimum necessary to
+              // disambiguate this from
+              // ShipMnaager::PulsarDamage
               { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0 } } },
              { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x4 } } },
              { I_MOV, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 0x18 } } },
@@ -206,7 +211,8 @@ DisasmTrace ShipManager_SunDamage_trace = {
                 .argf = { ARG_REG, ARG_ADDR },
                 .args = { { REG_ESP }, { .addr = 0x3f800000 } } },   // 1.0 damage
               { DT_OP(SKIP), .imin = 0, .imax = 3 },
-             { I_CALL, .argout = { DT_OUT_SYM2 } },                 // CALL Ship::ProjectileStrike
+             { I_CALL, .argout = { DT_OUT_SYM2 } },                 // CALL
+                                                                     // Ship::ProjectileStrike
               { DT_OP(FINISH) } },
     .out  = { &SYM(ShipManager_SunDamage),                           // DT_OUT_SYM1
               &SYM(Ship_ProjectileStrike) }
@@ -245,7 +251,9 @@ DisasmTrace ShipManager_JumpLeave_trace = {
              { I_SUB,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ECX }, { .addr = 1 } },
-                .argout = { DT_OUT_SYM2 } },   // this->fuel_count -= 1
+                .argout = { DT_OUT_SYM2 } },   // this->fuel_count
+                                               // -=
+                                               // 1
               { DT_OP(FINISH) } },
     .out  = { &SYM(ShipManager_JumpLeave),     // DT_OUT_SYM1
               &SYM(ShipManager_fuel_count_offset) }
@@ -258,6 +266,19 @@ Symbol SYM(ShipManager_JumpLeave) = {
              { 0 } }
 };
 FuncInfo FUNCINFO(ShipManager_JumpLeave) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_VOID
+};
+
+Symbol SYM(ShipManager_JumpArrive) = {
+    SYMNAME("ShipManager::JumpArrive"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_ForceJumpComplete_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager10JumpArriveEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_JumpArrive) = {
     .nargs   = 1,
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false } },
@@ -349,19 +370,39 @@ DisasmTrace ShipManager_OnLoop_trace = {
              { I_MOV,
                 .argf   = { 0, ARG_REG },
                 .args   = { { 0 }, { REG_ECX } },
-                .argcap = { DT_CAPTURE1 } },   // this pointer
+                .argcap = { DT_CAPTURE1 } },   // this
+                                               // pointer
               { DT_OP(SKIP), .imin = 1, .imax = 6 },
              { I_MOV,
                 .argf   = { ARG_REG, ARG_ADDR },
                 .args   = { { REG_ESP } },
                 .argstr = { 0, "reactor" } },
-             { DT_OP(SKIP), .imin = 300, .imax = 650 },
-             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL ShipSystem::GetExploded
+             { DT_OP(SKIP), .imin = 75, .imax = 175 },
+             { I_MOV,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM2 } },   // this->hackingSystem
+              { DT_OP(SKIP), .imin = 0, .imax = 2 },
+             { I_CALL,
+                .argf   = { ARG_PTRSIZE },
+                .args   = { { .ptrsize = -2 } },
+                .argout = { DT_OUT_SYM3 } },   // CALL HackingSystem::GetSpendDrone
+              { DT_OP(SKIP), .imin = 1, .imax = 4, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV, .argf = { ARG_REG, ARG_ADDR }, .args = { { REG_ESP }, { .addr = -1 } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(ShipManager_ModifyDroneCount) } },
+             { DT_OP(SKIP), .imin = 5, .imax = 11, .flow = DT_FLOW_JMP_BOTH },
+             { I_CMOVLE },
+             { DT_OP(SKIP), .imin = 125, .imax = 475 },
+             { I_CALL, .argout = { DT_OUT_SYM4 } },   // CALL
+                                                       // ShipSystem::GetExploded
               { I_TEST, .args = { ARG_REG, ARG_REG }, .args = { { REG_AL }, { REG_AL } } },
              { DT_OP(SKIP), .imin = 1, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
              { I_CALL, .argf = { ARG_ADDR }, .argsym = { &SYM(ShipManager_DamageHull) } },
              { DT_OP(FINISH) } },
-    .out  = { &SYM(ShipManager_OnLoop),   // DT_OUT_SYM1
+    .out  = { &SYM(ShipManager_OnLoop),                 // DT_OUT_SYM1
+              &SYM(ShipManager_hackingSystem_offset),   // DT_OUT_SYM2
+              &SYM(HackingSystem_GetSpendDrone),        // DT_OUT_SYM3
               &SYM(ShipSystem_GetExploded) }
 };
 
@@ -373,3 +414,320 @@ FuncInfo FUNCINFO(ShipManager_OnLoop) = { .nargs   = 1,
                                           .stdcall = true,
                                           .args    = { { 4, ARG_PTR, REG_ECX, false } },
                                           .rettype = RET_VOID };
+
+Symbol SYM(ShipManager_HasSystem) = {
+    SYMNAME("ShipManager::HasSystem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager9HasSystemEi" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_HasSystem) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+Symbol SYM(ShipManager_GetWeaponTotal) = {
+    SYMNAME("ShipManager::GetWeaponTotal"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager14GetWeaponTotalEv" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_GetWeaponTotal) = {
+    .nargs   = 1,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false } },
+    .rettype = RET_INT
+};
+
+Symbol SYM(ShipManager_AddWeapon) = {
+    SYMNAME("ShipManager::AddWeapon"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN11ShipManager9AddWeaponEPK15WeaponBlueprinti" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_AddWeapon) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+DisasmTrace ShipManager_PowerWeapon_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Shouldn't be powering weapons, no weapon system\n",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 10, .imax = 20, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_REG },
+                .args   = { { REG_ECX }, { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM2 } },        // this->weaponSystem
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL
+                                                       // WeaponSystem::PowerWeapon
+              { DT_OP(SKIP), .imin = 5, .imax = 13 },
+             { I_RETN, .argf = { ARG_ADDR }, .args = { { .addr = 0x0c } } },   // 3
+                                                                                // stack
+                                                                                // params
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_PowerWeapon),                                    // DT_OUT_SYM1
+              &SYM(ShipManager_weaponSystem_offset),                            // DT_OUT_SYM2
+              &SYM(WeaponSystem_PowerWeapon) }
+};
+
+Symbol SYM(ShipManager_PowerWeapon) = {
+    SYMNAME("ShipManager::PowerWeapon"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_PowerWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN11ShipManager11PowerWeaponEP17ProjectileFactorybb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_PowerWeapon) = {
+    .nargs   = 4,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false },
+                { 4, ARG_PTR, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+DisasmTrace ShipManager_DePowerWeapon_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Shouldn't be powering weapons, no weapon system\n",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 18, .imax = 30 },
+             { I_RETN, .argf = { ARG_ADDR }, .args = { { .addr = 0x8 } } },   // 2
+                                                                               // stack
+                                                                               // params
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_PowerWeapon) }
+};
+
+Symbol SYM(ShipManager_DePowerWeapon) = {
+    SYMNAME("ShipManager::DePowerWeapon"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DePowerWeapon_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN11ShipManager13DePowerWeaponEP17ProjectileFactoryb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_DePowerWeapon) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+Symbol SYM(ShipManager_weaponSystem_offset) = {
+    SYMNAME("ShipManager->weaponSystem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_PowerWeapon_trace }, { 0 } }
+};
+
+DisasmTrace ShipManager_GetWeaponTotal_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipManager_GetWeaponTotal),
+    .ops  = { { DT_OP(SKIP), .imin = 4, .imax = 12 },
+             { I_SUB,
+                .argf   = { 0, ARG_PTRSIZE },
+                .args   = { { 0 }, { .ptrsize = 4 } },
+                .argout = { 0, DT_OUT_SYM1 },
+                .argcap = { DT_CAPTURE1 } },   // weaponSystem->weapons
+              { I_SAR, .argf = { ARG_MATCH }, .argcap = { DT_MATCH1 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(WeaponSystem_weapons_offset) }
+};
+
+Symbol SYM(ShipManager_AddDrone) = {
+    SYMNAME("ShipManager::AddDrone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT,
+                .name = "_ZN11ShipManager8AddDroneEPK14DroneBlueprinti" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_AddDrone) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_PTR
+};
+
+DisasmTrace ShipManager_AddDrone_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipManager_AddDrone),
+    .ops  = { { DT_OP(SKIP), .imin = 13, .imax = 21, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { 0, ARG_REG },
+                .args   = { { 0 }, { REG_ECX } },
+                .argcap = { DT_CAPTURE1 } },   // capture
+                                               // this
+                                               // pointer
+              { DT_OP(SKIP), .imin = 0, .imax = 6, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL },                      // CALL
+                                               // ShipManager::CreateCrewDrone
+              { DT_OP(SKIP), .imin = 3, .imax = 9, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL },                      // CALL
+                                               // ShipManager::CreateSpaceDrone
+              { DT_OP(SKIP), .imin = 2, .imax = 8, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_REG },
+                .args   = { { REG_ECX } },
+                .argcap = { 0, DT_MATCH1 },
+                .argout = { 0, DT_OUT_SYM1 } },        // this->droneSystem
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL
+                                                       // DroneSystem::AddDrone
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_droneSystem_offset),    // DT_OUT_SYM1
+              &SYM(DroneSystem_AddDrone) }
+};
+
+Symbol SYM(ShipManager_droneSystem_offset) = {
+    SYMNAME("ShipManager->droneSystem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_AddDrone_trace }, { 0 } }
+};
+
+Symbol SYM(ShipManager_GetDroneTotal) = {
+    SYMNAME("ShipManager::GetDroneTotal"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &Equipment_AddDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager13GetDroneTotalEv" },
+             { 0 } }
+};
+
+DisasmTrace ShipManager_GetDroneTotal_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipManager_GetDroneTotal),
+    .ops  = { { DT_OP(SKIP), .imin = 4, .imax = 12 },
+             { I_SUB,
+                .argf   = { 0, ARG_PTRSIZE },
+                .args   = { { 0 }, { .ptrsize = 4 } },
+                .argout = { 0, DT_OUT_SYM1 },
+                .argcap = { DT_CAPTURE1 } },   // droneSystem->drones
+              { I_SAR, .argf = { ARG_MATCH }, .argcap = { DT_MATCH1 } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(DroneSystem_drones_offset) }
+};
+
+DisasmTrace ShipManager_ModifyDroneCount_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(ShipManager_ModifyDroneCount),
+    .ops  = { { DT_OP(SKIP), .imin = 9, .imax = 15, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ShipManager_droneSystem_offset) } },   // this->droneSystem
+              { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },                       // CALL
+                                                       // DroneSystem::ModifyDroneCount
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(DroneSystem_ModifyDroneCount) }
+};
+
+DisasmTrace ShipManager_AddItem_trace = {
+    .c    = DTRACE_CALLS,
+    .csym = &SYM(DroneSystem_ModifyDroneCount),
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 7, .imax = 16 },
+             { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 1 } } },
+             { DT_OP(SKIP), .imin = 1, .imax = 4 },
+             { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = 2 } } },
+             { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_AddItem) }
+};
+
+Symbol SYM(ShipManager_AddItem) = {
+    SYMNAME("ShipManager::AddItem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_AddItem_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager7AddItemEPK13ItemBlueprint" },
+             { 0 } }
+};
+
+FuncInfo FUNCINFO(ShipManager_AddItem) = {
+    .nargs   = 2,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true } },
+    .rettype = RET_VOID
+};
+
+DisasmTrace ShipManager_PowerDrone_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Shouldn't be powering drones, no drone system\n",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 11, .imax = 19 },
+             { I_CMP, .argf = { 0, ARG_ADDR }, .args = { { 0 }, { .addr = -1 } } },
+             { DT_OP(SKIP), .imin = 7, .imax = 15 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_ADDR },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(ShipManager_droneSystem_offset) } },   // this->droneSystem
+              { DT_OP(SKIP), .imin = 3, .imax = 9, .flow = DT_FLOW_JMP_BOTH },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL DroneSystem::PowerDrone
+              { DT_OP(SKIP), .imin = 5, .imax = 13 },
+             { I_RETN, .argf = { ARG_ADDR }, .args = { { .addr = 0x10 } } },   // 3
+                                                                                // stack
+                                                                                // params
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_PowerDrone),                                     // DT_OUT_SYM1
+              &SYM(DroneSystem_PowerDrone) }
+};
+
+Symbol SYM(ShipManager_PowerDrone) = {
+    SYMNAME("ShipManager::PowerDrone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_PowerDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager10PowerDroneEP5Droneibb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_PowerDrone) = {
+    .nargs   = 5,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false },
+                { 4, ARG_PTR, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true },
+                { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+DisasmTrace ShipManager_DePowerDrone_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "Shouldn't be powering drones, no drone system\n",
+    .mod  = DTRACE_MOD_FUNCSTART,
+    .ops  = { { I_PUSH, .outip = DT_OUT_SYM1 },
+             { DT_OP(SKIP), .imin = 9, .imax = 17 },
+             { I_MOV,
+                .argf   = { ARG_REG, ARG_REG },
+                .args   = { { REG_ECX }, { ARG_ADDR } },
+                .argsym = { 0, &SYM(ShipManager_droneSystem_offset) } },   // this->droneSystem
+              { DT_OP(SKIP), .imin = 2, .imax = 7 },
+             { I_CALL, .argout = { DT_OUT_SYM2 } },   // CALL DroneSystem::DePowerDrone
+              { DT_OP(SKIP), .imin = 5, .imax = 13 },
+             { I_RETN, .argf = { ARG_ADDR }, .args = { { .addr = 0x8 } } },   // 2
+                                                                               // stack
+                                                                               // params
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_DePowerDrone),                                  // DT_OUT_SYM1
+              &SYM(DroneSystem_DePowerDrone) }
+};
+
+Symbol SYM(ShipManager_DePowerDrone) = {
+    SYMNAME("ShipManager::DePowerDrone"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_DePowerDrone_trace },
+             { .type = SYMBOL_FIND_EXPORT, .name = "_ZN11ShipManager12DePowerDroneEP5Droneb" },
+             { 0 } }
+};
+FuncInfo FUNCINFO(ShipManager_DePowerDrone) = {
+    .nargs   = 3,
+    .stdcall = true,
+    .args    = { { 4, ARG_PTR, REG_ECX, false }, { 4, ARG_PTR, 0, true }, { 4, ARG_INT, 0, true } },
+    .rettype = RET_INT
+};
+
+Symbol SYM(ShipManager_hackingSystem_offset) = {
+    SYMNAME("ShipManager->hackingSystem"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &ShipManager_OnLoop_trace }, { 0 } }
+};

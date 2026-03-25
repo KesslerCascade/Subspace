@@ -1,4 +1,9 @@
 #pragma once
+#include <cx/container.h>
+#include <cx/string.h>
+#include <cx/thread.h>
+#include <cx/utils/compare.h>
+
 #include <stdbool.h>
 #include <stdint.h>
 #include "proto.h"
@@ -27,7 +32,7 @@ extern const char* subspace_version_series;
 extern const char* subspace_version_str;
 
 typedef struct FeatureSettingsEnt {
-    const char* name;
+    strref name;
     int type;   // same as control message types
     size_t off;
 } FeatureSettingsEnt;
@@ -44,7 +49,7 @@ typedef struct SubspaceFeature {
     bool available;   // is this feature available -- i.e. did all the necessary patches apply?
     bool enabled;   // is the feature enabled? Doesn't mean that it's active right now, just enabled
 
-    const char* name;   // name of the feature
+    strref name;    // name of the feature
     featureValidate_t validate;
     featurePatch_t patch;
     featureEnable_t enable;
@@ -65,10 +70,10 @@ typedef struct SubspaceGameSettings {
     int port;
     uint32_t cookie;     // unique ID to track game instances
 
-    char* gameDir;       // root directory where the game is located
-    char* gameProgram;   // name of the game executable
-    char* gamePath;      // full path to game executable
-    char* saveOverride;
+    string gameDir;      // root directory where the game is located
+    string gameProgram;   // name of the game executable
+    string gamePath;      // full path to game executable
+    string saveOverride;
 
     LaunchMode mode;
 } SubspaceGameSettings;
@@ -102,7 +107,7 @@ typedef struct GameGlobalState {
     // Tweaks
     bool tweaksOverrideFPS;
     bool ignoreFileDeletion;
-    char* saveFileOverride;        // temporary override for save file location
+    string saveFileOverride;       // temporary override for save file location
     bool postGameSaveNow;          // save the game at the end of the frame
     bool postGameSaveInProgress;   // we are doing the post game save right now
     bool deleteSaveOnMenu;         // delete save file on return to main menu
@@ -117,7 +122,7 @@ typedef struct GameGlobalState {
     // Practice Mode
     bool practiceMode;
     bool practiceLoadSave;   // load the practice save at the end of the frame when it's safe
-    char* practiceSave;      // current practice save file
+    string practiceSave;     // current practice save file
 
     // Screenshot
     bool screenshotNow;         // take a screenshot at the end of the frame
@@ -130,8 +135,10 @@ typedef struct GameGlobalContext {
     bool loadingGame;
     bool loadingBossShip;
     bool inGameOverLoop;
-    const char* curScrapSource;
-    const char* curDamageSource;
+    string curScrapSource;
+    string curDamageSource;
+    string curInvSource;
+    string curResourceSource;
 } GameGlobalContext;
 
 extern SubspaceGameSettings settings;

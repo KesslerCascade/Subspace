@@ -9,6 +9,7 @@ if(CX_PLATFORM_IS_UNIX)
         platform/unix/unix_fs_file.c
         platform/unix/unix_fs_fs.c
         platform/unix/unix_os.c
+        platform/unix/unix_random.c
         platform/unix/unix_sys_hostid.c
         platform/unix/unix_thread_thread.c
         platform/unix/unix_thread_threadobj.c

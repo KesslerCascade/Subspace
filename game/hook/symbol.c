@@ -4,7 +4,7 @@
 #include "hook/string.h"
 
 #ifdef SYMBOL_DEBUG
-#include "log/log.h"
+#include "log/gamelog.h"
 #endif
 
 static void symFindVirtual(addr_t base, Symbol* sym, SymbolFind* find)
@@ -38,7 +38,7 @@ static bool symFindOne(addr_t base, Symbol* sym, SymbolFind* find)
         }
         break;
     case SYMBOL_FIND_STRING:
-        addr = findString(base, find->str);
+        addr = findString(base, (strref)find->str);
         if (addr != 0) {
             sym->addr     = addr;
             sym->resolved = true;
@@ -67,7 +67,7 @@ bool _symResolve(addr_t base, Symbol* sym)
 
 #ifdef SYMBOL_DEBUG
     if (!sym->resolved && !sym->warned) {
-        log_fmt(LOG_Warn, "Failed to resolve symbol \"%s\"", sym->name);
+        logFmt(Warn, _S"Failed to resolve symbol \"${string}\"", stvar(strref, (strref)sym->name));
         sym->warned = true;
     }
 #endif

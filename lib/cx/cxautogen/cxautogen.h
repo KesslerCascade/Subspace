@@ -23,7 +23,7 @@ extern string cpassthrough;
 extern bool needmixinimpl;
 
 uint8* lazyPlatformPath(string path);
-bool parseFile(string fname, string* realfn, string srcpath, sa_string searchpath, bool included,
+bool parseFile(strref fname, string* realfn, string srcpath, sa_string searchpath, bool included,
                bool required);
 bool processInterfaces();
 bool processClasses();

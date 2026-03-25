@@ -44,8 +44,6 @@ void Tweaks_applyDefaultSettings(_In_ Tweaks* self)
     }
 }
 
-extern SettingsPage*
-SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
 extern SettingsPage* SubspaceFeature_createSettingsPage(_In_ SubspaceFeature* self, SubspaceUI* ui);   // parent
 #define parent_createSettingsPage(ui) SubspaceFeature_createSettingsPage((SubspaceFeature*)(self), ui)
 SettingsPage* Tweaks_createSettingsPage(_In_ Tweaks* self, SubspaceUI* ui)
@@ -54,5 +52,7 @@ SettingsPage* Tweaks_createSettingsPage(_In_ Tweaks* self, SubspaceUI* ui)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/tweaks/tweaks.auto.inc"
+// clang-format on
 // Autogen ends -------

@@ -9,15 +9,21 @@
 
 typedef struct LogDeferData LogDeferData;
 
-_Ret_valid_
-LogDeferData *logDeferCreate(void);
+// -------- High level interface
+
+_Ret_valid_ LogDeferData* logDeferCreate(void);
+LogDest* logDeferRegister(int level, _In_opt_ LogCategory* catfilter, _In_ LogDeferData* deferdata);
+
+// -------- Low level interface
 
 // for use with logRegisterDest along with the userdata returned from logdeferCreate
-void logDeferDest(int level, _In_opt_ LogCategory *cat, int64 timestamp, _In_opt_ strref msg, uint32 batchid, _In_opt_ void *userdata);
+void logDeferDest(int level, _In_opt_ LogCategory* cat, int64 timestamp, _In_opt_ strref msg,
+                  uint32 batchid, _In_opt_ void* userdata);
 
 // Atomically registers a new destination with the logging system, while also transferring
 // the contents of the defer buffer to the new destination. The defer buffer is destroyed
 // during the process and may not be re-used.
-_Ret_opt_valid_
-LogDest *logRegisterDestWithDefer(int maxlevel, _In_opt_ LogCategory *catfilter, _In_ LogDestFunc dest, _In_opt_ void *userdata,
-                                  _In_opt_ _Post_invalid_ LogDest *deferdest);
+_Ret_opt_valid_ LogDest*
+logRegisterDestWithDefer(int maxlevel, _In_opt_ LogCategory* catfilter, _In_ LogDestMsg msgfunc,
+                         _In_opt_ LogDestBatchDone batchfunc, _In_opt_ LogDestClose closefunc,
+                         _In_opt_ void* userdata, _In_opt_ _Post_invalid_ LogDest* deferdest);

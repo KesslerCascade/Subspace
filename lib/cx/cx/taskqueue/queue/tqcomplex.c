@@ -552,5 +552,7 @@ bool ComplexTaskQueue__queueMaint(_In_ ComplexTaskQueue* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/queue/tqcomplex.auto.inc"
+// clang-format on
 // Autogen ends -------

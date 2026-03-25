@@ -2,6 +2,7 @@
 #include "ftl/combatcontrol.h"
 #include "ftl/commandgui.h"
 #include "ftl/completeship.h"
+#include "ftl/equipment.h"
 #include "ftl/filehelper.h"
 #include "ftl/ftlbutton.h"
 #include "ftl/gameover.h"
@@ -193,6 +194,45 @@ DisasmTrace CommandGui_RunCommand_SHIP_trace = {
              { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ScoreKeeper::UnlockShip
               { DT_OP(FINISH) } },
     .out  = { &SYM(ScoreKeeper_UnlockShip) }
+};
+
+DisasmTrace CommandGui_RunCommand_WEAPON_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "WEAPON ",
+    .ops  = { { DT_OP(SKIP), .imin = 20, .imax = 40, .flow = DT_FLOW_JMP_BOTH },
+             { I_ADD,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CommandGui_equipScreen_offset) } },   // this = this->equipScreen
+              { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL Equipment::AddWeapon
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(Equipment_AddWeapon) }
+};
+
+DisasmTrace CommandGui_RunCommand_DRONE_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "DRONE ",
+    .ops  = { { DT_OP(SKIP), .imin = 20, .imax = 40, .flow = DT_FLOW_JMP_BOTH },
+             { I_ADD,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argsym = { 0, &SYM(CommandGui_equipScreen_offset) } },   // this = this->equipScreen
+              { DT_OP(SKIP), .imin = 0, .imax = 6 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL Equipment::AddDrone
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(Equipment_AddDrone) }
+};
+
+DisasmTrace CommandGui_RunCommand_DRONES_trace = {
+    .c    = DTRACE_STRREFS,
+    .cstr = "DRONES ",
+    .ops  = { { DT_OP(SKIP), .imin = 20, .imax = 26 },
+             { I_MOV, .argf = { ARG_REG }, .args = { { REG_ECX } } },
+             { DT_OP(SKIP), .imin = 0, .imax = 4 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ShipManager::ModifyDroneCount
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_ModifyDroneCount) }
 };
 
 INITWRAP(CommandGui_IsPaused);
@@ -661,4 +701,32 @@ FuncInfo FUNCINFO(CommandGui_RenderPause) = {
     .stdcall = true,
     .args    = { { 4, ARG_PTR, REG_ECX, false } },
     .rettype = RET_VOID
+};
+
+DisasmTrace CommandGui_ForceJumpComplete_trace = {
+    .c    = DTRACE_ADDR,
+    .csym = &SYM(CommandGui_ForceJumpComplete),
+    .ops  = { { DT_OP(SKIP), .imin = 3, .imax = 10, .flow = DT_FLOW_JMP_BOTH },
+             { I_MOV,
+                .argf   = { 0, ARG_ADDR },
+                .argsym = { 0, &SYM(CommandGui_shipComplete_offset) } },   // this->shipComplete
+              { DT_OP(SKIP), .imin = 3, .imax = 9 },
+             { I_CALL, .argout = { DT_OUT_SYM1 } },   // CALL ShipManager::JumpArrive
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_LEA,
+                .argf   = { ARG_REG },
+                .args   = { { REG_ECX } },
+                .argout = { 0, DT_OUT_SYM2 } },        // this = this->equipScreen
+              { DT_OP(SKIP), .imin = 0, .imax = 3 },
+             { I_CALL, .argout = { DT_OUT_SYM3 } },   // CALL Equipment::Jump
+
+              { DT_OP(FINISH) } },
+    .out  = { &SYM(ShipManager_JumpArrive),          // DT_OUT_SYM1
+              &SYM(CommandGui_equipScreen_offset),   // DT_OUT_SYM2
+              &SYM(Equipment_Jump) }
+};
+
+Symbol SYM(CommandGui_equipScreen_offset) = {
+    SYMNAME("CommandGui->equipScreen"),
+    .find = { { .type = SYMBOL_FIND_DISASM, .disasm = &CommandGui_ForceJumpComplete_trace }, { 0 } }
 };

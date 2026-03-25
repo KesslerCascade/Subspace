@@ -8,15 +8,19 @@
 #include "feature.h"
 #include "subspacegame.h"
 
-typedef struct DamageSource {
-    const char* prev;
+typedef struct EventSource {
+    string prev;
     bool set;
-} DamageSource;
+} EventSource;
 
-// most should be static; special handling needed for this one
-extern DamageSource systemExplodedSrc;
+// most should be static; special handling needed for these two
+extern EventSource systemExplodedSrc;
+extern EventSource hackingDroneSrc;
 
-void damageSourceSet(DamageSource* ds, const char* src);
-void damageSourceFinish(DamageSource* ds);
+void _eventSourceSet(EventSource* es, string* cur, strref src);
+void _eventSourceFinish(EventSource* es, string* cur);
+#define eventSourceSet(type, es, src) _eventSourceSet(es, &gc.cur##type##Source, src)
+#define eventSourceFinish(type, es)   _eventSourceFinish(es, &gc.cur##type##Source)
+
 void runTrackerHandleUpdate(bool r);
 bool runTrackerRenderWarning(void);

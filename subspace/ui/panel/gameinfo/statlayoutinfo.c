@@ -53,5 +53,7 @@ void StatLayoutInfo_destroy(_In_ StatLayoutInfo* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/panel/gameinfo/statlayoutinfo.auto.inc"
+// clang-format on
 // Autogen ends -------

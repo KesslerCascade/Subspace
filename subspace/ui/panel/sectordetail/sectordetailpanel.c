@@ -36,5 +36,7 @@ bool SectorDetailPanel_make(_In_ SectorDetailPanel* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/panel/sectordetail/sectordetailpanel.auto.inc"
+// clang-format on
 // Autogen ends -------

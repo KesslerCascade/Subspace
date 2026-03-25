@@ -2,8 +2,6 @@
 #include "ftl/ftl.h"
 #include "hook/function.h"
 
-typedef struct CombatControl CombatControl;
-
 extern DisasmTrace CombatControl_RenderTarget_trace;
 
 int subspace_CombatControl_RenderTarget_pre(CombatControl* self);

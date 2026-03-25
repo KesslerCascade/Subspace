@@ -1,4 +1,5 @@
 #include "logentspec.h"
+#include "proto.h"
 
 LogEntSpec Log_Scrap = {
     .id         = "Scrap",
@@ -56,4 +57,43 @@ LogEntSpec Log_Start = {
     .priority   = 0,
     .paramTypes = { LP_STRING, LP_STRING, LP_INT, LP_INT       },
     .paramNames = { "ship",    "name",    "seed", "difficulty" }
+};
+
+// Iventory tracking
+
+const char* InventoryTypeNames[INVT_Count] = { NULL, "Weapon", "Drone", "Augment" };
+
+const char* InventoryLocationNames[INVL_Count] = { NULL,     "Cargo",    "Weapons",
+                                                   "Drones", "Augments", "Overflow" };
+
+LogEntSpec Log_InvAdd = {
+    .id         = "InvAdd",
+    .numParams  = 4,
+    .priority   = 16,
+    .paramTypes = { LP_STRING, LP_STRING, LP_STRING, LP_STRING  },
+    .paramNames = { "source",  "type",    "name",    "location" }
+};
+
+LogEntSpec Log_InvMove = {
+    .id         = "InvMove",
+    .numParams  = 4,
+    .priority   = 5,
+    .paramTypes = { LP_STRING, LP_STRING, LP_STRING, LP_STRING },
+    .paramNames = { "type",    "name",    "from",    "to"      }
+};
+
+LogEntSpec Log_InvRemove = {
+    .id         = "InvRemove",
+    .numParams  = 4,
+    .priority   = 14,
+    .paramTypes = { LP_STRING, LP_STRING, LP_STRING, LP_STRING  },
+    .paramNames = { "disp",    "type",    "name",    "location" }
+};
+
+LogEntSpec Log_Resource = {
+    .id         = "Resource",
+    .numParams  = 4,
+    .priority   = 13,
+    .paramTypes = { LP_STRING, LP_STRING, LP_INT,   LP_INT  },
+    .paramNames = { "source",  "type",    "amount", "total" }
 };

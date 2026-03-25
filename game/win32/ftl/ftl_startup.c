@@ -1,9 +1,9 @@
-#include <windows.h>
-
 #include "ftl/capp.h"
 #include "ftl/osdep.h"
 #include "ftl/startup.h"
 #include "hook/disasmtrace.h"
+
+#include <windows.h>
 
 INITWRAP(sil_main);
 Symbol SYM(sil_main) = {

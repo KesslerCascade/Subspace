@@ -13,22 +13,17 @@
 #include "input/keybinds.h"
 #include "patch/patchlist.h"
 
-void practiceSetSave(const char* fn)
+void practiceSetSave(strref fn)
 {
     if (!PracticeMode_feature.enabled)
         return;
 
-    if (gs.practiceSave)
-        free(gs.practiceSave);
-
-    int l           = strlen(fn);
-    gs.practiceSave = malloc(l + 1);
-    memcpy(gs.practiceSave, fn, l + 1);
+    strDup(&gs.practiceSave, fn);
 }
 
 void practiceLoad()
 {
-    if (!PracticeMode_feature.enabled || !gs.practiceSave)
+    if (!PracticeMode_feature.enabled || strEmpty(gs.practiceSave))
         return;
 
     WorldManager* world = CApp_world(theApp);
@@ -49,15 +44,15 @@ void practiceLoad()
         }
 
         basic_string fname;
-        basic_string_set(&fname, gs.practiceSave);
+        basic_string_set_str(&fname, gs.practiceSave);
         WorldManager_LoadGame(world, &fname);
         basic_string_destroy(&fname);
 
         // without this the game stays at the menu after loading
         MainMenu_Close(menu);
 
-        ControlMsg* msg = controlNewMsg("GameState", 1);
-        controlMsgInt(msg, 0, "state", GAME_PRACTICE);
+        ControlMsg* msg = controlMsgCreate(_S"GameState");
+        cfieldSet(msg, _S"state", int32, GAME_PRACTICE);
         controlClientQueue(msg);
     }
 }
@@ -101,8 +96,8 @@ static void practicemode_key_cheats_cb(int key, int flags)
 }
 
 static KeyBind PracticeMode_keybinds[] = {
-    { .name = "practicemode_revert", .context = KB_CTX_GAME, .func = practicemode_key_revert_cb },
-    { .name      = "practicemode_cheats",
+    { .name = _S"practicemode_revert", .context = KB_CTX_GAME, .func = practicemode_key_revert_cb },
+    { .name      = _S"practicemode_cheats",
      .context   = KB_CTX_GAME,
      .flags_exc = KB_JUMPING,
      .func      = practicemode_key_cheats_cb },
@@ -122,7 +117,7 @@ Patch* PracticeMode_patches[] = {
 };
 
 SubspaceFeature PracticeMode_feature = {
-    .name            = "PracticeMode",
+    .name            = _S"PracticeMode",
     .enable          = practiceMode_Enable,
     .requiredPatches = PracticeMode_patches,
     .keybinds        = PracticeMode_keybinds,

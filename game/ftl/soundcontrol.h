@@ -4,8 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct SoundControl SoundControl;
-
 // FTL functions & wrappers below
 
 DECLSYM(SoundControl_Sounds);

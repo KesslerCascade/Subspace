@@ -29,5 +29,7 @@ uint32 UserFuncTask_run(_In_ UserFuncTask* self, _In_ TaskQueue* tq, _In_ TQWork
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/userfunctask.auto.inc"
+// clang-format on
 // Autogen ends -------

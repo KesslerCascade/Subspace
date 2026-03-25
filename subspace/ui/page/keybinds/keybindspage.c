@@ -348,5 +348,7 @@ void KeybindsPage_cancelBind(_In_ KeybindsPage* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/page/keybinds/keybindspage.auto.inc"
+// clang-format on
 // Autogen ends -------

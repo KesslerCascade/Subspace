@@ -165,5 +165,7 @@ void KBMgr_destroy(_In_ KBMgr* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "kbmgr/kbmgr.auto.inc"
+// clang-format on
 // Autogen ends -------

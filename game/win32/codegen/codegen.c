@@ -1,3 +1,5 @@
+#include <cx/utils/lazyinit.h>
+
 #include <windows.h>
 
 #include "codegen_private.h"
@@ -26,7 +28,7 @@ CRITICAL_SECTION cgCrit;
 
 #define ALIGNED(x) (((x + ALIGN - 1) / ALIGN) * ALIGN)
 
-static lazy_init codegen_is_init;
+static LazyInitState codegen_is_init;
 
 static void cgInit(void* dummy)
 {
@@ -44,7 +46,7 @@ static void cgInit(void* dummy)
 
 unsigned char* cgReserve(int maxsize)
 {
-    lazyinit(&codegen_is_init, cgInit, NULL);
+    lazyInit(&codegen_is_init, cgInit, NULL);
 
     EnterCriticalSection(&cgCrit);
     if (inProgress)   // we already own the critical section and
@@ -88,7 +90,7 @@ fail:
 
 bool cgComplete(int actualsize)
 {
-    lazyinit(&codegen_is_init, cgInit, NULL);
+    lazyInit(&codegen_is_init, cgInit, NULL);
 
     bool ret = true;
     DWORD dummy;
@@ -118,7 +120,7 @@ bool cgComplete(int actualsize)
 
 bool cgStartBatch()
 {
-    lazyinit(&codegen_is_init, cgInit, NULL);
+    lazyInit(&codegen_is_init, cgInit, NULL);
 
     EnterCriticalSection(&cgCrit);
     if (inProgress || batch)
@@ -141,7 +143,7 @@ fail:
 
 bool cgEndBatch()
 {
-    lazyinit(&codegen_is_init, cgInit, NULL);
+    lazyInit(&codegen_is_init, cgInit, NULL);
 
     EnterCriticalSection(&cgCrit);
     if (inProgress || !batch)

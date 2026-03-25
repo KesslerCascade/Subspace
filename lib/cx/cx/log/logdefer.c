@@ -26,7 +26,7 @@ _Use_decl_annotations_
 void logDeferDest(int level, LogCategory *cat, int64 timestamp, strref msg, uint32 batchid, void *userdata)
 {
     LogDeferData *dd = (LogDeferData *)userdata;
-    if (!dd || level == -1)
+    if (!dd)
         return;
 
     LogDeferEntry *de = xaAllocStruct(LogDeferEntry, XA_Zero);
@@ -43,7 +43,9 @@ void logDeferDest(int level, LogCategory *cat, int64 timestamp, strref msg, uint
 }
 
 _Use_decl_annotations_
-LogDest *logRegisterDestWithDefer(int maxlevel, LogCategory *catfilter, LogDestFunc dest, void *userdata, LogDest *deferdest)
+LogDest* logRegisterDestWithDefer(int maxlevel, LogCategory* catfilter, LogDestMsg msgfunc,
+                                  LogDestBatchDone batchfunc, LogDestClose closefunc,
+                                  void* userdata, LogDest* deferdest)
 {
     logCheckInit();
     if (!atomicLoad(bool, &_log_running, Acquire))
@@ -51,14 +53,16 @@ LogDest *logRegisterDestWithDefer(int maxlevel, LogCategory *catfilter, LogDestF
 
     if (!deferdest) {
         // just a regular registration in this case
-        return logRegisterDest(maxlevel, catfilter, dest, userdata);
+        return logRegisterDest(maxlevel, catfilter, msgfunc, batchfunc, closefunc, userdata);
     }
 
     LogDest *ndest = xaAlloc(sizeof(LogDest), XA_Zero);
 
     ndest->maxlevel = maxlevel;
     ndest->catfilter = catfilter;
-    ndest->func = dest;
+    ndest->msgfunc   = msgfunc;
+    ndest->batchfunc = batchfunc;
+    ndest->closefunc = closefunc;
     ndest->userdata = userdata;
 
     // swap out the new destination for the deferred one
@@ -71,22 +75,44 @@ LogDest *logRegisterDestWithDefer(int maxlevel, LogCategory *catfilter, LogDestF
         // never be run from two threads at once.
 
         // sanity check
-        if (deferdest->userdata && deferdest->func == logDeferDest) {
+        if (deferdest->userdata && deferdest->msgfunc == logDeferDest) {
             LogDeferData *dd = (LogDeferData *)deferdest->userdata;
             LogDeferEntry *head = dd->head;
             dd->tail = NULL;
             dd->head = NULL;
 
+            uint32 lastbatch = 0;
+            bool inbatch     = false;
+
             // go through linked list and send them all to the real destination
             LogDeferEntry *next;
             while (head) {
+                if (head != dd->head && head->batchid != lastbatch) {
+                    // notify previous batch was completed
+                    if (batchfunc)
+                        batchfunc(head->batchid, ndest->userdata);
+                    lastbatch = head->batchid;
+                    inbatch   = false;
+                }
+
                 next = head->next;
-                if (head->ent.level <= maxlevel && applyCatFilter(catfilter, head->ent.cat))
-                    dest(head->ent.level, head->ent.cat, head->ent.timestamp, head->ent.msg, head->batchid, userdata);
+                if (head->ent.level <= maxlevel && applyCatFilter(catfilter, head->ent.cat)) {
+                    msgfunc(head->ent.level,
+                            head->ent.cat,
+                            head->ent.timestamp,
+                            head->ent.msg,
+                            head->batchid,
+                            userdata);
+                    inbatch = true;
+                }
                 strDestroy(&head->ent.msg);
                 xaFree(head);
                 head = next;
             }
+
+            // notify final batch done
+            if (inbatch && batchfunc)
+                batchfunc(lastbatch, ndest->userdata);
 
             xaFree(dd);
         }
@@ -95,4 +121,10 @@ LogDest *logRegisterDestWithDefer(int maxlevel, LogCategory *catfilter, LogDestF
     xaFree(deferdest);
 
     return ndest;
+}
+
+_Use_decl_annotations_
+LogDest* logDeferRegister(int level, LogCategory* catfilter, LogDeferData* deferdata)
+{
+    return logRegisterDest(level, catfilter, logDeferDest, NULL, NULL, deferdata);
 }

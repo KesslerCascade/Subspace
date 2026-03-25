@@ -1,4 +1,5 @@
 #pragma once
+#include <cx/cx.h>
 
 #include "codegen/asm.h"
 #include "codegen/funcinfo.h"

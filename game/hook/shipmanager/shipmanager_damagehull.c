@@ -8,7 +8,7 @@
 int ShipManager_DamageHull_post(int ret, ShipManager* ship, int dmg, bool force)
 {
     // this is set in ShipSystem::GetExploded, but DamageHull is called right after
-    damageSourceFinish(&systemExplodedSrc);
+    eventSourceFinish(Damage, &systemExplodedSrc);
 
     return ret;
 }

@@ -126,15 +126,15 @@ Patch* InfoBlock_patches[] = { &patch_FTLButton_OnRender,
 
 FeatureSettingsSpec InfoBlock_spec = {
     .size = sizeof(InfoBlockSettings),
-    .ent  = { { .name = "ssver", .type = CF_INT, .off = offsetof(InfoBlockSettings, ssver) },
-             { .name = "ftlver", .type = CF_INT, .off = offsetof(InfoBlockSettings, ftlver) },
-             { .name = "fps", .type = CF_INT, .off = offsetof(InfoBlockSettings, fps) },
-             { .name = "sector", .type = CF_INT, .off = offsetof(InfoBlockSettings, sector) },
+    .ent  = { { .name = _S"ssver", .type = CF_INT, .off = offsetof(InfoBlockSettings, ssver) },
+             { .name = _S"ftlver", .type = CF_INT, .off = offsetof(InfoBlockSettings, ftlver) },
+             { .name = _S"fps", .type = CF_INT, .off = offsetof(InfoBlockSettings, fps) },
+             { .name = _S"sector", .type = CF_INT, .off = offsetof(InfoBlockSettings, sector) },
              { 0 } },
 };
 
 SubspaceFeature InfoBlock_feature = {
-    .name            = "InfoBlock",
+    .name            = _S"InfoBlock",
     .settingsspec    = &InfoBlock_spec,
     .requiredPatches = InfoBlock_patches,
     .requiredSymbols = { &SYM(freetype_easy_printRightAlign),

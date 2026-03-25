@@ -3,8 +3,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct AnimationTracker AnimationTracker;
-
 typedef void (*FUNCTYPE(AnimationTracker_Update))(AnimationTracker* self);
 DECLFUNC(AnimationTracker_Update);
 

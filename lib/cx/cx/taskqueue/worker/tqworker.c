@@ -17,5 +17,7 @@ void TQWorker_onStop(_In_ TQWorker* self, _In_ TaskQueue* tq)
 {}
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/worker/tqworker.auto.inc"
+// clang-format on
 // Autogen ends -------

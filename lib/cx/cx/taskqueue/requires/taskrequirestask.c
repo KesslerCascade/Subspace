@@ -76,5 +76,7 @@ void TaskRequiresTask_destroy(_In_ TaskRequiresTask* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/requires/taskrequirestask.auto.inc"
+// clang-format on
 // Autogen ends -------

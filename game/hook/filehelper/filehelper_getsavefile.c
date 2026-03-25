@@ -7,8 +7,8 @@
 
 basic_string* subspace_FileHelper_getSaveFile(basic_string* out)
 {
-    if (gs.saveFileOverride) {
-        basic_string_set(out, gs.saveFileOverride);
+    if (!strEmpty(gs.saveFileOverride)) {
+        basic_string_set_str(out, gs.saveFileOverride);
         return out;
     }
 

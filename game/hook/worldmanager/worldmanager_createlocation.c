@@ -11,7 +11,7 @@
 #include "patch/patchlist.h"
 #include "subspacegame.h"
 
-static DamageSource eventsrc;
+static EventSource eventsrc;
 
 int WorldManager_CreateLocation_pre(WorldManager* self, Location* loc)
 {
@@ -20,7 +20,7 @@ int WorldManager_CreateLocation_pre(WorldManager* self, Location* loc)
 
     if (RunTracker_feature.enabled && !gc.loadingGame) {
         // any damage that happens during this call is event damage
-        damageSourceSet(&eventsrc, "Event");
+        eventSourceSet(Damage, &eventsrc, _S"Event");
     }
 
     return 1;
@@ -31,24 +31,24 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
     if (gc.loadingGame)
         return;   // don't do this while loading the game
 
-    damageSourceFinish(&eventsrc);
+    eventSourceFinish(Damage, &eventsrc);
 
     LocationEvent* event    = loc ? Location_event(loc) : NULL;
     basic_string* eventname = event ? LocationEvent_eventName(event) : NULL;
 
     if (RunTracker_feature.enabled || SaveManager_feature.enabled) {
         // send beacon details first so savepoint can be updated if needed
-        ControlMsg* msg     = controlNewMsg("Beacon", 6);
+        ControlMsg* msg     = controlMsgCreate(_S"Beacon");
         WorldManager* world = CApp_world(theApp);
         int visits          = Location_visited(loc);
         Pointf* pos         = (Pointf*)loc;   // always the first field in Location
 
-        controlMsgInt(msg, 0, "sector", WorldManager_worldLevel(world) + 1);
-        controlMsgInt(msg, 1, "beacons", ScoreKeeper_stats(SKeeper)[1].current);
-        controlMsgInt(msg, 2, "visit", MAX(visits, 1));
-        controlMsgInt(msg, 3, "x", (int)pos->x);
-        controlMsgInt(msg, 4, "y", (int)pos->y);
-        controlMsgStr(msg, 5, "event", eventname ? eventname->buf : "");
+        cfieldSet(msg, _S"sector", int32, WorldManager_worldLevel(world) + 1);
+        cfieldSet(msg, _S"beacons", int32, ScoreKeeper_stats(SKeeper)[1].current);
+        cfieldSet(msg, _S"visit", int32, max(visits, 1));
+        cfieldSet(msg, _S"x", int32, (int)pos->x);
+        cfieldSet(msg, _S"y", int32, (int)pos->y);
+        cfieldSet(msg, _S"event", strref, eventname ? (strref)eventname->buf : (strref)"");
 
         msg->priority = 2;   // ensure this comes after NewGame and Sector
         controlClientQueue(msg);
@@ -57,7 +57,7 @@ void WorldManager_CreateLocation_post(WorldManager* self, Location* loc)
     if (RunTracker_feature.enabled) {
         if (eventname) {
             int visits = Location_visited(loc);
-            runLogSend(&Log_Event, eventname->buf, 1, MAX(visits, 1));
+            runLogSend(&Log_Event, eventname->buf, 1, max(visits, 1));
         }
     }
 

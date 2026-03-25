@@ -4,11 +4,10 @@ find_package (Threads REQUIRED)
 include (${CX_TOP_SOURCE_DIR}/cmake/werror.cmake)
 include (${CX_TOP_SOURCE_DIR}/cmake/buildtype.cmake)
 
-option (CX_USE_SYSTEM_MALLOC "Use system allocator rather than mimalloc" OFF)
-
 add_subdirectory(closure)
 add_subdirectory(container)
 add_subdirectory(debug)
+add_subdirectory(digest)
 add_subdirectory(format)
 add_subdirectory(fs)
 add_subdirectory(log)
@@ -75,15 +74,21 @@ add_library(cx STATIC
     ${CX_NATVIS_FILES}
     ${CX_CMAKE_FILES})
 
-target_link_libraries(cx ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} mimalloc mbedtls mbedx509 mbedcrypto)
+target_link_libraries(cx ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS})
 target_include_directories(cx SYSTEM PUBLIC ${CX_TOP_SOURCE_DIR} ${CX_TOP_SOURCE_DIR}/cx/include ${CX_TOP_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR})
 target_compile_definitions(cx PRIVATE UNICODE _UNICODE)
 if (CX_COMPILER_IS_MSVC)
     target_link_options(cx PUBLIC /NATVIS:${CMAKE_CURRENT_SOURCE_DIR}/cx.natvis)
 endif()
 
-if (CX_USE_SYSTEM_MALLOC)
+if (CX_MIMALLOC)
+    target_link_libraries(cx mimalloc)
+else()
     target_compile_definitions(cx PRIVATE XALLOC_USE_SYSTEM_MALLOC)
+endif()
+
+if (CX_XP_COMPAT)
+    target_compile_definitions(cx PRIVATE CX_XP_COMPAT)
 endif()
 
 target_compile_definitions(cx PUBLIC

@@ -143,5 +143,7 @@ void ImageLoad_destroy(_In_ ImageLoad* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/image/imageload.auto.inc"
+// clang-format on
 // Autogen ends -------

@@ -166,5 +166,7 @@ void TQThreadPoolRunner_destroy(_In_ TQThreadPoolRunner* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/runner/tqrthreadpool.auto.inc"
+// clang-format on
 // Autogen ends -------

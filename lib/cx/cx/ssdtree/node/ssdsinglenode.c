@@ -159,5 +159,7 @@ bool SSDSingleIter_iterOut(_In_ SSDSingleIter* self, _When_(return == true, _Out
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ssdtree/node/ssdsinglenode.auto.inc"
+// clang-format on
 // Autogen ends -------

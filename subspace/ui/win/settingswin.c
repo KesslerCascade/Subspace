@@ -261,5 +261,7 @@ void SettingsWin_destroy(_In_ SettingsWin* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/win/settingswin.auto.inc"
+// clang-format on
 // Autogen ends -------

@@ -27,5 +27,7 @@ _objfactory_guaranteed FrameAdv* FrameAdv_create(Subspace* ss)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/frameadv/frameadv.auto.inc"
+// clang-format on
 // Autogen ends -------

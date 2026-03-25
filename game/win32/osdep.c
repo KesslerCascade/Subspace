@@ -1,8 +1,8 @@
-#include <windows.h>
-
-#include "int64.h"
-#include "minicrt.h"
 #include "osdep.h"
+#include <cx/xalloc.h>
+#include "int64.h"
+
+#include <windows.h>
 
 static int64_t curFrameTime;
 
@@ -14,21 +14,6 @@ void osWriteDbg(const char* str)
     WriteConsoleA(hstdout, (void*)str, strlen(str), &written, NULL);
 }
 #endif
-
-void osSetCurrentDir(const char* dir)
-{
-    int dlen      = MultiByteToWideChar(CP_UTF8, 0, dir, -1, NULL, 0);
-    wchar_t* dirw = smalloc(dlen * sizeof(wchar_t));
-    MultiByteToWideChar(CP_UTF8, 0, dir, -1, dirw, dlen);
-
-    SetCurrentDirectoryW(dirw);
-    sfree(dirw);
-}
-
-void osSleep(int msec)
-{
-    SleepEx(msec, true);
-}
 
 void osExit(int retcode)
 {
@@ -63,8 +48,8 @@ void osNextFrame()
 bool osAbsolutePathUTF8(const char* fname, char* buf, size_t bufsz)
 {
     bool ret       = false;
-    wchar_t* cbuf  = smalloc(bufsz * 2);
-    wchar_t* cbuf2 = smalloc(bufsz * 2);
+    wchar_t* cbuf  = xaAlloc(bufsz * 2);
+    wchar_t* cbuf2 = xaAlloc(bufsz * 2);
 
     if (MultiByteToWideChar(CP_UTF8, 0, fname, -1, cbuf, bufsz) == 0)
         goto out;
@@ -78,8 +63,8 @@ bool osAbsolutePathUTF8(const char* fname, char* buf, size_t bufsz)
     ret = true;
 
 out:
-    sfree(cbuf);
-    sfree(cbuf2);
+    xaFree(cbuf);
+    xaFree(cbuf2);
     return ret;
 }
 
@@ -87,7 +72,7 @@ bool osWriteFile(const char* fn, uint8_t* buf, size_t sz)
 {
     bool ret     = false;
     int fnlen    = MultiByteToWideChar(CP_UTF8, 0, fn, -1, NULL, 0);
-    wchar_t* fnw = smalloc(fnlen * sizeof(wchar_t));
+    wchar_t* fnw = xaAlloc(fnlen * sizeof(wchar_t));
     MultiByteToWideChar(CP_UTF8, 0, fn, -1, fnw, fnlen);
 
     HANDLE f = CreateFileW(fnw,
@@ -107,6 +92,6 @@ bool osWriteFile(const char* fn, uint8_t* buf, size_t sz)
 out:
     if (f != INVALID_HANDLE_VALUE)
         CloseHandle(f);
-    sfree(fnw);
+    xaFree(fnw);
     return ret;
 }

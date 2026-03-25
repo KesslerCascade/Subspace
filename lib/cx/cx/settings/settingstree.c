@@ -39,5 +39,7 @@ void SettingsTree_destroy(_In_ SettingsTree* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "settings/settingstree.auto.inc"
+// clang-format on
 // Autogen ends -------

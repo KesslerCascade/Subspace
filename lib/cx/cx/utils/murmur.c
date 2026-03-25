@@ -2,24 +2,16 @@
 // Code is in the public domain
 
 #include "murmur.h"
+#include "cx/platform/os.h"
 #include "cx/string.h"
 #include "cx/utils/lazyinit.h"
-
-#ifndef CX_BUILDING_CXAUTOGEN
-#include <mbedtls/entropy.h>
-#endif
 
 static LazyInitState msInit;
 static uint32 murmur_seed;
 
 static void initSeed(void* unused)
 {
-#ifndef CX_BUILDING_CXAUTOGEN
-    mbedtls_entropy_context entropy;
-    mbedtls_entropy_init(&entropy);
-    mbedtls_entropy_func(&entropy, (unsigned char*)&murmur_seed, sizeof(murmur_seed));
-    mbedtls_entropy_free(&entropy);
-#endif
+    osGenRandom((uint8*)&murmur_seed, sizeof(murmur_seed));
 }
 
 _Use_decl_annotations_

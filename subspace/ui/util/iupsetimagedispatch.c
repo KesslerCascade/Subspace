@@ -47,5 +47,7 @@ void IupSetImageDispatch_destroy(_In_ IupSetImageDispatch* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/util/iupsetimagedispatch.auto.inc"
+// clang-format on
 // Autogen ends -------

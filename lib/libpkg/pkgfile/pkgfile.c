@@ -176,5 +176,7 @@ void PkgDirEnt_destroy(_In_ PkgDirEnt* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "pkgfile/pkgfile.auto.inc"
+// clang-format on
 // Autogen ends -------

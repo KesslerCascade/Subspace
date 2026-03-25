@@ -29,6 +29,7 @@ _objinit_guaranteed bool ControlServer_init(_In_ ControlServer* self)
 {
     self->preGameReady = trfifoCreate();
     self->gameEvents   = trfifoCreate();
+    self->logs         = trfifoCreate();
 
     // Autogen begins -----
     saInit(&self->clients, object, 1);
@@ -240,6 +241,7 @@ void ControlServer_destroy(_In_ ControlServer* self)
     saDestroy(&self->clients);
     rwlockDestroy(&self->handler_lock);
     htDestroy(&self->handlers);
+    objRelease(&self->logs);
     objRelease(&self->preGameReady);
     objRelease(&self->gameEvents);
     // Autogen ends -------
@@ -267,5 +269,7 @@ void ControlHandler_destroy(_In_ ControlHandler* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "control/controlserver.auto.inc"
+// clang-format on
 // Autogen ends -------

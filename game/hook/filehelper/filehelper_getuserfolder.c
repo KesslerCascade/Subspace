@@ -7,8 +7,8 @@
 
 basic_string* subspace_FileHelper_getUserFolder(basic_string* out)
 {
-    if (settings.saveOverride) {
-        basic_string_set(out, settings.saveOverride);
+    if (!strEmpty(settings.saveOverride)) {
+        basic_string_set_str(out, settings.saveOverride);
         return out;
     }
 

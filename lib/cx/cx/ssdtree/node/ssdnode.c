@@ -67,5 +67,7 @@ void SSDIterator_destroy(_In_ SSDIterator* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ssdtree/node/ssdnode.auto.inc"
+// clang-format on
 // Autogen ends -------

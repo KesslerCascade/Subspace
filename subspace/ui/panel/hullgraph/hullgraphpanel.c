@@ -301,5 +301,7 @@ void HullGraphPanel_destroy(_In_ HullGraphPanel* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "ui/panel/hullgraph/hullgraphpanel.auto.inc"
+// clang-format on
 // Autogen ends -------

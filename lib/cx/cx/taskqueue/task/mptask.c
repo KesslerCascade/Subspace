@@ -110,5 +110,7 @@ void MultiphaseTask__addPhases(_In_ MultiphaseTask* self, int32 num, MPTPhaseFun
 }
 
 // Autogen begins -----
+// clang-format off
 #include "taskqueue/task/mptask.auto.inc"
+// clang-format on
 // Autogen ends -------

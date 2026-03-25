@@ -3,9 +3,6 @@
 #include "ftl/ftl.h"
 #include "hook/function.h"
 
-typedef struct MainMenu MainMenu;
-typedef struct ShipManager ShipManager;
-
 extern DisasmTrace MainMenu_OnRender_trace;
 
 DECLSYM(MainMenu_OnRender);

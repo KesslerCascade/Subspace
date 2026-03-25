@@ -4,9 +4,6 @@
 #include "ftl/struct.h"
 #include "hook/function.h"
 
-typedef struct AchievementTracker AchievementTracker;
-typedef struct AnimationTracker AnimationTracker;
-
 extern DisasmTrace AchievementTracker_OnLoop_trace;
 extern DisasmTrace AchievementTracker_OnLoop_trace_2;
 
@@ -17,6 +14,9 @@ DECLSYM(AchievementTracker_Tracker);
 
 typedef void (*FUNCTYPE(AchievementTracker_OnLoop))(AchievementTracker* self);
 DECLFUNC(AchievementTracker_OnLoop);
+
+typedef void (*FUNCTYPE(AchievementTracker_SetFlag))(AchievementTracker* self, string* flag);
+DECLFUNC(AchievementTracker_SetFlag);
 
 typedef void (*FUNCTYPE(AchievementTracker_ResetFlags))(AchievementTracker* self);
 DECLFUNC(AchievementTracker_ResetFlags);

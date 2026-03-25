@@ -1,6 +1,9 @@
 #pragma once
 
+#include <cx/cx.h>
 #include <stdbool.h>
+#include <stdint.h>
+#include "ftl/types.h"
 
 // Helper macro for getting members of structures where the offsets are found at runtime through
 // disassembly. This uses the symbol resolution system to automatically calculate and cache the
@@ -8,6 +11,9 @@
 
 #define MEMBER(base, ParentType, parent, MemberType, member) \
     (*(MemberType*)((((uintptr_t)(parent)) + (symAddr(base, ParentType##_##member##_offset)))))
+
+#define MEMBER_FIXED(base, ParentType, parent, MemberType, offset) \
+    (*(MemberType*)((((uintptr_t)(parent)) + (offset))))
 
 typedef struct GL_Color {
     float r;
@@ -28,6 +34,7 @@ typedef struct basic_string {
 
 void basic_string_reset(basic_string* str);
 void basic_string_set(basic_string* str, const char* src);
+void basic_string_set_str(basic_string* str, strref src);
 void basic_string_destroy(basic_string* str);
 
 typedef struct vector {
@@ -35,6 +42,24 @@ typedef struct vector {
     void* finish;           // just past last element
     void* end_of_storage;   // just past end of allocated space
 } vector;
+
+typedef struct rb_tree_node rb_tree_node;
+typedef struct rb_tree_node {
+    int color;
+    rb_tree_node* parent;
+    rb_tree_node* left;
+    rb_tree_node* right;
+} rb_tree_node;
+
+typedef struct rb_tree_header {
+    rb_tree_node h;
+    size_t node_count;
+} rb_tree_header;
+
+typedef struct rb_tree {
+    int pad;   // void* ?
+    rb_tree_header h;
+} rb_tree;
 
 typedef struct TextString {
     basic_string data;
@@ -58,3 +83,10 @@ typedef struct Damage {
     bool bFriendlyFire;
     int iStun;
 } Damage;
+
+typedef struct EquipmentBoxItem {
+    ProjectileFactory* pWeapon;
+    Drone* pDrone;
+    CrewMember* pCrew;
+    AugmentBlueprint* augment;
+} EquipmentBoxItem;

@@ -152,5 +152,7 @@ void GameMgr_checkStartupValidate(_In_ GameMgr* self)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "gamemgr/gamemgr.auto.inc"
+// clang-format on
 // Autogen ends -------

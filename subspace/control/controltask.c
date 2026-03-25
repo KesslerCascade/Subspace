@@ -13,7 +13,7 @@
 
 void ControlTask_destroy(_In_ ControlTask* self)
 {
-    controlMsgFree(self->msg, CF_ALLOC_AUTO);
+    controlMsgDestroy(self->msg);
     // Autogen begins -----
     objRelease(&self->client);
     objRelease(&self->handler);
@@ -45,103 +45,15 @@ uint32 ControlTask_run(_In_ ControlTask* self, _In_ TaskQueue* tq, _In_ TQWorker
     if (self->handler->needinst && !inst)
         return TASK_Result_Success;
 
-    hashtable fields;
-    htInit(&fields, string, stvar, self->msg->hdr.nfields * 2);
-
-    for (int i = 0; i < self->msg->hdr.nfields; i++) {
-        ControlField* f = self->msg->fields[i];
-        stvar val       = { 0 };
-        if (!(f->h.flags & CF_ARRAY)) {
-            switch (f->h.ftype) {
-            case CF_INT:
-                if (f->h.flags & CF_UNSIGNED) {
-                    val.type           = stType(uint32);
-                    val.data.st_uint32 = f->d.cfd_uint;
-                } else {
-                    val.type          = stType(int32);
-                    val.data.st_int32 = f->d.cfd_int;
-                }
-                break;
-            case CF_INT64:
-                if (f->h.flags & CF_UNSIGNED) {
-                    val.type           = stType(uint64);
-                    val.data.st_uint64 = f->d.cfd_uint64;
-                } else {
-                    val.type          = stType(int64);
-                    val.data.st_int64 = f->d.cfd_int64;
-                }
-                break;
-            case CF_FLOAT32:
-                val.type            = stType(float32);
-                val.data.st_float32 = f->d.cfd_float32;
-                break;
-            case CF_FLOAT64:
-                val.type            = stType(float64);
-                val.data.st_float64 = f->d.cfd_float64;
-                break;
-            case CF_BOOL:
-                val.type         = stType(bool);
-                val.data.st_bool = f->d.cfd_bool;
-                break;
-            case CF_STRING:
-                val.type = stType(string);
-                strDup(&val.data.st_string, f->d.cfd_str);
-                break;
-            }
-        } else {
-            val.type = stType(sarray);
-            switch (f->h.ftype) {
-            case CF_INT:
-                if (f->h.flags & CF_UNSIGNED)
-                    saInit(&val.data.st_sarray, uint32, f->count);
-                else
-                    saInit(&val.data.st_sarray, int32, f->count);
-
-                saSetSize(&val.data.st_sarray, f->count);
-                memcpy(val.data.st_sarray.a, f->d.cfd_int_arr, f->count * sizeof(int32));
-                break;
-            case CF_INT64:
-                if (f->h.flags & CF_UNSIGNED)
-                    saInit(&val.data.st_sarray, uint64, f->count);
-                else
-                    saInit(&val.data.st_sarray, int64, f->count);
-
-                saSetSize(&val.data.st_sarray, f->count);
-                memcpy(val.data.st_sarray.a, f->d.cfd_int64_arr, f->count * sizeof(int64));
-                break;
-            case CF_FLOAT32:
-                saInit(&val.data.st_sarray, float32, f->count);
-                saSetSize(&val.data.st_sarray, f->count);
-                memcpy(val.data.st_sarray.a, f->d.cfd_float32_arr, f->count * sizeof(float32));
-                break;
-            case CF_FLOAT64:
-                saInit(&val.data.st_sarray, float64, f->count);
-                saSetSize(&val.data.st_sarray, f->count);
-                memcpy(val.data.st_sarray.a, f->d.cfd_float64_arr, f->count * sizeof(float64));
-                break;
-            case CF_BOOL:
-                saInit(&val.data.st_sarray, bool, f->count);
-                saSetSize(&val.data.st_sarray, f->count);
-                memcpy(val.data.st_sarray.a, f->d.cfd_bool_arr, f->count * sizeof(bool));
-                break;
-            case CF_STRING:
-                saClone(&val.data.st_sarray, f->d.cfd_str_arr);
-                break;
-            }
-        }
-
-        if (val.type != 0)
-            htInsertC(&fields, string, (string)f->h.name, stvar, &val);
-    }
-
-    self->handler->cb(inst, self->client, self->msg, fields);
+    self->handler->cb(inst, self->client, self->msg, self->msg->fields);
 
     objRelease(&inst);
-    htDestroy(&fields);
 
     return TASK_Result_Success;
 }
 
 // Autogen begins -----
+// clang-format off
 #include "control/controltask.auto.inc"
+// clang-format on
 // Autogen ends -------

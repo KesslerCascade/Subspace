@@ -106,14 +106,14 @@ enum HASHTABLE_GROWBY_ENUM {
 };
 
 enum HASHTABLE_GROW_ENUM {
-    HT_GROW_At75    = 0x00,     // Grow at 75% full (balanced)
-    HT_GROW_At50    = 0x01,     // Grow at 50% full (better performance)
-    HT_GROW_At90    = 0x02,     // Grow at 90% full (worse performance, memory efficient)
+    HT_GROW_At75    = 0x00,   // Grow at 75% full (balanced)
+    HT_GROW_At50    = 0x01,   // Grow at 50% full (better performance)
+    HT_GROW_At90    = 0x02,   // Grow at 90% full (worse performance, memory efficient)
     HT_GROW_AT_MASK = 0x0f,
 
     // some presets
-    HT_GROW_MaxSpeed = (int)HT_GROW_At50 | (int)HT_GROW_By300,
-    HT_GROW_MinSize  = (int)HT_GROW_At90 | (int)HT_GROW_By50,
+    HT_GROW_MaxSpeed = (uint32)HT_GROW_At50 | (uint32)HT_GROW_By300,
+    HT_GROW_MinSize  = (uint32)HT_GROW_At90 | (uint32)HT_GROW_By50,
 };
 
 enum HASHTABLE_FUNC_FLAGS_ENUM {

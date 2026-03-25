@@ -1,3 +1,4 @@
+#include <cx/format.h>
 #include "ftl/stdlib.h"
 
 #include "control/controlclient.h"
@@ -22,33 +23,30 @@ void saveManagerAutoSave(WorldManager* world)
     basic_string_reset(&sfile);
     FileHelper_getSaveFile(&sfile);
 
-    if (gs.saveFileOverride)
-        free(gs.saveFileOverride);   // shouldn't be possible? but don't leak anyway
-
-    char* tempfn = malloc(1024);
+    char* tempfn = xa_malloc(1024);
     if (!osAbsolutePathUTF8(sfile.buf, tempfn, 1024)) {
-        free(tempfn);
+        xa_free(tempfn);
         basic_string_destroy(&sfile);
         return;
     }
     size_t len = strlen(tempfn);
 
-    gs.saveFileOverride = malloc(len + 19);
-    memcpy(gs.saveFileOverride, tempfn, len);
-    xsnprintf(gs.saveFileOverride + len, 19, ".subspace-%08d", lcg_random() % 100000000);
+    strFormat(&gs.saveFileOverride,
+              _S"${string}.subspace-${0int(8)}",
+              stvar(strref, (strref)tempfn),
+              stvar(int32, lcg_random() % 100000000));
     basic_string_destroy(&sfile);
-    free(tempfn);
+    xa_free(tempfn);
 
     WorldManager_SaveGame(world);
 
     // notify main process to pick up the save file
-    ControlMsg* msg = controlNewMsg("AutoSave", 1);
-    controlMsgStr(msg, 0, "filename", gs.saveFileOverride);
+    ControlMsg* msg = controlMsgCreate(_S"AutoSave");
+    cfieldSet(msg, _S"filename", strref, gs.saveFileOverride);
     msg->priority = 100;   // AutoSave should happen last after everything else this frame
     controlClientQueue(msg);
 
-    free(gs.saveFileOverride);
-    gs.saveFileOverride   = NULL;
+    strDestroy(&gs.saveFileOverride);
     gs.autoSaveInProgress = false;
 }
 
@@ -58,6 +56,6 @@ Patch* SaveManager_patches[] = { &patch_FileHelper_getSaveFile,
                                  &patch_WorldManager_CreateLocation,
                                  0 };
 
-SubspaceFeature SaveManager_feature = { .name            = "SaveManager",
+SubspaceFeature SaveManager_feature = { .name            = _S"SaveManager",
                                         .requiredPatches = SaveManager_patches,
                                         .requiredSymbols = { 0 } };

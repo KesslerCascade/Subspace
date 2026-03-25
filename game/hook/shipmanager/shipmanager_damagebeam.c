@@ -3,7 +3,7 @@
 #include "hook/hook.h"
 #include "patch/patchlist.h"
 
-static DamageSource beamsrc;
+static EventSource beamsrc;
 
 // ---- Hooks ----------------
 
@@ -14,7 +14,7 @@ bool ShipManager_DamageBeam_pre(ShipManager* self, Pointf current, Pointf last, 
         CompleteShip* playerShip       = world ? WorldManager_playerShip(world) : NULL;
         ShipManager* playerShipManager = playerShip ? CompleteShip_shipManager(playerShip) : NULL;
         if (damage.iDamage > 0 && self == playerShipManager) {
-            damageSourceSet(&beamsrc,"Beam");
+            eventSourceSet(Damage, &beamsrc, _S"Beam");
         }
     }
 
@@ -24,7 +24,7 @@ bool ShipManager_DamageBeam_pre(ShipManager* self, Pointf current, Pointf last, 
 bool ShipManager_DamageBeam_post(bool ret, ShipManager* self, Pointf current, Pointf last,
                                  Damage damage)
 {
-    damageSourceFinish(&beamsrc);
+    eventSourceFinish(Damage, &beamsrc);
     return ret;
 }
 

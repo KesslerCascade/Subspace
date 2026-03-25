@@ -56,5 +56,7 @@ bool FeatureRegistry_isEnabled(_In_ FeatureRegistry* self, _In_opt_ strref name)
 }
 
 // Autogen begins -----
+// clang-format off
 #include "feature/featureregistry.auto.inc"
+// clang-format on
 // Autogen ends -------

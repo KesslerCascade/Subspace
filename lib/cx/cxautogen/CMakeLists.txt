@@ -8,6 +8,7 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "FreeBSD" OR ${CMAKE_SYSTEM_NAME} MATCHES "Linux
 	../cx/platform/unix/unix_error.c
 	../cx/platform/unix/unix_fs_file.c
 	../cx/platform/unix/unix_fs_fs.c
+	../cx/platform/unix/unix_random.c
 	../cx/platform/unix/unix_os.c
 	../cx/platform/unix/unix_time_clock.c)
     if(${CMAKE_SYSTEM_NAME} MATCHES "Linux")
@@ -25,6 +26,7 @@ elseif(${CMAKE_SYSTEM_NAME} MATCHES "Windows")
 	../cx/platform/win/win_fs_file.c
 	../cx/platform/win/win_fs_fs.c
 	../cx/platform/win/win_futex.c
+	../cx/platform/win/win_random.c
 	../cx/platform/win/win_os.c
 	../cx/platform/win/win_time_clock.c)
 else()
@@ -112,9 +114,19 @@ add_executable(cxautogen
 
 target_compile_definitions(cxautogen PRIVATE CX_BUILDING_CXAUTOGEN)
 
-target_link_libraries(cxautogen ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} mimalloc pcre2-8-object)
+target_link_libraries(cxautogen ${CMAKE_THREAD_LIBS_INIT} ${CMAKE_DL_LIBS} pcre2-8-object)
 target_include_directories(cxautogen PRIVATE ${CMAKE_CURRENT_SOURCE_DIR} SYSTEM PUBLIC ${CX_TOP_SOURCE_DIR} ${CX_TOP_SOURCE_DIR}/cx/include ${CX_TOP_BINARY_DIR})
 set_property(TARGET cxautogen PROPERTY FOLDER "utils")
+
+if (CX_COMPILER_IS_MSVC)
+    target_link_options(cxautogen PUBLIC /NATVIS:${CMAKE_CURRENT_SOURCE_DIR}/../cx/cx.natvis)
+endif()
+
+if (CX_MIMALLOC)
+    target_link_libraries(cxautogen mimalloc)
+else()
+    target_compile_definitions(cxautogen PRIVATE XALLOC_USE_SYSTEM_MALLOC)
+endif()
 
 export(TARGETS cxautogen FILE "${CMAKE_BINARY_DIR}/cxautogen-config.cmake")
 
